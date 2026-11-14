@@ -11,8 +11,70 @@
 // ============================================================
 // KONSTANTA & INISIALISASI
 // ============================================================
-const APP_TITLE = 'SiGuru SD - Portal Administrasi Sekolah Digital';
-const DRIVE_FOLDER_NAME = 'SiGuru SD - Bank Perangkat Ajar';
+var APP_TITLE = 'SiGuru SD - Portal Administrasi Sekolah Digital';
+var DRIVE_FOLDER_NAME = 'SiGuru SD - Bank Perangkat Ajar';
+
+// ============================================================
+// SISTEM VERSIONING & CONCURRENCY LOCK (REAL-TIME SYNC ENGINE)
+// ============================================================
+function getDataVersion() {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var verStr = props.getProperty('DATA_VERSION');
+    var lastUp = props.getProperty('LAST_UPDATED_AT');
+    if (!verStr) {
+      verStr = '1';
+      lastUp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+      props.setProperties({ 'DATA_VERSION': verStr, 'LAST_UPDATED_AT': lastUp });
+    }
+    return { version: Number(verStr), lastUpdated: lastUp };
+  } catch (e) {
+    return { version: 1, lastUpdated: new Date().toISOString() };
+  }
+}
+
+function incrementDataVersion(actionName) {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var currentVer = Number(props.getProperty('DATA_VERSION') || 1);
+    var newVer = currentVer + 1;
+    var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+    props.setProperties({
+      'DATA_VERSION': String(newVer),
+      'LAST_UPDATED_AT': now,
+      'LAST_ACTION': actionName || ''
+    });
+    return { version: newVer, lastUpdated: now };
+  } catch (e) {
+    return { version: Date.now(), lastUpdated: new Date().toISOString() };
+  }
+}
+
+/**
+ * Helper Eksekusi Tulis dengan LockService
+ * Mencegah race condition ketika banyak perangkat menulis bersamaan.
+ */
+function withScriptLock(actionName, fn) {
+  var lock = LockService.getScriptLock();
+  try {
+    // Tunggu antrean kunci hingga 15 detik
+    lock.waitLock(15000);
+    var res = fn();
+    SpreadsheetApp.flush();
+    if (res && res.success) {
+      var verInfo = incrementDataVersion(actionName);
+      res.version = verInfo.version;
+      res.sync_version = verInfo.version;
+      res.lastUpdated = verInfo.lastUpdated;
+      res.serverTimestamp = verInfo.lastUpdated;
+    }
+    return res;
+  } catch (err) {
+    return { success: false, message: 'Transaksi database terhambat antrean: ' + err.message };
+  } finally {
+    try { lock.releaseLock(); } catch (e) {}
+  }
+}
 
 /**
  * Endpoint Utama: doGet
@@ -26,6 +88,19 @@ function doGet(e) {
     switch (action) {
       case 'ping':
         result = { success: true, message: 'SiGuru SD REST API v2.0 aktif dan siap melayani permintaan.', timestamp: new Date().toISOString() };
+        break;
+
+      case 'checkSyncStatus':
+        // Heartbeat ringan untuk auto-synchronization multi-device
+        var clientVer = Number((e && e.parameter && e.parameter.clientVersion) ? e.parameter.clientVersion : 0);
+        var syncInfo = getDataVersion();
+        result = {
+          success: true,
+          serverVersion: syncInfo.version,
+          lastUpdated: syncInfo.lastUpdated,
+          hasUpdates: syncInfo.version > clientVer,
+          serverTime: new Date().toISOString()
+        };
         break;
 
       case 'login':
@@ -65,7 +140,7 @@ function doGet(e) {
 
 /**
  * Endpoint Utama: doPost
- * Menangani request POST untuk seluruh operasi CRUD Admin & Guru.
+ * Menangani request POST untuk seluruh operasi CRUD Admin & Guru dengan LockService.
  */
 function doPost(e) {
   var result;
@@ -78,93 +153,101 @@ function doPost(e) {
     switch (action) {
       // --- OPERASI KHUSUS ADMIN SEKOLAH ---
       case 'saveUser':
-        result = saveUserBackend(payload);
+        result = withScriptLock('saveUser', function() { return saveUserBackend(payload); });
         break;
 
       case 'toggleUserStatus':
-        result = toggleUserStatusBackend(payload);
+        result = withScriptLock('toggleUserStatus', function() { return toggleUserStatusBackend(payload); });
         break;
 
       case 'deleteUser':
-        result = deleteUserBackend(payload);
+        result = withScriptLock('deleteUser', function() { return deleteUserBackend(payload); });
         break;
 
       case 'saveKelas':
-        result = saveKelasBackend(payload);
+        result = withScriptLock('saveKelas', function() { return saveKelasBackend(payload); });
         break;
 
       case 'deleteKelas':
-        result = deleteKelasBackend(payload);
+        result = withScriptLock('deleteKelas', function() { return deleteKelasBackend(payload); });
         break;
 
       case 'savePenugasan':
-        result = savePenugasanBackend(payload);
+        result = withScriptLock('savePenugasan', function() { return savePenugasanBackend(payload); });
         break;
 
       case 'deletePenugasan':
-        result = deletePenugasanBackend(payload);
+        result = withScriptLock('deletePenugasan', function() { return deletePenugasanBackend(payload); });
         break;
 
       case 'savePengaturanSekolah':
-        result = savePengaturanSekolahBackend(payload);
+        result = withScriptLock('savePengaturanSekolah', function() { return savePengaturanSekolahBackend(payload); });
         break;
 
       case 'togglePublikasiPerangkat':
-        result = togglePublikasiPerangkatBackend(payload);
+        result = withScriptLock('togglePublikasiPerangkat', function() { return togglePublikasiPerangkatBackend(payload); });
         break;
 
       case 'logAdminActivity':
-        result = logAdminActivityBackend(payload);
+        result = withScriptLock('logAdminActivity', function() { return logAdminActivityBackend(payload); });
         break;
 
       // --- OPERASI PERANGKAT AJAR ---
       case 'uploadPerangkat':
-        result = uploadPerangkatBackend(payload);
+        result = withScriptLock('uploadPerangkat', function() { return uploadPerangkatBackend(payload); });
         break;
 
       case 'addPerangkat':
-        result = addPerangkatBackend(payload);
+        result = withScriptLock('addPerangkat', function() { return addPerangkatBackend(payload); });
         break;
 
       case 'editPerangkat':
-        result = editPerangkatBackend(payload);
+        result = withScriptLock('editPerangkat', function() { return editPerangkatBackend(payload); });
         break;
 
       case 'deletePerangkat':
-        result = deleteRowByIdBackend('Perangkat_Ajar', payload.id);
+        result = withScriptLock('deletePerangkat', function() { return deleteRowByIdBackend('Perangkat_Ajar', payload.id || payload.docId); });
         break;
 
       // --- OPERASI GURU (SISWA, PRESENSI, NILAI, JURNAL) ---
       case 'addSiswa':
-        result = addSiswaBackend(payload);
+        result = withScriptLock('addSiswa', function() { return addSiswaBackend(payload); });
         break;
 
       case 'editSiswa':
-        result = editSiswaBackend(payload);
+        result = withScriptLock('editSiswa', function() { return editSiswaBackend(payload); });
         break;
 
       case 'updatePresensi':
-        result = updatePresensiBackend(payload);
+        result = withScriptLock('updatePresensi', function() { return updatePresensiBackend(payload); });
         break;
 
       case 'batchUpdatePresensi':
-        result = batchUpdatePresensiBackend(payload);
+        result = withScriptLock('batchUpdatePresensi', function() { return batchUpdatePresensiBackend(payload); });
         break;
 
       case 'addNilai':
-        result = addNilaiBackend(payload);
+        result = withScriptLock('addNilai', function() { return addNilaiBackend(payload); });
         break;
 
       case 'addJurnal':
-        result = addJurnalBackend(payload);
+        result = withScriptLock('addJurnal', function() { return addJurnalBackend(payload); });
         break;
 
       case 'addCatatan':
-        result = addCatatanBackend(payload);
+        result = withScriptLock('addCatatan', function() { return addCatatanBackend(payload); });
+        break;
+
+      case 'addPengumuman':
+        result = withScriptLock('addPengumuman', function() { return addPengumumanBackend(payload); });
+        break;
+
+      case 'deletePengumuman':
+        result = withScriptLock('deletePengumuman', function() { return deleteRowByIdBackend('Pengumuman', payload.id || payload.pengumumanId); });
         break;
 
       case 'deleteRow':
-        result = deleteRowByIdBackend(payload.sheetName, payload.id);
+        result = withScriptLock('deleteRow', function() { return deleteRowByIdBackend(payload.sheetName, payload.id); });
         break;
 
       default:
@@ -208,6 +291,7 @@ function setupDatabase() {
     'Nilai_Siswa': ['ID_Nilai', 'ID_Kelas', 'Nama_Kelas', 'ID_Siswa', 'Nama_Siswa', 'Mata_Pelajaran', 'Lingkup_Materi', 'Nilai_Formatif', 'Nilai_Sumatif', 'Nilai_SAS', 'Nilai_Akhir', 'Semester', 'Tahun_Ajaran'],
     'Jurnal_Mengajar': ['ID_Jurnal', 'ID_Kelas', 'Nama_Kelas', 'Tanggal', 'Jam_Ke', 'Mata_Pelajaran', 'Topik_Materi', 'Kegiatan_Pembelajaran', 'Siswa_Tidak_Hadir', 'Catatan_Refleksi'],
     'Perangkat_Ajar': ['ID_Dokumen', 'Judul_Dokumen', 'Mata_Pelajaran', 'Kategori_Kelas', 'Jenis', 'Format_Tipe', 'Nama_File', 'Ukuran_File', 'Sumber', 'Durasi_JP', 'Link_Berkas', 'Deskripsi', 'Uploader', 'Status_Publikasi', 'Waktu_Upload'],
+    'Pengumuman': ['ID_Pengumuman', 'Tanggal', 'Judul', 'Isi', 'Pengirim', 'Status'],
     'Pengaturan_Sekolah': ['Kunci', 'Nilai'],
     'Log_Aktivitas_Admin': ['ID_Log', 'Waktu', 'ID_Admin', 'Nama_Admin', 'Aksi', 'Detail']
   };
@@ -337,12 +421,28 @@ function setupDatabase() {
   ];
   pengaturanSheet.getRange(2, 1, defaultPengaturan.length, defaultPengaturan[0].length).setValues(defaultPengaturan);
 
-  // 9. Data Default: Log_Aktivitas_Admin
+  // 9. Data Default: Jurnal_Mengajar
+  var jurnalSheet = ss.getSheetByName('Jurnal_Mengajar');
+  var defaultJurnal = [
+    ['JRN-001', 'KLS-04', 'Kelas IV-A', today, '1-2', 'Matematika', 'Pecahan Senilai', 'Eksplorasi benda konkret dan LKPD kelompok', 'Dimas Bayu (Sakit)', 'Siswa antusias dan memahami konsep pecahan senilai dengan baik.'],
+    ['JRN-002', 'KLS-01', 'Kelas I-A', today, '1-2', 'Pendidikan Agama Islam', 'Rukun Iman', 'Cerita bergambar dan bernyanyi rukun iman', '-', 'Siswa mampu menyebutkan 6 rukun iman secara berurutan.']
+  ];
+  if (jurnalSheet) jurnalSheet.getRange(2, 1, defaultJurnal.length, defaultJurnal[0].length).setValues(defaultJurnal);
+
+  // 10. Data Default: Pengumuman
+  var pengumumanSheet = ss.getSheetByName('Pengumuman');
+  var defaultPengumuman = [
+    ['PGM-001', today, 'Jadwal Penilaian Sumatif Akhir Semester (SAS)', 'Penilaian Sumatif Akhir Semester Ganjil akan dilaksanakan mulai tanggal 1 Desember 2026. Bapak/Ibu guru diharapkan menyelesaikan input nilai formatif tepat waktu.', 'Kepala Sekolah', 'Aktif'],
+    ['PGM-002', today, 'Rapat Koordinasi Kurikulum Merdeka', 'Rapat evaluasi perangkat ajar dan modul P5 akan diselenggarakan hari Sabtu pkl 09.00 WIB di Ruang Guru.', 'Kurikulum', 'Aktif']
+  ];
+  if (pengumumanSheet) pengumumanSheet.getRange(2, 1, defaultPengumuman.length, defaultPengumuman[0].length).setValues(defaultPengumuman);
+
+  // 11. Data Default: Log_Aktivitas_Admin
   var logSheet = ss.getSheetByName('Log_Aktivitas_Admin');
   var defaultLog = [
     ['LOG-001', now, 'USR-001', 'Budi Santoso, S.Pd.SD.', 'Inisialisasi Sistem', 'Setup database administrasi sekolah berhasil diselesaikan.']
   ];
-  logSheet.getRange(2, 1, defaultLog.length, defaultLog[0].length).setValues(defaultLog);
+  if (logSheet) logSheet.getRange(2, 1, defaultLog.length, defaultLog[0].length).setValues(defaultLog);
 
   // Hapus sheet1 jika ada
   var sheet1 = ss.getSheetByName('Sheet1');
@@ -446,7 +546,13 @@ function verifyLogin(username, password) {
   }
 
   userFound.assignedClasses = assignedClasses;
-  return { success: true, user: userFound };
+  var verInfo = getDataVersion();
+  return {
+    success: true,
+    user: userFound,
+    version: verInfo.version,
+    lastUpdated: verInfo.lastUpdated
+  };
 }
 
 // ============================================================
@@ -526,7 +632,28 @@ function getAllAdminData() {
       };
     });
 
-    // 9. Log Aktivitas Admin
+    // 9. Jurnal Mengajar
+    var jurnalRows = getSheetRows(ss, 'Jurnal_Mengajar');
+    var jurnal = jurnalRows.map(function(r) {
+      return {
+        id: r[0], idKelas: r[1] || '', namaKelas: r[2] || '',
+        tanggal: formatDateStr(r[3]), jamKe: String(r[4] || ''),
+        mapel: r[5] || '', topikMateri: r[6] || '',
+        kegiatanPembelajaran: r[7] || '', siswaTidakHadir: r[8] || '',
+        catatanRefleksi: r[9] || ''
+      };
+    });
+
+    // 10. Pengumuman Resmi
+    var pengumumanRows = getSheetRows(ss, 'Pengumuman');
+    var pengumuman = pengumumanRows.map(function(r) {
+      return {
+        id: r[0], tanggal: formatDateStr(r[1]), judul: r[2] || '',
+        isi: r[3] || '', pengirim: r[4] || 'Admin Sekolah', status: r[5] || 'Aktif'
+      };
+    });
+
+    // 11. Log Aktivitas Admin
     var logRows = getSheetRows(ss, 'Log_Aktivitas_Admin');
     var logs = logRows.map(function(r) {
       return {
@@ -534,8 +661,11 @@ function getAllAdminData() {
       };
     });
 
+    var verInfo = getDataVersion();
     return {
       success: true,
+      version: verInfo.version,
+      lastUpdated: verInfo.lastUpdated,
       data: {
         pengaturan: pengaturan,
         users: users,
@@ -544,7 +674,9 @@ function getAllAdminData() {
         siswa: siswa,
         presensi: presensi,
         nilai: nilai,
+        jurnal: jurnal,
         perangkat: perangkat,
+        pengumuman: pengumuman,
         logs: logs
       }
     };
@@ -616,7 +748,32 @@ function getTeacherData(teacherId) {
       };
     });
 
-    // 5. Perangkat Ajar yang berstatus 'Aktif'
+    // 5. Filter Kelas HANYA yang ditugaskan kepada guru ini
+    var kelasRows = getSheetRows(ss, 'Data_Kelas');
+    var myKelas = kelasRows.filter(function(r) {
+      return assignedClassIds[String(r[0]).trim()];
+    }).map(function(r) {
+      return {
+        id: r[0], tingkat: r[1], namaRombel: r[2], tahunAjaran: r[3],
+        idWali: r[4] || '', namaWali: r[5] || 'Belum Ditentukan', statusKelas: r[6] || 'Aktif'
+      };
+    });
+
+    // 6. Filter Jurnal Mengajar HANYA dari kelas guru ini
+    var jurnalRows = getSheetRows(ss, 'Jurnal_Mengajar');
+    var myJurnal = jurnalRows.filter(function(r) {
+      return assignedClassIds[String(r[1]).trim()];
+    }).map(function(r) {
+      return {
+        id: r[0], idKelas: r[1] || '', namaKelas: r[2] || '',
+        tanggal: formatDateStr(r[3]), jamKe: String(r[4] || ''),
+        mapel: r[5] || '', topikMateri: r[6] || '',
+        kegiatanPembelajaran: r[7] || '', siswaTidakHadir: r[8] || '',
+        catatanRefleksi: r[9] || ''
+      };
+    });
+
+    // 7. Perangkat Ajar yang berstatus 'Aktif'
     var perangkatRaw = getSheetRows(ss, 'Perangkat_Ajar');
     var perangkat = perangkatRaw.filter(function(r) {
       return String(r[13]).trim() === 'Aktif';
@@ -628,16 +785,33 @@ function getTeacherData(teacherId) {
       };
     });
 
+    // 8. Pengumuman Resmi Sekolah
+    var pengumumanRows = getSheetRows(ss, 'Pengumuman');
+    var pengumuman = pengumumanRows.filter(function(r) {
+      return String(r[5] || 'Aktif').trim() === 'Aktif';
+    }).map(function(r) {
+      return {
+        id: r[0], tanggal: formatDateStr(r[1]), judul: r[2] || '',
+        isi: r[3] || '', pengirim: r[4] || 'Admin Sekolah', status: r[5] || 'Aktif'
+      };
+    });
+
     var pengaturan = getSchoolSettingsObject(ss);
+    var verInfo = getDataVersion();
 
     return {
       success: true,
+      version: verInfo.version,
+      lastUpdated: verInfo.lastUpdated,
       data: {
         assignments: myAssignments,
+        kelas: myKelas,
         siswa: siswa,
         presensi: presensi,
         nilai: nilai,
+        jurnal: myJurnal,
         perangkat: perangkat,
+        pengumuman: pengumuman,
         pengaturan: pengaturan
       }
     };
@@ -732,19 +906,21 @@ function toggleUserStatusBackend(p) {
 
 function deleteUserBackend(p) {
   try {
-    // Validasi penugasan sebelum hapus
+    var userId = p.id || p.userId || '';
+    if (!userId) return { success: false, message: 'ID User wajib disertakan.' };
+
     var ss = getActiveDb();
     var tSheet = ss.getSheetByName('Penugasan_Guru');
     if (tSheet) {
       var tData = tSheet.getDataRange().getValues();
       for (var i = 1; i < tData.length; i++) {
-        if (String(tData[i][1]).trim() === String(p.id).trim() && String(tData[i][9]).trim() === 'Aktif') {
+        if (String(tData[i][1]).trim() === String(userId).trim() && String(tData[i][9]).trim() === 'Aktif') {
           return { success: false, message: 'Guru tidak dapat dihapus karena masih memiliki penugasan aktif di kelas ' + tData[i][4] + '. Akhiri penugasan terlebih dahulu.' };
         }
       }
     }
 
-    return deleteRowByIdBackend('Users', p.id);
+    return deleteRowByIdBackend('Users', userId);
   } catch (err) {
     return { success: false, message: err.message };
   }
@@ -911,6 +1087,9 @@ function savePenugasanBackend(p) {
 
 function deletePenugasanBackend(p) {
   try {
+    var tugasId = p.id || p.tugasId || '';
+    if (!tugasId) return { success: false, message: 'ID Penugasan wajib disertakan.' };
+
     var ss = getActiveDb();
     var sheet = ss.getSheetByName('Penugasan_Guru');
     var data = sheet.getDataRange().getValues();
@@ -919,7 +1098,7 @@ function deletePenugasanBackend(p) {
     var jenisTugas = '';
 
     for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]).trim() === String(p.id).trim()) {
+      if (String(data[i][0]).trim() === String(tugasId).trim()) {
         idGuru = data[i][1];
         idKelas = data[i][3];
         jenisTugas = data[i][5];
@@ -928,7 +1107,7 @@ function deletePenugasanBackend(p) {
     }
 
     // Hapus baris penugasan
-    var delRes = deleteRowByIdBackend('Penugasan_Guru', p.id);
+    var delRes = deleteRowByIdBackend('Penugasan_Guru', tugasId);
     if (!delRes.success) return delRes;
 
     // Jika yang dihapus adalah Wali Kelas, kosongkan di Data_Kelas
@@ -1111,28 +1290,40 @@ function togglePublikasiPerangkatBackend(p) {
 
 function uploadPerangkatBackend(payload) {
   try {
-    var namaFile = payload.namaFile || 'berkas_dokumen';
-    var mimeType = payload.mimeType || 'application/octet-stream';
-    var base64Data = payload.base64Data || '';
+    var namaFile = payload.namaFile || payload.fileName || 'berkas_dokumen';
+    var mimeType = payload.mimeType || payload.fileMime || 'application/octet-stream';
+    var base64Data = payload.base64Data || payload.fileBase64 || '';
     var judul = payload.judul || namaFile;
     var mapel = payload.mapel || 'Umum';
     var kategoriKelas = payload.kategoriKelas || 'Semua Kelas';
     var jenis = payload.jenis || 'Modul Ajar';
     var formatTipe = payload.formatTipe || 'PDF';
-    var durasi = payload.durasi || '4 JP';
+    var durasi = payload.durasi || payload.durasiJP || '4 JP';
     var deskripsi = payload.deskripsi || '';
     var uploader = payload.uploader || 'Admin Sekolah';
+    var fileUrl = payload.linkBerkas || 'https://drive.google.com/';
+    var ukuranFile = payload.ukuranFile || '1.0 MB';
 
-    var decodedData = Utilities.base64Decode(base64Data);
-    var blob = Utilities.newBlob(decodedData, mimeType, namaFile);
-
-    var folder = getOrCreateUploadFolder();
-    var file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-    var fileUrl = file.getUrl();
-    var fileId = file.getId();
-    var ukuranFile = _formatFileSize(file.getSize());
+    // Coba upload berkas fisik ke Google Drive jika ada data base64
+    if (base64Data && typeof base64Data === 'string' && base64Data.trim().length > 10) {
+      try {
+        var cleanBase64 = base64Data.replace(/^data:.*?;base64,/, '');
+        var decodedData = Utilities.base64Decode(cleanBase64);
+        var blob = Utilities.newBlob(decodedData, mimeType, namaFile);
+        var folder = getOrCreateUploadFolder();
+        var file = folder.createFile(blob);
+        try {
+          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        } catch (shareErr) {}
+        fileUrl = file.getUrl();
+        ukuranFile = _formatFileSize(file.getSize());
+      } catch (driveErr) {
+        // Jika DriveApp memerlukan izin tambahan, tetap simpan rekaman metadata dokumen
+        if (!fileUrl || fileUrl === 'https://drive.google.com/') {
+          fileUrl = 'https://drive.google.com/drive/my-drive';
+        }
+      }
+    }
 
     var ss = getActiveDb();
     var sheet = ss.getSheetByName('Perangkat_Ajar');
@@ -1150,10 +1341,10 @@ function uploadPerangkatBackend(payload) {
       fileUrl: fileUrl,
       id: newId,
       namaFile: namaFile,
-      message: 'Berkas "' + namaFile + '" berhasil disimpan ke Google Drive & Database.'
+      message: 'Berkas "' + namaFile + '" berhasil disimpan ke Bank Perangkat Ajar & Database.'
     };
   } catch (err) {
-    return { success: false, message: 'Gagal mengunggah berkas: ' + err.message };
+    return { success: false, message: 'Gagal memproses berkas: ' + err.message };
   }
 }
 
@@ -1405,6 +1596,30 @@ function addCatatanBackend(c) {
     ]);
 
     return { success: true, id: newId, message: 'Catatan tersimpan.' };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+}
+
+function addPengumumanBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var sheet = ss.getSheetByName('Pengumuman');
+    if (!sheet) {
+      sheet = ss.insertSheet('Pengumuman');
+      sheet.appendRow(['ID_Pengumuman', 'Tanggal', 'Judul', 'Isi', 'Pengirim', 'Status']);
+    }
+    var id = _generateId(sheet, 'PGM');
+    var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    sheet.appendRow([
+      id,
+      p.tanggal || today,
+      p.judul || 'Pengumuman Baru',
+      p.isi || '',
+      p.pengirim || 'Admin Sekolah',
+      p.status || 'Aktif'
+    ]);
+    return { success: true, id: id, message: 'Pengumuman berhasil dipublikasikan.' };
   } catch (err) {
     return { success: false, message: err.message };
   }

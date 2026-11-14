@@ -1,15 +1,23 @@
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '4.5mb'
+    }
+  }
+};
+
 export default async function handler(req, res) {
-  // Header CORS
+  // Header CORS lengkap
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   try {
-    let gasUrl = process.env.GAS_API_URL;
+    let gasUrl = process.env.GAS_API_URL || 'https://script.google.com/macros/s/AKfycbwsVr0J9qSchXl5ltrLdOcZF3aSWEoRiRH5_4lwXSmut92i3AKF7FrpTzjTmARoWAUfCg/exec';
     let action = '';
     let payload = {};
 
@@ -42,7 +50,6 @@ export default async function handler(req, res) {
         const json = JSON.parse(text);
         return res.status(200).json(json);
       } catch (e) {
-        // Jika Google mengembalikan halaman login HTML
         if (text.includes('ServiceLogin') || text.includes('accounts.google.com')) {
           return res.status(403).json({
             success: false,
@@ -51,7 +58,6 @@ export default async function handler(req, res) {
           });
         }
 
-        // Jika Google Apps Script masih menjalankan kode HTML lama (bukan REST API)
         if (text.trim().startsWith('<') || text.includes('<!DOCTYPE') || text.includes('SiGuru SD - Administrasi Guru')) {
           return res.status(502).json({
             success: false,
@@ -79,6 +85,7 @@ export default async function handler(req, res) {
         });
       }
 
+      // Kirim request ke Google Apps Script Web App
       const response = await fetch(gasUrl, {
         method: 'POST',
         redirect: 'follow',

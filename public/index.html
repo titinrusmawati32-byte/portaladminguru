@@ -293,15 +293,15 @@
   <div id="mainApp" class="flex-1 flex flex-col w-full min-h-screen relative" style="display: none;">
 
     <!-- TOP BAR (SCREEN 2 - AVATAR, BRAND, NOTIFICATION BELL) -->
-    <header class="w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-2 flex items-center justify-between no-print">
+    <header class="w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-2 flex items-center justify-between no-print gap-2">
       <!-- Left: User Profile Avatar with Online Dot -->
       <div class="flex items-center gap-3">
         <div class="relative cursor-pointer" onclick="toggleRoleSwitch()">
           <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-brandpurple-600 to-fuchsia-500 p-0.5 shadow-md flex items-center justify-center text-white font-extrabold text-sm overflow-hidden">
             <span id="topUserAvatarInitial">BS</span>
           </div>
-          <!-- Green Online Indicator Dot -->
-          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-400"></span>
+          <!-- Online Indicator Dot -->
+          <span id="onlinePresenceDot" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-400"></span>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
@@ -312,35 +312,40 @@
         </div>
       </div>
 
-      <!-- Center: Brand Name (Hidden on small mobile) -->
-      <div class="hidden sm:flex items-center gap-1.5 font-extrabold text-slate-800 text-sm tracking-tight">
-        <span class="w-2 h-2 rounded-full bg-brandpurple-600"></span>
-        <span>SiGuru SD</span>
+      <!-- Center: Real-Time Auto-Sync Status Badge -->
+      <div id="syncStatusBadge" onclick="manualTriggerSync()" title="Sinkronisasi Database Real-Time (Klik untuk sinkronkan sekarang)"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs select-none">
+        <span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="syncStatusText" class="tracking-tight text-[11px] sm:text-xs">Tersinkronisasi</span>
+        <span id="syncLastTime" class="hidden md:inline text-[10px] text-emerald-600/80 font-normal">--:--</span>
+        <svg id="syncIconSpin" class="w-3.5 h-3.5 text-emerald-700 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
       </div>
 
       <!-- Right: Action Buttons (Role Switcher & Notification Bell Pill) -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2 sm:gap-2.5">
         <!-- Role Quick Switch Pill Button -->
         <button onclick="toggleRoleSwitch()"
-          class="px-3 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-brandpurple-700 font-extrabold text-xs shadow-xs transition flex items-center gap-1 cursor-pointer">
+          class="px-2.5 sm:px-3 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-brandpurple-700 font-extrabold text-[11px] sm:text-xs shadow-xs transition flex items-center gap-1 cursor-pointer">
           <span id="switchRoleLabel">Ganti ke Guru</span>
         </button>
 
         <!-- Notification Bell Pill with Badge '2' (Screen 2) -->
-        <div class="relative w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs cursor-pointer"
-             onclick="showToast('2 Pengumuman baru tersedia di sistem.', 'info')">
-          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs cursor-pointer"
+             onclick="showToast('Sistem tersinkronisasi dengan Google Sheets pusat.', 'info')">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          <!-- Counter Badge '2' -->
+          <!-- Counter Badge -->
           <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brandmint-400 text-[10px] font-black text-slate-900 flex items-center justify-center shadow-xs">
-            2
+            ✓
           </span>
         </div>
 
         <!-- Logout Button -->
         <button onclick="handleLogout()" title="Keluar"
-          class="w-10 h-10 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition cursor-pointer shadow-xs">
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition cursor-pointer shadow-xs">
           <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
@@ -591,52 +596,360 @@
     }
 
     async function apiPost(action, payload = {}) {
-      if (!IS_CONNECTED) return null;
-      let lastErr = null;
+      if (!IS_CONNECTED) return { success: false, message: 'Backend belum terhubung di config.js' };
 
-      // 1. Coba via proxy serverless Vercel (/api/gas)
+      // Kirim via proxy serverless Vercel (/api/gas)
       try {
         const res = await fetch('/api/gas', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ gasUrl: GAS_URL, action: action, payload: payload })
         });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.success) return data;
-          if (data && data.message) throw new Error(data.message);
+        
+        const text = await res.text();
+        let data = null;
+        try {
+          data = JSON.parse(text);
+        } catch (pe) {
+          throw new Error('Respons backend bukan JSON: ' + (text ? text.slice(0, 120) : 'Respons kosong'));
+        }
+
+        if (res.ok && data && data.success) {
+          return data;
+        } else {
+          const msg = (data && data.message) ? data.message : ('Server error (HTTP ' + res.status + ')');
+          throw new Error(msg);
         }
       } catch (e) {
-        console.warn('Proxy POST info:', e.message);
-        lastErr = e;
-      }
-
-      // 2. Fallback: Direct POST ke Google Apps Script menggunakan text/plain (bebas CORS OPTIONS preflight)
-      try {
-        await fetch(GAS_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: action, payload: payload })
-        });
-        return { success: true, isDirect: true };
-      } catch (err) {
-        console.warn('Direct GAS POST info:', err.message);
-        throw (lastErr || err);
+        console.error('API POST Error:', e);
+        throw e;
       }
     }
 
-    async function syncBackendData() {
-      if (!IS_CONNECTED) return;
+    // ==========================================
+    // STANDARISASI SERVICE LAYER (DATASPEC TAHAP 3)
+    // ==========================================
+    const DataService = {
+      async request(method, action, payload = {}, params = {}) {
+        if (!IS_CONNECTED) {
+          throw new Error('Koneksi ke backend Google Apps Script belum terkonfigurasi di public/config.js');
+        }
+
+        const requestId = 'REQ-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+        const enrichedPayload = {
+          ...payload,
+          requestId: requestId,
+          userId: currentUser ? currentUser.id : 'ANON',
+          userRole: currentRole,
+          timestamp: new Date().toISOString()
+        };
+
+        if (method === 'GET') {
+          return await apiGet(action, params);
+        } else {
+          return await apiPost(action, enrichedPayload);
+        }
+      },
+
+      async get(action, params = {}) {
+        return await this.request('GET', action, {}, params);
+      },
+
+      async create(action, payload) {
+        return await this.request('POST', action, payload);
+      },
+
+      async update(action, payload) {
+        return await this.request('POST', action, payload);
+      },
+
+      async delete(action, payload) {
+        return await this.request('POST', action, payload);
+      },
+
+      async checkSync(clientVersion) {
+        return await this.get('checkSyncStatus', { clientVersion: clientVersion || 0 });
+      }
+    };
+
+    // ==========================================
+    // SISTEM SINKRONISASI DATA REAL-TIME (6 STATUS INDIKATOR)
+    // ==========================================
+    let activeModuleKey = null;
+
+    const syncState = {
+      clientVersion: 0,
+      serverVersion: 0,
+      lastSyncTime: null,
+      isSyncing: false,
+      pollTimer: null,
+      isTabActive: true,
+      status: 'synced', // 'synced' | 'syncing' | 'has_updates' | 'waiting' | 'offline' | 'error'
+      statusMessage: 'Tersinkronisasi'
+    };
+
+    function setSyncStatus(status, message) {
+      syncState.status = status;
+      syncState.statusMessage = message;
+
+      const badge = document.getElementById('syncStatusBadge');
+      const dot = document.getElementById('syncStatusDot');
+      const text = document.getElementById('syncStatusText');
+      const time = document.getElementById('syncLastTime');
+      const spin = document.getElementById('syncIconSpin');
+
+      if (!badge || !dot || !text) return;
+
+      badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs select-none ';
+      dot.className = 'w-2.5 h-2.5 rounded-full ';
+      if (spin) spin.classList.remove('animate-spin');
+
+      const nowStr = syncState.lastSyncTime ? syncState.lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--:--';
+      if (time) time.textContent = nowStr;
+
+      if (status === 'synced') {
+        badge.className += 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+        dot.className += 'bg-emerald-500 animate-pulse';
+        text.textContent = message || 'Tersinkronisasi';
+      } else if (status === 'syncing') {
+        badge.className += 'bg-amber-50 text-amber-800 border border-amber-200';
+        dot.className += 'bg-amber-500';
+        if (spin) spin.classList.add('animate-spin');
+        text.textContent = message || 'Menyinkronkan...';
+      } else if (status === 'has_updates') {
+        badge.className += 'bg-cyan-50 text-cyan-800 border border-cyan-300';
+        dot.className += 'bg-cyan-500 animate-ping';
+        text.textContent = message || 'Ada perubahan terbaru';
+      } else if (status === 'waiting') {
+        badge.className += 'bg-yellow-50 text-yellow-800 border border-yellow-200';
+        dot.className += 'bg-yellow-500';
+        text.textContent = message || 'Menunggu sinkronisasi';
+      } else if (status === 'offline') {
+        badge.className += 'bg-slate-100 text-slate-700 border border-slate-300';
+        dot.className += 'bg-rose-500';
+        text.textContent = message || 'Koneksi terputus';
+      } else if (status === 'error') {
+        badge.className += 'bg-rose-50 text-rose-800 border border-rose-200';
+        dot.className += 'bg-rose-600 animate-ping';
+        text.textContent = message || 'Gagal menyimpan';
+      }
+    }
+
+    async function syncBackendData(silent = false) {
+      if (!IS_CONNECTED) {
+        setSyncStatus('offline', 'Koneksi Terputus');
+        return false;
+      }
+      if (syncState.isSyncing) return false;
+      syncState.isSyncing = true;
+      if (!silent) setSyncStatus('syncing', 'Menyinkronkan...');
+
       try {
-        const res = await apiGet('getAllAdminData');
+        const endpoint = (currentRole === 'Guru' && currentUser && currentUser.id) ? 'getTeacherData' : 'getAllAdminData';
+        const params = (currentRole === 'Guru' && currentUser && currentUser.id) ? { teacherId: currentUser.id } : {};
+
+        const res = await apiGet(endpoint, params);
         if (res && res.success && res.data) {
+          // Merge data dari database pusat
           dbData = { ...dbData, ...res.data };
-          if (currentUser) renderPortal();
+          if (res.version) {
+            syncState.clientVersion = Number(res.version);
+            syncState.serverVersion = Number(res.version);
+          }
+          syncState.lastSyncTime = new Date();
+          setSyncStatus('synced', 'Tersinkronisasi');
+
+          // Perbarui tampilan aktif secara real-time
+          refreshActiveModuleContent();
+          return true;
+        } else {
+          if (!silent) setSyncStatus('error', 'Gagal Sinkronisasi');
+          return false;
+        }
+      } catch (err) {
+        console.warn('Sync backend error:', err);
+        if (!silent) setSyncStatus('error', 'Koneksi Terputus');
+        return false;
+      } finally {
+        syncState.isSyncing = false;
+      }
+    }
+
+    // Auto-Sync Heartbeat Polling setiap 6-8 detik
+    async function checkSyncHeartbeat() {
+      if (!currentUser) return;
+      if (!navigator.onLine) {
+        setSyncStatus('offline', 'Offline (Terputus)');
+        return;
+      }
+      if (!syncState.isTabActive) return;
+      if (syncState.isSyncing) return;
+
+      try {
+        const res = await apiGet('checkSyncStatus', { clientVersion: syncState.clientVersion });
+        if (res && res.success) {
+          syncState.serverVersion = Number(res.serverVersion || 0);
+          if (res.hasUpdates) {
+            console.log(`[AutoSync] Perubahan terdeteksi di server: v${res.serverVersion} (klien v${syncState.clientVersion}). Sinkronisasi otomatis...`);
+            // Jangan mengganggu pekerjaan pengguna jika sedang mengetik input
+            const activeEl = document.activeElement;
+            const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable);
+
+            if (isUserTyping) {
+              const onBlurHandler = () => {
+                activeEl.removeEventListener('blur', onBlurHandler);
+                syncBackendData(true);
+              };
+              activeEl.addEventListener('blur', onBlurHandler);
+            } else {
+              await syncBackendData(true);
+              showToast('Data diperbarui dari server secara otomatis.', 'info');
+            }
+          } else {
+            syncState.lastSyncTime = new Date();
+            setSyncStatus('synced', 'Tersinkronisasi');
+          }
         }
       } catch (e) {
-        console.warn('Sync tertunda:', e);
+        console.warn('Heartbeat check error:', e);
       }
+    }
+
+    function startAutoSync() {
+      if (syncState.pollTimer) clearInterval(syncState.pollTimer);
+      syncState.pollTimer = setInterval(checkSyncHeartbeat, 6500);
+    }
+
+    function stopAutoSync() {
+      if (syncState.pollTimer) {
+        clearInterval(syncState.pollTimer);
+        syncState.pollTimer = null;
+      }
+    }
+
+    function manualTriggerSync() {
+      showToast('Memeriksa pembaruan database...', 'info');
+      syncBackendData(false);
+    }
+
+    function refreshActiveModuleContent() {
+      if (!currentUser) return;
+      // Jangan re-render jika modal input sedang terbuka agar form tidak tertutup tiba-tiba
+      const modal = document.getElementById('universalModal');
+      if (modal && !modal.classList.contains('hidden')) return;
+
+      if (activeModuleKey) {
+        const contentEl = document.getElementById('moduleContentArea');
+        if (!contentEl) return;
+
+        switch (activeModuleKey) {
+          case 'admin-guru': renderModuleAdminGuru(contentEl); break;
+          case 'admin-kelas': renderModuleAdminKelas(contentEl); break;
+          case 'admin-penugasan': renderModuleAdminPenugasan(contentEl); break;
+          case 'admin-nilai': renderModuleAdminNilai(contentEl); break;
+          case 'admin-absensi': renderModuleAdminAbsensi(contentEl); break;
+          case 'admin-laporan': renderModuleAdminLaporan(contentEl); break;
+          case 'admin-perangkat': renderModuleAdminPerangkat(contentEl); break;
+          case 'admin-pengaturan': renderModuleAdminPengaturan(contentEl); break;
+          case 'guru-dashboard': renderModuleGuruDashboard(contentEl); break;
+          case 'guru-siswa': renderModuleGuruSiswa(contentEl); break;
+          case 'guru-nilai': renderModuleGuruNilai(contentEl); break;
+          case 'guru-presensi': renderModuleGuruPresensi(contentEl); break;
+          case 'guru-jurnal': renderModuleGuruJurnal(contentEl); break;
+          case 'guru-perangkat': renderModuleGuruPerangkat(contentEl); break;
+          case 'guru-analisis': renderModuleGuruAnalisis(contentEl); break;
+          case 'guru-pengumuman': renderModuleGuruPengumuman(contentEl); break;
+        }
+      } else {
+        renderPortal();
+      }
+    }
+
+    // Helper Eksekusi Tulis Terpusat dengan Verifikasi Backend
+    async function executeDbWrite(action, payload, successMsg = 'Data berhasil disimpan.') {
+      setSyncStatus('syncing', 'Menyimpan ke server...');
+      try {
+        const res = await apiPost(action, payload);
+        if (res && res.success) {
+          if (res.version) {
+            syncState.clientVersion = Number(res.version);
+            syncState.serverVersion = Number(res.version);
+          } else {
+            syncState.clientVersion += 1;
+          }
+          syncState.lastSyncTime = new Date();
+          setSyncStatus('synced', 'Tersinkronisasi');
+          if (successMsg) showToast(successMsg, 'success');
+          return { success: true, res };
+        } else {
+          const errMsg = (res && res.message) ? res.message : 'Penyimpanan backend gagal.';
+          setSyncStatus('error', 'Gagal Menyimpan');
+          showToast(errMsg, 'error');
+          return { success: false, message: errMsg };
+        }
+      } catch (err) {
+        setSyncStatus('error', 'Gagal Menyimpan');
+        showToast('Koneksi penyimpanan gagal: ' + err.message, 'error');
+        return { success: false, message: err.message };
+      }
+    }
+
+    // ==========================================
+    // SESSION PERSISTENCE & LOGIN
+    // ==========================================
+    function saveSessionState() {
+      if (!currentUser) {
+        sessionStorage.removeItem('siguru_session');
+        return;
+      }
+      try {
+        sessionStorage.setItem('siguru_session', JSON.stringify({
+          user: currentUser,
+          role: currentRole,
+          activeModule: activeModuleKey,
+          time: Date.now()
+        }));
+      } catch (e) {}
+    }
+
+    function restoreSession() {
+      try {
+        const raw = sessionStorage.getItem('siguru_session');
+        if (!raw) return false;
+        const s = JSON.parse(raw);
+        if (s && s.user && s.role) {
+          currentUser = s.user;
+          currentRole = s.role;
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('mainApp').style.display = 'flex';
+          updateHeaderUserUI();
+          if (s.activeModule) {
+            openModule(s.activeModule);
+          } else {
+            renderPortal();
+          }
+          syncBackendData(true);
+          startAutoSync();
+          return true;
+        }
+      } catch (e) {
+        console.warn('Gagal memulihkan sesi:', e);
+      }
+      return false;
+    }
+
+    function updateHeaderUserUI() {
+      const idEl = document.getElementById('topUserIdentity');
+      const badgeEl = document.getElementById('topUserRoleBadge');
+      const avatarEl = document.getElementById('topUserAvatarInitial');
+      const switchEl = document.getElementById('switchRoleLabel');
+
+      if (idEl) idEl.textContent = currentUser.nama.split(',')[0];
+      if (badgeEl) badgeEl.textContent = currentRole;
+      if (avatarEl) avatarEl.textContent = currentRole === 'Admin' ? 'BS' : 'DR';
+      if (switchEl) switchEl.textContent = currentRole === 'Admin' ? 'Beralih ke Guru' : 'Beralih ke Admin';
+      const schEl = document.getElementById('globalSchoolIdentity');
+      if (schEl && dbData.pengaturan) schEl.textContent = dbData.pengaturan.namaSekolah;
     }
 
     // ==========================================
@@ -686,20 +999,11 @@
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'flex';
       
-      // Update Top Bar
-      const idEl = document.getElementById('topUserIdentity');
-      const badgeEl = document.getElementById('topUserRoleBadge');
-      const avatarEl = document.getElementById('topUserAvatarInitial');
-      const switchEl = document.getElementById('switchRoleLabel');
-
-      if (idEl) idEl.textContent = currentUser.nama.split(',')[0];
-      if (badgeEl) badgeEl.textContent = currentRole;
-      if (avatarEl) avatarEl.textContent = currentRole === 'Admin' ? 'BS' : 'DR';
-      if (switchEl) switchEl.textContent = currentRole === 'Admin' ? 'Beralih ke Guru' : 'Beralih ke Admin';
-      document.getElementById('globalSchoolIdentity').textContent = dbData.pengaturan.namaSekolah;
-
+      saveSessionState();
+      updateHeaderUserUI();
       renderPortal();
       syncBackendData();
+      startAutoSync();
     }
 
     function toggleRoleSwitch() {
@@ -718,6 +1022,9 @@
 
     function handleLogout() {
       currentUser = null;
+      activeModuleKey = null;
+      stopAutoSync();
+      saveSessionState();
       document.getElementById('mainApp').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'flex';
       window.scrollTo(0, 0);
@@ -728,6 +1035,8 @@
     // RENDER PORTAL UTAMA (ADMIN VS GURU)
     // ==========================================
     function renderPortal() {
+      activeModuleKey = null;
+      saveSessionState();
       document.getElementById('portalDashboardView').classList.remove('hidden');
       document.getElementById('moduleView').classList.add('hidden');
       window.scrollTo(0, 0);
@@ -744,312 +1053,319 @@
     }
 
     // ==========================================
-    // 3. PORTAL ADMIN SEKOLAH (ZOMOPAY VIOLET-MINT DESIGN)
+    // 3. PORTAL ADMIN SEKOLAH (8 KARTU EDUKATIF SESUAI REFERENSI DESAIN)
     // ==========================================
     function renderPortalAdmin() {
       const p = dbData.pengaturan;
 
-      // Bottom Decorative Wavy Ribbons (Violet & Mint)
+      // Bottom Decorative Wavy Ribbons (Kuning & Biru Pendidikan)
       document.getElementById('bottomWaveContainer').innerHTML = `
         <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#7C3AED" opacity="0.3"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#14B8A6" opacity="0.25"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F6F4FE"></path>
+          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#EAB308" opacity="0.4"></path>
+          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#2563EB" opacity="0.3"></path>
+          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F8FAFC"></path>
         </svg>
       `;
 
-      // A. HERO BANNER ADMIN (SCREEN 2 - "YOUR BALANCE" VIOLET CARD WITH 3D COINS & MINT SLIDER)
+      // A. HERO BANNER ADMIN (BANNER BIRU NAVY + LOGO TUT WURI + ILUSTRASI 3D ASN SEKOLAH)
       document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="relative w-full rounded-[34px] p-6 sm:p-7 text-white glass-card-purple shadow-[0_22px_45px_rgba(109,40,217,0.36)] overflow-hidden">
+        <div class="relative w-full rounded-[32px] p-6 sm:p-8 text-white shadow-[0_20px_45px_rgba(15,43,92,0.35)] overflow-hidden"
+             style="background: linear-gradient(135deg, #091E42 0%, #0F3470 50%, #1754B5 100%);">
           
-          <!-- SVG Gradients Definition -->
-          <svg class="absolute w-0 h-0">
-            <defs>
-              <linearGradient id="goldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#FDE047"/>
-                <stop offset="50%" stop-color="#F59E0B"/>
-                <stop offset="100%" stop-color="#B45309"/>
-              </linearGradient>
-            </defs>
-          </svg>
+          <!-- Latar Lingkungan Sekolah: Langit Cerah & Awan Halus -->
+          <div class="absolute -right-20 -top-20 w-80 h-80 bg-sky-400/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-          <!-- Ambient Radial Glows Inside Card -->
-          <div class="absolute -right-16 -top-16 w-56 h-56 bg-fuchsia-400/25 rounded-full blur-2xl pointer-events-none"></div>
-          <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-brandmint-400/20 rounded-full blur-2xl pointer-events-none"></div>
-
-          <!-- Floating 3D Golden Coin 1 (Top Left) -->
-          <div class="floating-coin absolute -top-2 left-6 w-11 h-11 pointer-events-none drop-shadow-[0_8px_16px_rgba(245,158,11,0.55)]">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad1)" stroke="#B45309" stroke-width="3"/>
-              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5" stroke-dasharray="5,2"/>
-              <text x="50" y="63" font-size="34" font-weight="900" fill="#78350F" text-anchor="middle">★</text>
-            </svg>
-          </div>
-
-          <!-- Floating 3D Golden Coin 2 (Bottom Right) -->
-          <div class="floating-coin absolute -bottom-3 right-6 w-13 h-13 pointer-events-none drop-shadow-[0_10px_20px_rgba(245,158,11,0.6)]" style="animation-delay: -1.7s;">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad1)" stroke="#B45309" stroke-width="3"/>
-              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5"/>
-              <circle cx="50" cy="50" r="14" fill="#F59E0B" opacity="0.6"/>
-              <text x="50" y="61" font-size="28" font-weight="900" fill="#78350F" text-anchor="middle">SD</text>
-            </svg>
-          </div>
-
-          <!-- Card Header: Label & Plus Button -->
-          <div class="relative z-10 flex items-center justify-between mb-3">
-            <div>
-              <span class="text-xs font-bold text-purple-200 tracking-wide uppercase">Status Administrasi Sekolah:</span>
-            </div>
-            <!-- Translucent Plus Button '+' (Screen 2) -->
-            <button onclick="openFormPenugasanModal()" title="Tetapkan Penugasan Guru Baru"
-              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 text-white flex items-center justify-center font-bold text-lg shadow-sm transition active:scale-90 cursor-pointer">
-              +
-            </button>
-          </div>
-
-          <!-- Card Main Big Value ($1,286.00 equivalent) -->
-          <div class="relative z-10 space-y-1 mb-5">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-sm">
-              6 Rombel • 6 Guru
-            </h2>
-            <p class="text-xs sm:text-sm text-purple-200 font-medium">
-              ${p.namaSekolah} • Kurikulum Merdeka ${p.tahunAjaranAktif}
-            </p>
-          </div>
-
-          <!-- Progress Slider Bar (Screen 2: Mint Bar with White Knob) -->
-          <div class="relative z-10 space-y-1.5 pt-1">
-            <div class="flex items-center justify-between text-[11px] font-bold text-purple-200">
-              <span>Kelengkapan Rombel & Wali</span>
-              <span class="text-brandmint-300 font-extrabold">98.5% Lengkap</span>
-            </div>
+          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             
-            <div class="relative w-full h-2.5 rounded-full bg-black/20 p-0.5 overflow-visible">
-              <!-- Glowing Mint Track -->
-              <div class="h-full rounded-full bg-gradient-to-r from-teal-300 via-brandmint-400 to-emerald-400 shadow-[0_0_12px_rgba(45,212,191,0.8)]" style="width: 82%;"></div>
-              <!-- Round Slider Knob -->
-              <div class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-brandmint-400 shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer" style="left: calc(82% - 10px);">
-                <div class="w-1.5 h-1.5 rounded-full bg-brandmint-600"></div>
+            <!-- Sisi Kiri: Identitas Sekolah & Logo Tut Wuri Handayani -->
+            <div class="flex items-start gap-4 sm:gap-5 max-w-xl">
+              <!-- Logo Tut Wuri Handayani Resmi -->
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center shrink-0 border border-white/20 shadow-md">
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
+                  <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="#0284C7" stroke="#38BDF8" stroke-width="3"/>
+                  <circle cx="50" cy="50" r="34" fill="#F8FAFC"/>
+                  <path d="M50 18 L55 35 L45 35 Z" fill="#EAB308"/>
+                  <path d="M50 25 C45 30 35 34 26 42 C34 44 42 43 47 48 C43 53 36 57 28 65 C38 65 45 61 50 67 C55 61 62 65 72 65 C64 57 57 53 53 48 C58 43 66 44 74 42 C65 34 55 30 50 25 Z" fill="#CA8A04"/>
+                  <circle cx="50" cy="40" r="4.5" fill="#DC2626"/>
+                  <path d="M38 72 L62 72 L50 82 Z" fill="#0284C7"/>
+                </svg>
+              </div>
+
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/30 text-blue-200 border border-blue-400/30 uppercase tracking-wider">
+                    Sistem Terpadu
+                  </span>
+                  <span class="text-xs text-blue-200 font-semibold">• Kurikulum Merdeka</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white drop-shadow-sm">
+                  Portal Admin Sekolah
+                </h1>
+                <h2 class="text-sm sm:text-base font-bold text-sky-200">
+                  ${p.namaSekolah}
+                </h2>
+                <p class="text-xs sm:text-sm text-blue-100/90 italic font-medium pt-0.5">
+                  “Kelola dengan bijak, wujudkan sekolah yang lebih baik”
+                </p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-[10px] text-purple-200/80 pt-0.5">
-              <span>6 Rombel Aktif</span>
-              <span>100% Wali Kelas Ditetapkan</span>
+            <!-- Sisi Kanan: Ilustrasi 3D Administrator Sekolah ASN + Gedung & Bendera -->
+            <div class="relative w-48 sm:w-60 h-36 sm:h-40 flex items-end justify-center shrink-0">
+              
+              <svg viewBox="0 0 240 160" class="w-full h-full">
+                <defs>
+                  <linearGradient id="roofGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#EF4444"/>
+                    <stop offset="100%" stop-color="#991B1B"/>
+                  </linearGradient>
+                  <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#FEF08A"/>
+                    <stop offset="100%" stop-color="#FDE047"/>
+                  </linearGradient>
+                </defs>
+
+                <circle cx="45" cy="90" r="28" fill="#15803D" opacity="0.7"/>
+                <circle cx="195" cy="85" r="32" fill="#16A34A" opacity="0.6"/>
+
+                <rect x="35" y="80" width="170" height="70" rx="6" fill="url(#wallGrad)" stroke="#CA8A04" stroke-width="1.5"/>
+                <polygon points="25,80 120,40 215,80" fill="url(#roofGrad)"/>
+                <circle cx="120" cy="62" r="9" fill="#FFFFFF" stroke="#991B1B" stroke-width="1.5"/>
+                <line x1="120" y1="62" x2="120" y2="57" stroke="#1E293B" stroke-width="1.5"/>
+                <line x1="120" y1="62" x2="124" y2="62" stroke="#1E293B" stroke-width="1.5"/>
+                <rect x="50" y="95" width="22" height="24" rx="3" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="85" y="95" width="22" height="24" rx="3" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="135" y="95" width="22" height="24" rx="3" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="170" y="95" width="22" height="24" rx="3" fill="#38BDF8" stroke="#0284C7"/>
+
+                <line x1="210" y1="20" x2="210" y2="130" stroke="#CBD5E1" stroke-width="3"/>
+                <rect x="210" y="24" width="24" height="8" fill="#DC2626"/>
+                <rect x="210" y="32" width="24" height="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5"/>
+
+                <g transform="translate(90, 48)">
+                  <path d="M12 55 Q30 48 48 55 L55 95 L5 95 Z" fill="#D97706" stroke="#92400E" stroke-width="1.5"/>
+                  <polygon points="30,52 23,65 37,65" fill="#FEF08A"/>
+                  <polygon points="30,65 27,82 30,86 33,82" fill="#1E3A8A"/>
+                  <rect x="25" y="42" width="10" height="12" fill="#FBCFE8"/>
+                  <ellipse cx="30" cy="32" rx="14" ry="16" fill="#FED7AA"/>
+                  <path d="M16 28 Q30 14 44 28 Q38 18 20 20 Z" fill="#1E293B"/>
+                  <rect x="20" y="27" width="9" height="7" rx="2" fill="none" stroke="#1E293B" stroke-width="1.5"/>
+                  <rect x="31" y="27" width="9" height="7" rx="2" fill="none" stroke="#1E293B" stroke-width="1.5"/>
+                  <line x1="29" y1="30" x2="31" y2="30" stroke="#1E293B" stroke-width="1.5"/>
+                  <path d="M26 39 Q30 43 34 39" fill="none" stroke="#9A3412" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M5 75 Q-2 65 3 60 Q8 62 8 70 Z" fill="#FED7AA" stroke="#EA580C" stroke-width="1.2"/>
+                  <rect x="42" y="66" width="16" height="24" rx="2" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+                </g>
+              </svg>
+
             </div>
+
           </div>
         </div>
       `;
 
-      // B. GRID 8 QUICK ACTION SQUIRCLE BUTTONS & RECENT SECTION (SCREEN 2)
+      // B. GRID 8 KARTU MENU ADMIN (4 KOLOM X 2 BARIS SESUAI REFERENSI DESAIN)
       document.getElementById('portalCardsContainer').innerHTML = `
-        <div class="space-y-6">
+        <div class="space-y-4">
           
-          <!-- Section Quick Actions: 8 Colorful Squircles -->
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Administrasi</h3>
-              <span class="text-xs font-bold text-brandpurple-700">8 Modul Aktif</span>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Administrasi Sekolah</h3>
+              <p class="text-xs text-slate-500">Pilih modul tugas untuk mengelola data operasional sekolah</p>
             </div>
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
+              8 Modul Tersedia
+            </span>
+          </div>
 
-            <!-- Responsive Squircle Grid (4 columns desktop, 4 columns tablet/mobile) -->
-            <div class="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-              
-              <!-- 1. Coral / Orange Squircle: Manajemen Guru -->
-              <div onclick="openModule('admin-guru')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(255,107,74,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(255,107,74,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #FF7A59 0%, #FF5722 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- Responsive 8 Cards Grid (4 columns desktop, 2 columns tablet, 1-2 mobile) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- KARTU 1: MANAJEMEN GURU -->
+            <div onclick="openModule('admin-guru')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Guru</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Kelola Data Guru</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-blue-700 transition-colors truncate">Manajemen Guru</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Kelola data dan penugasan guru</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-blue-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 2. Cyan / Sky Squircle: Manajemen Kelas -->
-              <div onclick="openModule('admin-kelas')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(56,189,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(56,189,248,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 2: MANAJEMEN KELAS -->
+            <div onclick="openModule('admin-kelas')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-emerald-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Kelas</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Atur Rombel & Wali</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors truncate">Manajemen Kelas</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Atur kelas dan wali kelas</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-emerald-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 3. Rose / Pink Squircle: Pembagian Guru & Kelas -->
-              <div onclick="openModule('admin-penugasan')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,113,133,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,113,133,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 3: PEMBAGIAN GURU & KELAS -->
+            <div onclick="openModule('admin-penugasan')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-amber-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Penugasan</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Plotting Wali & Mapel</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-amber-700 transition-colors truncate">Pembagian Guru & Kelas</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Tentukan penugasan guru per kelas</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-amber-600 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 4. Mint / Teal Squircle: Rekapitulasi Nilai -->
-              <div onclick="openModule('admin-nilai')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(45,212,191,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(45,212,191,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 4: REKAPITULASI NILAI -->
+            <div onclick="openModule('admin-nilai')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-purple-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Rekap Nilai</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Formatif & SAS</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-purple-700 transition-colors truncate">Rekapitulasi Nilai</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Lihat dan cetak rekap nilai</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-purple-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 5. Purple / Violet Squircle: Rekapitulasi Absensi -->
-              <div onclick="openModule('admin-absensi')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(192,132,252,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(192,132,252,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #C084FC 0%, #7C3AED 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 5: REKAPITULASI ABSENSI -->
+            <div onclick="openModule('admin-absensi')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-emerald-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Absensi</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Kehadiran Siswa</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors truncate">Rekapitulasi Absensi</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Lihat dan cetak rekap absensi</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-emerald-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 6. Amber / Gold Squircle: Laporan Sekolah Resmi -->
-              <div onclick="openModule('admin-laporan')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,191,36,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,191,36,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 6: LAPORAN SEKOLAH -->
+            <div onclick="openModule('admin-laporan')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-rose-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Laporan</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Kop Surat PDF</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-rose-700 transition-colors truncate">Laporan Sekolah</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Generate laporan sekolah lengkap</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-rose-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 7. Royal Blue Squircle: Bank Perangkat Ajar -->
-              <div onclick="openModule('admin-perangkat')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(96,165,250,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(96,165,250,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 7: BANK PERANGKAT AJAR -->
+            <div onclick="openModule('admin-perangkat')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-sky-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Perangkat</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Word, PDF, Excel</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-sky-700 transition-colors truncate">Bank Perangkat Ajar</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Kelola bahan ajar untuk guru</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-sky-600 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 8. Indigo Squircle: Pengaturan Sekolah -->
-              <div onclick="openModule('admin-pengaturan')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(129,140,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(129,140,248,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 8: PENGATURAN SEKOLAH -->
+            <div onclick="openModule('admin-pengaturan')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Setelan</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Identitas Sekolah</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-indigo-700 transition-colors truncate">Pengaturan Sekolah</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Atur identitas dan konfigurasi sistem</p>
+                </div>
               </div>
-
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-blue-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
             </div>
+
           </div>
-
-          <!-- Section "Recent" (Screen 2 Signature List) -->
-          <div class="space-y-3 pt-2">
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Recent</h3>
-              <button onclick="openModule('admin-laporan')" class="text-xs font-extrabold text-brandpurple-700 hover:text-brandpurple-900 cursor-pointer">
-                View All
-              </button>
-            </div>
-
-            <div class="bg-white rounded-3xl p-3 sm:p-4 soft-card-shadow border border-slate-100 space-y-2">
-              
-              <!-- Recent Item 1 -->
-              <div onclick="openModule('admin-penugasan')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Penugasan Wali Kelas</h4>
-                    <p class="text-[11px] text-slate-400">Dewi Rahmawati, S.Pd. • Kelas IV-A</p>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700">Aktif</span>
-              </div>
-
-              <!-- Recent Item 2 -->
-              <div onclick="openModule('admin-absensi')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Presensi Harian Seluruh Kelas</h4>
-                    <p class="text-[11px] text-slate-400">Tingkat I - VI • Hari Ini</p>
-                  </div>
-                </div>
-                <span class="text-xs font-black text-brandmint-600">+98.2% Hadir</span>
-              </div>
-
-              <!-- Recent Item 3 -->
-              <div onclick="openModule('admin-nilai')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-purple-50 text-brandpurple-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Rekap Nilai Formatif & SAS</h4>
-                    <p class="text-[11px] text-slate-400">Matematika & Bhs. Indonesia Fase B</p>
-                  </div>
-                </div>
-                <span class="text-xs font-black text-brandpurple-700">87.67 Rata-rata</span>
-              </div>
-
-              <!-- Recent Item 4 -->
-              <div onclick="openModule('admin-perangkat')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Dokumen Modul Baru Diunggah</h4>
-                    <p class="text-[11px] text-slate-400">Modul Pecahan & Format Penilaian Excel</p>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-sky-50 text-sky-700">Tersedia</span>
-              </div>
-
-            </div>
-          </div>
-
         </div>
       `;
 
-      // C. WELCOME INFORMATION BAR ADMIN (PILL STYLE)
+      // C. WELCOME INFORMATION BAR ADMIN (PILL STYLE DUA SISI)
       document.getElementById('portalWelcomeBarContainer').innerHTML = `
         <div class="bg-white rounded-3xl p-4 sm:px-6 sm:py-3.5 soft-card-shadow border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-2xl bg-brandpurple-100 text-brandpurple-800 font-extrabold flex items-center justify-center text-sm shadow-xs shrink-0">
-              👑
+            <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm shrink-0">
+              i
             </div>
             <div>
-              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Kepala Sekolah & Admin!</h4>
-              <p class="text-xs text-slate-500">Kelola guru, rombel, dan evaluasi capaian sekolah dalam satu sentuhan.</p>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Kepala Sekolah!</h4>
+              <p class="text-xs text-slate-500">Kelola administrasi sekolah dengan mudah, cepat, dan aman.</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">${p.namaSekolah}</span>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200 shrink-0">
+              🏫
+            </div>
+            <div class="text-right sm:text-left">
+              <div class="font-extrabold text-slate-900 text-xs">${p.namaSekolah}</div>
+              <div class="text-[10px] text-slate-400">Kecamatan ${p.kecamatan || 'Ambulu - Jember'}</div>
+            </div>
           </div>
         </div>
       `;
     }
 
     // ==========================================
-    // 4. PORTAL GURU (ZOMOPAY EMERALD-MINT DESIGN)
+    // 4. PORTAL GURU (8-CARD PORTAL RESPONSIVE - SESUAI GAMBAR REFERENSI 4)
     // ==========================================
     function renderPortalGuru() {
       const p = dbData.pengaturan;
@@ -1057,277 +1373,314 @@
       // Bottom Decorative Wavy Ribbons (Emerald & Mint)
       document.getElementById('bottomWaveContainer').innerHTML = `
         <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#059669" opacity="0.3"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#14B8A6" opacity="0.25"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F6F4FE"></path>
+          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#047857" opacity="0.25"></path>
+          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#0D9488" opacity="0.2"></path>
+          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F8FAFC"></path>
         </svg>
       `;
 
-      // A. HERO BANNER GURU (EMERALD-MINT CARD WITH 3D COINS & MINT SLIDER)
+      // A. HERO BANNER GURU (EMERALD GRADIENT DENGAN TUT WURI HANDAYANI & GURU MUSLIMAH ASN)
       document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="relative w-full rounded-[34px] p-6 sm:p-7 text-white glass-card-emerald shadow-[0_22px_45px_rgba(5,150,105,0.36)] overflow-hidden">
+        <div class="relative w-full rounded-[30px] sm:rounded-[36px] p-5 sm:p-7 md:p-9 text-white shadow-[0_20px_50px_rgba(4,120,87,0.3)] overflow-hidden"
+             style="background: linear-gradient(135deg, #064E3B 0%, #065F46 40%, #047857 70%, #0D9488 100%);">
           
-          <svg class="absolute w-0 h-0">
-            <defs>
-              <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#FDE047"/>
-                <stop offset="50%" stop-color="#F59E0B"/>
-                <stop offset="100%" stop-color="#B45309"/>
-              </linearGradient>
-            </defs>
-          </svg>
+          <!-- Background Ambient Lights & Wave Accents -->
+          <div class="absolute -right-20 -top-20 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
 
-          <!-- Ambient Radial Glows -->
-          <div class="absolute -right-16 -top-16 w-56 h-56 bg-emerald-300/20 rounded-full blur-2xl pointer-events-none"></div>
-          <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-teal-400/20 rounded-full blur-2xl pointer-events-none"></div>
-
-          <!-- Floating 3D Golden Coin 1 (Top Left) -->
-          <div class="floating-coin absolute -top-2 left-6 w-11 h-11 pointer-events-none drop-shadow-[0_8px_16px_rgba(245,158,11,0.55)]">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad2)" stroke="#B45309" stroke-width="3"/>
-              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5" stroke-dasharray="5,2"/>
-              <text x="50" y="63" font-size="34" font-weight="900" fill="#78350F" text-anchor="middle">★</text>
-            </svg>
-          </div>
-
-          <!-- Floating 3D Golden Coin 2 (Bottom Right) -->
-          <div class="floating-coin absolute -bottom-3 right-6 w-13 h-13 pointer-events-none drop-shadow-[0_10px_20px_rgba(245,158,11,0.6)]" style="animation-delay: -1.7s;">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad2)" stroke="#B45309" stroke-width="3"/>
-              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5"/>
-              <circle cx="50" cy="50" r="14" fill="#F59E0B" opacity="0.6"/>
-              <text x="50" y="61" font-size="28" font-weight="900" fill="#78350F" text-anchor="middle">SD</text>
-            </svg>
-          </div>
-
-          <!-- Header Row -->
-          <div class="relative z-10 flex items-center justify-between mb-3">
-            <div>
-              <span class="text-xs font-bold text-emerald-100 tracking-wide uppercase">Kelas Ampuan Anda:</span>
-            </div>
-            <button onclick="openFormInputNilaiModal()" title="Input Nilai Baru"
-              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 text-white flex items-center justify-center font-bold text-lg shadow-sm transition active:scale-90 cursor-pointer">
-              +
-            </button>
-          </div>
-
-          <!-- Main Stat Display -->
-          <div class="relative z-10 space-y-1 mb-5">
-            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-sm">
-              Kelas IV-A • 28 Siswa
-            </h2>
-            <p class="text-xs sm:text-sm text-emerald-100 font-medium">
-              Fase B • Semester ${p.semesterAktif} • ${p.tahunAjaranAktif}
-            </p>
-          </div>
-
-          <!-- Progress Slider Bar -->
-          <div class="relative z-10 space-y-1.5 pt-1">
-            <div class="flex items-center justify-between text-[11px] font-bold text-emerald-100">
-              <span>Status Presensi Hari Ini</span>
-              <span class="text-yellow-300 font-extrabold">100% Terverifikasi</span>
-            </div>
+          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             
-            <div class="relative w-full h-2.5 rounded-full bg-black/20 p-0.5 overflow-visible">
-              <div class="h-full rounded-full bg-gradient-to-r from-teal-200 via-brandmint-300 to-yellow-300 shadow-[0_0_12px_rgba(45,212,191,0.8)]" style="width: 100%;"></div>
-              <div class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-emerald-400 shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer" style="left: calc(100% - 14px);">
-                <div class="w-1.5 h-1.5 rounded-full bg-emerald-600"></div>
+            <!-- SISI KIRI: LOGO TUT WURI HANDAYANI & IDENTITAS SEKOLAH -->
+            <div class="flex items-center gap-4 sm:gap-6 w-full md:w-auto">
+              <!-- Official Emblem Tut Wuri Handayani Badge -->
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center border border-white/20 shadow-lg shrink-0">
+                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
+                  <polygon points="50,4 93,27 77,88 23,88 7,27" fill="#0284C7" stroke="#38BDF8" stroke-width="2.5"/>
+                  <path d="M50,15 L50,68 M32,32 Q50,48 68,32 M24,48 Q50,66 76,48 M18,65 Q50,82 82,65" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/>
+                  <circle cx="50" cy="22" r="6" fill="#FACC15"/>
+                  <polygon points="50,13 46,24 54,24" fill="#FACC15"/>
+                  <path d="M22,82 Q50,96 78,82" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>
+                  <path d="M26,82 L74,82" stroke="#0284C7" stroke-width="1.5"/>
+                  <text x="50" y="80" font-size="7" font-weight="900" fill="#0369A1" text-anchor="middle" letter-spacing="1">TUT WURI HANDAYANI</text>
+                </svg>
+              </div>
+
+              <!-- Vertical White Separator Line -->
+              <div class="w-[1.5px] h-14 sm:h-16 bg-white/25 rounded-full shrink-0 hidden sm:block"></div>
+
+              <!-- Text Portal Guru -->
+              <div class="space-y-1">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white drop-shadow">
+                  Portal <span class="text-yellow-300">Guru</span>
+                </h1>
+                <h2 class="text-sm sm:text-base font-bold text-emerald-100/90 tracking-wide">
+                  ${p.namaSekolah || 'SD Negeri Cerdas Bangsa 01'}
+                </h2>
+                <p class="text-xs sm:text-sm text-emerald-100/80 font-normal italic">
+                  "Mengajar dengan hati, mendidik dengan teknologi"
+                </p>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-[10px] text-emerald-100/90 pt-0.5">
-              <span>27 Hadir • 1 Sakit</span>
-              <span>Jurnal Mengajar Terisi</span>
+            <!-- SISI KANAN: ILUSTRASI 3D GURU MUSLIMAH ASN, GEDUNG SEKOLAH & BENDERA MERAH PUTIH -->
+            <div class="relative w-full md:w-80 h-36 sm:h-44 flex items-center justify-center md:justify-end shrink-0">
+              <svg viewBox="0 0 280 150" class="w-full h-full max-w-[300px] overflow-visible drop-shadow-xl">
+                <!-- Sky & Cloud background -->
+                <ellipse cx="140" cy="140" rx="130" ry="25" fill="#047857" opacity="0.4"/>
+                
+                <!-- School Trees & Foliage -->
+                <circle cx="40" cy="90" r="28" fill="#15803D"/>
+                <circle cx="65" cy="80" r="32" fill="#22C55E"/>
+                <circle cx="240" cy="95" r="26" fill="#15803D"/>
+                <circle cx="220" cy="85" r="30" fill="#22C55E"/>
+
+                <!-- Gedung Sekolah Modern & Genteng Merah -->
+                <rect x="55" y="60" width="170" height="70" rx="4" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+                <polygon points="50,60 140,25 230,60" fill="#EA580C" stroke="#B45309" stroke-width="1.5"/>
+                
+                <!-- Menara Jam Sekolah -->
+                <rect x="125" y="15" width="30" height="30" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+                <polygon points="120,15 140,2 160,15" fill="#DC2626"/>
+                <circle cx="140" cy="28" r="7" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+                <line x1="140" y1="28" x2="140" y2="24" stroke="#0F172A" stroke-width="1.2"/>
+                <line x1="140" y1="28" x2="143" y2="28" stroke="#0F172A" stroke-width="1.2"/>
+
+                <!-- Jendela Gedung Sekolah -->
+                <rect x="70" y="80" width="18" height="20" rx="2" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="98" y="80" width="18" height="20" rx="2" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="165" y="80" width="18" height="20" rx="2" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="192" y="80" width="18" height="20" rx="2" fill="#38BDF8" stroke="#0284C7"/>
+                <rect x="130" y="90" width="20" height="40" fill="#92400E" rx="2"/>
+
+                <!-- Tiang Bendera & Bendera Merah Putih -->
+                <line x1="240" y1="20" x2="240" y2="130" stroke="#E2E8F0" stroke-width="3"/>
+                <rect x="240" y="24" width="24" height="8" fill="#DC2626"/>
+                <rect x="240" y="32" width="24" height="8" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5"/>
+
+                <!-- Karakter 3D Guru Muslimah ASN (Jilbab Khaki & Seragam ASN) -->
+                <g transform="translate(100, 42)">
+                  <!-- Badan & Seragam ASN Khaki -->
+                  <path d="M12 60 Q32 50 52 60 L60 100 L4 100 Z" fill="#D97706" stroke="#92400E" stroke-width="1.5"/>
+                  <polygon points="32,58 25,72 39,72" fill="#FEF08A"/>
+                  
+                  <!-- Hijab / Jilbab Warna Krem Khaki Hangat -->
+                  <path d="M16 26 C12 8, 52 8, 48 26 C48 38, 52 56, 46 64 C40 70, 24 70, 18 64 C12 56, 16 38, 16 26 Z" fill="#FDE68A" stroke="#D97706" stroke-width="1.5"/>
+                  
+                  <!-- Wajah Ramah Ibu Guru -->
+                  <ellipse cx="32" cy="34" rx="12" ry="14" fill="#FED7AA"/>
+                  
+                  <!-- Mata & Senyum Ramah -->
+                  <ellipse cx="27" cy="32" rx="2" ry="2.5" fill="#1E293B"/>
+                  <ellipse cx="37" cy="32" rx="2" ry="2.5" fill="#1E293B"/>
+                  <path d="M27 40 Q32 45 37 40" fill="none" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="24" cy="36" r="2" fill="#FB7185" opacity="0.6"/>
+                  <circle cx="40" cy="36" r="2" fill="#FB7185" opacity="0.6"/>
+
+                  <!-- Tangan Membawa Tablet Edukasi Digital -->
+                  <path d="M46 68 Q54 62 58 68 Q54 74 48 74 Z" fill="#FED7AA"/>
+                  <rect x="46" y="60" width="18" height="26" rx="3" fill="#0F172A" stroke="#38BDF8" stroke-width="1.2"/>
+                  <rect x="48" y="62" width="14" height="18" rx="1.5" fill="#38BDF8"/>
+                </g>
+              </svg>
             </div>
+
           </div>
         </div>
       `;
 
-      // B. GRID 8 QUICK ACTION SQUIRCLES (GURU) & RECENT
+      // B. GRID 8 KARTU MENU GURU (4 KOLOM X 2 BARIS SESUAI REFERENSI DESAIN 4)
       document.getElementById('portalCardsContainer').innerHTML = `
-        <div class="space-y-6">
+        <div class="space-y-4">
           
-          <!-- Section 8 Squircles Guru -->
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Pembelajaran</h3>
-              <span class="text-xs font-bold text-emerald-700">8 Modul Aktif</span>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Administrasi Pembelajaran Guru</h3>
+              <p class="text-xs text-slate-500">Pilih modul tugas untuk mengelola pembelajaran kelas Anda</p>
             </div>
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              8 Modul Guru Aktif
+            </span>
+          </div>
 
-            <div class="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-              
-              <!-- 1. Coral / Orange Squircle: Dashboard Guru -->
-              <div onclick="openModule('guru-dashboard')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(255,107,74,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(255,107,74,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #FF7A59 0%, #FF5722 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- Responsive 8 Cards Grid (4 columns desktop, 2 columns tablet, 1-2 mobile) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- KARTU 1: DASHBOARD GURU -->
+            <div onclick="openModule('guru-dashboard')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Beranda</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Aktivitas Kelas</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-blue-700 transition-colors truncate">Dashboard</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Ringkasan aktivitas kelas Anda</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-blue-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 2. Cyan / Sky Squircle: Data Siswa -->
-              <div onclick="openModule('guru-siswa')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(56,189,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(56,189,248,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+            <!-- KARTU 2: DATA SISWA -->
+            <div onclick="openModule('guru-siswa')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-emerald-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Siswa</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Buku Induk</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors truncate">Data Siswa</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Kelola data siswa kelas Anda</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-emerald-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 3. Rose / Pink Squircle: Input Nilai -->
-              <div onclick="openModule('guru-nilai')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,113,133,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,113,133,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            <!-- KARTU 3: INPUT NILAI -->
+            <div onclick="openModule('guru-nilai')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-amber-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Nilai</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Formatif & SAS</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-amber-700 transition-colors truncate">Input Nilai</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Masukkan dan kelola nilai siswa</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-amber-600 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 4. Mint / Teal Squircle: Presensi Siswa -->
-              <div onclick="openModule('guru-presensi')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(45,212,191,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(45,212,191,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <!-- KARTU 4: PRESENSI SISWA -->
+            <div onclick="openModule('guru-presensi')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-purple-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Presensi</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Hadir, Sakit, Izin</span>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-purple-700 transition-colors truncate">Presensi Siswa</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Kelola kehadiran siswa</p>
+                </div>
               </div>
+              <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-purple-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
 
-              <!-- 5. Purple / Violet Squircle: Jurnal Mengajar -->
-              <div onclick="openModule('guru-jurnal')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(192,132,252,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(192,132,252,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #C084FC 0%, #7C3AED 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- KARTU 5: JURNAL MENGAJAR -->
+            <div onclick="openModule('guru-jurnal')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-teal-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                   </svg>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Jurnal</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Catatan Harian</span>
-              </div>
-
-              <!-- 6. Amber / Gold Squircle: Perangkat Ajar -->
-              <div onclick="openModule('guru-perangkat')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,191,36,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,191,36,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                  </svg>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-teal-700 transition-colors truncate">Jurnal Mengajar</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Catat kegiatan pembelajaran</p>
                 </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Perangkat</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Modul & RPP</span>
               </div>
-
-              <!-- 7. Royal Blue Squircle: Analisis Hasil Belajar -->
-              <div onclick="openModule('guru-analisis')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(96,165,250,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(96,165,250,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                  </svg>
-                </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Analisis</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Grafik Ketuntasan</span>
+              <div class="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-teal-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </div>
-
-              <!-- 8. Indigo Squircle: Pengumuman Sekolah -->
-              <div onclick="openModule('guru-pengumuman')" class="flex flex-col items-center group cursor-pointer text-center">
-                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(129,140,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(129,140,248,0.42)] group-active:scale-95 transition-all duration-300"
-                     style="background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);">
-                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                  </svg>
-                </div>
-                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Info</span>
-                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Papan Pengumuman</span>
-              </div>
-
             </div>
+
+            <!-- KARTU 6: PERANGKAT PEMBELAJARAN -->
+            <div onclick="openModule('guru-perangkat')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-rose-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-rose-700 transition-colors truncate">Perangkat Pembelajaran</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Akses perangkat ajar</p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-rose-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
+
+            <!-- KARTU 7: ANALISIS -->
+            <div onclick="openModule('guru-analisis')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-sky-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-sky-700 transition-colors truncate">Analisis</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Lihat analisis hasil pembelajaran</p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-sky-600 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
+
+            <!-- KARTU 8: PENGUMUMAN -->
+            <div onclick="openModule('guru-pengumuman')" 
+                 class="bg-white rounded-[26px] p-4 sm:p-5 soft-card-shadow border border-slate-100/90 flex items-center justify-between gap-3.5 hover:-translate-y-1.5 hover:shadow-xl hover:border-indigo-200 transition-all duration-300 cursor-pointer group">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-13 h-13 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform shadow-xs">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                  </svg>
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-extrabold text-slate-900 text-sm group-hover:text-indigo-700 transition-colors truncate">Pengumuman</h4>
+                  <p class="text-[11px] text-slate-400 font-medium truncate mt-0.5">Lihat pengumuman terbaru</p>
+                </div>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 group-hover:bg-indigo-700 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </div>
+            </div>
+
           </div>
-
-          <!-- Section "Recent" (Guru) -->
-          <div class="space-y-3 pt-2">
-            <div class="flex items-center justify-between">
-              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Recent</h3>
-              <button onclick="openModule('guru-dashboard')" class="text-xs font-extrabold text-emerald-700 hover:text-emerald-900 cursor-pointer">
-                View All
-              </button>
-            </div>
-
-            <div class="bg-white rounded-3xl p-3 sm:p-4 soft-card-shadow border border-slate-100 space-y-2">
-              
-              <!-- Recent Item 1 -->
-              <div onclick="openModule('guru-presensi')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Presensi Siswa Hari Ini</h4>
-                    <p class="text-[11px] text-slate-400">27 Hadir • 1 Sakit (Dimas Bayu)</p>
-                  </div>
-                </div>
-                <span class="text-xs font-black text-brandmint-600">+96.4% Hadir</span>
-              </div>
-
-              <!-- Recent Item 2 -->
-              <div onclick="openModule('guru-nilai')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Input Nilai Formatif Pecahan</h4>
-                    <p class="text-[11px] text-slate-400">Siti Aisyah Putri • Nilai 92</p>
-                  </div>
-                </div>
-                <span class="text-xs font-black text-rose-600">92 Nilai</span>
-              </div>
-
-              <!-- Recent Item 3 -->
-              <div onclick="openModule('guru-jurnal')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-2xl bg-purple-50 text-brandpurple-600 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-extrabold text-slate-900">Jurnal Mengajar Terisi</h4>
-                    <p class="text-[11px] text-slate-400">Matematika • Pecahan Senilai</p>
-                  </div>
-                </div>
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700">Tersimpan</span>
-              </div>
-
-            </div>
-          </div>
-
         </div>
       `;
 
-      // C. WELCOME INFORMATION BAR GURU
+      // C. WELCOME INFORMATION BAR GURU (PILL STYLE DUA SISI SESUAI REFERENSI DESAIN 4)
       document.getElementById('portalWelcomeBarContainer').innerHTML = `
         <div class="bg-white rounded-3xl p-4 sm:px-6 sm:py-3.5 soft-card-shadow border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-sm shadow-xs shrink-0">
-              👩‍🏫
+            <div class="w-9 h-9 rounded-full bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm shrink-0">
+              i
             </div>
             <div>
-              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Bertugas, Ibu Dewi Rahmawati!</h4>
-              <p class="text-xs text-slate-500">Mendidik dengan hati, wujudkan generasi penerus yang berkarakter.</p>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Bapak/Ibu Guru!</h4>
+              <p class="text-xs text-slate-500">Mari wujudkan pembelajaran yang menyenangkan dan bermakna.</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">${p.namaSekolah}</span>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200 shrink-0">
+              🏫
+            </div>
+            <div class="text-right sm:text-left">
+              <div class="font-extrabold text-slate-900 text-xs">${p.namaSekolah}</div>
+              <div class="text-[10px] text-slate-400">Kecamatan ${p.kecamatan || 'Ambulu - Jember'}</div>
+            </div>
           </div>
         </div>
       `;
@@ -1337,6 +1690,8 @@
     // 5. NAVIGASI HALAMAN MODUL TERPISAH (SCREEN 3 STYLE)
     // ==========================================
     function openModule(moduleKey) {
+      activeModuleKey = moduleKey;
+      saveSessionState();
       document.getElementById('portalDashboardView').classList.add('hidden');
       document.getElementById('moduleView').classList.remove('hidden');
       window.scrollTo(0, 0);
@@ -1500,6 +1855,11 @@
         case 'guru-siswa':
           titleEl.textContent = 'Buku Induk Data Siswa Kelas';
           subEl.textContent = 'Daftar nomor induk, NISN, wali murid, dan kontak WhatsApp';
+          actionEl.innerHTML = `
+            <button onclick="openFormSiswaModal()" class="bg-emerald-600 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-emerald-700 transition">
+              + Tambah Siswa Baru
+            </button>
+          `;
           renderModuleGuruSiswa(contentEl);
           break;
 
@@ -2006,22 +2366,173 @@
     }
 
     // ==========================================
-    // ACTION HANDLERS & MODAL UTILITIES
+    // ACTION HANDLERS & MODAL UTILITIES (GURU)
     // ==========================================
-    function recordPresensiGuru(sId, sNama, status) {
-      showToast(`Presensi ${sNama}: ${status}`, 'success');
-      if (IS_CONNECTED) {
-        apiPost('updatePresensi', {
+    async function recordPresensiGuru(sId, sNama, status) {
+      const today = new Date().toISOString().slice(0, 10);
+      const k = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = k ? k.namaRombel : 'Kelas IV-A';
+
+      let existing = dbData.presensi.find(p => p.idSiswa === sId && p.tanggal === today);
+      if (existing) {
+        existing.statusHadir = status;
+      } else {
+        dbData.presensi.push({
+          id: 'PRS-' + Date.now().toString().slice(-4),
+          tanggal: today,
           idKelas: activeGuruClassId,
+          namaKelas: kNama,
           idSiswa: sId,
           namaSiswa: sNama,
           statusHadir: status
-        }).catch(console.error);
+        });
       }
+      refreshActiveModuleContent();
+
+      await executeDbWrite('updatePresensi', {
+        idKelas: activeGuruClassId,
+        namaKelas: kNama,
+        idSiswa: sId,
+        namaSiswa: sNama,
+        statusHadir: status
+      }, `Presensi ${sNama}: ${status} tersimpan.`);
     }
 
-    function markAllHadirToday() {
-      showToast('Seluruh siswa berhasil ditandai Hadir.', 'success');
+    async function markAllHadirToday() {
+      const today = new Date().toISOString().slice(0, 10);
+      const k = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = k ? k.namaRombel : 'Kelas IV-A';
+      const siswaList = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+
+      if (siswaList.length === 0) {
+        showToast('Tidak ada data siswa di kelas ini.', 'warning');
+        return;
+      }
+
+      const records = siswaList.map(s => {
+        let existing = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === today);
+        if (existing) {
+          existing.statusHadir = 'Hadir';
+        } else {
+          dbData.presensi.push({
+            id: 'PRS-' + Date.now().toString().slice(-4) + Math.random().toString(36).substr(2, 3),
+            tanggal: today,
+            idKelas: activeGuruClassId,
+            namaKelas: kNama,
+            idSiswa: s.id,
+            namaSiswa: s.nama,
+            statusHadir: 'Hadir'
+          });
+        }
+        return {
+          idKelas: activeGuruClassId,
+          namaKelas: kNama,
+          idSiswa: s.id,
+          namaSiswa: s.nama,
+          statusHadir: 'Hadir'
+        };
+      });
+
+      refreshActiveModuleContent();
+      await executeDbWrite('batchUpdatePresensi', { records }, `Presensi ${siswaList.length} siswa berhasil disimpan: Hadir.`);
+    }
+
+    // --- FORM DATA SISWA KELAS (BUKU INDUK) ---
+    function openFormSiswaModal(siswaId = null) {
+      const s = siswaId ? dbData.siswa.find(x => x.id === siswaId) : null;
+      const isEdit = !!s;
+      const currentKls = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const content = `
+        <form onsubmit="handleSaveSiswa(event, '${siswaId || ''}')" class="space-y-3.5 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Peserta Didik</label>
+            <input type="text" id="fsNama" required value="${s ? s.nama : ''}" placeholder="Contoh: Ahmad Fauzan Pratama" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">NIS (Nomor Induk)</label>
+              <input type="text" id="fsNis" required value="${s ? s.nis : ''}" placeholder="24001" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">NISN (10 Digit)</label>
+              <input type="text" id="fsNisn" required value="${s ? s.nisn : ''}" placeholder="0145678912" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin</label>
+              <select id="fsJk" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
+                <option value="L" ${!s || s.jenisKelamin === 'L' ? 'selected' : ''}>Laki-laki (L)</option>
+                <option value="P" ${s && s.jenisKelamin === 'P' ? 'selected' : ''}>Perempuan (P)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Kelas Rombel</label>
+              <input type="text" disabled value="${currentKls ? currentKls.namaRombel : 'Kelas IV-A'}" class="w-full p-2.5 bg-slate-200 text-slate-600 rounded-xl font-bold">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Nama Orang Tua / Wali</label>
+              <input type="text" id="fsWali" value="${s ? (s.namaWali || '') : ''}" placeholder="Nama Orang Tua" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">No. WhatsApp Wali</label>
+              <input type="tel" id="fsHp" value="${s ? (s.noHpWali || '') : ''}" placeholder="081234567890" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
+            </div>
+          </div>
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
+            <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-full font-bold cursor-pointer">
+              ${isEdit ? 'Simpan Perubahan' : 'Daftarkan Siswa'}
+            </button>
+          </div>
+        </form>
+      `;
+      openUniversalModal(isEdit ? 'Edit Data Siswa' : 'Tambah Peserta Didik Baru', content);
+    }
+
+    async function handleSaveSiswa(e, siswaId) {
+      e.preventDefault();
+      const nama = document.getElementById('fsNama').value.trim();
+      const nis = document.getElementById('fsNis').value.trim();
+      const nisn = document.getElementById('fsNisn').value.trim();
+      const jk = document.getElementById('fsJk').value;
+      const wali = document.getElementById('fsWali').value.trim();
+      const hp = document.getElementById('fsHp').value.trim();
+      const k = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = k ? k.namaRombel : 'Kelas IV-A';
+
+      let sObj;
+      if (siswaId) {
+        sObj = dbData.siswa.find(x => x.id === siswaId);
+        if (sObj) {
+          sObj.nama = nama;
+          sObj.nis = nis;
+          sObj.nisn = nisn;
+          sObj.jenisKelamin = jk;
+          sObj.namaWali = wali;
+          sObj.noHpWali = hp;
+        }
+      } else {
+        sObj = {
+          id: 'SIS-' + Date.now().toString().slice(-4),
+          idKelas: activeGuruClassId,
+          namaKelas: kNama,
+          nis: nis,
+          nisn: nisn,
+          nama: nama,
+          jenisKelamin: jk,
+          ttl: 'Jember, 01-01-2015',
+          namaWali: wali,
+          noHpWali: hp,
+          statusAktif: 'Aktif'
+        };
+        dbData.siswa.push(sObj);
+      }
+      closeUniversalModal();
+      openModule('guru-siswa');
+      await executeDbWrite(siswaId ? 'editSiswa' : 'addSiswa', sObj, `Data siswa ${nama} berhasil disimpan ke database pusat.`);
     }
 
     function openFormInputNilaiModal() {
@@ -2060,18 +2571,20 @@
       openUniversalModal('Input Nilai Siswa', content);
     }
 
-    function handleSaveNilai(e) {
+    async function handleSaveNilai(e) {
       e.preventDefault();
       const sVal = document.getElementById('fnSiswa').value.split('|');
       const f = parseFloat(document.getElementById('fnFormatif').value) || 0;
       const s = parseFloat(document.getElementById('fnSumatif').value) || 0;
       const sas = parseFloat(document.getElementById('fnSAS').value) || 0;
       const akhir = ((f + s + sas) / 3).toFixed(2);
+      const k = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = k ? k.namaRombel : 'Kelas IV-A';
 
       const nObj = {
         id: 'NLI-' + Date.now().toString().slice(-4),
         idKelas: activeGuruClassId,
-        namaKelas: 'Kelas IV-A',
+        namaKelas: kNama,
         idSiswa: sVal[0],
         namaSiswa: sVal[1],
         mapel: document.getElementById('fnMapel').value,
@@ -2081,11 +2594,10 @@
         nilaiAkhir: akhir
       };
       dbData.nilai.unshift(nObj);
-      if (IS_CONNECTED) apiPost('addNilai', nObj).catch(console.error);
-
       closeUniversalModal();
       openModule('guru-nilai');
-      showToast('Nilai berhasil disimpan.', 'success');
+
+      await executeDbWrite('addNilai', nObj, 'Nilai siswa berhasil disimpan ke database pusat.');
     }
 
     function openFormJurnalModal() {
@@ -2111,12 +2623,15 @@
       openUniversalModal('Tulis Jurnal Mengajar Baru', content);
     }
 
-    function handleSaveJurnal(e) {
+    async function handleSaveJurnal(e) {
       e.preventDefault();
+      const k = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = k ? k.namaRombel : 'Kelas IV-A';
+
       const jObj = {
         id: 'JRN-' + Date.now().toString().slice(-4),
         idKelas: activeGuruClassId,
-        namaKelas: 'Kelas IV-A',
+        namaKelas: kNama,
         tanggal: new Date().toISOString().slice(0, 10),
         jamKe: '1-2',
         mapel: 'Matematika',
@@ -2126,11 +2641,10 @@
         catatanRefleksi: document.getElementById('fjRefleksi').value
       };
       dbData.jurnal.unshift(jObj);
-      if (IS_CONNECTED) apiPost('addJurnal', jObj).catch(console.error);
-
       closeUniversalModal();
       openModule('guru-jurnal');
-      showToast('Jurnal mengajar tersimpan.', 'success');
+
+      await executeDbWrite('addJurnal', jObj, 'Jurnal pembelajaran berhasil dicatat ke database pusat.');
     }
 
     function previewOfficialReport(rId) {
@@ -2321,29 +2835,20 @@
 
       closeUniversalModal();
       openModule('admin-guru');
-      showToast('Data guru berhasil disimpan.', 'success');
-
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('saveUser', gObj);
-        } catch (err) {
-          console.warn('Gagal sinkron user backend:', err);
-        }
-      }
+      await executeDbWrite('saveUser', gObj, 'Data guru berhasil disimpan ke database pusat.');
     }
 
     async function toggleGuruStatus(guruId) {
       const g = dbData.users.find(u => u.id === guruId);
       if (!g) return;
-      g.statusAkun = g.statusAkun === 'Aktif' ? 'Nonaktif' : 'Aktif';
+      const prevStatus = g.statusAkun;
+      g.statusAkun = prevStatus === 'Aktif' ? 'Nonaktif' : 'Aktif';
       openModule('admin-guru');
-      showToast(`Status akun ${g.nama} diubah menjadi ${g.statusAkun}`, 'info');
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('toggleUserStatus', { userId: guruId });
-        } catch (e) {
-          console.warn(e);
-        }
+      
+      const writeRes = await executeDbWrite('toggleUserStatus', { userId: guruId }, `Status akun ${g.nama} diubah menjadi ${g.statusAkun}.`);
+      if (!writeRes.success) {
+        g.statusAkun = prevStatus;
+        openModule('admin-guru');
       }
     }
 
@@ -2351,16 +2856,19 @@
       const g = dbData.users.find(u => u.id === guruId);
       if (!g) return;
       if (!confirm(`Hapus data akun ${g.nama}? Seluruh riwayat penugasan juga akan dibersihkan.`)) return;
+      
+      const prevUsers = [...dbData.users];
+      const prevTugas = [...dbData.penugasan];
+
       dbData.users = dbData.users.filter(u => u.id !== guruId);
       dbData.penugasan = dbData.penugasan.filter(t => t.idGuru !== guruId);
       openModule('admin-guru');
-      showToast(`Akun ${g.nama} telah dihapus.`, 'success');
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('deleteUser', { userId: guruId });
-        } catch (e) {
-          console.warn(e);
-        }
+
+      const writeRes = await executeDbWrite('deleteUser', { userId: guruId }, `Akun ${g.nama} telah dihapus dari database.`);
+      if (!writeRes.success) {
+        dbData.users = prevUsers;
+        dbData.penugasan = prevTugas;
+        openModule('admin-guru');
       }
     }
 
@@ -2448,15 +2956,7 @@
 
       closeUniversalModal();
       openModule('admin-kelas');
-      showToast('Data rombongan belajar berhasil diperbarui.', 'success');
-
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('saveKelas', kObj);
-        } catch (err) {
-          console.warn('Gagal simpan kelas:', err);
-        }
-      }
+      await executeDbWrite('saveKelas', kObj, 'Data rombongan belajar berhasil disimpan ke database pusat.');
     }
 
     function openDetailSiswaModal(kelasId) {
@@ -2570,15 +3070,7 @@
 
       closeUniversalModal();
       openModule('admin-penugasan');
-      showToast(`Penugasan ${gVal[1]} berhasil ditetapkan.`, 'success');
-
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('savePenugasan', tObj);
-        } catch (err) {
-          console.warn('Gagal simpan penugasan:', err);
-        }
-      }
+      await executeDbWrite('savePenugasan', tObj, `Penugasan ${gVal[1]} berhasil ditetapkan.`);
     }
 
     async function deletePenugasanAction(tugasId) {
@@ -2586,16 +3078,14 @@
       if (!t) return;
       if (!confirm(`Akhiri penugasan ${t.namaGuru} di ${t.namaKelas}?`)) return;
 
+      const prevTugas = [...dbData.penugasan];
       dbData.penugasan = dbData.penugasan.filter(item => item.id !== tugasId);
       openModule('admin-penugasan');
-      showToast('Penugasan telah diakhiri.', 'info');
 
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('deletePenugasan', { tugasId });
-        } catch (e) {
-          console.warn(e);
-        }
+      const writeRes = await executeDbWrite('deletePenugasan', { tugasId }, 'Penugasan telah diakhiri di database.');
+      if (!writeRes.success) {
+        dbData.penugasan = prevTugas;
+        openModule('admin-penugasan');
       }
     }
 
@@ -2746,11 +3236,38 @@
       const deskripsi = document.getElementById('fDocDeskripsi').value.trim();
 
       const btn = document.getElementById('btnSubmitUpload');
-      btn.disabled = true;
-      btn.textContent = 'Menyimpan ke Bank Dokumen...';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Menyiapkan berkas...';
+      }
+
+      // Pastikan data base64 terbaca jika berkas dipilih
+      if (selectedUploadFile && (!selectedUploadBase64 || selectedUploadBase64.length === 0)) {
+        try {
+          selectedUploadBase64 = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = (ev) => resolve((ev.target.result || '').split(',')[1] || '');
+            r.onerror = reject;
+            r.readAsDataURL(selectedUploadFile);
+          });
+        } catch (fileErr) {
+          console.warn('Gagal membaca base64 berkas:', fileErr);
+        }
+      }
+
+      // Cek batas ukuran file (Vercel serverless limit ~4.5MB)
+      if (selectedUploadFile && selectedUploadFile.size > 4.2 * 1024 * 1024) {
+        showToast('Ukuran berkas melebihi 4 MB. Silakan cantumkan tautan Google Drive pada form.', 'warning');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Unggah Perangkat Sekarang';
+        }
+        return;
+      }
 
       const fileName = selectedUploadFile ? selectedUploadFile.name : `dokumen_${Date.now()}.${selectedFormatDoc.toLowerCase()}`;
       const fileSize = selectedUploadFile ? (selectedUploadFile.size > 1048576 ? (selectedUploadFile.size / 1048576).toFixed(1) + ' MB' : (selectedUploadFile.size / 1024).toFixed(0) + ' KB') : '0.5 MB';
+      const fileMime = selectedUploadFile ? selectedUploadFile.type : (selectedFormatDoc === 'PDF' ? 'application/pdf' : 'application/octet-stream');
 
       const dObj = {
         id: 'DOK-' + Date.now().toString().slice(-4),
@@ -2760,8 +3277,14 @@
         jenis: 'Modul Ajar',
         formatTipe: selectedFormatDoc,
         namaFile: fileName,
+        fileName: fileName,
+        fileMime: fileMime,
+        mimeType: fileMime,
+        fileBase64: selectedUploadBase64,
+        base64Data: selectedUploadBase64,
         ukuranFile: fileSize,
         durasiJP: durasi || '4 JP',
+        durasi: durasi || '4 JP',
         linkBerkas: link || 'https://drive.google.com/',
         deskripsi: deskripsi || '-',
         uploader: currentUser ? currentUser.nama : 'Admin Sekolah',
@@ -2771,24 +3294,10 @@
 
       // Simpan langsung ke state lokal agar tidak hilang
       dbData.perangkat.unshift(dObj);
-
-      // Kirim ke Google Apps Script backend
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('uploadPerangkat', {
-            ...dObj,
-            fileName: fileName,
-            fileMime: selectedUploadFile ? selectedUploadFile.type : 'application/pdf',
-            fileBase64: selectedUploadBase64
-          });
-        } catch (err) {
-          console.warn('Backend sync upload:', err.message);
-        }
-      }
-
       closeUniversalModal();
       openModule('admin-perangkat');
-      showToast('Perangkat ajar berhasil ditambahkan ke Bank Sekolah!', 'success');
+
+      await executeDbWrite('uploadPerangkat', dObj, 'Perangkat ajar berhasil diunggah ke Google Drive & Bank Dokumen!');
     }
 
     async function deletePerangkatAction(docId) {
@@ -2796,16 +3305,14 @@
       if (!d) return;
       if (!confirm(`Hapus dokumen "${d.judul}" dari Bank Perangkat Ajar?`)) return;
 
+      const prevPerangkat = [...dbData.perangkat];
       dbData.perangkat = dbData.perangkat.filter(item => item.id !== docId);
       openModule('admin-perangkat');
-      showToast('Dokumen telah dihapus.', 'info');
 
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('deletePerangkat', { docId });
-        } catch (e) {
-          console.warn(e);
-        }
+      const writeRes = await executeDbWrite('deletePerangkat', { docId }, 'Dokumen telah dihapus dari database.');
+      if (!writeRes.success) {
+        dbData.perangkat = prevPerangkat;
+        openModule('admin-perangkat');
       }
     }
 
@@ -2819,15 +3326,7 @@
       dbData.pengaturan.nipKepalaSekolah = document.getElementById('fpsNipKS').value.trim();
 
       document.getElementById('globalSchoolIdentity').textContent = dbData.pengaturan.namaSekolah;
-      showToast('Pengaturan identitas sekolah berhasil diperbarui.', 'success');
-
-      if (IS_CONNECTED) {
-        try {
-          await apiPost('savePengaturanSekolah', dbData.pengaturan);
-        } catch (err) {
-          console.warn('Gagal simpan pengaturan:', err);
-        }
-      }
+      await executeDbWrite('savePengaturanSekolah', dbData.pengaturan, 'Pengaturan identitas sekolah tersimpan.');
     }
 
     function openUniversalModal(title, bodyHtml) {
@@ -2856,6 +3355,45 @@
         setTimeout(() => t.remove(), 250);
       }, 3500);
     }
+
+    // ==========================================
+    // INISIALISASI APLIKASI & AUTO-SYNC EVENT LISTENERS
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Coba pulihkan sesi login yang tersimpan
+      const restored = restoreSession();
+      if (!restored) {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+      }
+
+      // 2. Event Listeners untuk Online / Offline Status
+      window.addEventListener('online', () => {
+        const dot = document.getElementById('onlinePresenceDot');
+        if (dot) dot.className = 'absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-400';
+        setSyncStatus('syncing', 'Menghubungkan...');
+        syncBackendData();
+      });
+
+      window.addEventListener('offline', () => {
+        const dot = document.getElementById('onlinePresenceDot');
+        if (dot) dot.className = 'absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-rose-500 border-2 border-white ring-1 ring-rose-400';
+        setSyncStatus('offline', 'Offline (Terputus)');
+        showToast('Koneksi internet terputus. Bekerja dalam mode offline.', 'error');
+      });
+
+      // 3. Tab Visibility Change (Pause saat tab latar belakang, resume saat aktif)
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          syncState.isTabActive = false;
+          stopAutoSync();
+        } else {
+          syncState.isTabActive = true;
+          startAutoSync();
+          checkSyncHeartbeat();
+        }
+      });
+    });
   </script>
 </body>
 </html>
