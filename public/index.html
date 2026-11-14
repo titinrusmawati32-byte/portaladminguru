@@ -28,16 +28,29 @@
             sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
           },
           colors: {
+            brandpurple: {
+              50: '#FAF5FF',
+              100: '#F3E8FF',
+              200: '#E9D5FF',
+              300: '#D8B4FE',
+              400: '#C084FC',
+              500: '#A855F7',
+              600: '#9333EA',
+              700: '#7C3AED',
+              800: '#6D28D9',
+              900: '#581C87',
+              950: '#3B0764'
+            },
+            brandmint: {
+              300: '#5EEAD4',
+              400: '#2DD4BF',
+              500: '#14B8A6',
+              600: '#0D9488'
+            },
             navy: {
               800: '#1e3a8a',
               900: '#13285c',
               950: '#0d1b3f',
-            },
-            portalgreen: {
-              600: '#059669',
-              700: '#047857',
-              800: '#065f46',
-              900: '#064e3b'
             }
           }
         }
@@ -51,7 +64,7 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
     body {
-      background-color: #F8FAFC;
+      background-color: #F6F4FE;
       color: #0F172A;
       overflow-x: hidden;
     }
@@ -63,38 +76,67 @@
       scrollbar-width: none;
     }
 
-    /* Gradients Hero Banner */
-    .hero-admin-gradient {
-      background: linear-gradient(135deg, #0e2756 0%, #173b7d 45%, #1e53a3 100%);
+    /* ZomoPay Glassmorphic Styles */
+    .glassmorphic {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 14px 34px -4px rgba(124, 58, 237, 0.08), 0 4px 12px -2px rgba(124, 58, 237, 0.03);
     }
-    .hero-guru-gradient {
-      background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #059669 100%);
+    .glass-card-purple {
+      background: linear-gradient(135deg, #6D28D9 0%, #7C3AED 45%, #9333EA 85%, #A855F7 100%);
+      box-shadow: 0 20px 40px -6px rgba(109, 40, 217, 0.38), 0 8px 16px -4px rgba(124, 58, 237, 0.2);
+    }
+    .glass-card-emerald {
+      background: linear-gradient(135deg, #065F46 0%, #059669 45%, #10B981 85%, #14B8A6 100%);
+      box-shadow: 0 20px 40px -6px rgba(5, 150, 105, 0.38), 0 8px 16px -4px rgba(16, 185, 129, 0.2);
+    }
+    .glass-mint-pill {
+      background: linear-gradient(135deg, #10B981 0%, #14B8A6 60%, #06B6D4 100%);
+      box-shadow: 0 10px 25px -4px rgba(20, 184, 166, 0.45);
+    }
+
+    /* Floating Animations for 3D Coins & Glass Cards */
+    @keyframes floatCoin {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(5deg); }
+    }
+    .floating-coin {
+      animation: floatCoin 3.5s ease-in-out infinite;
+    }
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0px) rotate(-3deg); }
+      50% { transform: translateY(-8px) rotate(-1deg); }
+    }
+    .floating-glass-card {
+      animation: floatCard 4.5s ease-in-out infinite;
     }
 
     /* Card Shadows & Hover Transitions */
     .menu-card {
       background-color: #FFFFFF;
-      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 24px -4px rgba(124, 58, 237, 0.06), 0 2px 6px -1px rgba(124, 58, 237, 0.03);
     }
     .menu-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 30px -4px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 38px -5px rgba(124, 58, 237, 0.14), 0 6px 14px -3px rgba(124, 58, 237, 0.06);
     }
     .menu-card:active {
       transform: scale(0.98);
     }
 
     .soft-card-shadow {
-      box-shadow: 0 6px 24px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+      box-shadow: 0 10px 30px -4px rgba(124, 58, 237, 0.08), 0 3px 10px -2px rgba(124, 58, 237, 0.04);
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .animate-fade-in {
-      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* Print Stylesheet Khusus Laporan Resmi */
@@ -120,92 +162,128 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 selection:bg-navy-900 selection:text-white">
+<body class="min-h-screen flex flex-col bg-[#F6F4FE] text-slate-900 selection:bg-brandpurple-700 selection:text-white pb-24">
 
   <!-- TOAST NOTIFICATION -->
   <div id="toastContainer" class="fixed top-4 right-4 z-[110] flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print"></div>
 
   <!-- ==========================================
-       1. HALAMAN LOGIN (PORTAL ENTRY)
+       1. HALAMAN LOGIN (SCREEN 1 - ZOMOPAY VIOLET GLASSMORPHISM)
        ========================================== -->
-  <section id="loginScreen" class="min-h-screen flex flex-col justify-center items-center px-4 py-8 bg-slate-100 no-print">
-    <div class="w-full max-w-md bg-white rounded-3xl soft-card-shadow border border-slate-200 overflow-hidden animate-fade-in">
+  <section id="loginScreen" class="min-h-screen flex flex-col justify-between items-center px-4 py-8 relative overflow-hidden no-print"
+           style="background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 40%, #581C87 80%, #3B0764 100%);">
+    
+    <!-- Ambient Fluid Background Lights -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-fuchsia-500/25 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-brandmint-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Status Sistem Mini Pill Top -->
+    <div class="relative z-10 w-full max-w-sm flex items-center justify-between px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-brandmint-400 animate-pulse"></span>
+        <span class="font-bold tracking-wide">SiGuru SD Digital</span>
+      </div>
+      <span class="text-[11px] text-purple-200">Online & Terhubung</span>
+    </div>
+
+    <!-- Main Hero Card Container (Screen 1 Equivalent) -->
+    <div class="relative z-10 w-full max-w-sm my-auto flex flex-col items-center">
       
-      <!-- Top Hero Banner Inside Login -->
-      <div class="hero-admin-gradient p-6 text-white relative overflow-hidden">
-        <div class="relative z-10">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center p-1">
-              <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                <polygon points="50,5 95,28 95,72 50,95 5,72 5,28" stroke="white" stroke-width="6" fill="#1e3a8a"/>
-                <path d="M50,22 L50,68 M32,45 L68,45" stroke="#facc15" stroke-width="8" stroke-linecap="round"/>
-              </svg>
-            </span>
-            <span class="text-xs font-bold uppercase tracking-wider text-yellow-300">SiGuru SD Digital</span>
+      <!-- Floating Stacked Frosted Glass Credit-Cards (Screen 1 Hero) -->
+      <div class="relative w-72 h-44 mb-8">
+        <!-- Back Card (Tilted Glass) -->
+        <div class="absolute inset-0 rounded-[28px] bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl -rotate-6 scale-95 transform transition-all"></div>
+        
+        <!-- Front Frosted Glass Card (Active Floating) -->
+        <div class="floating-glass-card absolute inset-0 rounded-[28px] p-5 flex flex-col justify-between text-white border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden"
+             style="background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.12) 100%); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+          
+          <!-- Top Row: Logo Tut Wuri / School Shield & Card Brand -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-white/25 flex items-center justify-center p-1.5 border border-white/30">
+                <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
+                  <polygon points="50,5 95,28 95,72 50,95 5,72 5,28" stroke="white" stroke-width="6" fill="#1e3a8a"/>
+                  <path d="M50,22 L50,68 M32,45 L68,45" stroke="#facc15" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-yellow-300">SiGuru Card</span>
+            </div>
+            <!-- Visa/Mastercard style pill badge -->
+            <span class="text-xs font-black tracking-widest text-white/90">PORTAL</span>
           </div>
-          <h1 class="text-2xl font-extrabold leading-tight">
-            Portal Administrasi<br>
-            Sekolah & <span class="text-yellow-400">Guru Terpadu.</span>
-          </h1>
-          <p class="text-xs text-slate-200 mt-2 leading-relaxed">
-            Pilih portal akses Anda untuk memulai pengelolaan sekolah atau pembelajaran kelas.
-          </p>
+
+          <!-- Middle: Smart Chip Vector & Card Number Simulation -->
+          <div class="flex items-center gap-3 my-auto">
+            <!-- Smart Chip Graphic -->
+            <div class="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-yellow-300/60 p-1 flex items-center justify-center shadow-xs">
+              <div class="w-full h-full border border-amber-600/40 rounded-xs flex flex-col justify-between p-0.5">
+                <div class="w-full h-[1px] bg-amber-700/40"></div>
+                <div class="w-full h-[1px] bg-amber-700/40"></div>
+              </div>
+            </div>
+            <div class="space-y-0.5">
+              <p class="text-[9px] uppercase tracking-wider text-purple-200 font-semibold">School ID / Access</p>
+              <p class="text-xs font-mono font-bold tracking-widest text-white">2051 4277 2026 01</p>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Identity -->
+          <div class="flex items-center justify-between text-[11px] pt-1 border-t border-white/15">
+            <span class="font-bold text-white tracking-wide">SDN Cerdas Bangsa 01</span>
+            <span class="font-extrabold text-brandmint-300">KURIKULUM MERDEKA</span>
+          </div>
         </div>
       </div>
 
-      <!-- Form Login & Tombol Cepat Masuk -->
-      <div class="p-6">
-        <!-- Status Sistem Terhubung -->
-        <div id="envStatusBadge" class="mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2.5">
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
-          <div>
-            <span class="font-bold block" id="envStatusText">Sistem Aktif & Terintegrasi</span>
-            <span class="text-[11px] text-emerald-700 block mt-0.5">Pilih Portal Admin atau Portal Guru di bawah untuk langsung masuk.</span>
-          </div>
-        </div>
+      <!-- Hand-Drawn Doodle Curved Arrow (Pointing to Title) -->
+      <div class="w-24 h-12 -my-2 flex justify-start pl-6 text-white/60">
+        <svg viewBox="0 0 80 40" class="w-full h-full fill-none stroke-current" stroke-width="2.5" stroke-linecap="round">
+          <path d="M10,5 Q40,30 65,15" />
+          <polyline points="55,12 65,15 62,25" />
+        </svg>
+      </div>
 
-        <!-- 2 PILIHAN PORTAL BESAR UTAMA -->
-        <div class="space-y-3">
-          <!-- Tombol Masuk Portal Admin -->
-          <button type="button" onclick="loginDirectRole('Admin')"
-            class="w-full p-4 rounded-2xl border-2 border-blue-500/30 hover:border-blue-600 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition flex items-center justify-between text-left group shadow-xs cursor-pointer">
-            <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-2xl bg-navy-900 text-yellow-400 flex items-center justify-center font-extrabold shadow-sm shrink-0">
-                <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              </div>
-              <div>
-                <h3 class="text-sm font-extrabold text-navy-950 group-hover:text-blue-900">Masuk ke Portal Admin</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5">Kepala Sekolah & Operator Administrasi</p>
-              </div>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-extrabold group-hover:translate-x-1 transition shadow-xs">
-              →
-            </div>
+      <!-- Bold Title (ZomoPay Typography Style) -->
+      <div class="text-center space-y-1 mt-2 mb-6 text-white">
+        <p class="text-xs font-extrabold uppercase tracking-widest text-brandmint-300">The Best Management System</p>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+          Portal Administrasi<br>
+          <span class="text-white drop-shadow-md">Guru & Sekolah</span>
+        </h1>
+        <p class="text-xs text-purple-200 max-w-xs mx-auto pt-1 leading-relaxed">
+          Satu pintu terintegrasi untuk Kepala Sekolah, Operator Administrasi, dan Guru Kelas.
+        </p>
+      </div>
+
+      <!-- Interactive Role Selection (Pill Buttons) -->
+      <div class="w-full space-y-2.5 max-w-xs mb-6">
+        <div class="p-1 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex gap-1">
+          <button type="button" id="roleBtnAdmin" onclick="setLoginRoleChoice('Admin')"
+            class="flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-white text-brandpurple-900 shadow-md">
+            <span>👑</span>
+            <span>Admin Sekolah</span>
           </button>
-
-          <!-- Tombol Masuk Portal Guru -->
-          <button type="button" onclick="loginDirectRole('Guru')"
-            class="w-full p-4 rounded-2xl border-2 border-emerald-500/30 hover:border-emerald-600 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition flex items-center justify-between text-left group shadow-xs cursor-pointer">
-            <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-2xl bg-emerald-800 text-yellow-400 flex items-center justify-center font-extrabold shadow-sm shrink-0">
-                <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-              </div>
-              <div>
-                <h3 class="text-sm font-extrabold text-emerald-950 group-hover:text-emerald-900">Masuk ke Portal Guru</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5">Guru Kelas & Guru Mata Pelajaran</p>
-              </div>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-extrabold group-hover:translate-x-1 transition shadow-xs">
-              →
-            </div>
+          <button type="button" id="roleBtnGuru" onclick="setLoginRoleChoice('Guru')"
+            class="flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-white hover:bg-white/10">
+            <span>👩‍🏫</span>
+            <span>Portal Guru</span>
           </button>
-        </div>
-
-        <!-- Opsi Login Manual Username/Password -->
-        <div class="mt-6 pt-5 border-t border-slate-100 text-center">
-          <p class="text-[11px] text-slate-400">Aplikasi Portal Administrasi SD • Kurikulum Merdeka</p>
         </div>
       </div>
+
+      <!-- Glowing Mint-Cyan Squircle Action Button (Screen 1 Forward Button) -->
+      <button type="button" onclick="loginSelectedRole()"
+        class="w-16 h-16 rounded-[22px] glass-mint-pill flex items-center justify-center text-white text-2xl font-black shadow-[0_15px_30px_rgba(20,184,166,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group">
+        <span class="group-hover:translate-x-1 transition-transform">➔</span>
+      </button>
+
+      <p class="text-[11px] text-purple-200/80 mt-3 font-medium">Ketuk tombol panah untuk masuk</p>
+    </div>
+
+    <!-- Bottom Footer Inside Login -->
+    <div class="relative z-10 text-center text-[11px] text-purple-300/70 pt-4">
+      SD Negeri Cerdas Bangsa 01 • Versi 2.0 Zomo Violet
     </div>
   </section>
 
@@ -214,39 +292,79 @@
        ========================================== -->
   <div id="mainApp" class="flex-1 flex flex-col w-full min-h-screen relative" style="display: none;">
 
-    <!-- TOP BAR MINIMALIS (Hanya Status Pengguna & Tombol Keluar - NO SIDEBAR, NO PERMANENT NAV) -->
-    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-3 pb-1 flex items-center justify-between text-xs no-print">
-      <div class="flex items-center gap-2 text-slate-500 font-medium text-[11px]">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-        <span id="globalSchoolIdentity">SD Negeri Cerdas Bangsa 01</span>
+    <!-- TOP BAR (SCREEN 2 - AVATAR, BRAND, NOTIFICATION BELL) -->
+    <header class="w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-2 flex items-center justify-between no-print">
+      <!-- Left: User Profile Avatar with Online Dot -->
+      <div class="flex items-center gap-3">
+        <div class="relative cursor-pointer" onclick="toggleRoleSwitch()">
+          <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-brandpurple-600 to-fuchsia-500 p-0.5 shadow-md flex items-center justify-center text-white font-extrabold text-sm overflow-hidden">
+            <span id="topUserAvatarInitial">BS</span>
+          </div>
+          <!-- Green Online Indicator Dot -->
+          <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-400"></span>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm font-extrabold text-slate-900 leading-tight" id="topUserIdentity">Budi Santoso</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-brandpurple-100 text-brandpurple-800" id="topUserRoleBadge">Admin</span>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-none mt-0.5" id="globalSchoolIdentity">SDN Cerdas Bangsa 01</p>
+        </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <span class="text-slate-600 font-bold" id="topUserIdentity">Budi Santoso (Admin)</span>
-        <button onclick="handleLogout()" class="px-3 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] transition cursor-pointer flex items-center gap-1">
-          <span>Keluar</span>
+      <!-- Center: Brand Name (Hidden on small mobile) -->
+      <div class="hidden sm:flex items-center gap-1.5 font-extrabold text-slate-800 text-sm tracking-tight">
+        <span class="w-2 h-2 rounded-full bg-brandpurple-600"></span>
+        <span>SiGuru SD</span>
+      </div>
+
+      <!-- Right: Action Buttons (Role Switcher & Notification Bell Pill) -->
+      <div class="flex items-center gap-2.5">
+        <!-- Role Quick Switch Pill Button -->
+        <button onclick="toggleRoleSwitch()"
+          class="px-3 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-brandpurple-700 font-extrabold text-xs shadow-xs transition flex items-center gap-1 cursor-pointer">
+          <span id="switchRoleLabel">Ganti ke Guru</span>
+        </button>
+
+        <!-- Notification Bell Pill with Badge '2' (Screen 2) -->
+        <div class="relative w-10 h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs cursor-pointer"
+             onclick="showToast('2 Pengumuman baru tersedia di sistem.', 'info')">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <!-- Counter Badge '2' -->
+          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brandmint-400 text-[10px] font-black text-slate-900 flex items-center justify-center shadow-xs">
+            2
+          </span>
+        </div>
+
+        <!-- Logout Button -->
+        <button onclick="handleLogout()" title="Keluar"
+          class="w-10 h-10 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition cursor-pointer shadow-xs">
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
         </button>
       </div>
-    </div>
+    </header>
 
     <!-- AREA VIEW 1: PORTAL DASHBOARD (ADMIN ATAU GURU) -->
-    <div id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 py-3 space-y-6 animate-fade-in">
+    <main id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-2 space-y-6 animate-fade-in">
       <!-- Container Hero & Kartu Menu akan dirender secara dinamis sesuai Role -->
       <div id="portalHeroContainer"></div>
       <div id="portalCardsContainer"></div>
       <div id="portalWelcomeBarContainer"></div>
-    </div>
+    </main>
 
-    <!-- AREA VIEW 2: HALAMAN MODUL TERSENDIRI (FULL SCREEN DENGAN TOMBOL KEMBALI) -->
-    <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-6 animate-fade-in">
-      <!-- Header Modul: Tombol Kembali yang Jelas & Judul -->
-      <div class="bg-white rounded-3xl p-4 sm:p-5 soft-card-shadow border border-slate-200 flex flex-wrap items-center justify-between gap-4 no-print">
+    <!-- AREA VIEW 2: HALAMAN MODUL TERSENDIRI (SCREEN 3 - HISTORY / MODULE VIEW) -->
+    <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-3 space-y-5 animate-fade-in">
+      <!-- Header Modul: Circular Back Button '<' + Filter Pills + Judul (Screen 3 style) -->
+      <div class="bg-white rounded-3xl p-4 sm:p-5 soft-card-shadow border border-slate-100 flex flex-wrap items-center justify-between gap-4 no-print">
         <div class="flex items-center gap-3.5">
-          <!-- TOMBOL KEMBALI KE PORTAL UTAMA -->
+          <!-- CIRCULAR BACK BUTTON '<' (SCREEN 3 STYLE) -->
           <button onclick="backToPortal()"
-            class="px-4 py-2.5 rounded-2xl bg-navy-900 hover:bg-navy-800 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer">
-            <span class="text-base leading-none">←</span>
-            <span>Kembali ke Portal</span>
+            class="w-11 h-11 rounded-2xl bg-brandpurple-50 hover:bg-brandpurple-100 text-brandpurple-700 font-extrabold text-lg flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer">
+            ‹
           </button>
           <div>
             <h2 class="text-base sm:text-lg font-extrabold text-slate-900 leading-tight" id="moduleViewTitle">Judul Modul</h2>
@@ -254,8 +372,72 @@
           </div>
         </div>
 
-        <div id="moduleHeaderActions" class="flex items-center gap-2"></div>
+        <!-- Filter Dropdown Pills (Screen 3 style: "Income v", "Yearly v") -->
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 font-extrabold text-xs flex items-center gap-1 cursor-pointer hover:bg-slate-200">
+              <span>Semua Rombel</span> <span class="text-[10px]">∨</span>
+            </span>
+            <span class="px-3 py-1.5 rounded-full bg-brandpurple-50 text-brandpurple-800 font-extrabold text-xs flex items-center gap-1 cursor-pointer hover:bg-brandpurple-100">
+              <span>2026/2027 Ganjil</span> <span class="text-[10px]">∨</span>
+            </span>
+          </div>
+          <div id="moduleHeaderActions" class="flex items-center gap-2"></div>
+        </div>
       </div>
+
+      <!-- 3D Analytics Bar Chart Card Container (Screen 3 Highlight) -->
+      <div id="moduleAnalyticsChartContainer"></div>
+
+      <!-- Kontainer Konten Inti Modul -->
+      <div id="moduleContentArea" class="flex-1 space-y-5"></div>
+    </div>
+
+    <!-- FLOATING BOTTOM NAVIGATION DOCK (SCREEN 2) -->
+    <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-sm sm:max-w-md bg-white/95 backdrop-blur-xl border border-white/60 shadow-[0_12px_36px_rgba(124,58,237,0.18)] rounded-full px-5 py-2.5 flex items-center justify-between no-print">
+      <!-- 1. Home / Portal Button -->
+      <button onclick="backToPortal()" class="flex flex-col items-center gap-0.5 text-brandpurple-700 cursor-pointer">
+        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+        <span class="text-[10px] font-extrabold">Beranda</span>
+      </button>
+
+      <!-- 2. Documents / Perangkat Button -->
+      <button onclick="openModule(currentRole === 'Admin' ? 'admin-perangkat' : 'guru-perangkat')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span class="text-[10px] font-bold">Perangkat</span>
+      </button>
+
+      <!-- 3. Center Elevated Violet Squircle Button (Screen 2 Signature) -->
+      <div class="-mt-8">
+        <button onclick="handleFloatingCenterAction()"
+          class="w-13 h-13 rounded-2xl glass-card-purple text-white flex items-center justify-center text-xl font-bold shadow-[0_10px_25px_rgba(109,40,217,0.45)] hover:scale-105 active:scale-95 transition-all cursor-pointer">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 4. Grades / Rekap Button -->
+      <button onclick="openModule(currentRole === 'Admin' ? 'admin-nilai' : 'guru-nilai')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <span class="text-[10px] font-bold">Nilai</span>
+      </button>
+
+      <!-- 5. Settings / Pengaturan Button -->
+      <button onclick="openModule(currentRole === 'Admin' ? 'admin-pengaturan' : 'guru-pengumuman')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span class="text-[10px] font-bold">Setelan</span>
+      </button>
+    </nav>
 
       <!-- Kontainer Konten Inti Modul -->
       <div id="moduleContentArea" class="flex-1 space-y-5"></div>
@@ -460,6 +642,27 @@
     // ==========================================
     // ALUR NAVIGASI PORTAL & LOGIN
     // ==========================================
+    let selectedLoginRoleChoice = 'Admin';
+
+    function setLoginRoleChoice(role) {
+      selectedLoginRoleChoice = role;
+      const btnAdmin = document.getElementById('roleBtnAdmin');
+      const btnGuru = document.getElementById('roleBtnGuru');
+      if (!btnAdmin || !btnGuru) return;
+
+      if (role === 'Admin') {
+        btnAdmin.className = 'flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-white text-brandpurple-900 shadow-md';
+        btnGuru.className = 'flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-white hover:bg-white/10';
+      } else {
+        btnGuru.className = 'flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-white text-brandpurple-900 shadow-md';
+        btnAdmin.className = 'flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-white hover:bg-white/10';
+      }
+    }
+
+    function loginSelectedRole() {
+      loginDirectRole(selectedLoginRoleChoice);
+    }
+
     function loginDirectRole(role) {
       currentRole = role;
       if (role === 'Admin') {
@@ -482,11 +685,35 @@
 
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'flex';
-      document.getElementById('topUserIdentity').textContent = `${currentUser.nama} (${currentRole})`;
+      
+      // Update Top Bar
+      const idEl = document.getElementById('topUserIdentity');
+      const badgeEl = document.getElementById('topUserRoleBadge');
+      const avatarEl = document.getElementById('topUserAvatarInitial');
+      const switchEl = document.getElementById('switchRoleLabel');
+
+      if (idEl) idEl.textContent = currentUser.nama.split(',')[0];
+      if (badgeEl) badgeEl.textContent = currentRole;
+      if (avatarEl) avatarEl.textContent = currentRole === 'Admin' ? 'BS' : 'DR';
+      if (switchEl) switchEl.textContent = currentRole === 'Admin' ? 'Beralih ke Guru' : 'Beralih ke Admin';
       document.getElementById('globalSchoolIdentity').textContent = dbData.pengaturan.namaSekolah;
 
       renderPortal();
       syncBackendData();
+    }
+
+    function toggleRoleSwitch() {
+      const targetRole = currentRole === 'Admin' ? 'Guru' : 'Admin';
+      loginDirectRole(targetRole);
+      showToast(`Beralih ke Portal ${targetRole}`, 'info');
+    }
+
+    function handleFloatingCenterAction() {
+      if (currentRole === 'Admin') {
+        openFormPenugasanModal();
+      } else {
+        openFormInputNilaiModal();
+      }
     }
 
     function handleLogout() {
@@ -517,924 +744,597 @@
     }
 
     // ==========================================
-    // 3. PORTAL ADMIN SEKOLAH (PERSIS REFERENSI DESAIN)
+    // 3. PORTAL ADMIN SEKOLAH (ZOMOPAY VIOLET-MINT DESIGN)
     // ==========================================
     function renderPortalAdmin() {
       const p = dbData.pengaturan;
 
-      // Bottom Decorative Wavy Ribbons (Blue & Golden Yellow)
+      // Bottom Decorative Wavy Ribbons (Violet & Mint)
       document.getElementById('bottomWaveContainer').innerHTML = `
         <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#1e40af" opacity="0.9"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#2563eb" opacity="0.8"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#f59e0b"></path>
+          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#7C3AED" opacity="0.3"></path>
+          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#14B8A6" opacity="0.25"></path>
+          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F6F4FE"></path>
         </svg>
       `;
 
-      // A. HERO BANNER ADMIN
+      // A. HERO BANNER ADMIN (SCREEN 2 - "YOUR BALANCE" VIOLET CARD WITH 3D COINS & MINT SLIDER)
       document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="rounded-[32px] p-6 sm:p-8 text-white shadow-xl relative overflow-hidden"
-             style="background: linear-gradient(135deg, #0940a8 0%, #0d5dd6 40%, #1780f2 80%, #2997ff 100%);">
+        <div class="relative w-full rounded-[34px] p-6 sm:p-7 text-white glass-card-purple shadow-[0_22px_45px_rgba(109,40,217,0.36)] overflow-hidden">
           
-          <!-- Background Organic Fluid Wave Accents -->
-          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 220" preserveAspectRatio="none">
-            <path d="M-50,180 Q150,80 400,160 T850,100 L850,220 L-50,220 Z" fill="white" opacity="0.08"/>
-            <path d="M-50,200 Q200,120 450,190 T850,150 L850,220 L-50,220 Z" fill="#60a5fa" opacity="0.12"/>
+          <!-- SVG Gradients Definition -->
+          <svg class="absolute w-0 h-0">
+            <defs>
+              <linearGradient id="goldGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FDE047"/>
+                <stop offset="50%" stop-color="#F59E0B"/>
+                <stop offset="100%" stop-color="#B45309"/>
+              </linearGradient>
+            </defs>
           </svg>
 
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
+          <!-- Ambient Radial Glows Inside Card -->
+          <div class="absolute -right-16 -top-16 w-56 h-56 bg-fuchsia-400/25 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-brandmint-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+          <!-- Floating 3D Golden Coin 1 (Top Left) -->
+          <div class="floating-coin absolute -top-2 left-6 w-11 h-11 pointer-events-none drop-shadow-[0_8px_16px_rgba(245,158,11,0.55)]">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad1)" stroke="#B45309" stroke-width="3"/>
+              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5" stroke-dasharray="5,2"/>
+              <text x="50" y="63" font-size="34" font-weight="900" fill="#78350F" text-anchor="middle">★</text>
+            </svg>
+          </div>
+
+          <!-- Floating 3D Golden Coin 2 (Bottom Right) -->
+          <div class="floating-coin absolute -bottom-3 right-6 w-13 h-13 pointer-events-none drop-shadow-[0_10px_20px_rgba(245,158,11,0.6)]" style="animation-delay: -1.7s;">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad1)" stroke="#B45309" stroke-width="3"/>
+              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5"/>
+              <circle cx="50" cy="50" r="14" fill="#F59E0B" opacity="0.6"/>
+              <text x="50" y="61" font-size="28" font-weight="900" fill="#78350F" text-anchor="middle">SD</text>
+            </svg>
+          </div>
+
+          <!-- Card Header: Label & Plus Button -->
+          <div class="relative z-10 flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs font-bold text-purple-200 tracking-wide uppercase">Status Administrasi Sekolah:</span>
+            </div>
+            <!-- Translucent Plus Button '+' (Screen 2) -->
+            <button onclick="openFormPenugasanModal()" title="Tetapkan Penugasan Guru Baru"
+              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 text-white flex items-center justify-center font-bold text-lg shadow-sm transition active:scale-90 cursor-pointer">
+              +
+            </button>
+          </div>
+
+          <!-- Card Main Big Value ($1,286.00 equivalent) -->
+          <div class="relative z-10 space-y-1 mb-5">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-sm">
+              6 Rombel • 6 Guru
+            </h2>
+            <p class="text-xs sm:text-sm text-purple-200 font-medium">
+              ${p.namaSekolah} • Kurikulum Merdeka ${p.tahunAjaranAktif}
+            </p>
+          </div>
+
+          <!-- Progress Slider Bar (Screen 2: Mint Bar with White Knob) -->
+          <div class="relative z-10 space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-purple-200">
+              <span>Kelengkapan Rombel & Wali</span>
+              <span class="text-brandmint-300 font-extrabold">98.5% Lengkap</span>
+            </div>
             
-            <!-- Kiri: Logo Tut Wuri, Judul, Sekolah, Slogan -->
-            <div class="md:col-span-7 flex items-center gap-5">
-              <!-- Emblem Logo Tut Wuri Handayani Resmi -->
-              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-500/20 p-1.5 flex items-center justify-center shrink-0 border border-white/40 shadow-lg">
-                <div class="w-full h-full rounded-full bg-[#1e40af] flex items-center justify-center p-2.5 shadow-inner">
-                  <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                    <polygon points="50,4 95,28 95,72 50,96 5,72 5,28" stroke="white" stroke-width="5" fill="#2563eb"/>
-                    <path d="M50,18 L50,68 M30,45 L70,45 M38,32 L62,32 M42,58 L58,58" stroke="#facc15" stroke-width="6" stroke-linecap="round"/>
-                    <circle cx="50" cy="22" r="5" fill="#ef4444"/>
-                    <path d="M30,76 Q50,86 70,76" stroke="white" stroke-width="4" fill="none"/>
+            <div class="relative w-full h-2.5 rounded-full bg-black/20 p-0.5 overflow-visible">
+              <!-- Glowing Mint Track -->
+              <div class="h-full rounded-full bg-gradient-to-r from-teal-300 via-brandmint-400 to-emerald-400 shadow-[0_0_12px_rgba(45,212,191,0.8)]" style="width: 82%;"></div>
+              <!-- Round Slider Knob -->
+              <div class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-brandmint-400 shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer" style="left: calc(82% - 10px);">
+                <div class="w-1.5 h-1.5 rounded-full bg-brandmint-600"></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-purple-200/80 pt-0.5">
+              <span>6 Rombel Aktif</span>
+              <span>100% Wali Kelas Ditetapkan</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // B. GRID 8 QUICK ACTION SQUIRCLE BUTTONS & RECENT SECTION (SCREEN 2)
+      document.getElementById('portalCardsContainer').innerHTML = `
+        <div class="space-y-6">
+          
+          <!-- Section Quick Actions: 8 Colorful Squircles -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Administrasi</h3>
+              <span class="text-xs font-bold text-brandpurple-700">8 Modul Aktif</span>
+            </div>
+
+            <!-- Responsive Squircle Grid (4 columns desktop, 4 columns tablet/mobile) -->
+            <div class="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              
+              <!-- 1. Coral / Orange Squircle: Manajemen Guru -->
+              <div onclick="openModule('admin-guru')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(255,107,74,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(255,107,74,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #FF7A59 0%, #FF5722 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                 </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Guru</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Kelola Data Guru</span>
               </div>
 
-              <!-- Pembatas Garis Putih Vertikal -->
-              <div class="w-[1.5px] h-20 bg-white/30 hidden sm:block"></div>
-
-              <!-- Teks Header Hero -->
-              <div class="space-y-1">
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
-                  Portal <span class="text-[#FFD700]">Admin</span> Sekolah
-                </h1>
-                <p class="text-base sm:text-lg font-bold text-white tracking-wide drop-shadow-sm">${p.namaSekolah}</p>
-                <p class="text-xs sm:text-sm text-blue-100 italic pt-0.5 opacity-95">
-                  "Kelola dengan bijak, wujudkan sekolah yang lebih baik"
-                </p>
+              <!-- 2. Cyan / Sky Squircle: Manajemen Kelas -->
+              <div onclick="openModule('admin-kelas')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(56,189,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(56,189,248,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Kelas</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Atur Rombel & Wali</span>
               </div>
-            </div>
 
-            <!-- Kanan: Ilustrasi 3D Administrator ASN, Gedung Sekolah, Merah Putih -->
-            <div class="md:col-span-5 flex justify-center md:justify-end items-center">
-              <svg viewBox="0 0 340 180" class="w-full max-w-[290px] sm:max-w-[340px] h-auto drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Langit Cerah & Awan 3D -->
-                <circle cx="295" cy="28" r="22" fill="#FEF08A" opacity="0.9"/>
-                <path d="M240,36 Q255,22 275,30 Q295,25 300,38 Q310,48 290,48 L240,48 Z" fill="white" opacity="0.4"/>
-                
-                <!-- Bukit Hijau di Belakang -->
-                <ellipse cx="140" cy="165" rx="140" ry="40" fill="#15803D" opacity="0.5"/>
-                <ellipse cx="230" cy="160" rx="110" ry="35" fill="#16A34A" opacity="0.4"/>
-
-                <!-- Gedung Sekolah Neoklasik 3D (Atap Merah, Dinding Krem) -->
-                <rect x="25" y="75" width="160" height="70" rx="3" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
-                <!-- Atap Limas Merah dengan Bevel -->
-                <polygon points="15,75 105,38 195,75" fill="#DC2626"/>
-                <polygon points="15,75 105,38 105,75" fill="#EF4444"/>
-                
-                <!-- Menara Jam Pusat Gedung -->
-                <rect x="90" y="48" width="30" height="27" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
-                <polygon points="85,48 105,30 125,48" fill="#B91C1C"/>
-                <circle cx="105" cy="62" r="7" fill="#FFFFFF" stroke="#1E293B" stroke-width="1.5"/>
-                <line x1="105" y1="62" x2="105" y2="58" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
-                <line x1="105" y1="62" x2="108" y2="62" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
-
-                <!-- Jendela Biru Gedung Sekolah -->
-                <rect x="40" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
-                <rect x="68" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
-                <rect x="122" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
-                <rect x="150" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
-                
-                <!-- Pintu Utama dengan Kolom Pilar -->
-                <rect x="94" y="112" width="22" height="33" rx="1" fill="#78350F"/>
-                <rect x="91" y="108" width="28" height="4" fill="#E2E8F0"/>
-
-                <!-- Tiang Bendera Merah Putih Berkibar -->
-                <line x1="212" y1="40" x2="212" y2="148" stroke="#E2E8F0" stroke-width="3"/>
-                <circle cx="212" cy="40" r="3" fill="#FACC15"/>
-                <path d="M213,44 Q228,40 240,46 Q242,52 240,54 Q228,48 213,52 Z" fill="#EF4444"/>
-                <path d="M213,52 Q228,48 240,54 Q242,60 240,62 Q228,56 213,60 Z" fill="#FFFFFF"/>
-
-                <!-- Pepohonan Asri 3D -->
-                <circle cx="20" cy="120" r="22" fill="#15803D"/>
-                <circle cx="210" cy="125" r="19" fill="#16A34A"/>
-                <circle cx="192" cy="130" r="15" fill="#22C55E"/>
-
-                <!-- Karakter 3D Administrator Pria ASN / Khaki (Kacamata, Senyum, Thumbs Up, Tablet) -->
-                <g transform="translate(196, 40)">
-                  <!-- Badan Jas Khaki ASN -->
-                  <path d="M52,76 C32,86 22,106 22,138 L82,138 C82,106 72,86 52,76 Z" fill="#D97706"/>
-                  <!-- Kerah Kemeja Putih & Dasi Coklat -->
-                  <polygon points="52,86 42,76 62,76" fill="#FFFFFF"/>
-                  <polygon points="52,82 46,102 52,118 58,102" fill="#78350F"/>
-                  
-                  <!-- Kepala & Leher -->
-                  <ellipse cx="52" cy="46" rx="19" ry="23" fill="#FED7AA"/>
-                  <!-- Rambut Hitam Rapi 3D -->
-                  <path d="M33,42 C33,24 46,20 62,23 C71,26 71,36 71,42 C67,34 52,30 33,42 Z" fill="#0F172A"/>
-                  <path d="M70,38 C72,42 72,48 70,52 Z" fill="#0F172A"/>
-                  
-                  <!-- Kacamata Hitam Keren & Mata Senyum -->
-                  <rect x="37" y="41" width="12" height="9" rx="2.5" fill="none" stroke="#0F172A" stroke-width="2.2"/>
-                  <rect x="55" y="41" width="12" height="9" rx="2.5" fill="none" stroke="#0F172A" stroke-width="2.2"/>
-                  <line x1="49" y1="45" x2="55" y2="45" stroke="#0F172A" stroke-width="2.2"/>
-                  <circle cx="43" cy="45" r="1.8" fill="#0F172A"/>
-                  <circle cx="61" cy="45" r="1.8" fill="#0F172A"/>
-                  
-                  <!-- Hidung & Senyum Ramah -->
-                  <path d="M52,48 L50,53 L54,53" stroke="#C2410C" stroke-width="1.2" fill="none"/>
-                  <path d="M45,58 Q52,65 59,58" stroke="#9A3412" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-                  
-                  <!-- Tangan Kanan Thumbs Up (Jempol Mengacung) -->
-                  <g transform="translate(26, 92)">
-                    <circle cx="5" cy="5" r="9" fill="#FED7AA"/>
-                    <path d="M3,5 L3,-5 C3,-8 8,-8 8,-5 L8,5 Z" fill="#FED7AA"/>
-                  </g>
-                  
-                  <!-- Tablet Digital Hitam di Tangan Kiri -->
-                  <rect x="68" y="90" width="24" height="34" rx="3.5" fill="#0F172A" transform="rotate(-10 68 90)"/>
-                  <rect x="70" y="92" width="20" height="30" rx="2.5" fill="#38BDF8" transform="rotate(-10 68 90)"/>
-                </g>
-              </svg>
-            </div>
-
-          </div>
-        </div>
-      `;
-
-      // B. GRID 8 KARTU MENU ADMIN (PERSIS REFERENSI GAMBAR - 4x2 GRID)
-      document.getElementById('portalCardsContainer').innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          
-          <!-- MENU 1: MANAJEMEN GURU (Top: 3 Pendidik 3D, Bottom: Teks + Tombol Biru) -->
-          <div onclick="openModule('admin-guru')"
-            class="bg-gradient-to-b from-[#EBF3FF] via-[#F4F8FF] to-[#FFFFFF] border border-[#D5E5FF] shadow-[0_4px_20px_-2px_rgba(24,119,242,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: 3 Teachers in Khaki -->
-            <div class="flex justify-center items-center h-28">
-              <svg viewBox="0 0 160 85" class="w-full max-w-[150px] h-auto drop-shadow-md">
-                <!-- Drop shadow bawah -->
-                <ellipse cx="80" cy="82" rx="65" ry="3" fill="#D0E3FF"/>
-                
-                <!-- Guru Kiri (Sedikit di Belakang) -->
-                <g transform="translate(20, 10)">
-                  <path d="M30,35 C18,42 12,56 12,75 L48,75 C48,56 42,42 30,35 Z" fill="#D97706"/>
-                  <polygon points="30,42 24,35 36,35" fill="#FFFFFF"/>
-                  <polygon points="30,40 26,52 30,62 34,52" fill="#78350F"/>
-                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
-                  <path d="M19,20 C19,10 26,7 35,9 C40,11 40,17 40,20 C38,15 28,13 19,20 Z" fill="#0F172A"/>
-                  <circle cx="26,22" r="1.5" fill="#0F172A"/>
-                  <circle cx="34,22" r="1.5" fill="#0F172A"/>
-                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
-                </g>
-
-                <!-- Guru Kanan (Sedikit di Belakang) -->
-                <g transform="translate(80, 10)">
-                  <path d="M30,35 C18,42 12,56 12,75 L48,75 C48,56 42,42 30,35 Z" fill="#D97706"/>
-                  <polygon points="30,42 24,35 36,35" fill="#FFFFFF"/>
-                  <polygon points="30,40 26,52 30,62 34,52" fill="#78350F"/>
-                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
-                  <path d="M19,20 C19,10 26,7 35,9 C40,11 40,17 40,20 C38,15 28,13 19,20 Z" fill="#0F172A"/>
-                  <rect x="23" y="19" width="6" height="5" rx="1" fill="none" stroke="#0F172A" stroke-width="1.2"/>
-                  <rect x="31" y="19" width="6" height="5" rx="1" fill="none" stroke="#0F172A" stroke-width="1.2"/>
-                  <circle cx="26,21.5" r="1.2" fill="#0F172A"/>
-                  <circle cx="34,21.5" r="1.2" fill="#0F172A"/>
-                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
-                </g>
-
-                <!-- Guru Tengah (Paling Depan & Menonjol) -->
-                <g transform="translate(50, 0)">
-                  <path d="M30,38 C16,46 10,60 10,80 L50,80 C50,60 44,46 30,38 Z" fill="#B45309"/>
-                  <polygon points="30,45 23,38 37,38" fill="#FFFFFF"/>
-                  <polygon points="30,43 25,56 30,68 35,56" fill="#451A03"/>
-                  <ellipse cx="30,22" rx="13" ry="16" fill="#FED7AA"/>
-                  <path d="M17,19 C17,7 26,4 37,6 C43,8 43,15 43,19 C40,13 28,11 17,19 Z" fill="#0F172A"/>
-                  <!-- Kacamata & Senyum -->
-                  <rect x="21" y="18" width="8" height="6.5" rx="1.5" fill="none" stroke="#0F172A" stroke-width="1.5"/>
-                  <rect x="31" y="18" width="8" height="6.5" rx="1.5" fill="none" stroke="#0F172A" stroke-width="1.5"/>
-                  <line x1="29" y1="21" x2="31" y2="21" stroke="#0F172A" stroke-width="1.5"/>
-                  <circle cx="25" cy="21" r="1.5" fill="#0F172A"/>
-                  <circle cx="35" cy="21" r="1.5" fill="#0F172A"/>
-                  <path d="M26,30 Q30,35 34,30" stroke="#9A3412" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                </g>
-              </svg>
-            </div>
-
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">Manajemen Guru</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Kelola data dan<br>penugasan guru</p>
+              <!-- 3. Rose / Pink Squircle: Pembagian Guru & Kelas -->
+              <div onclick="openModule('admin-penugasan')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,113,133,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,113,133,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Penugasan</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Plotting Wali & Mapel</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-blue-600 transition-all shrink-0">
-                →
+
+              <!-- 4. Mint / Teal Squircle: Rekapitulasi Nilai -->
+              <div onclick="openModule('admin-nilai')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(45,212,191,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(45,212,191,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Rekap Nilai</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Formatif & SAS</span>
               </div>
+
+              <!-- 5. Purple / Violet Squircle: Rekapitulasi Absensi -->
+              <div onclick="openModule('admin-absensi')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(192,132,252,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(192,132,252,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #C084FC 0%, #7C3AED 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Absensi</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Kehadiran Siswa</span>
+              </div>
+
+              <!-- 6. Amber / Gold Squircle: Laporan Sekolah Resmi -->
+              <div onclick="openModule('admin-laporan')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,191,36,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,191,36,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Laporan</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Kop Surat PDF</span>
+              </div>
+
+              <!-- 7. Royal Blue Squircle: Bank Perangkat Ajar -->
+              <div onclick="openModule('admin-perangkat')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(96,165,250,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(96,165,250,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Perangkat</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Word, PDF, Excel</span>
+              </div>
+
+              <!-- 8. Indigo Squircle: Pengaturan Sekolah -->
+              <div onclick="openModule('admin-pengaturan')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(129,140,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(129,140,248,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-brandpurple-700 transition-colors">Setelan</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Identitas Sekolah</span>
+              </div>
+
             </div>
           </div>
 
-          <!-- MENU 2: MANAJEMEN KELAS (Top: Gedung Sekolah 3D, Bottom: Teks + Tombol Hijau) -->
-          <div onclick="openModule('admin-kelas')"
-            class="bg-gradient-to-b from-[#EAF8F1] via-[#F3FCF7] to-[#FFFFFF] border border-[#C5F0DC] shadow-[0_4px_20px_-2px_rgba(16,185,129,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: School Building -->
-            <div class="flex justify-center items-center h-28">
-              <svg viewBox="0 0 160 85" class="w-full max-w-[150px] h-auto drop-shadow-md">
-                <ellipse cx="80" cy="80" rx="65" ry="3" fill="#D1FAE5"/>
-                <!-- Gedung Utama Sekolah -->
-                <rect x="35" y="32" width="90" height="46" rx="2" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
-                <polygon points="28,32 80,10 132,32" fill="#DC2626"/>
-                <polygon points="28,32 80,10 80,32" fill="#EF4444"/>
-                
-                <!-- Menara Jam Pusat -->
-                <rect x="70" y="16" width="20" height="18" fill="#FFFBEB" stroke="#B45309" stroke-width="1"/>
-                <polygon points="66,16 80,5 94,16" fill="#B91C1C"/>
-                <circle cx="80" cy="25" r="5" fill="#FFFFFF" stroke="#1E293B" stroke-width="1"/>
-                <line x1="80" y1="25" x2="80" y2="22" stroke="#1E293B" stroke-width="1"/>
-                <line x1="80" y1="25" x2="82" y2="25" stroke="#1E293B" stroke-width="1"/>
-                
-                <!-- Pintu & Jendela -->
-                <rect x="73" y="55" width="14" height="23" rx="1" fill="#78350F"/>
-                <rect x="44" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
-                <rect x="58" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
-                <rect x="90" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
-                <rect x="104" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
-                
-                <!-- Pepohonan Asri Samping Gedung -->
-                <circle cx="25" cy="58" r="14" fill="#15803D"/>
-                <circle cx="18" cy="62" r="10" fill="#16A34A"/>
-                <circle cx="135" cy="58" r="14" fill="#15803D"/>
-                <circle cx="142" cy="62" r="10" fill="#16A34A"/>
-              </svg>
+          <!-- Section "Recent" (Screen 2 Signature List) -->
+          <div class="space-y-3 pt-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Recent</h3>
+              <button onclick="openModule('admin-laporan')" class="text-xs font-extrabold text-brandpurple-700 hover:text-brandpurple-900 cursor-pointer">
+                View All
+              </button>
             </div>
 
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Manajemen Kelas</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Atur kelas dan<br>wali kelas</p>
+            <div class="bg-white rounded-3xl p-3 sm:p-4 soft-card-shadow border border-slate-100 space-y-2">
+              
+              <!-- Recent Item 1 -->
+              <div onclick="openModule('admin-penugasan')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Penugasan Wali Kelas</h4>
+                    <p class="text-[11px] text-slate-400">Dewi Rahmawati, S.Pd. • Kelas IV-A</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700">Aktif</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-emerald-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 3: PEMBAGIAN GURU & KELAS (Top: Clipboard + Avatar 3D, Bottom: Teks + Tombol Orange) -->
-          <div onclick="openModule('admin-penugasan')"
-            class="bg-gradient-to-b from-[#FFF5EC] via-[#FFF9F3] to-[#FFFFFF] border border-[#FEDDC3] shadow-[0_4px_20px_-2px_rgba(249,115,22,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: Clipboard with Avatar Badge -->
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <!-- Papan Clipboard Coklat 3D -->
-                <rect x="18" y="8" width="54" height="68" rx="6" fill="#FDBA74" stroke="#EA580C" stroke-width="1.5"/>
-                <rect x="22" y="16" width="46" height="56" rx="3" fill="#FFFFFF"/>
-                
-                <!-- Jepitan Kertas Biru 3D -->
-                <rect x="35" y="4" width="20" height="9" rx="3" fill="#2563EB" stroke="#1D4ED8" stroke-width="1"/>
-                <circle cx="45" cy="8.5" r="2" fill="#FFFFFF"/>
-                
-                <!-- Baris Checklist dengan Centang Hijau-Teal -->
-                <line x1="28" y1="28" x2="60" y2="28" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M28,26 L31,29 L37,23" stroke="#0D9488" stroke-width="2" stroke-linecap="round" fill="none"/>
-                
-                <line x1="28" y1="40" x2="60" y2="40" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M28,38 L31,41 L37,35" stroke="#0D9488" stroke-width="2" stroke-linecap="round" fill="none"/>
-                
-                <line x1="28" y1="52" x2="52" y2="52" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M28,50 L31,53 L37,47" stroke="#0D9488" stroke-width="2" stroke-linecap="round" fill="none"/>
-
-                <!-- Badge Avatar Pengguna Biru 3D di Kanan Bawah -->
-                <circle cx="68" cy="62" r="14" fill="#2563EB" stroke="#FFFFFF" stroke-width="2.5"/>
-                <circle cx="68" cy="57" r="4.5" fill="#FFFFFF"/>
-                <path d="M59,71 C59,66 63,64 68,64 C73,64 77,66 77,71 Z" fill="#FFFFFF"/>
-              </svg>
-            </div>
-
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-orange-700 transition-colors leading-tight">Pembagian<br>Guru & Kelas</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Tentukan penugasan<br>guru per kelas</p>
+              <!-- Recent Item 2 -->
+              <div onclick="openModule('admin-absensi')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Presensi Harian Seluruh Kelas</h4>
+                    <p class="text-[11px] text-slate-400">Tingkat I - VI • Hari Ini</p>
+                  </div>
+                </div>
+                <span class="text-xs font-black text-brandmint-600">+98.2% Hadir</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F97316] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-orange-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 4: REKAPITULASI NILAI (Top: Grafik 3D + Panah Naik Ungu, Bottom: Teks + Tombol Ungu) -->
-          <div onclick="openModule('admin-nilai')"
-            class="bg-gradient-to-b from-[#F5F0FF] via-[#FAF6FF] to-[#FFFFFF] border border-[#E7D6FF] shadow-[0_4px_20px_-2px_rgba(139,92,246,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: Bar Chart with Rising Arrow -->
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 110 85" class="w-24 h-22 drop-shadow-md">
-                <!-- Bar 1: Cyan -->
-                <rect x="18" y="52" width="14" height="24" rx="2" fill="#38BDF8"/>
-                <polygon points="18,52 24,46 38,46 32,52" fill="#7DD3FC"/>
-                <polygon points="32,52 38,46 38,70 32,76" fill="#0284C7"/>
-                
-                <!-- Bar 2: Emerald Green -->
-                <rect x="42" y="38" width="14" height="38" rx="2" fill="#10B981"/>
-                <polygon points="42,38 48,32 62,32 56,38" fill="#34D399"/>
-                <polygon points="56,38 62,32 62,70 56,76" fill="#059669"/>
-                
-                <!-- Bar 3: Royal Purple -->
-                <rect x="66" y="24" width="14" height="52" rx="2" fill="#8B5CF6"/>
-                <polygon points="66,24 72,18 86,18 80,24" fill="#A78BFA"/>
-                <polygon points="80,24 86,18 86,70 80,76" fill="#6D28D9"/>
-                
-                <!-- Panah Naik Melengkung Ungu-Magenta 3D -->
-                <path d="M12,48 Q45,28 85,12" stroke="#9333EA" stroke-width="5" stroke-linecap="round" fill="none"/>
-                <polygon points="85,6 94,14 82,18" fill="#9333EA"/>
-              </svg>
-            </div>
+              <!-- Recent Item 3 -->
+              <div onclick="openModule('admin-nilai')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-purple-50 text-brandpurple-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Rekap Nilai Formatif & SAS</h4>
+                    <p class="text-[11px] text-slate-400">Matematika & Bhs. Indonesia Fase B</p>
+                  </div>
+                </div>
+                <span class="text-xs font-black text-brandpurple-700">87.67 Rata-rata</span>
+              </div>
 
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors leading-tight">Rekapitulasi<br>Nilai</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Lihat dan cetak<br>rekap nilai</p>
+              <!-- Recent Item 4 -->
+              <div onclick="openModule('admin-perangkat')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Dokumen Modul Baru Diunggah</h4>
+                    <p class="text-[11px] text-slate-400">Modul Pecahan & Format Penilaian Excel</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-sky-50 text-sky-700">Tersedia</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-purple-700 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 5: REKAPITULASI ABSENSI (Top: Kalender + Jam 3D, Bottom: Teks + Tombol Teal) -->
-          <div onclick="openModule('admin-absensi')"
-            class="bg-gradient-to-b from-[#EDFBF8] via-[#F4FDFB] to-[#FFFFFF] border border-[#CCF8EE] shadow-[0_4px_20px_-2px_rgba(13,148,136,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: Calendar with Clock -->
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <!-- Kalender Hijau 3D -->
-                <rect x="15" y="16" width="56" height="52" rx="6" fill="#F0FDFA" stroke="#0D9488" stroke-width="1.5"/>
-                <path d="M15,22 C15,18 18,16 22,16 L65,16 C69,16 71,18 71,22 L71,28 L15,28 Z" fill="#0D9488"/>
-                
-                <!-- Ring Kalender -->
-                <rect x="25" y="10" width="5" height="10" rx="2.5" fill="#047857"/>
-                <rect x="55" y="10" width="5" height="10" rx="2.5" fill="#047857"/>
-                
-                <!-- Kotak-kotak Tanggal -->
-                <rect x="22" y="34" width="7" height="6" rx="1" fill="#CCFBF1"/>
-                <rect x="33" y="34" width="7" height="6" rx="1" fill="#CCFBF1"/>
-                <rect x="44" y="34" width="7" height="6" rx="1" fill="#CCFBF1"/>
-                <rect x="22" y="44" width="7" height="6" rx="1" fill="#CCFBF1"/>
-                <rect x="33" y="44" width="7" height="6" rx="1" fill="#CCFBF1"/>
-                
-                <!-- Jam Analog Biru 3D di Depan Kalender -->
-                <circle cx="62" cy="56" r="16" fill="#0284C7" stroke="#FFFFFF" stroke-width="2.5"/>
-                <circle cx="62" cy="56" r="12" fill="#FFFFFF"/>
-                <circle cx="62" cy="56" r="1.5" fill="#0F172A"/>
-                <line x1="62" y1="56" x2="62" y2="48" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round"/>
-                <line x1="62" y1="56" x2="68" y2="56" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-teal-700 transition-colors leading-tight">Rekapitulasi<br>Absensi</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Lihat dan cetak<br>rekap absensi</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-teal-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
-
-          <!-- MENU 6: LAPORAN SEKOLAH (Top: Dokumen + Diagram Lingkaran 3D, Bottom: Teks + Tombol Merah) -->
-          <div onclick="openModule('admin-laporan')"
-            class="bg-gradient-to-b from-[#FFF1F2] via-[#FFF6F7] to-[#FFFFFF] border border-[#FED0D7] shadow-[0_4px_20px_-2px_rgba(244,63,94,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: Document with Pie Chart -->
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <!-- Lembaran Dokumen Putih/Biru 3D -->
-                <rect x="18" y="10" width="46" height="58" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
-                <line x1="26" y1="20" x2="48" y2="20" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="26" y1="28" x2="42" y2="28" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
-                <line x1="26" y1="36" x2="38" y2="36" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
-                
-                <!-- Diagram Lingkaran (Pie Chart) 3D Berwarna -->
-                <g transform="translate(62, 54)">
-                  <circle cx="0" cy="0" r="18" fill="#F43F5E"/>
-                  <!-- Sektor Biru (40%) -->
-                  <path d="M0,0 L0,-18 A18,18 0 0,1 17,6 Z" fill="#2563EB"/>
-                  <!-- Sektor Kuning (25%) -->
-                  <path d="M0,0 L17,6 A18,18 0 0,1 -6,17 Z" fill="#FBBF24"/>
-                </g>
-              </svg>
-            </div>
-
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-rose-700 transition-colors leading-tight">Laporan<br>Sekolah</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Generate laporan<br>sekolah lengkap</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F43F5E] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-rose-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
-
-          <!-- MENU 7: BANK PERANGKAT AJAR (Top: Tumpukan 3 Buku 3D, Bottom: Teks + Tombol Sky Blue) -->
-          <div onclick="openModule('admin-perangkat')"
-            class="bg-gradient-to-b from-[#F0F9FF] via-[#F6FBFF] to-[#FFFFFF] border border-[#BAE8FD] shadow-[0_4px_20px_-2px_rgba(14,165,233,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: Stack of 3 Books -->
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <!-- Buku Bawah: Biru Tua -->
-                <polygon points="20,54 50,68 80,54 50,40" fill="#0284C7"/>
-                <polygon points="20,54 50,68 50,73 20,59" fill="#0369A1"/>
-                <polygon points="50,68 80,54 80,59 50,73" fill="#38BDF8"/>
-                
-                <!-- Buku Tengah: Kuning/Emas -->
-                <polygon points="20,40 50,54 80,40 50,26" fill="#F59E0B"/>
-                <polygon points="20,40 50,54 50,45 20,31" fill="#D97706"/>
-                <polygon points="50,54 80,40 80,45 50,59" fill="#FCD34D"/>
-                
-                <!-- Buku Atas: Biru Muda Cerah -->
-                <polygon points="20,26 50,40 80,26 50,12" fill="#2563EB"/>
-                <polygon points="20,26 50,40 50,31 20,17" fill="#1D4ED8"/>
-                <polygon points="50,40 80,26 80,31 50,45" fill="#60A5FA"/>
-              </svg>
-            </div>
-
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors leading-tight">Bank Perangkat<br>Ajar</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Kelola bahan ajar<br>untuk guru</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0EA5E9] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-sky-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
-
-          <!-- MENU 8: PENGATURAN SEKOLAH (Top: Roda Gigi Biru 3D, Bottom: Teks + Tombol Indigo) -->
-          <div onclick="openModule('admin-pengaturan')"
-            class="bg-gradient-to-b from-[#EEF2FF] via-[#F5F7FF] to-[#FFFFFF] border border-[#C9D5FE] shadow-[0_4px_20px_-2px_rgba(79,70,229,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <!-- 3D Illustration: Blue Gear / Cogwheel -->
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <!-- Roda Gigi Biru 3D Berkilau -->
-                <g transform="translate(50, 42)">
-                  <circle cx="0" cy="0" r="28" fill="#3B82F6"/>
-                  <!-- Gigi-gigi Gear -->
-                  <path d="M-6,-34 L6,-34 L5,-26 L-5,-26 Z" fill="#2563EB"/>
-                  <path d="M-6,34 L6,34 L5,26 L-5,26 Z" fill="#1D4ED8"/>
-                  <path d="M-34,-6 L-34,6 L-26,5 L-26,-5 Z" fill="#2563EB"/>
-                  <path d="M34,-6 L34,6 L26,5 L26,-5 Z" fill="#1D4ED8"/>
-                  
-                  <path d="M-22,-22 L-14,-28 L-9,-21 L-17,-15 Z" fill="#2563EB"/>
-                  <path d="M22,22 L14,28 L9,21 L17,15 Z" fill="#1D4ED8"/>
-                  <path d="M-22,22 L-28,14 L-21,9 L-15,17 Z" fill="#1D4ED8"/>
-                  <path d="M22,-22 L28,-14 L21,-9 L15,-17 Z" fill="#2563EB"/>
-                  
-                  <!-- Lingkaran Luar & Bevel Tengah -->
-                  <circle cx="0" cy="0" r="24" fill="#2563EB"/>
-                  <circle cx="0" cy="0" r="16" fill="#1E40AF"/>
-                  <!-- Lubang Poros Tengah -->
-                  <circle cx="0" cy="0" r="8" fill="#F8FAFC"/>
-                </g>
-              </svg>
-            </div>
-
-            <!-- Teks & Tombol Panah Bawah -->
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-indigo-700 transition-colors leading-tight">Pengaturan<br>Sekolah</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Atur identitas dan<br>konfigurasi sistem</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-indigo-600 transition-all shrink-0">
-                →
-              </div>
             </div>
           </div>
 
         </div>
       `;
 
-      // C. WELCOME INFORMATION BAR ADMIN (PILL STYLE PERSIS GAMBAR ACUAN)
+      // C. WELCOME INFORMATION BAR ADMIN (PILL STYLE)
       document.getElementById('portalWelcomeBarContainer').innerHTML = `
-        <div class="bg-white rounded-full sm:rounded-[26px] p-4 sm:px-6 sm:py-3.5 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-3xl p-4 sm:px-6 sm:py-3.5 soft-card-shadow border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-full bg-[#1A73E8] text-white font-extrabold flex items-center justify-center text-lg shadow-sm shrink-0">
-              i
+            <div class="w-10 h-10 rounded-2xl bg-brandpurple-100 text-brandpurple-800 font-extrabold flex items-center justify-center text-sm shadow-xs shrink-0">
+              👑
             </div>
             <div>
-              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Kepala Sekolah!</h4>
-              <p class="text-xs text-slate-500">Kelola administrasi sekolah dengan mudah, cepat, dan aman.</p>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Kepala Sekolah & Admin!</h4>
+              <p class="text-xs text-slate-500">Kelola guru, rombel, dan evaluasi capaian sekolah dalam satu sentuhan.</p>
             </div>
           </div>
-
-          <div class="hidden md:block w-px h-8 bg-slate-200"></div>
-
-          <div class="flex items-center gap-3">
-            <!-- Miniatur 3D Gedung Sekolah & Bendera Merah Putih -->
-            <svg viewBox="0 0 48 36" class="w-10 h-8 shrink-0">
-              <polygon points="24,4 4,14 44,14" fill="#DC2626"/>
-              <rect x="8" y="14" width="32" height="18" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
-              <rect x="20" y="20" width="8" height="12" fill="#475569"/>
-              <circle cx="24" cy="10" r="3" fill="#FFFFFF"/>
-              <circle cx="24" cy="10" r="1" fill="#DC2626"/>
-              <circle cx="5" cy="22" r="5" fill="#15803D"/>
-              <circle cx="43" cy="22" r="5" fill="#15803D"/>
-              <line x1="38" y1="4" x2="38" y2="16" stroke="#94A3B8" stroke-width="1.5"/>
-              <rect x="38" y="5" width="6" height="3" fill="#EF4444"/>
-              <rect x="38" y="8" width="6" height="3" fill="#FFFFFF"/>
-            </svg>
-            <div>
-              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm">${p.namaSekolah}</h4>
-              <p class="text-[11px] text-slate-500 font-medium">${p.kecamatan || 'Kecamatan Ambaru - Jember'}</p>
-            </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">${p.namaSekolah}</span>
           </div>
         </div>
       `;
     }
 
     // ==========================================
-    // 4. PORTAL GURU (PERSIS REFERENSI DESAIN - HIJAU EMERALD)
+    // 4. PORTAL GURU (ZOMOPAY EMERALD-MINT DESIGN)
     // ==========================================
     function renderPortalGuru() {
       const p = dbData.pengaturan;
 
-      // Bottom Decorative Wavy Ribbons (Emerald Green & Golden Yellow)
+      // Bottom Decorative Wavy Ribbons (Emerald & Mint)
       document.getElementById('bottomWaveContainer').innerHTML = `
         <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#065f46" opacity="0.9"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#059669" opacity="0.8"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#f59e0b"></path>
+          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#059669" opacity="0.3"></path>
+          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#14B8A6" opacity="0.25"></path>
+          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F6F4FE"></path>
         </svg>
       `;
 
-      // A. HERO BANNER GURU (EMERALD GREEN)
+      // A. HERO BANNER GURU (EMERALD-MINT CARD WITH 3D COINS & MINT SLIDER)
       document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="rounded-[32px] p-6 sm:p-8 text-white shadow-xl relative overflow-hidden"
-             style="background: linear-gradient(135deg, #064e3b 0%, #047857 40%, #059669 80%, #10b981 100%);">
+        <div class="relative w-full rounded-[34px] p-6 sm:p-7 text-white glass-card-emerald shadow-[0_22px_45px_rgba(5,150,105,0.36)] overflow-hidden">
           
-          <!-- Background Organic Wave Accents -->
-          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 220" preserveAspectRatio="none">
-            <path d="M-50,180 Q150,80 400,160 T850,100 L850,220 L-50,220 Z" fill="white" opacity="0.08"/>
-            <path d="M-50,200 Q200,120 450,190 T850,150 L850,220 L-50,220 Z" fill="#34d399" opacity="0.12"/>
+          <svg class="absolute w-0 h-0">
+            <defs>
+              <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FDE047"/>
+                <stop offset="50%" stop-color="#F59E0B"/>
+                <stop offset="100%" stop-color="#B45309"/>
+              </linearGradient>
+            </defs>
           </svg>
 
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
+          <!-- Ambient Radial Glows -->
+          <div class="absolute -right-16 -top-16 w-56 h-56 bg-emerald-300/20 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="absolute -left-16 -bottom-16 w-56 h-56 bg-teal-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+          <!-- Floating 3D Golden Coin 1 (Top Left) -->
+          <div class="floating-coin absolute -top-2 left-6 w-11 h-11 pointer-events-none drop-shadow-[0_8px_16px_rgba(245,158,11,0.55)]">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad2)" stroke="#B45309" stroke-width="3"/>
+              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5" stroke-dasharray="5,2"/>
+              <text x="50" y="63" font-size="34" font-weight="900" fill="#78350F" text-anchor="middle">★</text>
+            </svg>
+          </div>
+
+          <!-- Floating 3D Golden Coin 2 (Bottom Right) -->
+          <div class="floating-coin absolute -bottom-3 right-6 w-13 h-13 pointer-events-none drop-shadow-[0_10px_20px_rgba(245,158,11,0.6)]" style="animation-delay: -1.7s;">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <ellipse cx="50" cy="50" rx="46" ry="46" fill="url(#goldGrad2)" stroke="#B45309" stroke-width="3"/>
+              <ellipse cx="50" cy="50" rx="36" ry="36" fill="none" stroke="#FEF08A" stroke-width="2.5"/>
+              <circle cx="50" cy="50" r="14" fill="#F59E0B" opacity="0.6"/>
+              <text x="50" y="61" font-size="28" font-weight="900" fill="#78350F" text-anchor="middle">SD</text>
+            </svg>
+          </div>
+
+          <!-- Header Row -->
+          <div class="relative z-10 flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs font-bold text-emerald-100 tracking-wide uppercase">Kelas Ampuan Anda:</span>
+            </div>
+            <button onclick="openFormInputNilaiModal()" title="Input Nilai Baru"
+              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 text-white flex items-center justify-center font-bold text-lg shadow-sm transition active:scale-90 cursor-pointer">
+              +
+            </button>
+          </div>
+
+          <!-- Main Stat Display -->
+          <div class="relative z-10 space-y-1 mb-5">
+            <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white drop-shadow-sm">
+              Kelas IV-A • 28 Siswa
+            </h2>
+            <p class="text-xs sm:text-sm text-emerald-100 font-medium">
+              Fase B • Semester ${p.semesterAktif} • ${p.tahunAjaranAktif}
+            </p>
+          </div>
+
+          <!-- Progress Slider Bar -->
+          <div class="relative z-10 space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-emerald-100">
+              <span>Status Presensi Hari Ini</span>
+              <span class="text-yellow-300 font-extrabold">100% Terverifikasi</span>
+            </div>
             
-            <!-- Kiri: Logo Tut Wuri, Judul, Sekolah, Slogan -->
-            <div class="md:col-span-7 flex items-center gap-5">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-emerald-400/20 p-1.5 flex items-center justify-center shrink-0 border border-white/40 shadow-lg">
-                <div class="w-full h-full rounded-full bg-[#065f46] flex items-center justify-center p-2.5 shadow-inner">
-                  <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
-                    <polygon points="50,4 95,28 95,72 50,96 5,72 5,28" stroke="white" stroke-width="5" fill="#10b981"/>
-                    <path d="M50,18 L50,68 M30,45 L70,45 M38,32 L62,32 M42,58 L58,58" stroke="#facc15" stroke-width="6" stroke-linecap="round"/>
-                    <circle cx="50" cy="22" r="5" fill="#ef4444"/>
-                    <path d="M30,76 Q50,86 70,76" stroke="white" stroke-width="4" fill="none"/>
+            <div class="relative w-full h-2.5 rounded-full bg-black/20 p-0.5 overflow-visible">
+              <div class="h-full rounded-full bg-gradient-to-r from-teal-200 via-brandmint-300 to-yellow-300 shadow-[0_0_12px_rgba(45,212,191,0.8)]" style="width: 100%;"></div>
+              <div class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white border-2 border-emerald-400 shadow-[0_2px_8px_rgba(0,0,0,0.3)] flex items-center justify-center cursor-pointer" style="left: calc(100% - 14px);">
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-600"></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-emerald-100/90 pt-0.5">
+              <span>27 Hadir • 1 Sakit</span>
+              <span>Jurnal Mengajar Terisi</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // B. GRID 8 QUICK ACTION SQUIRCLES (GURU) & RECENT
+      document.getElementById('portalCardsContainer').innerHTML = `
+        <div class="space-y-6">
+          
+          <!-- Section 8 Squircles Guru -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Pembelajaran</h3>
+              <span class="text-xs font-bold text-emerald-700">8 Modul Aktif</span>
+            </div>
+
+            <div class="grid grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              
+              <!-- 1. Coral / Orange Squircle: Dashboard Guru -->
+              <div onclick="openModule('guru-dashboard')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(255,107,74,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(255,107,74,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #FF7A59 0%, #FF5722 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                   </svg>
                 </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Beranda</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Aktivitas Kelas</span>
               </div>
 
-              <div class="w-[1.5px] h-20 bg-white/30 hidden sm:block"></div>
-
-              <div class="space-y-1">
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
-                  Portal <span class="text-[#FFD700]">Guru</span>
-                </h1>
-                <p class="text-base sm:text-lg font-bold text-white tracking-wide drop-shadow-sm">${p.namaSekolah}</p>
-                <p class="text-xs sm:text-sm text-emerald-100 italic pt-0.5 opacity-95">
-                  "Mengajar dengan hati, mendidik dengan teknologi"
-                </p>
+              <!-- 2. Cyan / Sky Squircle: Data Siswa -->
+              <div onclick="openModule('guru-siswa')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(56,189,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(56,189,248,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Siswa</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Buku Induk</span>
               </div>
-            </div>
 
-            <!-- Kanan: Ilustrasi 3D Guru Wanita Berhijab, Gedung Sekolah, Merah Putih -->
-            <div class="md:col-span-5 flex justify-center md:justify-end items-center">
-              <svg viewBox="0 0 340 180" class="w-full max-w-[290px] sm:max-w-[340px] h-auto drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="295" cy="28" r="22" fill="#FEF08A" opacity="0.9"/>
-                <ellipse cx="140" cy="165" rx="140" ry="40" fill="#047857" opacity="0.5"/>
-                
-                <!-- Gedung Sekolah Hijau-Putih 3D -->
-                <rect x="25" y="75" width="160" height="70" rx="3" fill="#F8FAFC" stroke="#059669" stroke-width="1.5"/>
-                <polygon points="15,75 105,38 195,75" fill="#047857"/>
-                <polygon points="15,75 105,38 105,75" fill="#059669"/>
-                
-                <rect x="90" y="48" width="30" height="27" fill="#FEF3C7" stroke="#047857" stroke-width="1.5"/>
-                <circle cx="105" cy="62" r="7" fill="#FACC15"/>
-                
-                <rect x="40" y="88" width="20" height="18" rx="2" fill="#34D399"/>
-                <rect x="68" y="88" width="20" height="18" rx="2" fill="#34D399"/>
-                <rect x="122" y="88" width="20" height="18" rx="2" fill="#34D399"/>
-                <rect x="150" y="88" width="20" height="18" rx="2" fill="#34D399"/>
-
-                <!-- Tiang Bendera Merah Putih -->
-                <line x1="212" y1="40" x2="212" y2="148" stroke="#E2E8F0" stroke-width="3"/>
-                <path d="M213,44 Q228,40 240,46 Q242,52 240,54 Q228,48 213,52 Z" fill="#EF4444"/>
-                <path d="M213,52 Q228,48 240,54 Q242,60 240,62 Q228,56 213,60 Z" fill="#FFFFFF"/>
-
-                <!-- Pepohonan Asri 3D -->
-                <circle cx="20" cy="120" r="22" fill="#059669"/>
-                <circle cx="210" cy="125" r="19" fill="#10B981"/>
-                <circle cx="192" cy="130" r="15" fill="#34D399"/>
-
-                <!-- Karakter 3D Guru Wanita Berhijab (Seragam Khaki & Tablet) -->
-                <g transform="translate(196, 38)">
-                  <!-- Baju Khaki Guru -->
-                  <path d="M52,78 C32,88 24,108 24,140 L80,140 C80,108 72,88 52,78 Z" fill="#D97706"/>
-                  <!-- Hijab Anggun Warna Krem/Khaki Muda 3D -->
-                  <path d="M52,18 C34,18 26,34 26,56 C26,80 38,90 52,90 C66,90 78,80 78,56 C78,34 70,18 52,18 Z" fill="#FEF08A"/>
-                  <path d="M38,72 Q52,86 66,72" fill="#FDE047"/>
-                  
-                  <!-- Wajah Senyum Cantik -->
-                  <ellipse cx="52" cy="52" rx="15" ry="18" fill="#FED7AA"/>
-                  <circle cx="45" cy="50" r="2" fill="#1E293B"/>
-                  <circle cx="59" cy="50" r="2" fill="#1E293B"/>
-                  <path d="M46,60 Q52,66 58,60" stroke="#B45309" stroke-width="2.2" stroke-linecap="round" fill="none"/>
-                  
-                  <!-- Tablet di Tangan Kiri -->
-                  <rect x="65" y="90" width="24" height="34" rx="3.5" fill="#0F172A" transform="rotate(-5 65 90)"/>
-                  <rect x="67" y="92" width="20" height="30" rx="2.5" fill="#34D399" transform="rotate(-5 65 90)"/>
-                  
-                  <!-- Tangan Kanan Terbuka Ramah -->
-                  <circle cx="28" cy="98" r="8" fill="#FED7AA"/>
-                </g>
-              </svg>
-            </div>
-
-          </div>
-        </div>
-      `;
-
-      // B. GRID 8 KARTU MENU GURU (PERSIS REFERENSI DESAIN - 4x2 GRID)
-      document.getElementById('portalCardsContainer').innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          
-          <!-- MENU 1: DASHBOARD (Top: Rumah/Dashboard 3D, Bottom: Teks + Tombol Biru) -->
-          <div onclick="openModule('guru-dashboard')"
-            class="bg-gradient-to-b from-[#EBF3FF] via-[#F4F8FF] to-[#FFFFFF] border border-[#D5E5FF] shadow-[0_4px_20px_-2px_rgba(24,119,242,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <polygon points="50,12 18,36 82,36" fill="#2563EB"/>
-                <polygon points="50,12 18,36 50,36" fill="#3B82F6"/>
-                <rect x="26" y="34" width="48" height="38" rx="3" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
-                <rect x="42" y="48" width="16" height="24" rx="1.5" fill="#1E40AF"/>
-                <circle cx="50" cy="26" r="5" fill="#FFFFFF"/>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">Dashboard</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Ringkasan aktivitas<br>kelas Anda</p>
+              <!-- 3. Rose / Pink Squircle: Input Nilai -->
+              <div onclick="openModule('guru-nilai')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,113,133,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,113,133,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Nilai</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Formatif & SAS</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-blue-600 transition-all shrink-0">
-                →
+
+              <!-- 4. Mint / Teal Squircle: Presensi Siswa -->
+              <div onclick="openModule('guru-presensi')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(45,212,191,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(45,212,191,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Presensi</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Hadir, Sakit, Izin</span>
               </div>
+
+              <!-- 5. Purple / Violet Squircle: Jurnal Mengajar -->
+              <div onclick="openModule('guru-jurnal')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(192,132,252,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(192,132,252,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #C084FC 0%, #7C3AED 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Jurnal</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Catatan Harian</span>
+              </div>
+
+              <!-- 6. Amber / Gold Squircle: Perangkat Ajar -->
+              <div onclick="openModule('guru-perangkat')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(251,191,36,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(251,191,36,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Perangkat</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Modul & RPP</span>
+              </div>
+
+              <!-- 7. Royal Blue Squircle: Analisis Hasil Belajar -->
+              <div onclick="openModule('guru-analisis')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(96,165,250,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(96,165,250,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Analisis</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Grafik Ketuntasan</span>
+              </div>
+
+              <!-- 8. Indigo Squircle: Pengumuman Sekolah -->
+              <div onclick="openModule('guru-pengumuman')" class="flex flex-col items-center group cursor-pointer text-center">
+                <div class="w-15 h-15 sm:w-20 sm:h-20 rounded-[22px] sm:rounded-[26px] p-3.5 sm:p-5 flex items-center justify-center text-white shadow-[0_10px_20px_rgba(129,140,248,0.28)] group-hover:scale-108 group-hover:shadow-[0_14px_28px_rgba(129,140,248,0.42)] group-active:scale-95 transition-all duration-300"
+                     style="background: linear-gradient(135deg, #818CF8 0%, #4F46E5 100%);">
+                  <svg class="w-7 h-7 sm:w-9 sm:h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                  </svg>
+                </div>
+                <span class="mt-2 text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Info</span>
+                <span class="text-[10px] text-slate-400 font-medium hidden sm:block">Papan Pengumuman</span>
+              </div>
+
             </div>
           </div>
 
-          <!-- MENU 2: DATA SISWA (Top: Kelompok Siswa 3D, Bottom: Teks + Tombol Hijau) -->
-          <div onclick="openModule('guru-siswa')"
-            class="bg-gradient-to-b from-[#EAF8F1] via-[#F3FCF7] to-[#FFFFFF] border border-[#C5F0DC] shadow-[0_4px_20px_-2px_rgba(16,185,129,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex justify-center items-center h-28">
-              <svg viewBox="0 0 160 85" class="w-full max-w-[150px] h-auto drop-shadow-md">
-                <!-- 3 Siswa Ceria Berseragam SD Merah-Putih -->
-                <ellipse cx="80" cy="82" rx="65" ry="3" fill="#D1FAE5"/>
-                <!-- Siswa Kiri -->
-                <g transform="translate(20, 12)">
-                  <path d="M30,36 C18,44 12,56 12,74 L48,74 C48,56 42,44 30,36 Z" fill="#EF4444"/>
-                  <polygon points="30,42 24,36 36,36" fill="#FFFFFF"/>
-                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
-                  <path d="M19,19 C19,10 26,7 35,9 C40,11 40,17 40,19 C38,15 28,13 19,19 Z" fill="#0F172A"/>
-                  <circle cx="26,22" r="1.5" fill="#0F172A"/>
-                  <circle cx="34,22" r="1.5" fill="#0F172A"/>
-                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
-                </g>
-                <!-- Siswa Kanan -->
-                <g transform="translate(80, 12)">
-                  <path d="M30,36 C18,44 12,56 12,74 L48,74 C48,56 42,44 30,36 Z" fill="#EF4444"/>
-                  <polygon points="30,42 24,36 36,36" fill="#FFFFFF"/>
-                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
-                  <path d="M19,19 C19,10 26,7 35,9 C40,11 40,17 40,19 C38,15 28,13 19,19 Z" fill="#0F172A"/>
-                  <circle cx="26,22" r="1.5" fill="#0F172A"/>
-                  <circle cx="34,22" r="1.5" fill="#0F172A"/>
-                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
-                </g>
-                <!-- Siswa Tengah -->
-                <g transform="translate(50, 0)">
-                  <path d="M30,38 C16,46 10,60 10,80 L50,80 C50,60 44,46 30,38 Z" fill="#DC2626"/>
-                  <polygon points="30,45 23,38 37,38" fill="#FFFFFF"/>
-                  <polygon points="30,44 26,56 30,66 34,56" fill="#991B1B"/>
-                  <ellipse cx="30,22" rx="13" ry="16" fill="#FED7AA"/>
-                  <path d="M17,19 C17,7 26,4 37,6 C43,8 43,15 43,19 C40,13 28,11 17,19 Z" fill="#0F172A"/>
-                  <circle cx="25" cy="21" r="1.8" fill="#0F172A"/>
-                  <circle cx="35" cy="21" r="1.8" fill="#0F172A"/>
-                  <path d="M26,30 Q30,35 34,30" stroke="#9A3412" stroke-width="1.8" stroke-linecap="round" fill="none"/>
-                </g>
-              </svg>
+          <!-- Section "Recent" (Guru) -->
+          <div class="space-y-3 pt-2">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Recent</h3>
+              <button onclick="openModule('guru-dashboard')" class="text-xs font-extrabold text-emerald-700 hover:text-emerald-900 cursor-pointer">
+                View All
+              </button>
             </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Data Siswa</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Kelola data siswa<br>kelas Anda</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-emerald-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 3: INPUT NILAI (Top: Clipboard Nilai 3D, Bottom: Teks + Tombol Orange) -->
-          <div onclick="openModule('guru-nilai')"
-            class="bg-gradient-to-b from-[#FFF5EC] via-[#FFF9F3] to-[#FFFFFF] border border-[#FEDDC3] shadow-[0_4px_20px_-2px_rgba(249,115,22,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <rect x="20" y="8" width="56" height="68" rx="6" fill="#FDBA74" stroke="#EA580C" stroke-width="1.5"/>
-                <rect x="25" y="16" width="46" height="56" rx="3" fill="#FFFFFF"/>
-                <rect x="38" y="4" width="20" height="9" rx="3" fill="#EA580C"/>
-                <circle cx="48" cy="8.5" r="2" fill="#FFFFFF"/>
-                <!-- Centang Hijau & Pensil Emas 3D -->
-                <path d="M30,30 L35,35 L45,23" stroke="#16A34A" stroke-width="3" stroke-linecap="round" fill="none"/>
-                <path d="M30,46 L35,51 L45,39" stroke="#16A34A" stroke-width="3" stroke-linecap="round" fill="none"/>
-                <!-- Pensil Miring 3D -->
-                <g transform="translate(62, 35) rotate(35)">
-                  <polygon points="0,0 6,0 6,28 0,28" fill="#FBBF24"/>
-                  <polygon points="0,28 3,34 6,28" fill="#F59E0B"/>
-                  <polygon points="2,32 3,34 4,32" fill="#0F172A"/>
-                </g>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-orange-700 transition-colors">Input Nilai</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Masukkan dan kelola<br>nilai siswa</p>
+            <div class="bg-white rounded-3xl p-3 sm:p-4 soft-card-shadow border border-slate-100 space-y-2">
+              
+              <!-- Recent Item 1 -->
+              <div onclick="openModule('guru-presensi')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Presensi Siswa Hari Ini</h4>
+                    <p class="text-[11px] text-slate-400">27 Hadir • 1 Sakit (Dimas Bayu)</p>
+                  </div>
+                </div>
+                <span class="text-xs font-black text-brandmint-600">+96.4% Hadir</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F97316] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-orange-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 4: PRESENSI SISWA (Top: Kalender Centang 3D, Bottom: Teks + Tombol Ungu) -->
-          <div onclick="openModule('guru-presensi')"
-            class="bg-gradient-to-b from-[#F5F0FF] via-[#FAF6FF] to-[#FFFFFF] border border-[#E7D6FF] shadow-[0_4px_20px_-2px_rgba(139,92,246,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <rect x="18" y="14" width="56" height="54" rx="6" fill="#FAF5FF" stroke="#9333EA" stroke-width="1.5"/>
-                <path d="M18,20 C18,16 21,14 25,14 L67,14 C71,14 74,16 74,20 L74,26 L18,26 Z" fill="#9333EA"/>
-                <rect x="28" y="8" width="5" height="10" rx="2.5" fill="#6B21A8"/>
-                <rect x="58" y="8" width="5" height="10" rx="2.5" fill="#6B21A8"/>
-                <!-- Badge Centang Hijau Besar 3D -->
-                <circle cx="64" cy="54" r="16" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>
-                <path d="M57,54 L62,59 L71,49" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors">Presensi Siswa</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Kelola kehadiran<br>siswa</p>
+              <!-- Recent Item 2 -->
+              <div onclick="openModule('guru-nilai')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Input Nilai Formatif Pecahan</h4>
+                    <p class="text-[11px] text-slate-400">Siti Aisyah Putri • Nilai 92</p>
+                  </div>
+                </div>
+                <span class="text-xs font-black text-rose-600">92 Nilai</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-purple-700 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 5: JURNAL MENGAJAR (Top: Buku Terbuka 3D, Bottom: Teks + Tombol Teal) -->
-          <div onclick="openModule('guru-jurnal')"
-            class="bg-gradient-to-b from-[#EDFBF8] via-[#F4FDFB] to-[#FFFFFF] border border-[#CCF8EE] shadow-[0_4px_20px_-2px_rgba(13,148,136,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <path d="M50,22 C40,16 26,16 16,18 L16,62 C26,60 40,60 50,66 C60,60 74,60 84,62 L84,18 C74,16 60,16 50,22 Z" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
-                <line x1="50" y1="22" x2="50" y2="66" stroke="#0D9488" stroke-width="2"/>
-                <line x1="24" y1="28" x2="42" y2="28" stroke="#99F6E4" stroke-width="2"/>
-                <line x1="24" y1="36" x2="42" y2="36" stroke="#99F6E4" stroke-width="2"/>
-                <line x1="58" y1="28" x2="76" y2="28" stroke="#99F6E4" stroke-width="2"/>
-                <line x1="58" y1="36" x2="76" y2="36" stroke="#99F6E4" stroke-width="2"/>
-                <!-- Bookmark Pita Emas 3D -->
-                <polygon points="50,22 46,36 50,33 54,36" fill="#F59E0B"/>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-teal-700 transition-colors">Jurnal Mengajar</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Catat kegiatan<br>pembelajaran</p>
+              <!-- Recent Item 3 -->
+              <div onclick="openModule('guru-jurnal')" class="p-3 rounded-2xl hover:bg-slate-50 transition flex items-center justify-between cursor-pointer border border-transparent hover:border-slate-100">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-2xl bg-purple-50 text-brandpurple-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-extrabold text-slate-900">Jurnal Mengajar Terisi</h4>
+                    <p class="text-[11px] text-slate-400">Matematika • Pecahan Senilai</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700">Tersimpan</span>
               </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-teal-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
 
-          <!-- MENU 6: PERANGKAT PEMBELAJARAN (Top: Dokumen + Pita 3D, Bottom: Teks + Tombol Rose) -->
-          <div onclick="openModule('guru-perangkat')"
-            class="bg-gradient-to-b from-[#FFF1F2] via-[#FFF6F7] to-[#FFFFFF] border border-[#FED0D7] shadow-[0_4px_20px_-2px_rgba(244,63,94,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <rect x="20" y="10" width="46" height="60" rx="4" fill="#FFFFFF" stroke="#FDA4AF" stroke-width="1.5"/>
-                <line x1="28" y1="20" x2="52" y2="20" stroke="#F43F5E" stroke-width="2" stroke-linecap="round"/>
-                <line x1="28" y1="28" x2="48" y2="28" stroke="#FECDD3" stroke-width="2" stroke-linecap="round"/>
-                <line x1="28" y1="36" x2="44" y2="36" stroke="#FECDD3" stroke-width="2" stroke-linecap="round"/>
-                <!-- Medali/Badge Biru 3D -->
-                <circle cx="62" cy="56" r="14" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
-                <path d="M57,56 L61,60 L68,52" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-rose-700 transition-colors leading-tight">Perangkat<br>Pembelajaran</h3>
-                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Akses perangkat<br>ajar</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F43F5E] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-rose-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
-
-          <!-- MENU 7: ANALISIS (Top: Grafik Batang 3D, Bottom: Teks + Tombol Sky Blue) -->
-          <div onclick="openModule('guru-analisis')"
-            class="bg-gradient-to-b from-[#F0F9FF] via-[#F6FBFF] to-[#FFFFFF] border border-[#BAE8FD] shadow-[0_4px_20px_-2px_rgba(14,165,233,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <rect x="20" y="48" width="12" height="24" rx="2" fill="#0284C7"/>
-                <rect x="38" y="32" width="12" height="40" rx="2" fill="#0EA5E9"/>
-                <rect x="56" y="16" width="12" height="56" rx="2" fill="#38BDF8"/>
-                <path d="M16,42 L34,26 L52,32 L72,12" stroke="#0369A1" stroke-width="3" stroke-linecap="round" fill="none"/>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors">Analisis</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Lihat analisis hasil<br>pembelajaran</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0EA5E9] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-sky-600 transition-all shrink-0">
-                →
-              </div>
-            </div>
-          </div>
-
-          <!-- MENU 8: PENGUMUMAN (Top: Megafon 3D, Bottom: Teks + Tombol Indigo) -->
-          <div onclick="openModule('guru-pengumuman')"
-            class="bg-gradient-to-b from-[#EEF2FF] via-[#F5F7FF] to-[#FFFFFF] border border-[#C9D5FE] shadow-[0_4px_20px_-2px_rgba(79,70,229,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
-            <div class="flex items-center h-28 pl-1">
-              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
-                <!-- Megafon Toa Biru 3D -->
-                <polygon points="25,40 40,32 60,24 60,56 40,48 25,40" fill="#2563EB"/>
-                <path d="M60,24 C70,24 74,36 74,40 C74,44 70,56 60,56 Z" fill="#60A5FA"/>
-                <line x1="32" y1="44" x2="36" y2="62" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
-                <!-- Gelombang Suara -->
-                <path d="M78,32 Q84,40 78,48" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                <path d="M84,26 Q92,40 84,54" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-              </svg>
-            </div>
-            <div class="flex items-end justify-between w-full">
-              <div>
-                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-indigo-700 transition-colors">Pengumuman</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Lihat pengumuman<br>terbaru</p>
-              </div>
-              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-indigo-600 transition-all shrink-0">
-                →
-              </div>
             </div>
           </div>
 
         </div>
       `;
 
-      // C. WELCOME INFORMATION BAR GURU (PILL STYLE)
+      // C. WELCOME INFORMATION BAR GURU
       document.getElementById('portalWelcomeBarContainer').innerHTML = `
-        <div class="bg-white rounded-full sm:rounded-[26px] p-4 sm:px-6 sm:py-3.5 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-3xl p-4 sm:px-6 sm:py-3.5 soft-card-shadow border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-full bg-[#10B981] text-white font-extrabold flex items-center justify-center text-lg shadow-sm shrink-0">
-              i
+            <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-sm shadow-xs shrink-0">
+              👩‍🏫
             </div>
             <div>
-              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Bapak/Ibu Guru!</h4>
-              <p class="text-xs text-slate-500">Mari wujudkan pembelajaran yang menyenangkan dan bermakna.</p>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Bertugas, Ibu Dewi Rahmawati!</h4>
+              <p class="text-xs text-slate-500">Mendidik dengan hati, wujudkan generasi penerus yang berkarakter.</p>
             </div>
           </div>
-
-          <div class="hidden md:block w-px h-8 bg-slate-200"></div>
-
-          <div class="flex items-center gap-3">
-            <svg viewBox="0 0 48 36" class="w-10 h-8 shrink-0">
-              <polygon points="24,4 4,14 44,14" fill="#059669"/>
-              <rect x="8" y="14" width="32" height="18" fill="#F0FDF4" stroke="#059669" stroke-width="1"/>
-              <rect x="20" y="20" width="8" height="12" fill="#047857"/>
-              <circle cx="24" cy="10" r="3" fill="#FACC15"/>
-              <circle cx="5" cy="22" r="5" fill="#10B981"/>
-              <circle cx="43" cy="22" r="5" fill="#10B981"/>
-              <line x1="38" y1="4" x2="38" y2="16" stroke="#94A3B8" stroke-width="1.5"/>
-              <rect x="38" y="5" width="6" height="3" fill="#EF4444"/>
-              <rect x="38" y="8" width="6" height="3" fill="#FFFFFF"/>
-            </svg>
-            <div>
-              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm">${p.namaSekolah}</h4>
-              <p class="text-[11px] text-slate-500 font-medium">${p.kecamatan || 'Kecamatan Ambaru - Jember'}</p>
-            </div>
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold text-xs">${p.namaSekolah}</span>
           </div>
         </div>
       `;
     }
 
     // ==========================================
-    // 5. NAVIGASI HALAMAN MODUL TERPISAH
+    // 5. NAVIGASI HALAMAN MODUL TERPISAH (SCREEN 3 STYLE)
     // ==========================================
     function openModule(moduleKey) {
       document.getElementById('portalDashboardView').classList.add('hidden');
@@ -1444,8 +1344,65 @@
       const titleEl = document.getElementById('moduleViewTitle');
       const subEl = document.getElementById('moduleViewSubtitle');
       const actionEl = document.getElementById('moduleHeaderActions');
+      const chartEl = document.getElementById('moduleAnalyticsChartContainer');
       const contentEl = document.getElementById('moduleContentArea');
       actionEl.innerHTML = '';
+
+      // SCREEN 3: 3D Analytics Bar Chart Card
+      chartEl.innerHTML = `
+        <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-3 animate-fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Statistik & Distribusi Modul</h3>
+              <p class="text-[11px] text-slate-400">Ringkasan capaian administrasi & data aktif</p>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-brandpurple-50 text-brandpurple-800 font-extrabold text-xs">
+              Target: 100%
+            </span>
+          </div>
+
+          <!-- Vertical Pill Bars Chart with Floating Purple Tag (Screen 3 Highlight) -->
+          <div class="relative pt-7 pb-1">
+            <!-- Floating Purple Tag ($2,465 Equivalent) -->
+            <div class="absolute top-0 left-[51%] -translate-x-1/2 px-3 py-1 rounded-full bg-brandpurple-700 text-white font-black text-xs shadow-md">
+              98.5%
+            </div>
+            
+            <div class="flex items-end justify-between gap-3 h-32 px-2 sm:px-6">
+              <!-- Bar 1: Cyan -->
+              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div class="w-6 sm:w-8 rounded-full bg-cyan-400 shadow-xs" style="height: 55%;"></div>
+                <span class="text-[11px] font-bold text-slate-400">Kls 1</span>
+              </div>
+              <!-- Bar 2: Coral -->
+              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div class="w-6 sm:w-8 rounded-full bg-orange-400 shadow-xs" style="height: 72%;"></div>
+                <span class="text-[11px] font-bold text-slate-400">Kls 2</span>
+              </div>
+              <!-- Bar 3: Mint (Highest Bar with Floating Purple Tag) -->
+              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div class="w-6 sm:w-8 rounded-full bg-brandmint-400 shadow-md" style="height: 98%;"></div>
+                <span class="text-[11px] font-extrabold text-brandpurple-700">Kls 3</span>
+              </div>
+              <!-- Bar 4: Amber -->
+              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div class="w-6 sm:w-8 rounded-full bg-amber-400 shadow-xs" style="height: 64%;"></div>
+                <span class="text-[11px] font-bold text-slate-400">Kls 4</span>
+              </div>
+              <!-- Bar 5: Teal -->
+              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div class="w-6 sm:w-8 rounded-full bg-teal-400 shadow-xs" style="height: 84%;"></div>
+                <span class="text-[11px] font-bold text-slate-400">Kls 5</span>
+              </div>
+              <!-- Bar 6: Purple -->
+              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <div class="w-6 sm:w-8 rounded-full bg-brandpurple-400 shadow-xs" style="height: 92%;"></div>
+                <span class="text-[11px] font-bold text-slate-400">Kls 6</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
 
       switch (moduleKey) {
         // --- MODUL ADMIN ---
