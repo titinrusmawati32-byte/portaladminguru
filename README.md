@@ -6,22 +6,37 @@ Frontend di-deploy di **Vercel** • Backend REST API di **Google Apps Script** 
 
 ---
 
-## ✨ Fitur Utama (Admin First Architecture)
+## 🎨 Konsep Desain Portal Berbasis Kartu (Portal-Based Dashboard)
 
-### A. Portal Admin Sekolah (Pusat Kendali Administrator)
-1. **Dashboard Admin**: Ringkasan 8 KPI utama, status kelengkapan administrasi per kelas, dan riwayat audit trail log aktivitas admin.
-2. **Manajemen Guru**: Pengelolaan data guru, email Google, NIP, jenis guru (Guru Kelas / Guru Mapel), status akun (Aktif/Nonaktif), dan riwayat penugasan.
-3. **Manajemen Kelas**: Struktur rombel tingkat I–VI, tahun ajaran aktif, wali kelas, guru mapel terdaftar, dan peninjauan daftar siswa per rombel.
-4. **Pembagian Guru & Kelas (Penugasan Guru)**: Penetapan Wali Kelas dan Guru Mapel (mendukung 1 guru mapel mengajar banyak kelas).
-5. **Rekapitulasi Nilai Seluruh Kelas**: Monitoring nilai formatif, sumatif, SAS, rata-rata, persentase ketuntasan (KKM ≥ 75), ekspor Excel (.xlsx) dan cetak PDF. (Admin hanya bertugas melihat, menganalisis, dan mencetak).
-6. **Rekapitulasi Absensi Sekolah**: Monitoring kehadiran harian, bulanan, dan semester tingkat sekolah (Hadir, Sakit, Izin, Alfa), persentase kehadiran, ekspor Excel dan cetak PDF.
-7. **Pusat Laporan Sekolah (8 Kategori)**: Dokumen resmi siap cetak lengkap dengan **Kop Surat Sekolah**, Logo Tut Wuri / Sekolah, Nomor NPSN, Tabel Data, dan Titik Tanda Tangan Kepala Sekolah & Pengawas Pembina.
-8. **Bank Perangkat Ajar**: Pengelolaan materi dan bahan ajar sekolah (Word, PDF, Excel), kategorisasi fase/tingkat, dan kontrol publikasi aktif/draft untuk guru.
-9. **Pengaturan Identitas Sekolah**: Konfigurasi Nama Sekolah, NPSN, Alamat Lengkap, Kepala Sekolah, NIP, Logo, Tahun Ajaran, dan Semester aktif.
+Aplikasi mengadopsi navigasi berbasis portal kartu modern sesuai standar UI edukasi modern (tanpa sidebar dan tanpa topbar konvensional):
 
-### B. Portal Guru (Pembatasan Akses RBAC)
-- **Role-Based Access Control**: Guru hanya dapat mengakses dan mengelola kelas dan mata pelajaran yang secara resmi ditugaskan kepadanya di sistem.
-- **Administrasi Kelas**: Pengisian presensi harian, penilaian siswa, dan akses bank perangkat ajar terverifikasi.
+### A. Portal Admin Sekolah (Biru Navy & Emas)
+1. **Hero Banner Admin**: Banner biru royal bercahaya dengan logo Tut Wuri Handayani, judul "Portal Admin Sekolah", identitas sekolah, slogan, serta ilustrasi 3D administrator ASN berkacamata memegang tablet, gedung sekolah neoklasik beratap merah, bendera Merah Putih berkibar, dan pepohonan asri.
+2. **8 Kartu Menu Admin (Grid 4x2 Responsif)**:
+   - **Manajemen Guru**: Kartu pastel biru muda dengan ilustrasi 3D 3 orang guru berbusana khaki ASN, tombol panah bulat biru.
+   - **Manajemen Kelas**: Kartu pastel hijau mint dengan ilustrasi 3D gedung sekolah beratap merah dan menara jam, tombol panah bulat hijau.
+   - **Pembagian Guru & Kelas**: Kartu pastel aprikot/oranye dengan ilustrasi 3D papan clipboard checklist dan badge profil avatar biru, tombol panah bulat oranye.
+   - **Rekapitulasi Nilai**: Kartu pastel ungu lavender dengan ilustrasi 3D grafik batang tiga warna dan panah naik melengkung ungu-magenta, tombol panah bulat ungu.
+   - **Rekapitulasi Absensi**: Kartu pastel hijau toska/teal dengan ilustrasi 3D kalender hijau dan jam dinding analog biru bulat, tombol panah bulat toska.
+   - **Laporan Sekolah**: Kartu pastel merah muda/pink dengan ilustrasi 3D dokumen folder dan diagram lingkaran (pie chart) 3 warna, tombol panah bulat merah.
+   - **Bank Perangkat Ajar**: Kartu pastel biru langit/cyan dengan ilustrasi 3D tumpukan 3 buku bersampul biru dan berhalaman emas, tombol panah bulat biru langit.
+   - **Pengaturan Sekolah**: Kartu pastel biru nila/indigo dengan ilustrasi 3D roda gigi (gear) mekanik biru 3 dimensi, tombol panah bulat indigo.
+3. **Welcome Information Bar**: Bilah pil putih dengan ikon bundar info "i" biru, ucapan *"Selamat Datang, Kepala Sekolah!"*, pembatas garis halus, serta miniatur sekolah *"SD Negeri Cerdas Bangsa 01 - Kecamatan Ambaru - Jember"*.
+4. **Pita Hiasan Gelombang Bawah**: Aksen pita bergelombang dinamis berwarna biru laut dan kuning emas.
+
+### B. Portal Guru (Hijau Emerald & Emas)
+1. **Hero Banner Guru**: Banner hijau emerald dengan logo Tut Wuri Handayani, judul "Portal Guru", identitas sekolah, slogan, serta ilustrasi 3D guru wanita berhijab dan berseragam dinas memegang tablet.
+2. **8 Kartu Menu Guru (Grid 4x2 Responsif)**:
+   - **Dashboard**: Kartu pastel biru muda dengan ilustrasi 3D rumah/dashboard.
+   - **Data Siswa**: Kartu pastel hijau mint dengan ilustrasi 3D 3 siswa SD berseragam merah-putih.
+   - **Input Nilai**: Kartu pastel oranye dengan ilustrasi 3D checklist nilai dan pensil emas.
+   - **Presensi Siswa**: Kartu pastel ungu dengan ilustrasi 3D kalender bertanda centang hijau.
+   - **Jurnal Mengajar**: Kartu pastel toska dengan ilustrasi 3D buku terbuka dan pita pembatas buku.
+   - **Perangkat Pembelajaran**: Kartu pastel pink dengan ilustrasi 3D dokumen resmi bermedali biru.
+   - **Analisis**: Kartu pastel biru langit dengan ilustrasi 3D grafik tren capaian belajar.
+   - **Pengumuman**: Kartu pastel indigo dengan ilustrasi 3D megafon/toa pengumuman biru.
+3. **Welcome Information Bar Guru**: Bilah pil putih dengan ikon bundar info "i" hijau, ucapan *"Selamat Datang, Bapak/Ibu Guru!"*, pembatas garis, dan identitas sekolah.
+4. **Pita Hiasan Gelombang Bawah**: Aksen pita bergelombang dinamis berwarna hijau emerald dan kuning emas.
 
 ---
 

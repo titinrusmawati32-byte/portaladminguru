@@ -302,8 +302,8 @@
       pengaturan: {
         namaSekolah: 'SD Negeri Cerdas Bangsa 01',
         npsn: '20512345',
-        alamatSekolah: 'Jl. Pendidikan No. 45, Kecamatan Ambulu - Jember',
-        kecamatan: 'Kecamatan Ambulu - Jember',
+        alamatSekolah: 'Jl. Pendidikan No. 45, Kecamatan Ambaru - Jember',
+        kecamatan: 'Kecamatan Ambaru - Jember',
         kepalaSekolah: 'Dra. Hj. Nurul Hidayati, M.Pd.',
         nipKepalaSekolah: '19700512 199603 2 001',
         tahunAjaranAktif: '2026/2027',
@@ -517,32 +517,40 @@
     }
 
     // ==========================================
-    // 3. PORTAL ADMIN SEKOLAH (SESUAI GAMBAR ACUAN)
+    // 3. PORTAL ADMIN SEKOLAH (PERSIS REFERENSI DESAIN)
     // ==========================================
     function renderPortalAdmin() {
       const p = dbData.pengaturan;
 
-      // Update Wave Color ke Blue-Yellow
+      // Bottom Decorative Wavy Ribbons (Blue & Golden Yellow)
       document.getElementById('bottomWaveContainer').innerHTML = `
-        <svg viewBox="0 0 1200 60" preserveAspectRatio="none" class="w-full h-8 sm:h-12">
-          <path d="M0,0 C300,45 600,10 900,40 C1050,55 1150,20 1200,30 L1200,60 L0,60 Z" fill="#0284c7" opacity="0.8"></path>
-          <path d="M0,20 C250,55 550,25 850,50 C1000,60 1120,35 1200,45 L1200,60 L0,60 Z" fill="#facc15" opacity="0.95"></path>
+        <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
+          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#1e40af" opacity="0.9"></path>
+          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#2563eb" opacity="0.8"></path>
+          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#f59e0b"></path>
         </svg>
       `;
 
       // A. HERO BANNER ADMIN
       document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="hero-admin-gradient rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="rounded-[32px] p-6 sm:p-8 text-white shadow-xl relative overflow-hidden"
+             style="background: linear-gradient(135deg, #0940a8 0%, #0d5dd6 40%, #1780f2 80%, #2997ff 100%);">
+          
+          <!-- Background Organic Fluid Wave Accents -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 220" preserveAspectRatio="none">
+            <path d="M-50,180 Q150,80 400,160 T850,100 L850,220 L-50,220 Z" fill="white" opacity="0.08"/>
+            <path d="M-50,200 Q200,120 450,190 T850,150 L850,220 L-50,220 Z" fill="#60a5fa" opacity="0.12"/>
+          </svg>
+
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
             
             <!-- Kiri: Logo Tut Wuri, Judul, Sekolah, Slogan -->
             <div class="md:col-span-7 flex items-center gap-5">
-              <!-- Emblem Logo Tut Wuri Handayani -->
-              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-500/20 p-1.5 flex items-center justify-center shrink-0 border border-white/30 shadow-md">
-                <div class="w-full h-full rounded-full bg-[#1e40af] flex items-center justify-center p-2.5">
+              <!-- Emblem Logo Tut Wuri Handayani Resmi -->
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-500/20 p-1.5 flex items-center justify-center shrink-0 border border-white/40 shadow-lg">
+                <div class="w-full h-full rounded-full bg-[#1e40af] flex items-center justify-center p-2.5 shadow-inner">
                   <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
                     <polygon points="50,4 95,28 95,72 50,96 5,72 5,28" stroke="white" stroke-width="5" fill="#2563eb"/>
-                    <!-- Obor dan Sayap -->
                     <path d="M50,18 L50,68 M30,45 L70,45 M38,32 L62,32 M42,58 L58,58" stroke="#facc15" stroke-width="6" stroke-linecap="round"/>
                     <circle cx="50" cy="22" r="5" fill="#ef4444"/>
                     <path d="M30,76 Q50,86 70,76" stroke="white" stroke-width="4" fill="none"/>
@@ -551,15 +559,15 @@
               </div>
 
               <!-- Pembatas Garis Putih Vertikal -->
-              <div class="w-[2px] h-20 bg-white/30 hidden sm:block"></div>
+              <div class="w-[1.5px] h-20 bg-white/30 hidden sm:block"></div>
 
               <!-- Teks Header Hero -->
               <div class="space-y-1">
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">
-                  Portal <span class="text-yellow-400">Admin</span> Sekolah
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
+                  Portal <span class="text-[#FFD700]">Admin</span> Sekolah
                 </h1>
-                <p class="text-base sm:text-lg font-bold text-white tracking-wide">${p.namaSekolah}</p>
-                <p class="text-xs sm:text-sm text-blue-100 italic pt-0.5 opacity-90">
+                <p class="text-base sm:text-lg font-bold text-white tracking-wide drop-shadow-sm">${p.namaSekolah}</p>
+                <p class="text-xs sm:text-sm text-blue-100 italic pt-0.5 opacity-95">
                   "Kelola dengan bijak, wujudkan sekolah yang lebih baik"
                 </p>
               </div>
@@ -567,52 +575,83 @@
 
             <!-- Kanan: Ilustrasi 3D Administrator ASN, Gedung Sekolah, Merah Putih -->
             <div class="md:col-span-5 flex justify-center md:justify-end items-center">
-              <svg viewBox="0 0 320 180" class="w-full max-w-[280px] sm:max-w-[320px] h-auto drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Langit Cerah & Awan -->
-                <circle cx="280" cy="30" r="22" fill="#FEF08A" opacity="0.8"/>
-                <path d="M220,40 Q235,25 255,35 Q275,30 280,45 Q290,55 270,55 L220,55 Z" fill="white" opacity="0.3"/>
-                <!-- Gedung Sekolah Merah-Kuning -->
-                <rect x="30" y="70" width="160" height="75" rx="3" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
-                <polygon points="20,70 110,35 200,70" fill="#DC2626"/>
-                <rect x="95" y="48" width="30" height="22" fill="#FEF08A" stroke="#B45309" stroke-width="1.5"/>
-                <circle cx="110" cy="59" r="5" fill="#1E293B"/>
-                <!-- Jendela Gedung Sekolah -->
-                <rect x="45" y="85" width="22" height="20" rx="2" fill="#60A5FA"/>
-                <rect x="75" y="85" width="22" height="20" rx="2" fill="#60A5FA"/>
-                <rect x="135" y="85" width="22" height="20" rx="2" fill="#60A5FA"/>
-                <rect x="165" y="85" width="22" height="20" rx="2" fill="#60A5FA"/>
-                <!-- Pintu Gedung -->
-                <rect x="100" y="115" width="20" height="30" rx="1" fill="#475569"/>
-                <!-- Tiang Bendera Merah Putih -->
-                <line x1="215" y1="45" x2="215" y2="145" stroke="#E2E8F0" stroke-width="3"/>
-                <rect x="216" y="48" width="24" height="8" fill="#EF4444"/>
-                <rect x="216" y="56" width="24" height="8" fill="#FFFFFF"/>
-                <!-- Pepohonan Asri -->
-                <circle cx="25" cy="115" r="20" fill="#15803D"/>
-                <circle cx="215" cy="120" r="18" fill="#16A34A"/>
-                <circle cx="195" cy="125" r="14" fill="#22C55E"/>
-                <!-- Karakter 3D Administrator Pria ASN / Khaki (Kacamata, Senyum, Thumbs up, Tablet) -->
-                <g transform="translate(190, 45)">
+              <svg viewBox="0 0 340 180" class="w-full max-w-[290px] sm:max-w-[340px] h-auto drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Langit Cerah & Awan 3D -->
+                <circle cx="295" cy="28" r="22" fill="#FEF08A" opacity="0.9"/>
+                <path d="M240,36 Q255,22 275,30 Q295,25 300,38 Q310,48 290,48 L240,48 Z" fill="white" opacity="0.4"/>
+                
+                <!-- Bukit Hijau di Belakang -->
+                <ellipse cx="140" cy="165" rx="140" ry="40" fill="#15803D" opacity="0.5"/>
+                <ellipse cx="230" cy="160" rx="110" ry="35" fill="#16A34A" opacity="0.4"/>
+
+                <!-- Gedung Sekolah Neoklasik 3D (Atap Merah, Dinding Krem) -->
+                <rect x="25" y="75" width="160" height="70" rx="3" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+                <!-- Atap Limas Merah dengan Bevel -->
+                <polygon points="15,75 105,38 195,75" fill="#DC2626"/>
+                <polygon points="15,75 105,38 105,75" fill="#EF4444"/>
+                
+                <!-- Menara Jam Pusat Gedung -->
+                <rect x="90" y="48" width="30" height="27" fill="#FEF3C7" stroke="#B45309" stroke-width="1.5"/>
+                <polygon points="85,48 105,30 125,48" fill="#B91C1C"/>
+                <circle cx="105" cy="62" r="7" fill="#FFFFFF" stroke="#1E293B" stroke-width="1.5"/>
+                <line x1="105" y1="62" x2="105" y2="58" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="105" y1="62" x2="108" y2="62" stroke="#1E293B" stroke-width="1.5" stroke-linecap="round"/>
+
+                <!-- Jendela Biru Gedung Sekolah -->
+                <rect x="40" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
+                <rect x="68" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
+                <rect x="122" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
+                <rect x="150" y="88" width="20" height="18" rx="2" fill="#60A5FA" stroke="#2563EB" stroke-width="1"/>
+                
+                <!-- Pintu Utama dengan Kolom Pilar -->
+                <rect x="94" y="112" width="22" height="33" rx="1" fill="#78350F"/>
+                <rect x="91" y="108" width="28" height="4" fill="#E2E8F0"/>
+
+                <!-- Tiang Bendera Merah Putih Berkibar -->
+                <line x1="212" y1="40" x2="212" y2="148" stroke="#E2E8F0" stroke-width="3"/>
+                <circle cx="212" cy="40" r="3" fill="#FACC15"/>
+                <path d="M213,44 Q228,40 240,46 Q242,52 240,54 Q228,48 213,52 Z" fill="#EF4444"/>
+                <path d="M213,52 Q228,48 240,54 Q242,60 240,62 Q228,56 213,60 Z" fill="#FFFFFF"/>
+
+                <!-- Pepohonan Asri 3D -->
+                <circle cx="20" cy="120" r="22" fill="#15803D"/>
+                <circle cx="210" cy="125" r="19" fill="#16A34A"/>
+                <circle cx="192" cy="130" r="15" fill="#22C55E"/>
+
+                <!-- Karakter 3D Administrator Pria ASN / Khaki (Kacamata, Senyum, Thumbs Up, Tablet) -->
+                <g transform="translate(196, 40)">
                   <!-- Badan Jas Khaki ASN -->
-                  <path d="M50,75 C30,85 20,105 20,135 L80,135 C80,105 70,85 50,75 Z" fill="#D97706"/>
-                  <!-- Kerah & Dasi Coklat -->
-                  <polygon points="50,85 40,75 60,75" fill="#F8FAFC"/>
-                  <polygon points="50,82 45,100 50,115 55,100" fill="#78350F"/>
-                  <!-- Kepala & Rambut -->
-                  <ellipse cx="50" cy="45" rx="18" ry="22" fill="#FED7AA"/>
-                  <path d="M32,40 C32,25 45,20 60,24 C68,27 68,36 68,40 C65,34 50,30 32,40 Z" fill="#1E293B"/>
-                  <!-- Kacamata & Mata -->
-                  <rect x="36" y="40" width="11" height="8" rx="2" fill="none" stroke="#0F172A" stroke-width="2"/>
-                  <rect x="53" y="40" width="11" height="8" rx="2" fill="none" stroke="#0F172A" stroke-width="2"/>
-                  <line x1="47" y1="44" x2="53" y2="44" stroke="#0F172A" stroke-width="2"/>
-                  <!-- Senyum Ramah -->
-                  <path d="M44,56 Q50,62 56,56" stroke="#9A3412" stroke-width="2" fill="none"/>
-                  <!-- Tangan Thumbs Up -->
-                  <circle cx="25" cy="95" r="9" fill="#FED7AA"/>
-                  <path d="M22,95 L22,86 C22,83 26,83 26,86 L26,95 Z" fill="#FED7AA"/>
-                  <!-- Tablet di Tangan Kiri -->
-                  <rect x="65" y="90" width="22" height="32" rx="3" fill="#0F172A" transform="rotate(-10 65 90)"/>
-                  <rect x="67" y="92" width="18" height="28" rx="2" fill="#38BDF8" transform="rotate(-10 65 90)"/>
+                  <path d="M52,76 C32,86 22,106 22,138 L82,138 C82,106 72,86 52,76 Z" fill="#D97706"/>
+                  <!-- Kerah Kemeja Putih & Dasi Coklat -->
+                  <polygon points="52,86 42,76 62,76" fill="#FFFFFF"/>
+                  <polygon points="52,82 46,102 52,118 58,102" fill="#78350F"/>
+                  
+                  <!-- Kepala & Leher -->
+                  <ellipse cx="52" cy="46" rx="19" ry="23" fill="#FED7AA"/>
+                  <!-- Rambut Hitam Rapi 3D -->
+                  <path d="M33,42 C33,24 46,20 62,23 C71,26 71,36 71,42 C67,34 52,30 33,42 Z" fill="#0F172A"/>
+                  <path d="M70,38 C72,42 72,48 70,52 Z" fill="#0F172A"/>
+                  
+                  <!-- Kacamata Hitam Keren & Mata Senyum -->
+                  <rect x="37" y="41" width="12" height="9" rx="2.5" fill="none" stroke="#0F172A" stroke-width="2.2"/>
+                  <rect x="55" y="41" width="12" height="9" rx="2.5" fill="none" stroke="#0F172A" stroke-width="2.2"/>
+                  <line x1="49" y1="45" x2="55" y2="45" stroke="#0F172A" stroke-width="2.2"/>
+                  <circle cx="43" cy="45" r="1.8" fill="#0F172A"/>
+                  <circle cx="61" cy="45" r="1.8" fill="#0F172A"/>
+                  
+                  <!-- Hidung & Senyum Ramah -->
+                  <path d="M52,48 L50,53 L54,53" stroke="#C2410C" stroke-width="1.2" fill="none"/>
+                  <path d="M45,58 Q52,65 59,58" stroke="#9A3412" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                  
+                  <!-- Tangan Kanan Thumbs Up (Jempol Mengacung) -->
+                  <g transform="translate(26, 92)">
+                    <circle cx="5" cy="5" r="9" fill="#FED7AA"/>
+                    <path d="M3,5 L3,-5 C3,-8 8,-8 8,-5 L8,5 Z" fill="#FED7AA"/>
+                  </g>
+                  
+                  <!-- Tablet Digital Hitam di Tangan Kiri -->
+                  <rect x="68" y="90" width="24" height="34" rx="3.5" fill="#0F172A" transform="rotate(-10 68 90)"/>
+                  <rect x="70" y="92" width="20" height="30" rx="2.5" fill="#38BDF8" transform="rotate(-10 68 90)"/>
                 </g>
               </svg>
             </div>
@@ -621,208 +660,391 @@
         </div>
       `;
 
-      // B. GRID 8 KARTU MENU ADMIN (4 KOLOM x 2 BARIS)
+      // B. GRID 8 KARTU MENU ADMIN (PERSIS REFERENSI GAMBAR - 4x2 GRID)
       document.getElementById('portalCardsContainer').innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           
-          <!-- MENU 1: MANAJEMEN GURU -->
-          <div onclick="openModule('admin-guru')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-blue-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <circle cx="24" cy="16" r="9" fill="#3B82F6"/>
-                  <circle cx="12" cy="20" r="7" fill="#60A5FA"/>
-                  <circle cx="36" cy="20" r="7" fill="#60A5FA"/>
-                  <path d="M12,42 C12,33 18,30 24,30 C30,30 36,33 36,42 Z" fill="#1D4ED8"/>
-                  <path d="M4,44 C4,37 8,35 12,35 C16,35 18,37 19,44 Z" fill="#2563EB" opacity="0.8"/>
-                  <path d="M44,44 C44,37 40,35 36,35 C32,35 30,37 29,44 Z" fill="#2563EB" opacity="0.8"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-blue-900 truncate">Manajemen Guru</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Kelola data dan penugasan guru</p>
-              </div>
+          <!-- MENU 1: MANAJEMEN GURU (Top: 3 Pendidik 3D, Bottom: Teks + Tombol Biru) -->
+          <div onclick="openModule('admin-guru')"
+            class="bg-gradient-to-b from-[#EBF3FF] via-[#F4F8FF] to-[#FFFFFF] border border-[#D5E5FF] shadow-[0_4px_20px_-2px_rgba(24,119,242,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: 3 Teachers in Khaki -->
+            <div class="flex justify-center items-center h-28">
+              <svg viewBox="0 0 160 85" class="w-full max-w-[150px] h-auto drop-shadow-md">
+                <!-- Drop shadow bawah -->
+                <ellipse cx="80" cy="82" rx="65" ry="3" fill="#D0E3FF"/>
+                
+                <!-- Guru Kiri (Sedikit di Belakang) -->
+                <g transform="translate(20, 10)">
+                  <path d="M30,35 C18,42 12,56 12,75 L48,75 C48,56 42,42 30,35 Z" fill="#D97706"/>
+                  <polygon points="30,42 24,35 36,35" fill="#FFFFFF"/>
+                  <polygon points="30,40 26,52 30,62 34,52" fill="#78350F"/>
+                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
+                  <path d="M19,20 C19,10 26,7 35,9 C40,11 40,17 40,20 C38,15 28,13 19,20 Z" fill="#0F172A"/>
+                  <circle cx="26,22" r="1.5" fill="#0F172A"/>
+                  <circle cx="34,22" r="1.5" fill="#0F172A"/>
+                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
+                </g>
+
+                <!-- Guru Kanan (Sedikit di Belakang) -->
+                <g transform="translate(80, 10)">
+                  <path d="M30,35 C18,42 12,56 12,75 L48,75 C48,56 42,42 30,35 Z" fill="#D97706"/>
+                  <polygon points="30,42 24,35 36,35" fill="#FFFFFF"/>
+                  <polygon points="30,40 26,52 30,62 34,52" fill="#78350F"/>
+                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
+                  <path d="M19,20 C19,10 26,7 35,9 C40,11 40,17 40,20 C38,15 28,13 19,20 Z" fill="#0F172A"/>
+                  <rect x="23" y="19" width="6" height="5" rx="1" fill="none" stroke="#0F172A" stroke-width="1.2"/>
+                  <rect x="31" y="19" width="6" height="5" rx="1" fill="none" stroke="#0F172A" stroke-width="1.2"/>
+                  <circle cx="26,21.5" r="1.2" fill="#0F172A"/>
+                  <circle cx="34,21.5" r="1.2" fill="#0F172A"/>
+                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
+                </g>
+
+                <!-- Guru Tengah (Paling Depan & Menonjol) -->
+                <g transform="translate(50, 0)">
+                  <path d="M30,38 C16,46 10,60 10,80 L50,80 C50,60 44,46 30,38 Z" fill="#B45309"/>
+                  <polygon points="30,45 23,38 37,38" fill="#FFFFFF"/>
+                  <polygon points="30,43 25,56 30,68 35,56" fill="#451A03"/>
+                  <ellipse cx="30,22" rx="13" ry="16" fill="#FED7AA"/>
+                  <path d="M17,19 C17,7 26,4 37,6 C43,8 43,15 43,19 C40,13 28,11 17,19 Z" fill="#0F172A"/>
+                  <!-- Kacamata & Senyum -->
+                  <rect x="21" y="18" width="8" height="6.5" rx="1.5" fill="none" stroke="#0F172A" stroke-width="1.5"/>
+                  <rect x="31" y="18" width="8" height="6.5" rx="1.5" fill="none" stroke="#0F172A" stroke-width="1.5"/>
+                  <line x1="29" y1="21" x2="31" y2="21" stroke="#0F172A" stroke-width="1.5"/>
+                  <circle cx="25" cy="21" r="1.5" fill="#0F172A"/>
+                  <circle cx="35" cy="21" r="1.5" fill="#0F172A"/>
+                  <path d="M26,30 Q30,35 34,30" stroke="#9A3412" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                </g>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">Manajemen Guru</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Kelola data dan<br>penugasan guru</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-blue-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 2: MANAJEMEN KELAS -->
-          <div onclick="openModule('admin-kelas')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-emerald-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <polygon points="24,6 4,18 44,18" fill="#EF4444"/>
-                  <rect x="8" y="18" width="32" height="24" rx="2" fill="#FEF08A" stroke="#D97706" stroke-width="1.5"/>
-                  <rect x="14" y="24" width="7" height="8" rx="1" fill="#3B82F6"/>
-                  <rect x="27" y="24" width="7" height="8" rx="1" fill="#3B82F6"/>
-                  <rect x="20" y="34" width="8" height="8" fill="#B45309"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-emerald-900 truncate">Manajemen Kelas</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Atur kelas dan wali kelas</p>
-              </div>
+          <!-- MENU 2: MANAJEMEN KELAS (Top: Gedung Sekolah 3D, Bottom: Teks + Tombol Hijau) -->
+          <div onclick="openModule('admin-kelas')"
+            class="bg-gradient-to-b from-[#EAF8F1] via-[#F3FCF7] to-[#FFFFFF] border border-[#C5F0DC] shadow-[0_4px_20px_-2px_rgba(16,185,129,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: School Building -->
+            <div class="flex justify-center items-center h-28">
+              <svg viewBox="0 0 160 85" class="w-full max-w-[150px] h-auto drop-shadow-md">
+                <ellipse cx="80" cy="80" rx="65" ry="3" fill="#D1FAE5"/>
+                <!-- Gedung Utama Sekolah -->
+                <rect x="35" y="32" width="90" height="46" rx="2" fill="#FEF3C7" stroke="#D97706" stroke-width="1.2"/>
+                <polygon points="28,32 80,10 132,32" fill="#DC2626"/>
+                <polygon points="28,32 80,10 80,32" fill="#EF4444"/>
+                
+                <!-- Menara Jam Pusat -->
+                <rect x="70" y="16" width="20" height="18" fill="#FFFBEB" stroke="#B45309" stroke-width="1"/>
+                <polygon points="66,16 80,5 94,16" fill="#B91C1C"/>
+                <circle cx="80" cy="25" r="5" fill="#FFFFFF" stroke="#1E293B" stroke-width="1"/>
+                <line x1="80" y1="25" x2="80" y2="22" stroke="#1E293B" stroke-width="1"/>
+                <line x1="80" y1="25" x2="82" y2="25" stroke="#1E293B" stroke-width="1"/>
+                
+                <!-- Pintu & Jendela -->
+                <rect x="73" y="55" width="14" height="23" rx="1" fill="#78350F"/>
+                <rect x="44" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
+                <rect x="58" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
+                <rect x="90" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
+                <rect x="104" y="40" width="12" height="13" rx="1" fill="#60A5FA" stroke="#2563EB" stroke-width="0.8"/>
+                
+                <!-- Pepohonan Asri Samping Gedung -->
+                <circle cx="25" cy="58" r="14" fill="#15803D"/>
+                <circle cx="18" cy="62" r="10" fill="#16A34A"/>
+                <circle cx="135" cy="58" r="14" fill="#15803D"/>
+                <circle cx="142" cy="62" r="10" fill="#16A34A"/>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Manajemen Kelas</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Atur kelas dan<br>wali kelas</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-emerald-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 3: PEMBAGIAN GURU & KELAS -->
-          <div onclick="openModule('admin-penugasan')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-orange-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="10" y="8" width="28" height="34" rx="4" fill="#F1F5F9" stroke="#EA580C" stroke-width="2"/>
-                  <rect x="18" y="4" width="12" height="6" rx="2" fill="#EA580C"/>
-                  <circle cx="24" cy="20" r="3" fill="#3B82F6"/>
-                  <line x1="16" y1="28" x2="32" y2="28" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
-                  <circle cx="34" cy="34" r="8" fill="#10B981"/>
-                  <path d="M30,34 L33,37 L38,31" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-orange-900 truncate">Pembagian Guru & Kelas</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Tentukan penugasan guru per kelas</p>
-              </div>
+          <!-- MENU 3: PEMBAGIAN GURU & KELAS (Top: Clipboard + Avatar 3D, Bottom: Teks + Tombol Orange) -->
+          <div onclick="openModule('admin-penugasan')"
+            class="bg-gradient-to-b from-[#FFF5EC] via-[#FFF9F3] to-[#FFFFFF] border border-[#FEDDC3] shadow-[0_4px_20px_-2px_rgba(249,115,22,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: Clipboard with Avatar Badge -->
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <!-- Papan Clipboard Coklat 3D -->
+                <rect x="18" y="8" width="54" height="68" rx="6" fill="#FDBA74" stroke="#EA580C" stroke-width="1.5"/>
+                <rect x="22" y="16" width="46" height="56" rx="3" fill="#FFFFFF"/>
+                
+                <!-- Jepitan Kertas Biru 3D -->
+                <rect x="35" y="4" width="20" height="9" rx="3" fill="#2563EB" stroke="#1D4ED8" stroke-width="1"/>
+                <circle cx="45" cy="8.5" r="2" fill="#FFFFFF"/>
+                
+                <!-- Baris Checklist dengan Centang Hijau-Teal -->
+                <line x1="28" y1="28" x2="60" y2="28" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M28,26 L31,29 L37,23" stroke="#0D9488" stroke-width="2" stroke-linecap="round" fill="none"/>
+                
+                <line x1="28" y1="40" x2="60" y2="40" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M28,38 L31,41 L37,35" stroke="#0D9488" stroke-width="2" stroke-linecap="round" fill="none"/>
+                
+                <line x1="28" y1="52" x2="52" y2="52" stroke="#E2E8F0" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M28,50 L31,53 L37,47" stroke="#0D9488" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+                <!-- Badge Avatar Pengguna Biru 3D di Kanan Bawah -->
+                <circle cx="68" cy="62" r="14" fill="#2563EB" stroke="#FFFFFF" stroke-width="2.5"/>
+                <circle cx="68" cy="57" r="4.5" fill="#FFFFFF"/>
+                <path d="M59,71 C59,66 63,64 68,64 C73,64 77,66 77,71 Z" fill="#FFFFFF"/>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-orange-700 transition-colors leading-tight">Pembagian<br>Guru & Kelas</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Tentukan penugasan<br>guru per kelas</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F97316] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-orange-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 4: REKAPITULASI NILAI -->
-          <div onclick="openModule('admin-nilai')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-purple-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="8" y="30" width="7" height="12" rx="1.5" fill="#38BDF8"/>
-                  <rect x="18" y="22" width="7" height="20" rx="1.5" fill="#3B82F6"/>
-                  <rect x="28" y="14" width="7" height="28" rx="1.5" fill="#8B5CF6"/>
-                  <path d="M10,24 L22,14 L32,18 L42,8" stroke="#9333EA" stroke-width="3" stroke-linecap="round"/>
-                  <polygon points="42,8 36,8 42,14" fill="#9333EA"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-purple-900 truncate">Rekapitulasi Nilai</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Lihat dan cetak rekap nilai</p>
-              </div>
+          <!-- MENU 4: REKAPITULASI NILAI (Top: Grafik 3D + Panah Naik Ungu, Bottom: Teks + Tombol Ungu) -->
+          <div onclick="openModule('admin-nilai')"
+            class="bg-gradient-to-b from-[#F5F0FF] via-[#FAF6FF] to-[#FFFFFF] border border-[#E7D6FF] shadow-[0_4px_20px_-2px_rgba(139,92,246,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: Bar Chart with Rising Arrow -->
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 110 85" class="w-24 h-22 drop-shadow-md">
+                <!-- Bar 1: Cyan -->
+                <rect x="18" y="52" width="14" height="24" rx="2" fill="#38BDF8"/>
+                <polygon points="18,52 24,46 38,46 32,52" fill="#7DD3FC"/>
+                <polygon points="32,52 38,46 38,70 32,76" fill="#0284C7"/>
+                
+                <!-- Bar 2: Emerald Green -->
+                <rect x="42" y="38" width="14" height="38" rx="2" fill="#10B981"/>
+                <polygon points="42,38 48,32 62,32 56,38" fill="#34D399"/>
+                <polygon points="56,38 62,32 62,70 56,76" fill="#059669"/>
+                
+                <!-- Bar 3: Royal Purple -->
+                <rect x="66" y="24" width="14" height="52" rx="2" fill="#8B5CF6"/>
+                <polygon points="66,24 72,18 86,18 80,24" fill="#A78BFA"/>
+                <polygon points="80,24 86,18 86,70 80,76" fill="#6D28D9"/>
+                
+                <!-- Panah Naik Melengkung Ungu-Magenta 3D -->
+                <path d="M12,48 Q45,28 85,12" stroke="#9333EA" stroke-width="5" stroke-linecap="round" fill="none"/>
+                <polygon points="85,6 94,14 82,18" fill="#9333EA"/>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors leading-tight">Rekapitulasi<br>Nilai</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Lihat dan cetak<br>rekap nilai</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-purple-700 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 5: REKAPITULASI ABSENSI -->
-          <div onclick="openModule('admin-absensi')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-teal-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="8" y="10" width="32" height="30" rx="4" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
-                  <rect x="8" y="10" width="32" height="8" rx="2" fill="#0D9488"/>
-                  <line x1="16" y1="6" x2="16" y2="12" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
-                  <line x1="32" y1="6" x2="32" y2="12" stroke="#0F766E" stroke-width="3" stroke-linecap="round"/>
-                  <circle cx="34" cy="34" r="9" fill="#0284C7"/>
-                  <polyline points="34,29 34,34 37,36" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-teal-900 truncate">Rekapitulasi Absensi</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Lihat dan cetak rekap absensi</p>
-              </div>
+          <!-- MENU 5: REKAPITULASI ABSENSI (Top: Kalender + Jam 3D, Bottom: Teks + Tombol Teal) -->
+          <div onclick="openModule('admin-absensi')"
+            class="bg-gradient-to-b from-[#EDFBF8] via-[#F4FDFB] to-[#FFFFFF] border border-[#CCF8EE] shadow-[0_4px_20px_-2px_rgba(13,148,136,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: Calendar with Clock -->
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <!-- Kalender Hijau 3D -->
+                <rect x="15" y="16" width="56" height="52" rx="6" fill="#F0FDFA" stroke="#0D9488" stroke-width="1.5"/>
+                <path d="M15,22 C15,18 18,16 22,16 L65,16 C69,16 71,18 71,22 L71,28 L15,28 Z" fill="#0D9488"/>
+                
+                <!-- Ring Kalender -->
+                <rect x="25" y="10" width="5" height="10" rx="2.5" fill="#047857"/>
+                <rect x="55" y="10" width="5" height="10" rx="2.5" fill="#047857"/>
+                
+                <!-- Kotak-kotak Tanggal -->
+                <rect x="22" y="34" width="7" height="6" rx="1" fill="#CCFBF1"/>
+                <rect x="33" y="34" width="7" height="6" rx="1" fill="#CCFBF1"/>
+                <rect x="44" y="34" width="7" height="6" rx="1" fill="#CCFBF1"/>
+                <rect x="22" y="44" width="7" height="6" rx="1" fill="#CCFBF1"/>
+                <rect x="33" y="44" width="7" height="6" rx="1" fill="#CCFBF1"/>
+                
+                <!-- Jam Analog Biru 3D di Depan Kalender -->
+                <circle cx="62" cy="56" r="16" fill="#0284C7" stroke="#FFFFFF" stroke-width="2.5"/>
+                <circle cx="62" cy="56" r="12" fill="#FFFFFF"/>
+                <circle cx="62" cy="56" r="1.5" fill="#0F172A"/>
+                <line x1="62" y1="56" x2="62" y2="48" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="62" y1="56" x2="68" y2="56" stroke="#0F172A" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-teal-700 transition-colors leading-tight">Rekapitulasi<br>Absensi</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Lihat dan cetak<br>rekap absensi</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-teal-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 6: LAPORAN SEKOLAH -->
-          <div onclick="openModule('admin-laporan')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-rose-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="8" y="6" width="24" height="34" rx="3" fill="#FFFFFF" stroke="#E11D48" stroke-width="2"/>
-                  <line x1="14" y1="14" x2="26" y2="14" stroke="#FDA4AF" stroke-width="2"/>
-                  <line x1="14" y1="20" x2="22" y2="20" stroke="#FDA4AF" stroke-width="2"/>
-                  <circle cx="32" cy="32" r="11" fill="#0284C7"/>
-                  <path d="M32,32 L32,21 A11,11 0 0,1 43,32 Z" fill="#F43F5E"/>
-                  <path d="M32,32 L43,32 A11,11 0 0,1 32,43 Z" fill="#FBBF24"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-rose-900 truncate">Laporan Sekolah</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Generate laporan sekolah lengkap</p>
-              </div>
+          <!-- MENU 6: LAPORAN SEKOLAH (Top: Dokumen + Diagram Lingkaran 3D, Bottom: Teks + Tombol Merah) -->
+          <div onclick="openModule('admin-laporan')"
+            class="bg-gradient-to-b from-[#FFF1F2] via-[#FFF6F7] to-[#FFFFFF] border border-[#FED0D7] shadow-[0_4px_20px_-2px_rgba(244,63,94,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: Document with Pie Chart -->
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <!-- Lembaran Dokumen Putih/Biru 3D -->
+                <rect x="18" y="10" width="46" height="58" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+                <line x1="26" y1="20" x2="48" y2="20" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="26" y1="28" x2="42" y2="28" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                <line x1="26" y1="36" x2="38" y2="36" stroke="#CBD5E1" stroke-width="2" stroke-linecap="round"/>
+                
+                <!-- Diagram Lingkaran (Pie Chart) 3D Berwarna -->
+                <g transform="translate(62, 54)">
+                  <circle cx="0" cy="0" r="18" fill="#F43F5E"/>
+                  <!-- Sektor Biru (40%) -->
+                  <path d="M0,0 L0,-18 A18,18 0 0,1 17,6 Z" fill="#2563EB"/>
+                  <!-- Sektor Kuning (25%) -->
+                  <path d="M0,0 L17,6 A18,18 0 0,1 -6,17 Z" fill="#FBBF24"/>
+                </g>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-rose-700 transition-colors leading-tight">Laporan<br>Sekolah</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Generate laporan<br>sekolah lengkap</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F43F5E] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-rose-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 7: BANK PERANGKAT AJAR -->
-          <div onclick="openModule('admin-perangkat')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-sky-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <polygon points="6,34 24,42 42,34 24,26" fill="#0284C7"/>
-                  <polygon points="6,26 24,34 42,26 24,18" fill="#F59E0B"/>
-                  <polygon points="6,18 24,26 42,18 24,10" fill="#3B82F6"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-sky-900 truncate">Bank Perangkat Ajar</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Kelola bahan ajar untuk guru</p>
-              </div>
+          <!-- MENU 7: BANK PERANGKAT AJAR (Top: Tumpukan 3 Buku 3D, Bottom: Teks + Tombol Sky Blue) -->
+          <div onclick="openModule('admin-perangkat')"
+            class="bg-gradient-to-b from-[#F0F9FF] via-[#F6FBFF] to-[#FFFFFF] border border-[#BAE8FD] shadow-[0_4px_20px_-2px_rgba(14,165,233,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: Stack of 3 Books -->
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <!-- Buku Bawah: Biru Tua -->
+                <polygon points="20,54 50,68 80,54 50,40" fill="#0284C7"/>
+                <polygon points="20,54 50,68 50,73 20,59" fill="#0369A1"/>
+                <polygon points="50,68 80,54 80,59 50,73" fill="#38BDF8"/>
+                
+                <!-- Buku Tengah: Kuning/Emas -->
+                <polygon points="20,40 50,54 80,40 50,26" fill="#F59E0B"/>
+                <polygon points="20,40 50,54 50,45 20,31" fill="#D97706"/>
+                <polygon points="50,54 80,40 80,45 50,59" fill="#FCD34D"/>
+                
+                <!-- Buku Atas: Biru Muda Cerah -->
+                <polygon points="20,26 50,40 80,26 50,12" fill="#2563EB"/>
+                <polygon points="20,26 50,40 50,31 20,17" fill="#1D4ED8"/>
+                <polygon points="50,40 80,26 80,31 50,45" fill="#60A5FA"/>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors leading-tight">Bank Perangkat<br>Ajar</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Kelola bahan ajar<br>untuk guru</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0EA5E9] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-sky-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
-          <!-- MENU 8: PENGATURAN SEKOLAH -->
-          <div onclick="openModule('admin-pengaturan')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-indigo-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <circle cx="24" cy="24" r="8" fill="#6366F1"/>
-                  <path d="M24,4 L27,9 L33,7 L34,13 L40,14 L39,20 L44,23 L41,28 L44,33 L39,36 L40,42 L34,43 L33,49 L27,47 L24,52 L21,47 L15,49 L14,43 L8,42 L9,36 L4,33 L7,28 L4,23 L9,20 L8,14 L14,13 L15,7 L21,9 Z" fill="none" stroke="#4F46E5" stroke-width="4"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-indigo-900 truncate">Pengaturan Sekolah</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Atur identitas dan konfigurasi sistem</p>
-              </div>
+          <!-- MENU 8: PENGATURAN SEKOLAH (Top: Roda Gigi Biru 3D, Bottom: Teks + Tombol Indigo) -->
+          <div onclick="openModule('admin-pengaturan')"
+            class="bg-gradient-to-b from-[#EEF2FF] via-[#F5F7FF] to-[#FFFFFF] border border-[#C9D5FE] shadow-[0_4px_20px_-2px_rgba(79,70,229,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <!-- 3D Illustration: Blue Gear / Cogwheel -->
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <!-- Roda Gigi Biru 3D Berkilau -->
+                <g transform="translate(50, 42)">
+                  <circle cx="0" cy="0" r="28" fill="#3B82F6"/>
+                  <!-- Gigi-gigi Gear -->
+                  <path d="M-6,-34 L6,-34 L5,-26 L-5,-26 Z" fill="#2563EB"/>
+                  <path d="M-6,34 L6,34 L5,26 L-5,26 Z" fill="#1D4ED8"/>
+                  <path d="M-34,-6 L-34,6 L-26,5 L-26,-5 Z" fill="#2563EB"/>
+                  <path d="M34,-6 L34,6 L26,5 L26,-5 Z" fill="#1D4ED8"/>
+                  
+                  <path d="M-22,-22 L-14,-28 L-9,-21 L-17,-15 Z" fill="#2563EB"/>
+                  <path d="M22,22 L14,28 L9,21 L17,15 Z" fill="#1D4ED8"/>
+                  <path d="M-22,22 L-28,14 L-21,9 L-15,17 Z" fill="#1D4ED8"/>
+                  <path d="M22,-22 L28,-14 L21,-9 L15,-17 Z" fill="#2563EB"/>
+                  
+                  <!-- Lingkaran Luar & Bevel Tengah -->
+                  <circle cx="0" cy="0" r="24" fill="#2563EB"/>
+                  <circle cx="0" cy="0" r="16" fill="#1E40AF"/>
+                  <!-- Lubang Poros Tengah -->
+                  <circle cx="0" cy="0" r="8" fill="#F8FAFC"/>
+                </g>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+
+            <!-- Teks & Tombol Panah Bawah -->
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-indigo-700 transition-colors leading-tight">Pengaturan<br>Sekolah</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Atur identitas dan<br>konfigurasi sistem</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-indigo-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
         </div>
       `;
 
-      // C. WELCOME INFORMATION BAR ADMIN
+      // C. WELCOME INFORMATION BAR ADMIN (PILL STYLE PERSIS GAMBAR ACUAN)
       document.getElementById('portalWelcomeBarContainer').innerHTML = `
-        <div class="bg-white rounded-3xl p-4 sm:p-5 soft-card-shadow border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-full sm:rounded-[26px] p-4 sm:px-6 sm:py-3.5 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-extrabold text-lg shrink-0">
+            <div class="w-10 h-10 rounded-full bg-[#1A73E8] text-white font-extrabold flex items-center justify-center text-lg shadow-sm shrink-0">
               i
             </div>
             <div>
-              <h4 class="text-sm font-extrabold text-slate-900">Selamat Datang, Kepala Sekolah!</h4>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Kepala Sekolah!</h4>
               <p class="text-xs text-slate-500">Kelola administrasi sekolah dengan mudah, cepat, dan aman.</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-3 bg-slate-50 border border-slate-200/80 px-4 py-2 rounded-2xl">
-            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
-              🏫
-            </div>
-            <div class="text-right sm:text-left">
-              <p class="text-xs font-extrabold text-slate-900">${p.namaSekolah}</p>
-              <p class="text-[10px] text-slate-500 font-medium">${p.kecamatan || 'Kecamatan Ambulu - Jember'}</p>
+          <div class="hidden md:block w-px h-8 bg-slate-200"></div>
+
+          <div class="flex items-center gap-3">
+            <!-- Miniatur 3D Gedung Sekolah & Bendera Merah Putih -->
+            <svg viewBox="0 0 48 36" class="w-10 h-8 shrink-0">
+              <polygon points="24,4 4,14 44,14" fill="#DC2626"/>
+              <rect x="8" y="14" width="32" height="18" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
+              <rect x="20" y="20" width="8" height="12" fill="#475569"/>
+              <circle cx="24" cy="10" r="3" fill="#FFFFFF"/>
+              <circle cx="24" cy="10" r="1" fill="#DC2626"/>
+              <circle cx="5" cy="22" r="5" fill="#15803D"/>
+              <circle cx="43" cy="22" r="5" fill="#15803D"/>
+              <line x1="38" y1="4" x2="38" y2="16" stroke="#94A3B8" stroke-width="1.5"/>
+              <rect x="38" y="5" width="6" height="3" fill="#EF4444"/>
+              <rect x="38" y="8" width="6" height="3" fill="#FFFFFF"/>
+            </svg>
+            <div>
+              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm">${p.namaSekolah}</h4>
+              <p class="text-[11px] text-slate-500 font-medium">${p.kecamatan || 'Kecamatan Ambaru - Jember'}</p>
             </div>
           </div>
         </div>
@@ -830,28 +1052,37 @@
     }
 
     // ==========================================
-    // 4. PORTAL GURU (SESUAI GAMBAR ACUAN - HIJAU)
+    // 4. PORTAL GURU (PERSIS REFERENSI DESAIN - HIJAU EMERALD)
     // ==========================================
     function renderPortalGuru() {
       const p = dbData.pengaturan;
 
-      // Update Wave Color ke Green-Yellow
+      // Bottom Decorative Wavy Ribbons (Emerald Green & Golden Yellow)
       document.getElementById('bottomWaveContainer').innerHTML = `
-        <svg viewBox="0 0 1200 60" preserveAspectRatio="none" class="w-full h-8 sm:h-12">
-          <path d="M0,0 C300,45 600,10 900,40 C1050,55 1150,20 1200,30 L1200,60 L0,60 Z" fill="#059669" opacity="0.85"></path>
-          <path d="M0,20 C250,55 550,25 850,50 C1000,60 1120,35 1200,45 L1200,60 L0,60 Z" fill="#facc15" opacity="0.95"></path>
+        <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
+          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#065f46" opacity="0.9"></path>
+          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#059669" opacity="0.8"></path>
+          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#f59e0b"></path>
         </svg>
       `;
 
       // A. HERO BANNER GURU (EMERALD GREEN)
       document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="hero-guru-gradient rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="rounded-[32px] p-6 sm:p-8 text-white shadow-xl relative overflow-hidden"
+             style="background: linear-gradient(135deg, #064e3b 0%, #047857 40%, #059669 80%, #10b981 100%);">
+          
+          <!-- Background Organic Wave Accents -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 800 220" preserveAspectRatio="none">
+            <path d="M-50,180 Q150,80 400,160 T850,100 L850,220 L-50,220 Z" fill="white" opacity="0.08"/>
+            <path d="M-50,200 Q200,120 450,190 T850,150 L850,220 L-50,220 Z" fill="#34d399" opacity="0.12"/>
+          </svg>
+
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
             
             <!-- Kiri: Logo Tut Wuri, Judul, Sekolah, Slogan -->
             <div class="md:col-span-7 flex items-center gap-5">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-emerald-400/20 p-1.5 flex items-center justify-center shrink-0 border border-white/30 shadow-md">
-                <div class="w-full h-full rounded-full bg-[#065f46] flex items-center justify-center p-2.5">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-emerald-400/20 p-1.5 flex items-center justify-center shrink-0 border border-white/40 shadow-lg">
+                <div class="w-full h-full rounded-full bg-[#065f46] flex items-center justify-center p-2.5 shadow-inner">
                   <svg viewBox="0 0 100 100" class="w-full h-full fill-white">
                     <polygon points="50,4 95,28 95,72 50,96 5,72 5,28" stroke="white" stroke-width="5" fill="#10b981"/>
                     <path d="M50,18 L50,68 M30,45 L70,45 M38,32 L62,32 M42,58 L58,58" stroke="#facc15" stroke-width="6" stroke-linecap="round"/>
@@ -861,47 +1092,68 @@
                 </div>
               </div>
 
-              <div class="w-[2px] h-20 bg-white/30 hidden sm:block"></div>
+              <div class="w-[1.5px] h-20 bg-white/30 hidden sm:block"></div>
 
               <div class="space-y-1">
-                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">
-                  Portal <span class="text-yellow-400">Guru</span>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-white drop-shadow-sm">
+                  Portal <span class="text-[#FFD700]">Guru</span>
                 </h1>
-                <p class="text-base sm:text-lg font-bold text-white tracking-wide">${p.namaSekolah}</p>
-                <p class="text-xs sm:text-sm text-emerald-100 italic pt-0.5 opacity-90">
+                <p class="text-base sm:text-lg font-bold text-white tracking-wide drop-shadow-sm">${p.namaSekolah}</p>
+                <p class="text-xs sm:text-sm text-emerald-100 italic pt-0.5 opacity-95">
                   "Mengajar dengan hati, mendidik dengan teknologi"
                 </p>
               </div>
             </div>
 
-            <!-- Kanan: Ilustrasi 3D Guru Wanita Berhijab, Memegang Tablet, Gedung Sekolah -->
+            <!-- Kanan: Ilustrasi 3D Guru Wanita Berhijab, Gedung Sekolah, Merah Putih -->
             <div class="md:col-span-5 flex justify-center md:justify-end items-center">
-              <svg viewBox="0 0 320 180" class="w-full max-w-[280px] sm:max-w-[320px] h-auto drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Gedung Sekolah Hijau-Putih -->
-                <polygon points="20,70 110,35 200,70" fill="#047857"/>
-                <rect x="30" y="70" width="160" height="75" rx="3" fill="#F8FAFC" stroke="#059669" stroke-width="1.5"/>
-                <circle cx="110" cy="59" r="6" fill="#FACC15"/>
-                <!-- Pepohonan Asri -->
-                <circle cx="25" cy="115" r="22" fill="#059669"/>
-                <circle cx="215" cy="120" r="18" fill="#10B981"/>
-                <circle cx="195" cy="125" r="15" fill="#34D399"/>
-                <!-- Karakter Guru Wanita Berhijab (3D Style) -->
-                <g transform="translate(195, 40)">
+              <svg viewBox="0 0 340 180" class="w-full max-w-[290px] sm:max-w-[340px] h-auto drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="295" cy="28" r="22" fill="#FEF08A" opacity="0.9"/>
+                <ellipse cx="140" cy="165" rx="140" ry="40" fill="#047857" opacity="0.5"/>
+                
+                <!-- Gedung Sekolah Hijau-Putih 3D -->
+                <rect x="25" y="75" width="160" height="70" rx="3" fill="#F8FAFC" stroke="#059669" stroke-width="1.5"/>
+                <polygon points="15,75 105,38 195,75" fill="#047857"/>
+                <polygon points="15,75 105,38 105,75" fill="#059669"/>
+                
+                <rect x="90" y="48" width="30" height="27" fill="#FEF3C7" stroke="#047857" stroke-width="1.5"/>
+                <circle cx="105" cy="62" r="7" fill="#FACC15"/>
+                
+                <rect x="40" y="88" width="20" height="18" rx="2" fill="#34D399"/>
+                <rect x="68" y="88" width="20" height="18" rx="2" fill="#34D399"/>
+                <rect x="122" y="88" width="20" height="18" rx="2" fill="#34D399"/>
+                <rect x="150" y="88" width="20" height="18" rx="2" fill="#34D399"/>
+
+                <!-- Tiang Bendera Merah Putih -->
+                <line x1="212" y1="40" x2="212" y2="148" stroke="#E2E8F0" stroke-width="3"/>
+                <path d="M213,44 Q228,40 240,46 Q242,52 240,54 Q228,48 213,52 Z" fill="#EF4444"/>
+                <path d="M213,52 Q228,48 240,54 Q242,60 240,62 Q228,56 213,60 Z" fill="#FFFFFF"/>
+
+                <!-- Pepohonan Asri 3D -->
+                <circle cx="20" cy="120" r="22" fill="#059669"/>
+                <circle cx="210" cy="125" r="19" fill="#10B981"/>
+                <circle cx="192" cy="130" r="15" fill="#34D399"/>
+
+                <!-- Karakter 3D Guru Wanita Berhijab (Seragam Khaki & Tablet) -->
+                <g transform="translate(196, 38)">
                   <!-- Baju Khaki Guru -->
-                  <path d="M50,78 C30,88 22,108 22,140 L78,140 C78,108 70,88 50,78 Z" fill="#D97706"/>
-                  <!-- Hijab Anggun Warna Krem/Khaki Muda -->
-                  <path d="M50,20 C34,20 28,34 28,55 C28,78 38,88 50,88 C62,88 72,78 72,55 C72,34 66,20 50,20 Z" fill="#FDE68A"/>
-                  <!-- Wajah Senyum -->
-                  <ellipse cx="50" cy="50" rx="14" ry="17" fill="#FED7AA"/>
-                  <!-- Mata & Senyum -->
-                  <circle cx="44" cy="48" r="2" fill="#1E293B"/>
-                  <circle cx="56" cy="48" r="2" fill="#1E293B"/>
-                  <path d="M45,58 Q50,64 55,58" stroke="#B45309" stroke-width="2" fill="none"/>
+                  <path d="M52,78 C32,88 24,108 24,140 L80,140 C80,108 72,88 52,78 Z" fill="#D97706"/>
+                  <!-- Hijab Anggun Warna Krem/Khaki Muda 3D -->
+                  <path d="M52,18 C34,18 26,34 26,56 C26,80 38,90 52,90 C66,90 78,80 78,56 C78,34 70,18 52,18 Z" fill="#FEF08A"/>
+                  <path d="M38,72 Q52,86 66,72" fill="#FDE047"/>
+                  
+                  <!-- Wajah Senyum Cantik -->
+                  <ellipse cx="52" cy="52" rx="15" ry="18" fill="#FED7AA"/>
+                  <circle cx="45" cy="50" r="2" fill="#1E293B"/>
+                  <circle cx="59" cy="50" r="2" fill="#1E293B"/>
+                  <path d="M46,60 Q52,66 58,60" stroke="#B45309" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                  
                   <!-- Tablet di Tangan Kiri -->
-                  <rect x="58" y="90" width="22" height="32" rx="3" fill="#0F172A" transform="rotate(-5 58 90)"/>
-                  <rect x="60" y="92" width="18" height="28" rx="2" fill="#34D399" transform="rotate(-5 58 90)"/>
-                  <!-- Tangan Kanan Terbuka Menyapa -->
-                  <circle cx="28" cy="95" r="8" fill="#FED7AA"/>
+                  <rect x="65" y="90" width="24" height="34" rx="3.5" fill="#0F172A" transform="rotate(-5 65 90)"/>
+                  <rect x="67" y="92" width="20" height="30" rx="2.5" fill="#34D399" transform="rotate(-5 65 90)"/>
+                  
+                  <!-- Tangan Kanan Terbuka Ramah -->
+                  <circle cx="28" cy="98" r="8" fill="#FED7AA"/>
                 </g>
               </svg>
             </div>
@@ -910,205 +1162,271 @@
         </div>
       `;
 
-      // B. GRID 8 KARTU MENU GURU (4 KOLOM x 2 BARIS)
+      // B. GRID 8 KARTU MENU GURU (PERSIS REFERENSI DESAIN - 4x2 GRID)
       document.getElementById('portalCardsContainer').innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           
-          <!-- MENU 1: DASHBOARD -->
-          <div onclick="openModule('guru-dashboard')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-blue-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <polygon points="24,6 6,22 42,22" fill="#2563EB"/>
-                  <rect x="10" y="20" width="28" height="22" rx="2" fill="#60A5FA"/>
-                  <rect x="18" y="28" width="12" height="14" rx="1" fill="#FFFFFF"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-blue-900 truncate">Dashboard</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Ringkasan aktivitas kelas Anda</p>
-              </div>
+          <!-- MENU 1: DASHBOARD (Top: Rumah/Dashboard 3D, Bottom: Teks + Tombol Biru) -->
+          <div onclick="openModule('guru-dashboard')"
+            class="bg-gradient-to-b from-[#EBF3FF] via-[#F4F8FF] to-[#FFFFFF] border border-[#D5E5FF] shadow-[0_4px_20px_-2px_rgba(24,119,242,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <polygon points="50,12 18,36 82,36" fill="#2563EB"/>
+                <polygon points="50,12 18,36 50,36" fill="#3B82F6"/>
+                <rect x="26" y="34" width="48" height="38" rx="3" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.5"/>
+                <rect x="42" y="48" width="16" height="24" rx="1.5" fill="#1E40AF"/>
+                <circle cx="50" cy="26" r="5" fill="#FFFFFF"/>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
-            </div>
-          </div>
-
-          <!-- MENU 2: DATA SISWA -->
-          <div onclick="openModule('guru-siswa')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-emerald-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <circle cx="24" cy="16" r="8" fill="#10B981"/>
-                  <circle cx="12" cy="20" r="6" fill="#34D399"/>
-                  <circle cx="36" cy="20" r="6" fill="#34D399"/>
-                  <path d="M12,42 C12,32 18,30 24,30 C30,30 36,32 36,42 Z" fill="#047857"/>
-                  <path d="M4,44 C4,38 8,36 12,36 C16,36 18,38 19,44 Z" fill="#059669" opacity="0.8"/>
-                  <path d="M44,44 C44,38 40,36 36,36 C32,36 30,38 29,44 Z" fill="#059669" opacity="0.8"/>
-                </svg>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">Dashboard</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Ringkasan aktivitas<br>kelas Anda</p>
               </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-emerald-900 truncate">Data Siswa</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Kelola data siswa kelas Anda</p>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-blue-600 transition-all shrink-0">
+                →
               </div>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
             </div>
           </div>
 
-          <!-- MENU 3: INPUT NILAI -->
-          <div onclick="openModule('guru-nilai')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-orange-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="10" y="8" width="28" height="34" rx="4" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
-                  <rect x="18" y="4" width="12" height="6" rx="2" fill="#EA580C"/>
-                  <path d="M16,20 L22,26 L34,14" stroke="#16A34A" stroke-width="3" stroke-linecap="round"/>
-                  <line x1="16" y1="32" x2="32" y2="32" stroke="#EA580C" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-orange-900 truncate">Input Nilai</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Masukkan dan kelola nilai siswa</p>
-              </div>
+          <!-- MENU 2: DATA SISWA (Top: Kelompok Siswa 3D, Bottom: Teks + Tombol Hijau) -->
+          <div onclick="openModule('guru-siswa')"
+            class="bg-gradient-to-b from-[#EAF8F1] via-[#F3FCF7] to-[#FFFFFF] border border-[#C5F0DC] shadow-[0_4px_20px_-2px_rgba(16,185,129,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex justify-center items-center h-28">
+              <svg viewBox="0 0 160 85" class="w-full max-w-[150px] h-auto drop-shadow-md">
+                <!-- 3 Siswa Ceria Berseragam SD Merah-Putih -->
+                <ellipse cx="80" cy="82" rx="65" ry="3" fill="#D1FAE5"/>
+                <!-- Siswa Kiri -->
+                <g transform="translate(20, 12)">
+                  <path d="M30,36 C18,44 12,56 12,74 L48,74 C48,56 42,44 30,36 Z" fill="#EF4444"/>
+                  <polygon points="30,42 24,36 36,36" fill="#FFFFFF"/>
+                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
+                  <path d="M19,19 C19,10 26,7 35,9 C40,11 40,17 40,19 C38,15 28,13 19,19 Z" fill="#0F172A"/>
+                  <circle cx="26,22" r="1.5" fill="#0F172A"/>
+                  <circle cx="34,22" r="1.5" fill="#0F172A"/>
+                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
+                </g>
+                <!-- Siswa Kanan -->
+                <g transform="translate(80, 12)">
+                  <path d="M30,36 C18,44 12,56 12,74 L48,74 C48,56 42,44 30,36 Z" fill="#EF4444"/>
+                  <polygon points="30,42 24,36 36,36" fill="#FFFFFF"/>
+                  <ellipse cx="30,22" rx="11" ry="14" fill="#FED7AA"/>
+                  <path d="M19,19 C19,10 26,7 35,9 C40,11 40,17 40,19 C38,15 28,13 19,19 Z" fill="#0F172A"/>
+                  <circle cx="26,22" r="1.5" fill="#0F172A"/>
+                  <circle cx="34,22" r="1.5" fill="#0F172A"/>
+                  <path d="M27,28 Q30,32 33,28" stroke="#9A3412" stroke-width="1.5" fill="none"/>
+                </g>
+                <!-- Siswa Tengah -->
+                <g transform="translate(50, 0)">
+                  <path d="M30,38 C16,46 10,60 10,80 L50,80 C50,60 44,46 30,38 Z" fill="#DC2626"/>
+                  <polygon points="30,45 23,38 37,38" fill="#FFFFFF"/>
+                  <polygon points="30,44 26,56 30,66 34,56" fill="#991B1B"/>
+                  <ellipse cx="30,22" rx="13" ry="16" fill="#FED7AA"/>
+                  <path d="M17,19 C17,7 26,4 37,6 C43,8 43,15 43,19 C40,13 28,11 17,19 Z" fill="#0F172A"/>
+                  <circle cx="25" cy="21" r="1.8" fill="#0F172A"/>
+                  <circle cx="35" cy="21" r="1.8" fill="#0F172A"/>
+                  <path d="M26,30 Q30,35 34,30" stroke="#9A3412" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                </g>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
-            </div>
-          </div>
-
-          <!-- MENU 4: PRESENSI SISWA -->
-          <div onclick="openModule('guru-presensi')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-purple-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="8" y="10" width="32" height="30" rx="4" fill="#FAF5FF" stroke="#9333EA" stroke-width="2"/>
-                  <rect x="8" y="10" width="32" height="8" rx="2" fill="#9333EA"/>
-                  <circle cx="32" cy="32" r="8" fill="#10B981"/>
-                  <path d="M28,32 L31,35 L36,29" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">Data Siswa</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Kelola data siswa<br>kelas Anda</p>
               </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-purple-900 truncate">Presensi Siswa</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Kelola kehadiran siswa</p>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-emerald-600 transition-all shrink-0">
+                →
               </div>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
-            </div>
-          </div>
-
-          <!-- MENU 5: JURNAL MENGAJAR -->
-          <div onclick="openModule('guru-jurnal')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-teal-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <!-- Buku Terbuka 3D -->
-                  <path d="M24,12 C18,8 10,8 6,10 L6,38 C10,36 18,36 24,40 C30,36 38,36 42,38 L42,10 C38,8 30,8 24,12 Z" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
-                  <line x1="24" y1="12" x2="24" y2="40" stroke="#0D9488" stroke-width="2"/>
-                  <line x1="10" y1="18" x2="20" y2="18" stroke="#99F6E4" stroke-width="2"/>
-                  <line x1="10" y1="24" x2="20" y2="24" stroke="#99F6E4" stroke-width="2"/>
-                  <line x1="28" y1="18" x2="38" y2="18" stroke="#99F6E4" stroke-width="2"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-teal-900 truncate">Jurnal Mengajar</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Catat kegiatan pembelajaran</p>
-              </div>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
             </div>
           </div>
 
-          <!-- MENU 6: PERANGKAT PEMBELAJARAN -->
-          <div onclick="openModule('guru-perangkat')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-rose-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="8" y="6" width="24" height="34" rx="3" fill="#FFFFFF" stroke="#E11D48" stroke-width="2"/>
-                  <line x1="14" y1="14" x2="26" y2="14" stroke="#FDA4AF" stroke-width="2"/>
-                  <line x1="14" y1="20" x2="24" y2="20" stroke="#FDA4AF" stroke-width="2"/>
-                  <circle cx="32" cy="32" r="9" fill="#0284C7"/>
-                  <path d="M28,32 L31,35 L36,29" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-rose-900 truncate">Perangkat Pembelajaran</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Akses perangkat ajar</p>
-              </div>
+          <!-- MENU 3: INPUT NILAI (Top: Clipboard Nilai 3D, Bottom: Teks + Tombol Orange) -->
+          <div onclick="openModule('guru-nilai')"
+            class="bg-gradient-to-b from-[#FFF5EC] via-[#FFF9F3] to-[#FFFFFF] border border-[#FEDDC3] shadow-[0_4px_20px_-2px_rgba(249,115,22,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <rect x="20" y="8" width="56" height="68" rx="6" fill="#FDBA74" stroke="#EA580C" stroke-width="1.5"/>
+                <rect x="25" y="16" width="46" height="56" rx="3" fill="#FFFFFF"/>
+                <rect x="38" y="4" width="20" height="9" rx="3" fill="#EA580C"/>
+                <circle cx="48" cy="8.5" r="2" fill="#FFFFFF"/>
+                <!-- Centang Hijau & Pensil Emas 3D -->
+                <path d="M30,30 L35,35 L45,23" stroke="#16A34A" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <path d="M30,46 L35,51 L45,39" stroke="#16A34A" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <!-- Pensil Miring 3D -->
+                <g transform="translate(62, 35) rotate(35)">
+                  <polygon points="0,0 6,0 6,28 0,28" fill="#FBBF24"/>
+                  <polygon points="0,28 3,34 6,28" fill="#F59E0B"/>
+                  <polygon points="2,32 3,34 4,32" fill="#0F172A"/>
+                </g>
+              </svg>
             </div>
-            <div class="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
-            </div>
-          </div>
-
-          <!-- MENU 7: ANALISIS -->
-          <div onclick="openModule('guru-analisis')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-cyan-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <rect x="8" y="28" width="7" height="14" rx="1.5" fill="#0891B2"/>
-                  <rect x="18" y="20" width="7" height="22" rx="1.5" fill="#06B6D4"/>
-                  <rect x="28" y="12" width="7" height="30" rx="1.5" fill="#22D3EE"/>
-                  <path d="M10,24 L22,14 L32,18 L42,6" stroke="#0E7490" stroke-width="3" stroke-linecap="round"/>
-                </svg>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-orange-700 transition-colors">Input Nilai</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Masukkan dan kelola<br>nilai siswa</p>
               </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-cyan-900 truncate">Analisis</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Lihat analisis hasil pembelajaran</p>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F97316] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-orange-600 transition-all shrink-0">
+                →
               </div>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
             </div>
           </div>
 
-          <!-- MENU 8: PENGUMUMAN -->
-          <div onclick="openModule('guru-pengumuman')" class="menu-card rounded-3xl p-5 cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3.5 min-w-0">
-              <div class="w-13 h-13 rounded-2xl bg-blue-50 flex items-center justify-center p-2.5 shrink-0 group-hover:scale-105 transition">
-                <svg viewBox="0 0 48 48" class="w-full h-full">
-                  <!-- Megaphone 3D -->
-                  <polygon points="10,20 18,16 28,12 28,32 18,28 10,24" fill="#2563EB"/>
-                  <path d="M28,12 C34,12 36,20 36,22 C36,24 34,32 28,32 Z" fill="#60A5FA"/>
-                  <line x1="14" y1="24" x2="16" y2="34" stroke="#1D4ED8" stroke-width="3" stroke-linecap="round"/>
-                </svg>
+          <!-- MENU 4: PRESENSI SISWA (Top: Kalender Centang 3D, Bottom: Teks + Tombol Ungu) -->
+          <div onclick="openModule('guru-presensi')"
+            class="bg-gradient-to-b from-[#F5F0FF] via-[#FAF6FF] to-[#FFFFFF] border border-[#E7D6FF] shadow-[0_4px_20px_-2px_rgba(139,92,246,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <rect x="18" y="14" width="56" height="54" rx="6" fill="#FAF5FF" stroke="#9333EA" stroke-width="1.5"/>
+                <path d="M18,20 C18,16 21,14 25,14 L67,14 C71,14 74,16 74,20 L74,26 L18,26 Z" fill="#9333EA"/>
+                <rect x="28" y="8" width="5" height="10" rx="2.5" fill="#6B21A8"/>
+                <rect x="58" y="8" width="5" height="10" rx="2.5" fill="#6B21A8"/>
+                <!-- Badge Centang Hijau Besar 3D -->
+                <circle cx="64" cy="54" r="16" fill="#10B981" stroke="#FFFFFF" stroke-width="2.5"/>
+                <path d="M57,54 L62,59 L71,49" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-purple-700 transition-colors">Presensi Siswa</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Kelola kehadiran<br>siswa</p>
               </div>
-              <div class="min-w-0">
-                <h3 class="text-sm font-extrabold text-slate-900 group-hover:text-blue-900 truncate">Pengumuman</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">Lihat pengumuman terbaru</p>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-purple-700 transition-all shrink-0">
+                →
               </div>
             </div>
-            <div class="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-xs shrink-0 group-hover:translate-x-1 transition shadow-sm">
-              →
+          </div>
+
+          <!-- MENU 5: JURNAL MENGAJAR (Top: Buku Terbuka 3D, Bottom: Teks + Tombol Teal) -->
+          <div onclick="openModule('guru-jurnal')"
+            class="bg-gradient-to-b from-[#EDFBF8] via-[#F4FDFB] to-[#FFFFFF] border border-[#CCF8EE] shadow-[0_4px_20px_-2px_rgba(13,148,136,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <path d="M50,22 C40,16 26,16 16,18 L16,62 C26,60 40,60 50,66 C60,60 74,60 84,62 L84,18 C74,16 60,16 50,22 Z" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+                <line x1="50" y1="22" x2="50" y2="66" stroke="#0D9488" stroke-width="2"/>
+                <line x1="24" y1="28" x2="42" y2="28" stroke="#99F6E4" stroke-width="2"/>
+                <line x1="24" y1="36" x2="42" y2="36" stroke="#99F6E4" stroke-width="2"/>
+                <line x1="58" y1="28" x2="76" y2="28" stroke="#99F6E4" stroke-width="2"/>
+                <line x1="58" y1="36" x2="76" y2="36" stroke="#99F6E4" stroke-width="2"/>
+                <!-- Bookmark Pita Emas 3D -->
+                <polygon points="50,22 46,36 50,33 54,36" fill="#F59E0B"/>
+              </svg>
+            </div>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-teal-700 transition-colors">Jurnal Mengajar</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Catat kegiatan<br>pembelajaran</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#10B981] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-teal-600 transition-all shrink-0">
+                →
+              </div>
+            </div>
+          </div>
+
+          <!-- MENU 6: PERANGKAT PEMBELAJARAN (Top: Dokumen + Pita 3D, Bottom: Teks + Tombol Rose) -->
+          <div onclick="openModule('guru-perangkat')"
+            class="bg-gradient-to-b from-[#FFF1F2] via-[#FFF6F7] to-[#FFFFFF] border border-[#FED0D7] shadow-[0_4px_20px_-2px_rgba(244,63,94,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <rect x="20" y="10" width="46" height="60" rx="4" fill="#FFFFFF" stroke="#FDA4AF" stroke-width="1.5"/>
+                <line x1="28" y1="20" x2="52" y2="20" stroke="#F43F5E" stroke-width="2" stroke-linecap="round"/>
+                <line x1="28" y1="28" x2="48" y2="28" stroke="#FECDD3" stroke-width="2" stroke-linecap="round"/>
+                <line x1="28" y1="36" x2="44" y2="36" stroke="#FECDD3" stroke-width="2" stroke-linecap="round"/>
+                <!-- Medali/Badge Biru 3D -->
+                <circle cx="62" cy="56" r="14" fill="#2563EB" stroke="#FFFFFF" stroke-width="2"/>
+                <path d="M57,56 L61,60 L68,52" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-rose-700 transition-colors leading-tight">Perangkat<br>Pembelajaran</h3>
+                <p class="text-[11px] text-slate-500 mt-1 leading-snug">Akses perangkat<br>ajar</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#F43F5E] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-rose-600 transition-all shrink-0">
+                →
+              </div>
+            </div>
+          </div>
+
+          <!-- MENU 7: ANALISIS (Top: Grafik Batang 3D, Bottom: Teks + Tombol Sky Blue) -->
+          <div onclick="openModule('guru-analisis')"
+            class="bg-gradient-to-b from-[#F0F9FF] via-[#F6FBFF] to-[#FFFFFF] border border-[#BAE8FD] shadow-[0_4px_20px_-2px_rgba(14,165,233,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <rect x="20" y="48" width="12" height="24" rx="2" fill="#0284C7"/>
+                <rect x="38" y="32" width="12" height="40" rx="2" fill="#0EA5E9"/>
+                <rect x="56" y="16" width="12" height="56" rx="2" fill="#38BDF8"/>
+                <path d="M16,42 L34,26 L52,32 L72,12" stroke="#0369A1" stroke-width="3" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-sky-700 transition-colors">Analisis</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Lihat analisis hasil<br>pembelajaran</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0EA5E9] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-sky-600 transition-all shrink-0">
+                →
+              </div>
+            </div>
+          </div>
+
+          <!-- MENU 8: PENGUMUMAN (Top: Megafon 3D, Bottom: Teks + Tombol Indigo) -->
+          <div onclick="openModule('guru-pengumuman')"
+            class="bg-gradient-to-b from-[#EEF2FF] via-[#F5F7FF] to-[#FFFFFF] border border-[#C9D5FE] shadow-[0_4px_20px_-2px_rgba(79,70,229,0.08)] rounded-[28px] p-5 flex flex-col justify-between h-[215px] relative overflow-hidden group hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer">
+            <div class="flex items-center h-28 pl-1">
+              <svg viewBox="0 0 100 85" class="w-22 h-22 drop-shadow-md">
+                <!-- Megafon Toa Biru 3D -->
+                <polygon points="25,40 40,32 60,24 60,56 40,48 25,40" fill="#2563EB"/>
+                <path d="M60,24 C70,24 74,36 74,40 C74,44 70,56 60,56 Z" fill="#60A5FA"/>
+                <line x1="32" y1="44" x2="36" y2="62" stroke="#1E40AF" stroke-width="4" stroke-linecap="round"/>
+                <!-- Gelombang Suara -->
+                <path d="M78,32 Q84,40 78,48" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <path d="M84,26 Q92,40 84,54" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <div class="flex items-end justify-between w-full">
+              <div>
+                <h3 class="text-[15px] font-extrabold text-slate-900 group-hover:text-indigo-700 transition-colors">Pengumuman</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">Lihat pengumuman<br>terbaru</p>
+              </div>
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-extrabold text-sm shadow-md group-hover:scale-110 group-hover:bg-indigo-600 transition-all shrink-0">
+                →
+              </div>
             </div>
           </div>
 
         </div>
       `;
 
-      // C. WELCOME INFORMATION BAR GURU
+      // C. WELCOME INFORMATION BAR GURU (PILL STYLE)
       document.getElementById('portalWelcomeBarContainer').innerHTML = `
-        <div class="bg-white rounded-3xl p-4 sm:p-5 soft-card-shadow border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="bg-white rounded-full sm:rounded-[26px] p-4 sm:px-6 sm:py-3.5 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
-            <div class="w-10 h-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-extrabold text-lg shrink-0">
+            <div class="w-10 h-10 rounded-full bg-[#10B981] text-white font-extrabold flex items-center justify-center text-lg shadow-sm shrink-0">
               i
             </div>
             <div>
-              <h4 class="text-sm font-extrabold text-slate-900">Selamat Datang, Bapak/Ibu Guru!</h4>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, Bapak/Ibu Guru!</h4>
               <p class="text-xs text-slate-500">Mari wujudkan pembelajaran yang menyenangkan dan bermakna.</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-3 bg-emerald-50/60 border border-emerald-200/80 px-4 py-2 rounded-2xl">
-            <div class="w-8 h-8 rounded-xl bg-emerald-200 text-emerald-800 flex items-center justify-center">
-              🏫
-            </div>
-            <div class="text-right sm:text-left">
-              <p class="text-xs font-extrabold text-slate-900">${p.namaSekolah}</p>
-              <p class="text-[10px] text-slate-500 font-medium">${p.kecamatan || 'Kecamatan Ambulu - Jember'}</p>
+          <div class="hidden md:block w-px h-8 bg-slate-200"></div>
+
+          <div class="flex items-center gap-3">
+            <svg viewBox="0 0 48 36" class="w-10 h-8 shrink-0">
+              <polygon points="24,4 4,14 44,14" fill="#059669"/>
+              <rect x="8" y="14" width="32" height="18" fill="#F0FDF4" stroke="#059669" stroke-width="1"/>
+              <rect x="20" y="20" width="8" height="12" fill="#047857"/>
+              <circle cx="24" cy="10" r="3" fill="#FACC15"/>
+              <circle cx="5" cy="22" r="5" fill="#10B981"/>
+              <circle cx="43" cy="22" r="5" fill="#10B981"/>
+              <line x1="38" y1="4" x2="38" y2="16" stroke="#94A3B8" stroke-width="1.5"/>
+              <rect x="38" y="5" width="6" height="3" fill="#EF4444"/>
+              <rect x="38" y="8" width="6" height="3" fill="#FFFFFF"/>
+            </svg>
+            <div>
+              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm">${p.namaSekolah}</h4>
+              <p class="text-[11px] text-slate-500 font-medium">${p.kecamatan || 'Kecamatan Ambaru - Jember'}</p>
             </div>
           </div>
         </div>
@@ -1526,7 +1844,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Kecamatan / Kabupaten</label>
-              <input type="text" id="fpsKec" required value="${p.kecamatan || 'Kecamatan Ambulu - Jember'}" class="w-full px-3.5 py-2.5 bg-[#F1F4F9] rounded-xl text-sm font-medium">
+              <input type="text" id="fpsKec" required value="${p.kecamatan || 'Kecamatan Ambaru - Jember'}" class="w-full px-3.5 py-2.5 bg-[#F1F4F9] rounded-xl text-sm font-medium">
             </div>
           </div>
           <div>
