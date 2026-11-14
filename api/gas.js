@@ -50,6 +50,15 @@ export default async function handler(req, res) {
             message: 'Akses ditolak oleh Google. Setelan "Who has access" di Apps Script belum disetel ke "Anyone" (Siapa saja).'
           });
         }
+
+        // Jika Google Apps Script masih menjalankan kode HTML lama (bukan REST API)
+        if (text.trim().startsWith('<') || text.includes('<!DOCTYPE') || text.includes('SiGuru SD - Administrasi Guru')) {
+          return res.status(502).json({
+            success: false,
+            message: 'Google Apps Script masih menjalankan kode HTML lama. Ganti isi Code.gs di Apps Script dengan kode REST API dari gas/Code.gs, lalu Deploy > Manage deployments > Edit > New Version.'
+          });
+        }
+
         return res.status(502).json({
           success: false,
           message: 'Respons dari Google Apps Script bukan JSON: ' + text.slice(0, 150)
@@ -91,6 +100,14 @@ export default async function handler(req, res) {
             message: 'Akses ditolak oleh Google. Setelan "Who has access" di Apps Script belum disetel ke "Anyone" (Siapa saja).'
           });
         }
+
+        if (text.trim().startsWith('<') || text.includes('<!DOCTYPE') || text.includes('SiGuru SD - Administrasi Guru')) {
+          return res.status(502).json({
+            success: false,
+            message: 'Google Apps Script masih menjalankan kode HTML lama. Ganti isi Code.gs di Apps Script dengan kode REST API dari gas/Code.gs, lalu Deploy > Manage deployments > Edit > New Version.'
+          });
+        }
+
         return res.status(502).json({
           success: false,
           message: 'Respons dari Google Apps Script bukan JSON: ' + text.slice(0, 150)

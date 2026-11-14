@@ -1,153 +1,68 @@
-# 🎓 SiGuru SD — Portal Administrasi Guru Kelas Digital
+# 🎓 SiGuru SD — Portal Administrasi Guru & Sekolah Terpadu (Admin First)
 
-**Sistem Administrasi Guru Kelas SD Terpadu (Kurikulum Merdeka)**
+**Sistem Administrasi Sekolah & Guru Kelas SD Terpadu (Kurikulum Merdeka)**
 
-Frontend di-deploy di **Vercel** • Backend REST API di **Google Apps Script** • Database di **Google Sheets** • Penyimpanan Berkas di **Google Drive**
-
----
-
-## ✨ Fitur Utama
-
-- **Bank Perangkat Ajar**: Upload dan kelola dokumen Word (.docx), PDF (.pdf), dan Excel (.xlsx).
-- **Hak Akses Berbasis Peran (RBAC)**:
-  - **Admin Sekolah**: Upload, edit, dan hapus perangkat ajar.
-  - **Guru Kelas**: Buka, unduh, dan cari dokumen (read-only).
-- **Buku Induk Siswa**: Data peserta didik lengkap dengan tombol WhatsApp wali murid.
-- **Presensi Harian**: Pencatatan kehadiran harian (Hadir/Sakit/Izin/Alfa).
-- **Jurnal Mengajar**: Agenda harian dan refleksi materi pembelajaran.
-- **PWA (Progressive Web App)**: Bisa di-instal di HP dan Laptop.
+Frontend di-deploy di **Vercel** • Backend REST API di **Google Apps Script** • Database di **Google Sheets** (10 Sheet Relasional) • Penyimpanan Berkas di **Google Drive**
 
 ---
 
-## 🏗️ Arsitektur
+## ✨ Fitur Utama (Admin First Architecture)
 
-```
-┌─────────────────────────────┐     fetch() / REST API     ┌──────────────────────────┐
-│   Frontend (Vercel)         │ ◄─────────────────────────► │  Backend (Google Apps     │
-│                             │    GET ?action=getAllData    │  Script Web App)         │
-│   • HTML + Tailwind CSS     │    POST {action, payload}   │                          │
-│   • JavaScript (SPA)        │                             │  • Code.gs               │
-│   • Inline SVG Icons        │                             │  • Google Sheets (DB)    │
-│   • PWA Support             │                             │  • Google Drive (Files)  │
-└─────────────────────────────┘                             └──────────────────────────┘
-```
+### A. Portal Admin Sekolah (Pusat Kendali Administrator)
+1. **Dashboard Admin**: Ringkasan 8 KPI utama, status kelengkapan administrasi per kelas, dan riwayat audit trail log aktivitas admin.
+2. **Manajemen Guru**: Pengelolaan data guru, email Google, NIP, jenis guru (Guru Kelas / Guru Mapel), status akun (Aktif/Nonaktif), dan riwayat penugasan.
+3. **Manajemen Kelas**: Struktur rombel tingkat I–VI, tahun ajaran aktif, wali kelas, guru mapel terdaftar, dan peninjauan daftar siswa per rombel.
+4. **Pembagian Guru & Kelas (Penugasan Guru)**: Penetapan Wali Kelas dan Guru Mapel (mendukung 1 guru mapel mengajar banyak kelas).
+5. **Rekapitulasi Nilai Seluruh Kelas**: Monitoring nilai formatif, sumatif, SAS, rata-rata, persentase ketuntasan (KKM ≥ 75), ekspor Excel (.xlsx) dan cetak PDF. (Admin hanya bertugas melihat, menganalisis, dan mencetak).
+6. **Rekapitulasi Absensi Sekolah**: Monitoring kehadiran harian, bulanan, dan semester tingkat sekolah (Hadir, Sakit, Izin, Alfa), persentase kehadiran, ekspor Excel dan cetak PDF.
+7. **Pusat Laporan Sekolah (8 Kategori)**: Dokumen resmi siap cetak lengkap dengan **Kop Surat Sekolah**, Logo Tut Wuri / Sekolah, Nomor NPSN, Tabel Data, dan Titik Tanda Tangan Kepala Sekolah & Pengawas Pembina.
+8. **Bank Perangkat Ajar**: Pengelolaan materi dan bahan ajar sekolah (Word, PDF, Excel), kategorisasi fase/tingkat, dan kontrol publikasi aktif/draft untuk guru.
+9. **Pengaturan Identitas Sekolah**: Konfigurasi Nama Sekolah, NPSN, Alamat Lengkap, Kepala Sekolah, NIP, Logo, Tahun Ajaran, dan Semester aktif.
 
----
-
-## 🚀 Langkah Deployment
-
-### Bagian A: Deploy Backend (Google Apps Script)
-
-1. **Buat Google Spreadsheet baru** di [sheets.new](https://sheets.new).  
-   Beri nama: `Database SiGuru SD`
-
-2. Klik menu **Ekstensi** > **Apps Script**.
-
-3. Di editor Apps Script, buka file `Code.gs` (sudah ada secara default).  
-   **Hapus semua isinya**, lalu salin dan tempel seluruh kode dari file [`gas/Code.gs`](gas/Code.gs) di repositori ini.
-
-4. Klik **Simpan** (Ctrl + S).
-
-5. **Jalankan `setupDatabase()`**:
-   - Pada dropdown fungsi di samping tombol **Run**, pilih `setupDatabase`.
-   - Klik **Run** (Jalankan).
-   - Pada dialog otorisasi pertama kali:
-     - Klik **Review Permissions** > Pilih akun Google > **Advanced** > **Go to... (unsafe)** > **Allow**.
-   - Buka kembali tab Spreadsheet — 7 sheet baru akan otomatis muncul.
-
-6. **Deploy sebagai Web App**:
-   - Klik tombol biru **Deploy** > **New deployment**.
-   - Pada **Type**, pilih **Web app**.
-   - **Description**: `SiGuru SD API v1`
-   - **Execute as**: `Me (email@gmail.com)`
-   - **Who has access**: `Anyone`
-   - Klik **Deploy**.
-   - **Salin URL Web App** yang ditampilkan (format: `https://script.google.com/macros/s/ABCDEF.../exec`).  
-     ⚠️ URL ini akan digunakan di langkah selanjutnya!
+### B. Portal Guru (Pembatasan Akses RBAC)
+- **Role-Based Access Control**: Guru hanya dapat mengakses dan mengelola kelas dan mata pelajaran yang secara resmi ditugaskan kepadanya di sistem.
+- **Administrasi Kelas**: Pengisian presensi harian, penilaian siswa, dan akses bank perangkat ajar terverifikasi.
 
 ---
 
-### Bagian B: Deploy Frontend ke Vercel via GitHub
+## 🏗️ Struktur Basis Data Relasional (10 Sheet)
 
-1. **Push repositori ini ke GitHub**:
-   ```bash
-   cd siguru-sd
-   git init
-   git add .
-   git commit -m "Initial commit: SiGuru SD portal"
-   git branch -M main
-   git remote add origin https://github.com/USERNAME/siguru-sd.git
-   git push -u origin main
-   ```
-
-2. **Hubungkan ke Vercel**:
-   - Buka [vercel.com](https://vercel.com) dan login dengan akun GitHub Anda.
-   - Klik **Add New Project** > Pilih repositori `siguru-sd`.
-   - Biarkan semua pengaturan default (Framework: Other, Output: `public`).
-   - Klik **Deploy**.
-
-3. **Konfigurasi URL API Database (`public/config.js`)**:
-   - Buka file `public/config.js`.
-   - Masukkan URL Web App dari Langkah A.6 ke dalam variabel `GAS_API_URL`:
-     ```javascript
-     const APP_CONFIG = {
-       GAS_API_URL: 'https://script.google.com/macros/s/ABCDEF.../exec',
-       // ...
-     };
-     ```
-   - Commit dan push perubahan ke GitHub:
-     ```bash
-     git add public/config.js
-     git commit -m "chore: atur URL database Google Apps Script di config.js"
-     git push
-     ```
-   - Vercel akan otomatis melakukan auto-deploy dan langsung terhubung dengan database Google Sheets!
-     git add .
-     git commit -m "Tambahkan URL API backend"
-     git push
-     ```
-   - Vercel akan otomatis re-deploy.
-
-4. **Buka URL Vercel** yang diberikan (misalnya `https://siguru-sd.vercel.app`) — Portal SiGuru SD sudah aktif!
+1. `Users` `[ID_User, Username, Password, Nama_Lengkap, Email, NIP, Role, Jenis_Guru, Status_Akun, Status_Tugas]`
+2. `Data_Kelas` `[ID_Kelas, Tingkat, Nama_Rombel, Tahun_Ajaran, ID_Wali_Kelas, Nama_Wali_Kelas, Status_Kelas]`
+3. `Penugasan_Guru` `[ID_Penugasan, ID_Guru, Nama_Guru, ID_Kelas, Nama_Kelas, Jenis_Tugas, Mata_Pelajaran, Tahun_Ajaran, Semester, Status]`
+4. `Data_Siswa` `[ID_Siswa, ID_Kelas, Nama_Kelas, NIS, NISN, Nama_Siswa, JK, TTL, Nama_Wali, No_HP_Wali, Status]`
+5. `Presensi` `[ID_Presensi, Tanggal, ID_Kelas, Nama_Kelas, ID_Siswa, Nama_Siswa, Status_Hadir, Keterangan, Waktu_Input]`
+6. `Nilai_Siswa` `[ID_Nilai, ID_Kelas, Nama_Kelas, ID_Siswa, Nama_Siswa, Mata_Pelajaran, Lingkup_Materi, Nilai_Formatif, Nilai_Sumatif, Nilai_SAS, Nilai_Akhir, Semester, Tahun_Ajaran]`
+7. `Jurnal_Mengajar` `[ID_Jurnal, ID_Kelas, Nama_Kelas, Tanggal, Jam_Ke, Mata_Pelajaran, Topik_Materi, Kegiatan_Pembelajaran, Siswa_Tidak_Hadir, Catatan_Refleksi]`
+8. `Perangkat_Ajar` `[ID_Dokumen, Judul_Dokumen, Mata_Pelajaran, Kategori_Kelas, Jenis, Format_Tipe, Nama_File, Ukuran_File, Sumber, Durasi_JP, Link_Berkas, Deskripsi, Uploader, Status_Publikasi, Waktu_Upload]`
+9. `Pengaturan_Sekolah` `[Kunci, Nilai]` (Key-Value)
+10. `Log_Aktivitas_Admin` `[ID_Log, Waktu, ID_Admin, Nama_Admin, Aksi, Detail]`
 
 ---
 
-### Bagian C: Uji Coba
+## 🚀 Panduan Pembaruan ke Google Apps Script & Vercel
 
-| Akun | Username | Password | Hak Akses |
-|------|----------|----------|-----------|
-| Admin Sekolah | `admin` | `admin2026` | Upload, Edit, Hapus dokumen |
-| Guru Kelas | `peserta` | `edudigital` | Buka & Unduh dokumen (Read-Only) |
+### Langkah 1: Perbarui Google Apps Script
+1. Buka Google Spreadsheet database Anda, klik **Ekstensi** > **Apps Script**.
+2. Hapus seluruh isi `Code.gs` dan tempelkan seluruh kode dari [`gas/Code.gs`](gas/Code.gs).
+3. Simpan (**Ctrl + S**).
+4. Jalankan fungsi **`setupDatabase`** sekali untuk menginisialisasi 10 sheet relasional.
+5. Klik **Deploy** > **Manage deployments** > Ikon **Pensil (Edit)** > Versi: **New version** > Akses: **Anyone** > Klik **Deploy**.
 
-**Tombol Cepat**: Di halaman login, klik langsung **Admin Sekolah** atau **Guru Kelas** untuk masuk instan.
-
----
-
-## 📁 Struktur Proyek
-
-```
-siguru-sd/
-├── api/
-│   └── gas.js              # Vercel Serverless Proxy (Bypass CORS & 302 Redirect)
-├── public/
-│   ├── config.js           # File konfigurasi URL Database GAS
-│   └── index.html          # Frontend SPA (HTML + CSS + JS)
-├── gas/
-│   └── Code.gs             # Backend Google Apps Script (REST API)
-├── vercel.json             # Konfigurasi Vercel
-├── package.json            # Metadata proyek
-├── .gitignore
-└── README.md               # Panduan ini
+### Langkah 2: Sinkronkan ke GitHub & Vercel
+Jalankan di PowerShell:
+```bash
+git add .
+git commit -m "feat: implementasi Portal Admin Sekolah lengkap (Admin First Development)"
+git push origin main --force
 ```
 
 ---
 
-## 🔧 Mode Offline / Demo
+## 🔑 Akun Login Bawaan
 
-Jika `GAS_API_URL` dikosongkan (`''`), aplikasi berjalan dalam **mode offline** dengan data contoh disimpan di `localStorage` browser. Cocok untuk demo atau presentasi tanpa koneksi internet.
-
----
-
-## 📜 Lisensi
-
-Proyek ini dibuat untuk keperluan administrasi guru SD di Indonesia.
+| Peran | Username | Password | Hak Akses |
+|---|---|---|---|
+| **Admin Sekolah** | `admin` | `admin2026` | Pengelolaan Penuh: Guru, Kelas, Penugasan, Rekap Nilai, Rekap Absensi, Laporan, Pengaturan |
+| **Guru Kelas** | `dewi` | `guru2026` | Pembelajaran Kelas IV-A (Presensi, Siswa, Nilai, Bank Dokumen) |
+| **Guru Mapel** | `fauzi` | `guru2026` | Pembelajaran Mapel PAI (Multi-Kelas: I-A & IV-A) |
