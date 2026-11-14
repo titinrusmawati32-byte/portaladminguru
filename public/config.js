@@ -12,7 +12,7 @@ const APP_CONFIG = {
   // Masukkan URL Google Apps Script Web App (JSON REST API) Anda di sini
   // Didapatkan dari: Apps Script Editor > Deploy > Manage deployments > Web App URL
   // Contoh: 'https://script.google.com/macros/s/AKfycbx.../exec'
-  GAS_API_URL: 'https://script.google.com/macros/s/AKfycbyaCAjInJ5JdGWzfHgUwnB569kVOtapVz2tybSNpmvhMkPvE4TiO5YKK1gci4BKiZ1S/exec',
+  GAS_API_URL: 'https://script.google.com/macros/s/AKfycbwsVr0J9qSchXl5ltrLdOcZF3aSWEoRiRH5_4lwXSmut92i3AKF7FrpTzjTmARoWAUfCg/exec',
 
   // Konfigurasi Default Aplikasi
   APP_NAME: 'SiGuru SD',
