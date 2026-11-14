@@ -525,9 +525,30 @@
       ? window.APP_CONFIG.isConnected()
       : (typeof GAS_API_URL === 'string' && GAS_API_URL.trim().length > 15);
 
-    // Helper HTTP Fetch ke Google Apps Script REST API
+    // Helper HTTP Fetch dengan Vercel Proxy (Bypass 302 Redirect & CORS Browser)
     async function gasGet(action, params = {}) {
       if (!IS_CONNECTED) return null;
+      try {
+        // Coba via Vercel Serverless Proxy /api/gas terlebih dahulu
+        const proxyUrl = new URL('/api/gas', window.location.origin);
+        proxyUrl.searchParams.set('action', action);
+        proxyUrl.searchParams.set('gasUrl', GAS_API_URL);
+        Object.entries(params).forEach(([k, v]) => proxyUrl.searchParams.set(k, String(v)));
+
+        const res = await fetch(proxyUrl.toString());
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.isAuthError) {
+            showToast(data.message, 'error');
+            throw new Error(data.message);
+          }
+          return data;
+        }
+      } catch (proxyErr) {
+        console.warn('Proxy /api/gas tidak tersedia, mencoba direct fetch:', proxyErr);
+      }
+
+      // Fallback Direct Fetch ke GAS
       try {
         const url = new URL(GAS_API_URL);
         url.searchParams.set('action', action);
@@ -535,18 +556,44 @@
         const res = await fetch(url.toString(), { redirect: 'follow' });
         return await res.json();
       } catch (err) {
-        console.error('gasGet error (' + action + '):', err);
+        console.error('gasGet direct fetch error (' + action + '):', err);
         throw err;
       }
     }
 
     async function gasPost(action, payload = {}) {
       if (!IS_CONNECTED) return null;
+
+      // 1. Coba lewat Vercel Serverless Proxy (Menghindari blokir 302 CORS di Chrome)
+      try {
+        const res = await fetch('/api/gas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gasUrl: GAS_API_URL,
+            action: action,
+            payload: payload
+          })
+        });
+
+        const data = await res.json();
+        if (data && data.isAuthError) {
+          showToast(data.message, 'error');
+          throw new Error(data.message);
+        }
+        if (res.ok) {
+          return data;
+        }
+      } catch (proxyErr) {
+        console.warn('Proxy POST /api/gas gagal, mencoba direct fetch:', proxyErr);
+      }
+
+      // 2. Fallback Direct Fetch
       try {
         const res = await fetch(GAS_API_URL, {
           method: 'POST',
           redirect: 'follow',
-          headers: { 'Content-Type': 'text/plain' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action, payload })
         });
         return await res.json();

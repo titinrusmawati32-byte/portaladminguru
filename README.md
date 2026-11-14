@@ -127,6 +127,8 @@ Frontend di-deploy di **Vercel** • Backend REST API di **Google Apps Script** 
 
 ```
 siguru-sd/
+├── api/
+│   └── gas.js              # Vercel Serverless Proxy (Bypass CORS & 302 Redirect)
 ├── public/
 │   ├── config.js           # File konfigurasi URL Database GAS
 │   └── index.html          # Frontend SPA (HTML + CSS + JS)
