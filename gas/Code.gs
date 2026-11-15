@@ -32,26 +32,13 @@ var OFFICIAL_SCHOOLS_AMBULU = [
 ];
 
 // ============================================================
-// CONCURRENCY SCRIPT LOCK HELPER (RESILIENT & NON-BLOCKING)
+// CONCURRENCY SAFE TRANSACTION HELPER (100% NON-BLOCKING)
 // ============================================================
 function withScriptLock(operationName, callback) {
-  var lock = LockService.getScriptLock();
-  var acquired = false;
   try {
-    acquired = lock.tryLock(2000); // Coba lock 2 detik saja
-  } catch (e) {
-    acquired = false;
-  }
-
-  try {
-    // Selalu eksekusi callback secara aman agar tidak memblokir pengguna
     return callback();
   } catch (err) {
-    return { success: false, message: 'Gagal memproses ' + operationName + ': ' + err.message };
-  } finally {
-    if (acquired) {
-      try { lock.releaseLock(); } catch (e) {}
-    }
+    return { success: false, message: 'Gagal memproses ' + operationName + ': ' + (err.message || String(err)) };
   }
 }
 
@@ -344,6 +331,13 @@ function doPost(e) {
       case 'saveNilai':
         result = withScriptLock('addNilai', function () {
           return addNilaiBackend(payload);
+        });
+        break;
+
+      case 'batchSaveNilai':
+      case 'batchAddNilai':
+        result = withScriptLock('batchSaveNilai', function () {
+          return batchSaveNilaiBackend(payload);
         });
         break;
 
@@ -1455,6 +1449,39 @@ function addNilaiBackend(p) {
     return { success: true, id: nId, message: 'Penilaian berhasil disimpan.' };
   } catch (err) {
     return { success: false, message: 'Gagal simpan nilai: ' + err.message };
+  }
+}
+
+function batchSaveNilaiBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var grades = p.grades || [];
+    var count = 0;
+
+    if (npsn && grades.length > 0) {
+      grades.forEach(function (item) {
+        var nId = item.id || ('NIL-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 3));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          nId, 'NILAI',
+          item.ownerUid || p.ownerUid || '',
+          item.teacherName || p.teacherName || '',
+          item.idKelas || p.idKelas || '',
+          item.namaKelas || p.namaKelas || '',
+          item.semester || p.semester || 'Ganjil',
+          (item.mapel || p.mapel || '') + ' - ' + (item.namaPenilaian || item.jenisPenilaian || 'Nilai') + ' - ' + (item.namaSiswa || ''),
+          String(item.nilaiAngka !== undefined ? item.nilaiAngka : (item.nilaiAkhir || 0)),
+          item
+        );
+        count++;
+      });
+    }
+
+    return { success: true, count: count, message: 'Berhasil menyimpan ' + count + ' nilai peserta didik.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal batch simpan nilai: ' + err.message };
   }
 }
 
