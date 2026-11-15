@@ -202,6 +202,24 @@ function doGet(e) {
         result = initAllAmbuluSchoolSheets();
         break;
 
+      case 'getAllPerangkat':
+      case 'getPerangkatAdmin':
+      case 'getAllPerangkatAdmin':
+        result = getAllPerangkatAdminBackend();
+        break;
+
+      case 'savePerangkatAdmin':
+        result = withScriptLock('savePerangkatAdmin', function () {
+          return savePerangkatAdminBackend(payload);
+        });
+        break;
+
+      case 'deletePerangkatAdmin':
+        result = withScriptLock('deletePerangkatAdmin', function () {
+          return deletePerangkatAdminBackend(payload);
+        });
+        break;
+
       default:
         result = { success: true, message: 'SiGuru SD Kecamatan Ambulu REST API aktif.' };
         break;
@@ -351,6 +369,24 @@ function doPost(e) {
 
       case 'initAllSheets':
         result = initAllAmbuluSchoolSheets();
+        break;
+
+      case 'getAllPerangkat':
+      case 'getPerangkatAdmin':
+      case 'getAllPerangkatAdmin':
+        result = getAllPerangkatAdminBackend();
+        break;
+
+      case 'savePerangkatAdmin':
+        result = withScriptLock('savePerangkatAdmin', function () {
+          return savePerangkatAdminBackend(payload);
+        });
+        break;
+
+      case 'deletePerangkatAdmin':
+        result = withScriptLock('deletePerangkatAdmin', function () {
+          return deletePerangkatAdminBackend(payload);
+        });
         break;
 
       default:
@@ -789,11 +825,14 @@ function getAllTeachersAdminBackend() {
       }
     }
 
+    var perangkatRes = getAllPerangkatAdminBackend();
+
     return {
       success: true,
       pendingTeachers: pendingList,
       verifiedTeachers: verifiedList,
       rejectedTeachers: rejectedList,
+      perangkatList: (perangkatRes && perangkatRes.list) ? perangkatRes.list : [],
       schools: OFFICIAL_SCHOOLS_AMBULU
     };
   } catch (e) {
@@ -990,6 +1029,14 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
     var myNilai = [];
     var myJurnal = [];
     var myPerangkat = [];
+
+    // Muat semua paket perangkat ajar Google Drive resmi dari Admin Pusat Koorwil Ambulu
+    var adminPerangkatRes = getAllPerangkatAdminBackend();
+    if (adminPerangkatRes && adminPerangkatRes.list && adminPerangkatRes.list.length > 0) {
+      adminPerangkatRes.list.forEach(function (pkg) {
+        myPerangkat.push(pkg);
+      });
+    }
 
     // Jika NPSN diberikan, baca langsung dari Sheet Tab khusus Per Lembaga
     if (npsn) {
@@ -1500,6 +1547,191 @@ function deletePerangkatBackend(p) {
 }
 
 // ============================================================
+// BANK PERANGKAT AJAR ADMIN (GOOGLE DRIVE LINK MULTI-SCHOOL)
+// ============================================================
+function getOrCreatePerangkatAjarSheet(ss) {
+  var sheet = ss.getSheetByName('Perangkat_Ajar');
+  if (!sheet) {
+    sheet = ss.insertSheet('Perangkat_Ajar');
+    var headers = [
+      'ID_Perangkat',
+      'Judul',
+      'Kategori_Kelas',
+      'Mata_Pelajaran',
+      'Semester',
+      'Jenis_Dokumen',
+      'URL_Google_Drive',
+      'Deskripsi',
+      'Uploader',
+      'Status_Publikasi',
+      'Waktu_Upload'
+    ];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setFontWeight('bold')
+      .setBackground('#1E293B')
+      .setFontColor('#FFFFFF');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function getAllPerangkatAdminBackend() {
+  try {
+    var ss = getActiveDb();
+    var sheet = getOrCreatePerangkatAjarSheet(ss);
+    var list = [];
+    if (sheet && sheet.getLastRow() > 1) {
+      var data = sheet.getDataRange().getValues();
+      for (var i = 1; i < data.length; i++) {
+        var r = data[i];
+        var id = String(r[0]).trim();
+        var judul = String(r[1]).trim();
+        var status = String(r[9] || 'Aktif').trim();
+        if (id && judul && status !== 'Dihapus') {
+          list.push({
+            id: id,
+            judul: judul,
+            kategoriKelas: String(r[2] || 'Semua Kelas').trim(),
+            mapel: String(r[3] || 'Semua Mapel').trim(),
+            semester: String(r[4] || 'Lengkap').trim(),
+            jenis: String(r[5] || 'Modul Ajar Kurikulum Merdeka').trim(),
+            urlDrive: String(r[6] || '').trim(),
+            linkBerkas: String(r[6] || '').trim(), // Alias link agar guru langsung buka
+            formatTipe: 'Google Drive',
+            deskripsi: String(r[7] || '').trim(),
+            uploader: String(r[8] || 'Admin Koorwil Ambulu').trim(),
+            statusPublikasi: status,
+            waktuUpload: String(r[10] || '').trim(),
+            isFromAdmin: true
+          });
+        }
+      }
+    }
+    return { success: true, list: list };
+  } catch (err) {
+    return { success: false, message: 'Gagal mengambil perangkat ajar: ' + err.message, list: [] };
+  }
+}
+
+function savePerangkatAdminBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var sheet = getOrCreatePerangkatAjarSheet(ss);
+    var id = (p.id || '').trim();
+    if (!id) {
+      id = 'PRG-ADM-' + Date.now().toString().slice(-6);
+    }
+    var judul = (p.judul || '').trim();
+    var kategoriKelas = (p.kategoriKelas || 'Semua Kelas').trim();
+    var mapel = (p.mapel || 'Semua Mapel').trim();
+    var semester = (p.semester || 'Semester 1 & 2 (Lengkap)').trim();
+    var jenis = (p.jenis || 'Paket Perangkat Ajar Kurikulum Merdeka').trim();
+    var urlDrive = (p.urlDrive || p.linkBerkas || '').trim();
+    var deskripsi = (p.deskripsi || '').trim();
+    var uploader = (p.uploader || 'Admin Koorwil Ambulu').trim();
+    var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+
+    if (!judul || !urlDrive) {
+      return { success: false, message: 'Judul dan URL Google Drive wajib diisi.' };
+    }
+
+    // Pastikan format URL valid
+    if (urlDrive.indexOf('http://') !== 0 && urlDrive.indexOf('https://') !== 0) {
+      urlDrive = 'https://' + urlDrive;
+    }
+
+    var data = sheet.getDataRange().getValues();
+    var foundRow = -1;
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === id) {
+        foundRow = i + 1;
+        break;
+      }
+    }
+
+    var rowValues = [
+      id,
+      judul,
+      kategoriKelas,
+      mapel,
+      semester,
+      jenis,
+      urlDrive,
+      deskripsi,
+      uploader,
+      'Aktif',
+      nowStr
+    ];
+
+    if (foundRow !== -1) {
+      sheet.getRange(foundRow, 1, 1, rowValues.length).setValues([rowValues]);
+    } else {
+      sheet.appendRow(rowValues);
+    }
+
+    logActivity('ADMIN', uploader, 'Admin Pusat', 'PUSAT', 'Upload Perangkat Ajar', 'Judul: ' + judul + ' | URL Drive: ' + urlDrive);
+
+    var createdItem = {
+      id: id,
+      judul: judul,
+      kategoriKelas: kategoriKelas,
+      mapel: mapel,
+      semester: semester,
+      jenis: jenis,
+      urlDrive: urlDrive,
+      linkBerkas: urlDrive,
+      formatTipe: 'Google Drive',
+      deskripsi: deskripsi,
+      uploader: uploader,
+      statusPublikasi: 'Aktif',
+      waktuUpload: nowStr,
+      isFromAdmin: true
+    };
+
+    return {
+      success: true,
+      id: id,
+      perangkat: createdItem,
+      message: 'Paket Perangkat Ajar Google Drive berhasil dipublikasikan untuk seluruh guru!'
+    };
+  } catch (err) {
+    return { success: false, message: 'Gagal menyimpan perangkat ajar: ' + err.message };
+  }
+}
+
+function deletePerangkatAdminBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var sheet = getOrCreatePerangkatAjarSheet(ss);
+    var id = (p.id || '').trim();
+    if (!id) {
+      return { success: false, message: 'ID Perangkat wajib disertakan.' };
+    }
+
+    var data = sheet.getDataRange().getValues();
+    var found = false;
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][0]).trim() === id) {
+        sheet.deleteRow(i + 1);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      return { success: false, message: 'Perangkat ajar tidak ditemukan.' };
+    }
+
+    logActivity('ADMIN', 'Admin Pusat', 'Admin Pusat', 'PUSAT', 'Hapus Perangkat Ajar', 'ID: ' + id);
+
+    return { success: true, message: 'Paket Perangkat ajar berhasil dihapus.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal menghapus perangkat ajar: ' + err.message };
+  }
+}
+
+// ============================================================
 // AUDIT LOG & VERSIONING
 // ============================================================
 function logActivity(userId, userName, role, schoolId, action, detail) {
@@ -1552,6 +1784,10 @@ function setupDatabaseMultiSchool() {
     {
       name: 'Data_Siswa',
       headers: ['ID_Siswa', 'ID_Kelas', 'Owner_UID', 'ID_Sekolah', 'NIS', 'NISN', 'Nama_Lengkap', 'JK', 'Tempat_Lahir', 'Tanggal_Lahir', 'Alamat', 'Nama_Wali', 'No_HP_Wali', 'Status']
+    },
+    {
+      name: 'Perangkat_Ajar',
+      headers: ['ID_Perangkat', 'Judul', 'Kategori_Kelas', 'Mata_Pelajaran', 'Semester', 'Jenis_Dokumen', 'URL_Google_Drive', 'Deskripsi', 'Uploader', 'Status_Publikasi', 'Waktu_Upload']
     },
     {
       name: 'Audit_Logs',

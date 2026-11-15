@@ -1841,11 +1841,14 @@
           break;
 
         case 'guru-perangkat':
-          titleEl.textContent = 'Perangkat Pembelajaran & Modul Ajar';
-          subEl.textContent = 'Unduh dan pelajari modul ajar Word, PDF, dan format penilaian';
+          titleEl.textContent = 'Bank Perangkat Ajar & Kurikulum Merdeka';
+          subEl.textContent = 'Akses dan unduh berkas resmi Google Drive yang dibagikan Admin Koorwil Pendidikan';
           actionEl.innerHTML = `
-            <button onclick="openUploadPerangkatModal()" class="bg-sky-600 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-sky-700 transition">
-              + Unggah Dokumen
+            <button onclick="syncBackendData().then(() => renderModuleGuruPerangkat(document.getElementById('moduleContentArea')));" class="bg-emerald-600 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer hover:bg-emerald-700 transition flex items-center gap-1.5 shadow-sm">
+              <span>🔄</span> <span>Muat Ulang Paket</span>
+            </button>
+            <button onclick="openUploadPerangkatModal()" class="bg-sky-600 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer hover:bg-sky-700 transition">
+              + Unggah Mandiri
             </button>
           `;
           renderModuleGuruPerangkat(contentEl);
@@ -2752,20 +2755,151 @@
       await executeDbWrite('addJurnal', jObj, 'Jurnal pembelajaran berhasil dicatat.');
     }
 
-    // --- PERANGKAT PEMBELAJARAN GURU ---
+    // --- BANK PERANGKAT PEMBELAJARAN GURU (GOOGLE DRIVE RESMI ADMIN) ---
+    let filterPerangkatKeyword = '';
+    let filterPerangkatKelas = 'ALL';
+
     function renderModuleGuruPerangkat(c) {
-      c.innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          ${dbData.perangkat.map(d => `
-            <div class="bg-white p-4 rounded-2xl border border-slate-100 space-y-2 soft-card-shadow">
-              <span class="px-2 py-0.5 rounded font-bold bg-blue-50 text-blue-700 text-[10px]">${d.formatTipe || 'PDF'}</span>
-              <h4 class="font-extrabold text-slate-900">${d.judul}</h4>
-              <p class="text-slate-500">${d.mapel || 'Umum'} • ${d.kategoriKelas || 'Semua Kelas'}</p>
-              <a href="${d.linkBerkas || '#'}" target="_blank" class="inline-block mt-2 px-4 py-1.5 bg-emerald-700 text-white font-bold rounded-full hover:bg-emerald-800">
-                Buka / Unduh Dokumen
-              </a>
+      const allPkgs = dbData.perangkat || [];
+      const filtered = allPkgs.filter(d => {
+        const matchKls = (filterPerangkatKelas === 'ALL') || (d.kategoriKelas === filterPerangkatKelas) || (d.kategoriKelas === 'Semua Kelas');
+        const matchText = !filterPerangkatKeyword || 
+          (d.judul && d.judul.toLowerCase().includes(filterPerangkatKeyword.toLowerCase())) ||
+          (d.mapel && d.mapel.toLowerCase().includes(filterPerangkatKeyword.toLowerCase())) ||
+          (d.deskripsi && d.deskripsi.toLowerCase().includes(filterPerangkatKeyword.toLowerCase()));
+        return matchKls && matchText;
+      });
+
+      if (allPkgs.length === 0) {
+        c.innerHTML = `
+          <div class="bg-white rounded-3xl p-8 border border-slate-100 text-center space-y-3 soft-card-shadow">
+            <div class="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-3xl">📁</div>
+            <h4 class="text-base font-extrabold text-slate-900">Belum Ada Paket Perangkat Ajar</h4>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">
+              Admin Koorwil Pendidikan Kecamatan Ambulu belum mengunggah paket perangkat pembelajaran, atau silakan klik tombol di bawah untuk memeriksa pembaruan database.
+            </p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button onclick="syncBackendData().then(() => renderModuleGuruPerangkat(document.getElementById('moduleContentArea')));"
+                class="px-5 py-2.5 rounded-full bg-emerald-600 text-white font-extrabold text-xs shadow-md hover:bg-emerald-700 cursor-pointer flex items-center gap-1.5">
+                <span>🔄</span> <span>Periksa Pembaruan Database</span>
+              </button>
+              <button onclick="openUploadPerangkatModal()" class="px-5 py-2.5 rounded-full bg-sky-600 text-white font-extrabold text-xs shadow-md hover:bg-sky-700 cursor-pointer">
+                + Unggah Mandiri
+              </button>
             </div>
-          `).join('')}
+          </div>
+        `;
+        return;
+      }
+
+      c.innerHTML = `
+        <div class="space-y-4">
+          
+          <!-- Banner Pengantar -->
+          <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200/60 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-base">📁</span>
+                <h4 class="text-xs sm:text-sm font-extrabold text-emerald-950">Bank Perangkat Ajar Resmi Koorwil Ambulu</h4>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-600 text-white">Google Drive</span>
+              </div>
+              <p class="text-[11px] text-emerald-800/80 leading-relaxed">
+                Modul Ajar, Prota, Prosem, ATP, CP, dan LKPD Kurikulum Merdeka yang dibagikan Admin Pusat. Cukup klik tombol untuk membuka & mengunduh paket berkas lengkap.
+              </p>
+            </div>
+            <button onclick="syncBackendData().then(() => renderModuleGuruPerangkat(document.getElementById('moduleContentArea')));"
+              class="shrink-0 px-3 py-1.5 rounded-full bg-white border border-emerald-300 text-emerald-800 text-[11px] font-bold hover:bg-emerald-100 transition flex items-center gap-1 cursor-pointer shadow-xs">
+              <span>🔄</span> <span>Sinkronkan</span>
+            </button>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="bg-white rounded-2xl p-3 border border-slate-100 soft-card-shadow flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2 flex-1 min-w-[200px]">
+              <span class="text-slate-400">🔍</span>
+              <input type="text" placeholder="Cari judul perangkat ajar atau mata pelajaran..."
+                value="${filterPerangkatKeyword}"
+                oninput="filterPerangkatKeyword = this.value; renderModuleGuruPerangkat(document.getElementById('moduleContentArea'));"
+                class="w-full bg-transparent font-medium focus:outline-none text-slate-800 placeholder-slate-400 text-xs">
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400 font-bold text-[11px]">Tingkat:</span>
+              <select onchange="filterPerangkatKelas = this.value; renderModuleGuruPerangkat(document.getElementById('moduleContentArea'));"
+                class="bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs p-1.5 rounded-xl focus:outline-none">
+                <option value="ALL" ${filterPerangkatKelas === 'ALL' ? 'selected' : ''}>Semua Kelas</option>
+                <option value="Kelas 1" ${filterPerangkatKelas === 'Kelas 1' ? 'selected' : ''}>Kelas 1</option>
+                <option value="Kelas 2" ${filterPerangkatKelas === 'Kelas 2' ? 'selected' : ''}>Kelas 2</option>
+                <option value="Kelas 3" ${filterPerangkatKelas === 'Kelas 3' ? 'selected' : ''}>Kelas 3</option>
+                <option value="Kelas 4" ${filterPerangkatKelas === 'Kelas 4' ? 'selected' : ''}>Kelas 4</option>
+                <option value="Kelas 5" ${filterPerangkatKelas === 'Kelas 5' ? 'selected' : ''}>Kelas 5</option>
+                <option value="Kelas 6" ${filterPerangkatKelas === 'Kelas 6' ? 'selected' : ''}>Kelas 6</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- List Card Perangkat Ajar -->
+          ${filtered.length === 0 ? `
+            <div class="bg-white rounded-3xl p-8 border border-slate-100 text-center space-y-2 soft-card-shadow">
+              <p class="text-xs text-slate-500 font-medium">Tidak ada perangkat ajar yang sesuai dengan kata kunci "${filterPerangkatKeyword}".</p>
+              <button onclick="filterPerangkatKeyword = ''; filterPerangkatKelas = 'ALL'; renderModuleGuruPerangkat(document.getElementById('moduleContentArea'));"
+                class="text-xs text-emerald-600 font-bold hover:underline">
+                Reset Filter
+              </button>
+            </div>
+          ` : `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${filtered.map(d => `
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-card-shadow space-y-3 flex flex-col justify-between hover:border-emerald-200 transition">
+                  <div class="space-y-2">
+                    
+                    <!-- Badges Top -->
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Google Drive</span>
+                      </span>
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        ${d.kategoriKelas || 'Semua Kelas'}
+                      </span>
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                        ${d.mapel || 'Semua Mapel'}
+                      </span>
+                      ${d.semester ? `
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                          ${d.semester}
+                        </span>
+                      ` : ''}
+                    </div>
+
+                    <!-- Judul -->
+                    <h4 class="font-extrabold text-slate-900 text-sm leading-snug">${d.judul}</h4>
+
+                    <!-- Deskripsi -->
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                      ${d.deskripsi || 'Paket perangkat pembelajaran Kurikulum Merdeka lengkap siap pakai dan dapat disunting.'}
+                    </p>
+
+                    <!-- Meta Pengunggah -->
+                    <div class="text-[11px] text-slate-400 font-medium flex items-center justify-between pt-1 border-t border-slate-50">
+                      <span>Oleh: <strong class="text-slate-600">${d.uploader || 'Admin Koorwil Ambulu'}</strong></span>
+                      <span>${d.waktuUpload || '-'}</span>
+                    </div>
+                  </div>
+
+                  <!-- Tombol 1-Klik Buka / Unduh Google Drive -->
+                  <div class="pt-2">
+                    <a href="${d.linkBerkas || d.urlDrive || '#'}" target="_blank" rel="noopener noreferrer"
+                      class="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-98 cursor-pointer">
+                      <span>📥 Buka / Unduh Paket Perangkat Ajar (Google Drive)</span>
+                      <span>➔</span>
+                    </a>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+
         </div>
       `;
     }
