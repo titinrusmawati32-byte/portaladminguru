@@ -338,7 +338,7 @@
   <!-- ============================================================
        MODAL PEMILIH AKUN GOOGLE (GOOGLE ACCOUNT CHOOSER DIALOG)
        ============================================================ -->
-  <div id="modalGoogleAccountPicker" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+  <div id="modalGoogleAccountPicker" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4" style="display: none; z-index: 99999;">
     <div class="glass-box bg-slate-900/98 max-w-md w-full rounded-3xl border border-white/20 p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       
       <!-- Modal Header dengan Logo Google Resmi -->
@@ -408,8 +408,18 @@
     // ==========================================
     // INITIALIZATION & SESSION RESTORE
     // ==========================================
+    // INITIALIZATION & SESSION RESTORE
+    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       populateSchoolFilterDropdown();
+
+      // Bind click handler tombol login admin secara langsung
+      const btnLogin = document.getElementById('btnGoogleOwnerLogin');
+      if (btnLogin) {
+        btnLogin.addEventListener('click', openGoogleAccountPickerModal);
+        btnLogin.onclick = openGoogleAccountPickerModal;
+      }
+
       const restored = restoreAdminSession();
       if (restored) {
         showDashboard();
@@ -422,11 +432,37 @@
     // ==========================================
     // GOOGLE ACCOUNT PICKER MODAL LOGIC
     // ==========================================
-    function openGoogleAccountPickerModal() {
+    function getSavedGoogleAccounts() {
+      try {
+        const raw = localStorage.getItem('siguru_registered_google_accounts');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      const single = localStorage.getItem('siguru_saved_owner_email');
+      return single ? [single] : [];
+    }
+
+    function saveGoogleAccount(email) {
+      if (!email || !email.includes('@')) return;
+      const cleanEmail = email.trim().toLowerCase();
+      let accounts = getSavedGoogleAccounts();
+      if (!accounts.includes(cleanEmail)) {
+        accounts.push(cleanEmail);
+        localStorage.setItem('siguru_registered_google_accounts', JSON.stringify(accounts));
+      }
+      localStorage.setItem('siguru_saved_owner_email', cleanEmail);
+    }
+
+    function openGoogleAccountPickerModal(e) {
+      if (e && e.preventDefault) e.preventDefault();
       const modal = document.getElementById('modalGoogleAccountPicker');
       if (!modal) return;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
+      modal.style.display = 'flex';
+      modal.style.zIndex = '99999';
       hideModalStatus();
       renderGoogleAccountsList();
     }
@@ -436,14 +472,14 @@
       if (!modal) return;
       modal.classList.add('hidden');
       modal.classList.remove('flex');
+      modal.style.display = 'none';
     }
 
     function renderGoogleAccountsList() {
       const list = document.getElementById('googleAccountsList');
       if (!list) return;
 
-      const savedEmail = localStorage.getItem('siguru_saved_owner_email') || '';
-
+      const accounts = getSavedGoogleAccounts();
       let html = '';
 
       // OPSI 1: Akun Google Aktif di Browser (Auto-Detect Sesi)
@@ -455,32 +491,32 @@
               👤
             </div>
             <div class="text-left">
-              <div class="font-bold text-white text-xs">Akun Google Utama Pemilik</div>
-              <div class="text-[11px] text-cyan-300 font-mono">Sesi Aktif di Browser Ini</div>
+              <div class="font-bold text-white text-xs">Akun Google Utama (Sesi Aktif di Browser)</div>
+              <div class="text-[11px] text-cyan-300 font-mono">Deteksi Akun Google di Perangkat Ini</div>
             </div>
           </div>
           <span class="text-xs font-bold text-cyan-400 group-hover:translate-x-1 transition">Pilih ➔</span>
         </div>
       `;
 
-      // OPSI 2: Jika pernah tersimpan email sebelumnya
-      if (savedEmail) {
+      // OPSI 2..n: Akun Google yang tersimpan / terdaftar di perangkat
+      accounts.forEach(acc => {
         html += `
-          <div onclick="selectGoogleAccount('${savedEmail}')"
+          <div onclick="selectGoogleAccount('${acc}')"
             class="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-amber-500/30 hover:border-amber-400 transition cursor-pointer flex items-center justify-between gap-3 group">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
                 👑
               </div>
               <div class="text-left">
-                <div class="font-bold text-white text-xs">${savedEmail}</div>
+                <div class="font-bold text-white text-xs">${acc}</div>
                 <div class="text-[11px] text-amber-300/80 font-mono">Akun Terdaftar di Perangkat Ini</div>
               </div>
             </div>
             <span class="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">Pilih ➔</span>
           </div>
         `;
-      }
+      });
 
       list.innerHTML = html;
     }
@@ -492,7 +528,8 @@
       if (box.classList.contains('hidden')) {
         box.classList.remove('hidden');
         if (lbl) lbl.textContent = 'Sembunyikan isian';
-        document.getElementById('inpModalCustomEmail')?.focus();
+        const inp = document.getElementById('inpModalCustomEmail');
+        if (inp) inp.focus();
       } else {
         box.classList.add('hidden');
         if (lbl) lbl.textContent = 'Gunakan akun Google lain';
@@ -526,7 +563,9 @@
         if (res && res.success) {
           const verifiedEmail = res.adminEmail || emailPayload || 'Akun Google Pemilik';
           if (emailPayload) {
-            localStorage.setItem('siguru_saved_owner_email', emailPayload);
+            saveGoogleAccount(emailPayload);
+          } else if (res.adminEmail) {
+            saveGoogleAccount(res.adminEmail);
           }
           showModalStatus('✅ Akun Google Terverifikasi! Mengalihkan ke Dashboard...', true);
           showAdminToast('Login Berhasil! Selamat datang Admin Pemilik.', 'success');
@@ -626,7 +665,6 @@
     }
     async function handleGoogleDirectAuth() {
       openGoogleAccountPickerModal();
-    }
     }
 
     function restoreAdminSession() {

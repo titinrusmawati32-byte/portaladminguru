@@ -17,7 +17,7 @@ echo.
 
 echo [3/4] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Update Admin: Hapus Kolom Input Manual, Terapkan Dialog Pop-up Pemilih Akun Google Resmi
+if "%commit_msg%"=="" set commit_msg=Fix: Tombol Login Admin Responsif 100% dan Dialog Pemilih Akun Google
 
 git commit -m "%commit_msg%"
 echo.
@@ -28,6 +28,7 @@ git push origin main
 echo.
 echo ============================================================
 echo Selesai! Jika berhasil, perubahan sudah aktif di GitHub.
+echo Vercel akan otomatis men-deploy dalam 1-2 menit.
 echo ============================================================
 echo.
 pause
