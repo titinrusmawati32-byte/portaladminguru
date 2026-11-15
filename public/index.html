@@ -573,6 +573,114 @@
     const IS_CONNECTED = !!(window.APP_CONFIG && window.APP_CONFIG.isConnected && window.APP_CONFIG.isConnected());
 
     // ==========================================
+    // PENGATURAN REKAP & IDENTITAS SEKOLAH (SESUAI TEMPLATE RESMI)
+    // ==========================================
+    let schoolMetaConfig = {
+      kepalaSekolah: 'Drs. Bambang Hartono, M.M.',
+      nipKepalaSekolah: '19700505 199512 1 002',
+      kkm: 75,
+      bobotTugas: 0.2,
+      bobotUH: 0.3,
+      bobotPTS: 0.2,
+      bobotPAS: 0.3,
+      totalPertemuanAbsensi: 32
+    };
+
+    function loadSchoolMetaConfig() {
+      try {
+        const saved = localStorage.getItem('siguru_meta_config');
+        if (saved) {
+          schoolMetaConfig = { ...schoolMetaConfig, ...JSON.parse(saved) };
+        }
+      } catch (e) {}
+    }
+    loadSchoolMetaConfig();
+
+    function openSchoolMetaModal() {
+      const content = `
+        <form onsubmit="handleSaveSchoolMeta(event)" class="space-y-3.5 text-xs">
+          <div class="p-3 bg-violet-50 rounded-2xl border border-violet-100 text-brand-dark leading-relaxed">
+            Sesuaikan identitas Kepala Sekolah, standar KKM, dan bobot nilai akhir. Seluruh cetakan PDF & ekspor Excel rekap otomatis mengikuti pengaturan ini.
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold mb-1">Nama Kepala Sekolah *</label>
+              <input type="text" id="cfgKepsek" required value="${schoolMetaConfig.kepalaSekolah}" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">NIP Kepala Sekolah *</label>
+              <input type="text" id="cfgNipKepsek" required value="${schoolMetaConfig.nipKepalaSekolah}" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-mono font-bold">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold mb-1">Batas KKM / KKTP *</label>
+              <input type="number" id="cfgKkm" required min="50" max="100" value="${schoolMetaConfig.kkm}" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">Total Pertemuan Semester *</label>
+              <input type="number" id="cfgPertemuan" required min="10" max="80" value="${schoolMetaConfig.totalPertemuanAbsensi}" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center">
+            </div>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-[#F8F7FD] border border-violet-100/70 space-y-2">
+            <span class="block font-bold text-brand-dark">Bobot Nilai Akhir (Total = 1.0 / 100%):</span>
+            <div class="grid grid-cols-4 gap-2 text-center">
+              <div>
+                <span class="block text-[10px] text-brand-muted font-bold">Tugas</span>
+                <input type="number" id="cfgBobotTugas" step="0.05" min="0" max="1" value="${schoolMetaConfig.bobotTugas}" class="w-full p-1.5 text-center font-bold bg-white border border-[#E2DEF7] rounded-lg text-xs">
+              </div>
+              <div>
+                <span class="block text-[10px] text-brand-muted font-bold">UH</span>
+                <input type="number" id="cfgBobotUH" step="0.05" min="0" max="1" value="${schoolMetaConfig.bobotUH}" class="w-full p-1.5 text-center font-bold bg-white border border-[#E2DEF7] rounded-lg text-xs">
+              </div>
+              <div>
+                <span class="block text-[10px] text-brand-muted font-bold">PTS</span>
+                <input type="number" id="cfgBobotPTS" step="0.05" min="0" max="1" value="${schoolMetaConfig.bobotPTS}" class="w-full p-1.5 text-center font-bold bg-white border border-[#E2DEF7] rounded-lg text-xs">
+              </div>
+              <div>
+                <span class="block text-[10px] text-brand-muted font-bold">PAS</span>
+                <input type="number" id="cfgBobotPAS" step="0.05" min="0" max="1" value="${schoolMetaConfig.bobotPAS}" class="w-full p-1.5 text-center font-bold bg-white border border-[#E2DEF7] rounded-lg text-xs">
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold cursor-pointer">Batal</button>
+            <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-full shadow-xs cursor-pointer">
+              Simpan Pengaturan
+            </button>
+          </div>
+        </form>
+      `;
+      openUniversalModal('⚙️ Pengaturan Rekap (Kepsek, KKM & Bobot)', content);
+    }
+
+    function handleSaveSchoolMeta(e) {
+      e.preventDefault();
+      schoolMetaConfig.kepalaSekolah = document.getElementById('cfgKepsek').value.trim();
+      schoolMetaConfig.nipKepalaSekolah = document.getElementById('cfgNipKepsek').value.trim();
+      schoolMetaConfig.kkm = Number(document.getElementById('cfgKkm').value || 75);
+      schoolMetaConfig.totalPertemuanAbsensi = Number(document.getElementById('cfgPertemuan').value || 32);
+      schoolMetaConfig.bobotTugas = Number(document.getElementById('cfgBobotTugas').value || 0.2);
+      schoolMetaConfig.bobotUH = Number(document.getElementById('cfgBobotUH').value || 0.3);
+      schoolMetaConfig.bobotPTS = Number(document.getElementById('cfgBobotPTS').value || 0.2);
+      schoolMetaConfig.bobotPAS = Number(document.getElementById('cfgBobotPAS').value || 0.3);
+
+      try {
+        localStorage.setItem('siguru_meta_config', JSON.stringify(schoolMetaConfig));
+      } catch (e) {}
+
+      closeUniversalModal();
+      showToast('Pengaturan rekap berhasil diperbarui!', 'success');
+      if (activeModuleKey === 'guru-nilai') switchNilaiSubTab(activeNilaiSubTab);
+      else if (activeModuleKey === 'guru-presensi') renderModuleGuruPresensi(document.getElementById('moduleContentArea'));
+      else if (activeModuleKey === 'guru-jurnal') renderModuleGuruJurnal(document.getElementById('moduleContentArea'));
+    }
+
+    // ==========================================
     // TAB LOGIN SWITCHER (MASUK vs DAFTAR)
     // ==========================================
     function switchLoginTab(tab) {
@@ -882,7 +990,6 @@
 
       renderPortal();
       syncBackendData();
-      startAutoSync();
 
       showToast(`Berhasil masuk ke ${school.nama}!`, 'success');
 
@@ -1170,7 +1277,7 @@
 
           syncState.lastSyncTime = new Date();
           setSyncStatus('synced', 'Tersinkronisasi');
-          refreshActiveModuleContent();
+          // PERINGATAN: refreshActiveModuleContent() dinonaktifkan di sini agar form/layar tidak ter-reset sendiri.
           return true;
         }
       } catch (e) {
@@ -1180,9 +1287,13 @@
       return false;
     }
 
+    // DINONAKTIFKAN TOTAL SESUAI INSTRUKSI:
+    // "jangan buat aplikasi merefresh dengan sendirinya kalau tidak di refresh oleh user."
     function startAutoSync() {
-      if (syncState.pollTimer) clearInterval(syncState.pollTimer);
-      syncState.pollTimer = setInterval(syncBackendData, 9000);
+      if (syncState.pollTimer) {
+        clearInterval(syncState.pollTimer);
+        syncState.pollTimer = null;
+      }
     }
 
     function stopAutoSync() {
@@ -1192,9 +1303,20 @@
       }
     }
 
-    function manualTriggerSync() {
-      showToast('Memeriksa pembaruan database...', 'info');
-      syncBackendData();
+    async function manualTriggerSync() {
+      showToast('Menyinkronkan data dengan database...', 'info');
+      setSyncStatus('syncing', 'Menyinkronkan...');
+      const ok = await syncBackendData();
+      if (ok) {
+        showToast('Data berhasil diperbarui dari database.', 'success');
+        if (activeModuleKey) {
+          openModule(activeModuleKey);
+        } else {
+          renderPortal();
+        }
+      } else {
+        showToast('Data sudah versi terbaru.', 'info');
+      }
     }
 
     // ==========================================
@@ -1259,7 +1381,6 @@
             renderPortal();
           }
           syncBackendData();
-          startAutoSync();
           return true;
         }
       } catch (e) {}
@@ -2539,14 +2660,20 @@
                 </select>
               </div>
 
-              <!-- Kategori Penilaian Sesuai Permintaan User -->
+              <!-- Kategori Penilaian Sesuai Permintaan User & Template Resmi -->
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Kategori Penilaian *</label>
                 <select id="inpNilaiKategori" onchange="autoFillNamaPenilaian()" required
                   class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
+                  <option value="Tugas 1">Tugas 1 (T1)</option>
+                  <option value="Tugas 2">Tugas 2 (T2)</option>
+                  <option value="Tugas 3">Tugas 3 (T3)</option>
+                  <option value="UH 1">Ulangan Harian 1 (UH 1 / Formatif 1)</option>
+                  <option value="UH 2">Ulangan Harian 2 (UH 2 / Formatif 2)</option>
+                  <option value="PTS">Penilaian Tengah Semester (PTS / STS)</option>
+                  <option value="PAS">Penilaian Akhir Semester (PAS / SAS)</option>
                   <option value="Formatif">Formatif (Asesmen Harian)</option>
                   <option value="Sumatif Lingkup Materi">Sumatif Lingkup Materi</option>
-                  <option value="Ulangan Harian">Ulangan Harian (UH)</option>
                   <option value="Tugas">Tugas Mandiri / Kelompok</option>
                   <option value="Keterampilan">Keterampilan / Praktik</option>
                   <option value="Sumatif Akhir Semester">Sumatif Akhir Semester (SAS)</option>
@@ -2895,99 +3022,238 @@
       switchNilaiSubTab('history');
     }
 
+    // ==========================================
+    // 1. REKAP NILAI SISWA (SESUAI TEMPLATE RESMI)
+    // ==========================================
+    function compileRekapNilaiMatrix(actKls, students, mapel) {
+      const kkm = schoolMetaConfig.kkm || 75;
+      const bT = schoolMetaConfig.bobotTugas;
+      const bU = schoolMetaConfig.bobotUH;
+      const bPTS = schoolMetaConfig.bobotPTS;
+      const bPAS = schoolMetaConfig.bobotPAS;
+
+      const compiledRows = students.map((s, idx) => {
+        const studentGrades = dbData.nilai.filter(n => {
+          if (n.idSiswa !== s.id) return false;
+          if (mapel !== 'ALL' && n.mapel && n.mapel !== mapel) return false;
+          return true;
+        });
+
+        function findScore(patterns) {
+          for (let p of patterns) {
+            const found = studentGrades.find(n => {
+              const cat = (n.kategori || n.jenisPenilaian || '').toLowerCase();
+              const name = (n.namaPenilaian || '').toLowerCase();
+              return cat.includes(p) || name.includes(p);
+            });
+            if (found) return Number(found.nilaiAngka !== undefined ? found.nilaiAngka : found.nilaiAkhir);
+          }
+          return null;
+        }
+
+        let t1 = findScore(['tugas 1', 't1', 't-1']);
+        let t2 = findScore(['tugas 2', 't2', 't-2']);
+        let t3 = findScore(['tugas 3', 't3', 't-3']);
+        let uh1 = findScore(['uh 1', 'uh1', 'ulangan harian 1', 'formatif 1']);
+        let uh2 = findScore(['uh 2', 'uh2', 'ulangan harian 2', 'formatif 2']);
+        let pts = findScore(['pts', 'sts', 'tengah semester']);
+        let pas = findScore(['pas', 'sas', 'akhir semester']);
+
+        // Jika ada nilai umum tanpa nama T1/UH1, alokasikan ke slot kosong
+        studentGrades.forEach(g => {
+          const cat = (g.kategori || '').toLowerCase();
+          const val = Number(g.nilaiAngka !== undefined ? g.nilaiAngka : g.nilaiAkhir);
+          if (cat.includes('tugas')) {
+            if (t1 === null) t1 = val;
+            else if (t2 === null) t2 = val;
+            else if (t3 === null) t3 = val;
+          } else if (cat.includes('formatif') || cat.includes('uh') || cat.includes('ulangan')) {
+            if (uh1 === null) uh1 = val;
+            else if (uh2 === null) uh2 = val;
+          } else if (cat.includes('tengah')) {
+            if (pts === null) pts = val;
+          } else if (cat.includes('akhir')) {
+            if (pas === null) pas = val;
+          }
+        });
+
+        // Hitung Rata-rata Tugas
+        const validTugas = [t1, t2, t3].filter(v => v !== null && !isNaN(v) && v !== '');
+        const rataTugas = validTugas.length > 0 ? (validTugas.reduce((a, b) => a + Number(b), 0) / validTugas.length) : null;
+
+        // Hitung Rata-rata UH
+        const validUH = [uh1, uh2].filter(v => v !== null && !isNaN(v) && v !== '');
+        const rataUH = validUH.length > 0 ? (validUH.reduce((a, b) => a + Number(b), 0) / validUH.length) : null;
+
+        // Hitung Nilai Akhir (Tugas 20%, UH 30%, PTS 20%, PAS 30%)
+        let nilaiAkhir = 0;
+        let totalBobotAktif = 0;
+        if (rataTugas !== null) { nilaiAkhir += (rataTugas * bT); totalBobotAktif += bT; }
+        if (rataUH !== null) { nilaiAkhir += (rataUH * bU); totalBobotAktif += bU; }
+        if (pts !== null && !isNaN(pts) && pts !== '') { nilaiAkhir += (Number(pts) * bPTS); totalBobotAktif += bPTS; }
+        if (pas !== null && !isNaN(pas) && pas !== '') { nilaiAkhir += (Number(pas) * bPAS); totalBobotAktif += bPAS; }
+
+        if (totalBobotAktif > 0 && totalBobotAktif < 0.99) {
+          nilaiAkhir = nilaiAkhir / totalBobotAktif;
+        }
+
+        const naFormatted = (totalBobotAktif > 0) ? Number(nilaiAkhir.toFixed(1)) : 0;
+
+        let predikat = 'D';
+        if (naFormatted >= 90) predikat = 'A';
+        else if (naFormatted >= 80) predikat = 'B';
+        else if (naFormatted >= kkm) predikat = 'C';
+        else predikat = 'D';
+
+        const isTuntas = naFormatted >= kkm;
+
+        return {
+          no: idx + 1,
+          idSiswa: s.id,
+          nis: s.nis || '-',
+          nisn: s.nisn || '-',
+          nama: s.nama,
+          t1: t1 !== null ? t1 : '',
+          t2: t2 !== null ? t2 : '',
+          t3: t3 !== null ? t3 : '',
+          uh1: uh1 !== null ? uh1 : '',
+          uh2: uh2 !== null ? uh2 : '',
+          pts: pts !== null ? pts : '',
+          pas: pas !== null ? pas : '',
+          rataTugas: rataTugas !== null ? Number(rataTugas.toFixed(1)) : 0,
+          rataUH: rataUH !== null ? Number(rataUH.toFixed(1)) : 0,
+          nilaiAkhir: naFormatted,
+          predikat: predikat,
+          keterangan: isTuntas ? 'Tuntas' : 'Belum Tuntas',
+          isTuntas: isTuntas
+        };
+      });
+
+      const validNA = compiledRows.filter(r => r.nilaiAkhir > 0);
+      const avg = validNA.length > 0 ? (validNA.reduce((a, b) => a + b.nilaiAkhir, 0) / validNA.length).toFixed(1) : '0.0';
+      const highest = validNA.length > 0 ? Math.max(...validNA.map(r => r.nilaiAkhir)).toFixed(1) : '0.0';
+      const lowest = validNA.length > 0 ? Math.min(...validNA.map(r => r.nilaiAkhir)).toFixed(1) : '0.0';
+      const tuntasCount = compiledRows.filter(r => r.isTuntas && r.nilaiAkhir > 0).length;
+      const belumTuntasCount = compiledRows.length - tuntasCount;
+      const tuntasPct = compiledRows.length > 0 ? ((tuntasCount / compiledRows.length) * 100).toFixed(1) : '0.0';
+
+      return {
+        rows: compiledRows,
+        stats: {
+          avg: avg,
+          highest: highest,
+          lowest: lowest,
+          tuntasCount: tuntasCount,
+          belumTuntasCount: belumTuntasCount,
+          tuntasPct: tuntasPct
+        }
+      };
+    }
+
     function renderRekapRiwayatNilai(container, actKls, students) {
-      const myNilai = dbData.nilai.filter(n => n.idKelas === activeGuruClassId);
       const mapels = getTeacherMapelList();
-
-      const filteredNilai = (filterRekapMapel === 'ALL')
-        ? myNilai
-        : myNilai.filter(n => n.mapel === filterRekapMapel);
-
-      if (myNilai.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-[28px] p-8 border border-violet-100/70 text-center space-y-3 shadow-xs">
-            <div class="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-3xl">📊</div>
-            <h4 class="text-base font-black text-brand-dark">Belum Ada Riwayat Penilaian</h4>
-            <p class="text-xs text-brand-muted max-w-sm mx-auto">
-              Belum ada data nilai yang tersimpan untuk kelas ${actKls.namaRombel}. Mulai isi nilai pada lembar input massal.
-            </p>
-            <button onclick="switchNilaiSubTab('input')" class="px-5 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs shadow-xs cursor-pointer">
-              Mulai Input Nilai Sekarang ➔
-            </button>
-          </div>
-        `;
-        return;
-      }
+      const currentSelectedMapel = (filterRekapMapel === 'ALL') ? (mapels[0] || 'Matematika') : filterRekapMapel;
+      const matrix = compileRekapNilaiMatrix(actKls, students, currentSelectedMapel);
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', desa: 'Ambulu' };
+      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
       container.innerHTML = `
         <div class="bg-white rounded-[26px] p-5 border border-violet-100/70 shadow-xs space-y-4">
           
-          <!-- Filter & Action Header -->
+          <!-- Filter & Toolbar Header Sesuai Template -->
           <div class="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-violet-50 pb-3">
             <div class="flex items-center gap-2">
-              <span class="text-brand-muted font-bold text-[11px]">Filter Mapel:</span>
+              <span class="text-brand-muted font-bold text-[11px]">Mata Pelajaran:</span>
               <select onchange="filterRekapMapel = this.value; renderRekapRiwayatNilai(document.getElementById('nilaiSubTabContentArea'), dbData.kelas.find(k => k.id === activeGuruClassId), dbData.siswa.filter(s => s.idKelas === activeGuruClassId));"
                 class="bg-[#F8F7FD] border border-violet-100 text-brand-dark font-bold text-xs p-1.5 rounded-xl focus:outline-none">
-                <option value="ALL" ${filterRekapMapel === 'ALL' ? 'selected' : ''}>Semua Mata Pelajaran</option>
-                ${mapels.map(m => `<option value="${m}" ${filterRekapMapel === m ? 'selected' : ''}>${m}</option>`).join('')}
+                ${mapels.map(m => `<option value="${m}" ${currentSelectedMapel === m ? 'selected' : ''}>${m}</option>`).join('')}
               </select>
             </div>
 
-            <!-- Tombol Ekspor Excel & Cetak PDF Rapi Sesuai Request User -->
+            <!-- Tombol Ekspor Excel & Cetak PDF Rapi Sesuai Template Resmi -->
             <div class="flex items-center gap-2">
-              <button onclick="exportNilaiToExcel('${filterRekapMapel}')"
+              <button onclick="openSchoolMetaModal()"
+                class="px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 text-brand-700 font-extrabold text-xs border border-violet-200 shadow-2xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>⚙️</span> <span>Atur KKM & Kepsek</span>
+              </button>
+              <button onclick="exportNilaiToExcel('${currentSelectedMapel}')"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
               </button>
-              <button onclick="printRekapNilaiPDF('${filterRekapMapel}')"
+              <button onclick="printRekapNilaiPDF('${currentSelectedMapel}')"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>🖨️</span> <span>Cetak / PDF Rapi</span>
               </button>
             </div>
           </div>
 
-          <!-- Tabel Rekap Nilai Siswa -->
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs" id="tableRekapNilai">
-              <thead>
-                <tr class="border-b border-violet-50 text-brand-muted font-bold text-[11px]">
-                  <th class="pb-2.5">No</th>
-                  <th class="pb-2.5">Siswa</th>
-                  <th class="pb-2.5">Mata Pelajaran</th>
-                  <th class="pb-2.5">Penilaian / Topik</th>
-                  <th class="pb-2.5 text-center">Nilai</th>
-                  <th class="pb-2.5 text-center">Status</th>
-                  <th class="pb-2.5">Catatan Guru</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-violet-50 font-medium">
-                ${filteredNilai.map((n, idx) => {
-                  const score = n.nilaiAngka !== undefined ? n.nilaiAngka : (n.nilaiAkhir || 0);
-                  const isTuntas = n.statusTuntas ? (n.statusTuntas === 'Tuntas') : (score >= (n.kktp || 75));
-                  return `
-                    <tr class="hover:bg-[#F8F7FD]">
-                      <td class="py-2.5 text-brand-muted font-bold">${idx + 1}</td>
-                      <td class="py-2.5">
-                        <div class="font-black text-brand-dark">${n.namaSiswa}</div>
-                        <div class="text-[10px] text-brand-muted font-mono">${n.nis || '-'}</div>
-                      </td>
-                      <td class="py-2.5 text-brand-muted font-bold">${n.mapel}</td>
-                      <td class="py-2.5">
-                        <span class="font-black text-brand-dark block">${n.namaPenilaian || n.kategori || 'Asesmen'}</span>
-                        <span class="text-[10px] text-brand-muted">${n.lingkupMateri || n.tanggal || '-'}</span>
-                      </td>
-                      <td class="py-2.5 text-center font-black text-sm text-brand-dark">${score}</td>
-                      <td class="py-2.5 text-center">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                          ${isTuntas ? 'Tuntas' : 'Remedial'}
-                        </span>
-                      </td>
-                      <td class="py-2.5 text-slate-500 text-[11px]">${n.catatan || '-'}</td>
+          <!-- Preview Lembar Rekap Nilai Siswa (Template Resmi) -->
+          <div class="space-y-3">
+            <div class="text-center space-y-0.5 border-b border-violet-100 pb-2">
+              <h3 class="text-base font-black text-brand-dark uppercase tracking-wide">${sch.nama}</h3>
+              <h4 class="text-sm font-extrabold text-brand-700 tracking-wider">REKAP NILAI SISWA</h4>
+              <p class="text-[11px] text-brand-muted">Mata Pelajaran: <strong>${currentSelectedMapel}</strong> • Rombel: <strong>${actKls ? actKls.namaRombel : '-'}</strong> • Semester: <strong>${actKls ? actKls.semester : 'Ganjil'} ${actKls ? actKls.tahunAjaran : '2026/2027'}</strong></p>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse" id="tableOfficialRekapNilai">
+                <thead>
+                  <tr class="bg-[#1B365D] text-white text-[11px] font-bold text-center">
+                    <th class="p-2 border border-slate-700 w-8">No</th>
+                    <th class="p-2 border border-slate-700 w-20">NIS</th>
+                    <th class="p-2 border border-slate-700 text-left min-w-[150px]">Nama Siswa</th>
+                    <th class="p-2 border border-slate-700 w-12">T1</th>
+                    <th class="p-2 border border-slate-700 w-12">T2</th>
+                    <th class="p-2 border border-slate-700 w-12">T3</th>
+                    <th class="p-2 border border-slate-700 w-12">UH1</th>
+                    <th class="p-2 border border-slate-700 w-12">UH2</th>
+                    <th class="p-2 border border-slate-700 w-12">PTS</th>
+                    <th class="p-2 border border-slate-700 w-12">PAS</th>
+                    <th class="p-2 border border-slate-700 w-16 bg-[#162C4E]">Rata² T</th>
+                    <th class="p-2 border border-slate-700 w-16 bg-[#162C4E]">Rata² UH</th>
+                    <th class="p-2 border border-slate-700 w-16 bg-[#0E1E36]">Nilai Akhir</th>
+                    <th class="p-2 border border-slate-700 w-12">Pred.</th>
+                    <th class="p-2 border border-slate-700 w-24">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 font-medium">
+                  ${matrix.rows.map(r => `
+                    <tr class="hover:bg-[#F8F7FD] text-center">
+                      <td class="p-2 border border-slate-200 text-slate-500">${r.no}</td>
+                      <td class="p-2 border border-slate-200 font-mono text-[11px]">${r.nis}</td>
+                      <td class="p-2 border border-slate-200 text-left font-black text-brand-dark">${r.nama}</td>
+                      <td class="p-2 border border-slate-200">${r.t1 !== '' ? r.t1 : '-'}</td>
+                      <td class="p-2 border border-slate-200">${r.t2 !== '' ? r.t2 : '-'}</td>
+                      <td class="p-2 border border-slate-200">${r.t3 !== '' ? r.t3 : '-'}</td>
+                      <td class="p-2 border border-slate-200">${r.uh1 !== '' ? r.uh1 : '-'}</td>
+                      <td class="p-2 border border-slate-200">${r.uh2 !== '' ? r.uh2 : '-'}</td>
+                      <td class="p-2 border border-slate-200">${r.pts !== '' ? r.pts : '-'}</td>
+                      <td class="p-2 border border-slate-200">${r.pas !== '' ? r.pas : '-'}</td>
+                      <td class="p-2 border border-slate-200 font-bold bg-slate-50">${r.rataTugas}</td>
+                      <td class="p-2 border border-slate-200 font-bold bg-slate-50">${r.rataUH}</td>
+                      <td class="p-2 border border-slate-200 font-black text-xs ${r.isTuntas ? 'text-brand-dark' : 'text-rose-600'} bg-slate-50">${r.nilaiAkhir}</td>
+                      <td class="p-2 border border-slate-200 font-black ${r.isTuntas ? 'text-brand-dark' : 'text-rose-600'}">${r.predikat}</td>
+                      <td class="p-2 border border-slate-200 font-black text-[11px] ${r.isTuntas ? 'text-emerald-700' : 'text-rose-600'}">${r.keterangan}</td>
                     </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Ringkasan Statistik Kelas Sesuai Template -->
+            <div class="bg-[#EBF3FA] rounded-2xl p-3 border border-slate-300 text-[11px] font-bold text-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <span>Rata-rata kelas: <strong class="text-brand-dark">${matrix.stats.avg}</strong></span>
+              <span>Tertinggi: <strong class="text-brand-dark">${matrix.stats.highest}</strong></span>
+              <span>Terendah: <strong class="text-brand-dark">${matrix.stats.lowest}</strong></span>
+              <span>Tuntas: <strong class="text-emerald-700">${matrix.stats.tuntasCount}</strong></span>
+              <span>Belum tuntas: <strong class="text-rose-600">${matrix.stats.belumTuntasCount}</strong></span>
+              <span>Ketuntasan klasikal: <strong class="text-brand-700">${matrix.stats.tuntasPct}%</strong></span>
+            </div>
+
+            <!-- Petunjuk Skala Predikat & Bobot -->
+            <div class="text-[10px] text-slate-500 italic leading-relaxed">
+              * Keterangan: T = Tugas, UH = Ulangan Harian, PTS = Penilaian Tengah Semester, PAS = Penilaian Akhir Semester. Bobot: Tugas ${(schoolMetaConfig.bobotTugas*100)}%, UH ${(schoolMetaConfig.bobotUH*100)}%, PTS ${(schoolMetaConfig.bobotPTS*100)}%, PAS ${(schoolMetaConfig.bobotPAS*100)}%. KKM ${schoolMetaConfig.kkm}. Predikat: A ≥ 90, B 80–89, C ${schoolMetaConfig.kkm}–79, D < ${schoolMetaConfig.kkm}.
+            </div>
           </div>
 
         </div>
@@ -2997,199 +3263,193 @@
     function exportNilaiToExcel(filterMapel = 'ALL') {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD Negeri Ambulu', npsn: '-' };
-      const myNilai = dbData.nilai.filter(n => n.idKelas === activeGuruClassId);
-      const dataToExport = (filterMapel === 'ALL') ? myNilai : myNilai.filter(n => n.mapel === filterMapel);
+      const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const selectedMapel = filterMapel === 'ALL' ? (getTeacherMapelList()[0] || 'Matematika') : filterMapel;
+      const matrix = compileRekapNilaiMatrix(actKls, students, selectedMapel);
 
-      if (dataToExport.length === 0) {
-        showToast('Tidak ada data nilai untuk diekspor.', 'warning');
-        return;
-      }
+      let csv = '\uFEFF';
+      csv += 'PENGATURAN & PETUNJUK,,,,\r\n';
+      csv += 'Isi sel berwarna kuning (teks biru). Semua sheet rekap otomatis mengikuti pengaturan ini.,,,,\r\n';
+      csv += 'Identitas,,,,\r\n';
+      csv += `Nama Sekolah,"${sch.nama}",,Skala Predikat,\r\n`;
+      csv += `Nama Guru,"${currentUser ? currentUser.nama : 'Guru'}",,A,≥ 90\r\n`;
+      csv += `NIP Guru,"${currentUser ? (currentUser.nip || '-') : '-'}",,B,80 – 89\r\n`;
+      csv += `Mata Pelajaran,"${selectedMapel}",,C,KKM – 79\r\n`;
+      csv += `Kelas,"${actKls ? actKls.namaRombel : '-'}",,D,< KKM\r\n`;
+      csv += `Semester,"${actKls ? actKls.semester : 'Ganjil'}",,,\r\n`;
+      csv += `Tahun Ajaran,"${actKls ? actKls.tahunAjaran : '2026/2027'}",,,\r\n`;
+      csv += `KKM,${schoolMetaConfig.kkm},,,\r\n`;
+      csv += ',,,,\r\n';
+      csv += 'Bobot Nilai Akhir,,,,\r\n';
+      csv += `Bobot Tugas,${schoolMetaConfig.bobotTugas},,,\r\n`;
+      csv += `Bobot Ulangan Harian,${schoolMetaConfig.bobotUH},,,\r\n`;
+      csv += `Bobot PTS,${schoolMetaConfig.bobotPTS},,,\r\n`;
+      csv += `Bobot PAS,${schoolMetaConfig.bobotPAS},,,\r\n`;
+      csv += 'Total Bobot (harus 100%),1,OK,,\r\n';
+      csv += `Total Pertemuan Semester,${schoolMetaConfig.totalPertemuanAbsensi},,,\r\n`;
+      csv += `Nama Kepala Sekolah,"${schoolMetaConfig.kepalaSekolah}",,,\r\n`;
+      csv += `NIP Kepala Sekolah,"${schoolMetaConfig.nipKepalaSekolah}",,,\r\n`;
+      csv += ',,,,\r\n';
+      csv += 'REKAP NILAI SISWA,,,,,,,,,,,,,,\r\n';
+      csv += `"${sch.nama}",,,,,,,,,,,,,,\r\n`;
+      csv += `Mata Pelajaran,:,${selectedMapel},,,,,,,,,,,,\r\n`;
+      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,,,,,,,,,,,\r\n`;
+      csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,,,,,,,\r\n`;
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += 'No,NIS,Nama Siswa,T1,T2,T3,UH1,UH2,PTS,PAS,Rata² Tugas,Rata² UH,Nilai Akhir,Predikat,Keterangan\r\n';
 
-      let csvContent = '\uFEFF'; // UTF-8 BOM agar rapi di Microsoft Excel
-      csvContent += '"PEMERINTAH KABUPATEN JEMBER - DINAS PENDIDIKAN"\r\n';
-      csvContent += '"KOORDINATOR WILAYAH PENDIDIKAN KECAMATAN AMBULU"\r\n';
-      csvContent += '"REKAPITULASI DAFTAR NILAI PESERTA DIDIK"\r\n';
-      csvContent += `"Satuan Pendidikan:","${sch.nama}"\r\n`;
-      csvContent += `"NPSN:","${sch.npsn}"\r\n`;
-      csvContent += `"Rombongan Belajar:","${actKls ? actKls.namaRombel : '-'}"\r\n`;
-      csvContent += `"Tahun Ajaran / Semester:","${actKls ? actKls.tahunAjaran : '2026/2027'} - ${actKls ? actKls.semester : 'Ganjil'}"\r\n`;
-      csvContent += `"Guru Pengampu:","${currentUser ? currentUser.nama : 'Guru'}"\r\n`;
-      csvContent += `"Filter Mapel:","${filterMapel}"\r\n`;
-      csvContent += `"Tanggal Ekspor:","${new Date().toLocaleDateString('id-ID')}"\r\n\r\n`;
-
-      csvContent += '"No","NIS","NISN","Nama Peserta Didik","Mata Pelajaran","Kategori Penilaian","Judul / Topik Penilaian","Lingkup Materi","Nilai Angka","Batas KKTP","Status Ketuntasan","Catatan Guru"\r\n';
-
-      let totalScore = 0;
-      let highest = -Infinity;
-      let lowest = Infinity;
-      let tuntasCount = 0;
-
-      dataToExport.forEach((n, idx) => {
-        const score = n.nilaiAngka !== undefined ? n.nilaiAngka : (n.nilaiAkhir || 0);
-        const kktp = n.kktp || 75;
-        const isTuntas = score >= kktp;
-        if (isTuntas) tuntasCount++;
-        totalScore += score;
-        if (score > highest) highest = score;
-        if (score < lowest) lowest = score;
-
-        csvContent += `"${idx + 1}","${n.nis || '-'}","${n.nisn || '-'}","${(n.namaSiswa || '').replace(/"/g, '""')}","${(n.mapel || '').replace(/"/g, '""')}","${(n.kategori || n.jenisPenilaian || '').replace(/"/g, '""')}","${(n.namaPenilaian || '').replace(/"/g, '""')}","${(n.lingkupMateri || '').replace(/"/g, '""')}","${score}","${kktp}","${isTuntas ? 'Tuntas' : 'Remedial'}","${(n.catatan || '-').replace(/"/g, '""')}"\r\n`;
+      matrix.rows.forEach(r => {
+        csv += `${r.no},"${r.nis}","${r.nama.replace(/"/g, '""')}",${r.t1},${r.t2},${r.t3},${r.uh1},${r.uh2},${r.pts},${r.pas},${r.rataTugas},${r.rataUH},${r.nilaiAkhir},${r.predikat},${r.keterangan}\r\n`;
       });
 
-      const avg = (totalScore / dataToExport.length).toFixed(1);
-      const tuntasPct = Math.round((tuntasCount / dataToExport.length) * 100);
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += `Rata-rata Kelas,,,${matrix.stats.avg},,,,,,,,,,,\r\n`;
+      csv += `Nilai Tertinggi,,,${matrix.stats.highest},,,,,,,,,,,\r\n`;
+      csv += `Nilai Terendah,,,${matrix.stats.lowest},,,,,,,,,,,\r\n`;
+      csv += `Jumlah Tuntas,,,${matrix.stats.tuntasCount},,,,,,,,,,,\r\n`;
+      csv += `Jumlah Belum Tuntas,,,${matrix.stats.belumTuntasCount},,,,,,,,,,,\r\n`;
+      csv += `Ketuntasan Klasikal,,,${(Number(matrix.stats.tuntasPct) / 100).toFixed(2)},,,,,,,,,,,\r\n`;
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += ',"Mengetahui,",,,,,,,,,,Guru Mata Pelajaran,,,\r\n';
+      csv += ',Kepala Sekolah,,,,,,,,,,,,,\r\n';
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += ',,,,,,,,,,,,,,\r\n';
+      csv += `,"${schoolMetaConfig.kepalaSekolah}",,,,,,,,,,"${currentUser ? currentUser.nama : 'Guru'}",,,\r\n`;
+      csv += `,NIP. ${schoolMetaConfig.nipKepalaSekolah},,,,,,,,,,NIP. ${currentUser ? (currentUser.nip || '-') : '-'},,,\r\n`;
 
-      csvContent += `\r\n"STATISTIK PEMBELAJARAN KELAS"\r\n`;
-      csvContent += `"Total Rekap Penilaian:","${dataToExport.length} data"\r\n`;
-      csvContent += `"Rata-rata Nilai:","${avg}"\r\n`;
-      csvContent += `"Nilai Tertinggi:","${highest}"\r\n`;
-      csvContent += `"Nilai Terendah:","${lowest}"\r\n`;
-      csvContent += `"Jumlah Tuntas (>= KKTP):","${tuntasCount} siswa"\r\n`;
-      csvContent += `"Jumlah Remedial:","${dataToExport.length - tuntasCount} siswa"\r\n`;
-      csvContent += `"Ketuntasan Klasikal:","${tuntasPct}%"\r\n`;
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      const filename = `Rekap_Nilai_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}_${filterMapel.replace(/[^a-zA-Z0-9]/g, '_')}.csv`;
       link.setAttribute('href', url);
-      link.setAttribute('download', filename);
+      link.setAttribute('download', `Rekap_Nilai_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}_${selectedMapel.replace(/[^a-zA-Z0-9]/g, '_')}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Berkas Rekap Excel (.csv) berhasil diunduh.', 'success');
+      showToast('Berkas Rekap Nilai Excel (.csv) berhasil diunduh.', 'success');
     }
 
     function printRekapNilaiPDF(filterMapel = 'ALL') {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
-      const myNilai = dbData.nilai.filter(n => n.idKelas === activeGuruClassId);
-      const dataToPrint = (filterMapel === 'ALL') ? myNilai : myNilai.filter(n => n.mapel === filterMapel);
-
-      if (dataToPrint.length === 0) {
-        showToast('Tidak ada data nilai untuk dicetak.', 'warning');
-        return;
-      }
-
-      let totalScore = 0;
-      let highest = -Infinity;
-      let lowest = Infinity;
-      let tuntasCount = 0;
-
-      dataToPrint.forEach(n => {
-        const score = n.nilaiAngka !== undefined ? n.nilaiAngka : (n.nilaiAkhir || 0);
-        const kktp = n.kktp || 75;
-        if (score >= kktp) tuntasCount++;
-        totalScore += score;
-        if (score > highest) highest = score;
-        if (score < lowest) lowest = score;
-      });
-
-      const avg = (totalScore / dataToPrint.length).toFixed(1);
-      const tuntasPct = Math.round((tuntasCount / dataToPrint.length) * 100);
-      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const selectedMapel = filterMapel === 'ALL' ? (getTeacherMapelList()[0] || 'Matematika') : filterMapel;
+      const matrix = compileRekapNilaiMatrix(actKls, students, selectedMapel);
+      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
       const printContainer = document.getElementById('printAreaContainer');
       printContainer.innerHTML = `
-        <div style="font-family: Arial, sans-serif; color: #000; padding: 10px; max-width: 900px; margin: 0 auto; line-height: 1.3;">
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 10px; max-width: 1050px; margin: 0 auto; line-height: 1.3;">
           
-          <!-- KOP SURAT RESMI PEMERINTAH KABUPATEN JEMBER -->
-          <div style="text-align: center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 13pt; font-weight: bold; text-transform: uppercase;">PEMERINTAH KABUPATEN JEMBER</h3>
-            <h2 style="margin: 2px 0; font-size: 15pt; font-weight: bold; text-transform: uppercase;">DINAS PENDIDIKAN</h2>
-            <h4 style="margin: 0; font-size: 11pt; font-weight: bold; text-transform: uppercase;">KOORDINATOR WILAYAH SATUAN PENDIDIKAN KECAMATAN AMBULU</h4>
-            <h1 style="margin: 4px 0; font-size: 16pt; font-weight: 900; text-transform: uppercase; color: #1e1b4b;">${sch.nama}</h1>
-            <p style="margin: 0; font-size: 9pt;">NPSN: ${sch.npsn} • Alamat: Desa ${sch.desa || 'Ambulu'}, Kecamatan Ambulu, Kabupaten Jember, Jawa Timur</p>
+          <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
+            Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 1
+          </div>
+
+          <!-- KOP SURAT SEKOLAH -->
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+            <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${sch.nama}</h2>
+            <p style="margin: 2px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
           </div>
 
           <!-- JUDUL LAPORAN -->
-          <div style="text-align: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 13pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">REKAPITULASI DAFTAR NILAI ASESMEN SISWA</h3>
-            <p style="margin: 4px 0 0; font-size: 10pt;">Kurikulum Merdeka • Tahun Ajaran ${actKls ? actKls.tahunAjaran : '2026/2027'} (${actKls ? actKls.semester : 'Ganjil'})</p>
+          <div style="text-align: center; margin-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">REKAP NILAI SISWA</h3>
           </div>
 
           <!-- IDENTITAS KELAS -->
-          <table style="width: 100%; font-size: 10pt; margin-bottom: 12px; border-collapse: collapse;">
+          <table style="width: 100%; font-size: 9pt; margin-bottom: 10px; border-collapse: collapse;">
             <tr>
-              <td style="width: 18%; font-weight: bold;">Rombongan Belajar</td>
+              <td style="width: 15%; font-weight: bold;">Mata Pelajaran</td>
               <td style="width: 2%;">:</td>
-              <td style="width: 30%;">${actKls ? actKls.namaRombel : '-'} (Tingkat ${actKls ? actKls.tingkat : 'SD'})</td>
-              <td style="width: 18%; font-weight: bold;">Mata Pelajaran</td>
+              <td style="width: 38%;">${selectedMapel}</td>
+              <td style="width: 15%; font-weight: bold;">Kelas</td>
               <td style="width: 2%;">:</td>
-              <td style="width: 30%; font-weight: bold;">${filterMapel}</td>
+              <td style="width: 28%;">${actKls ? actKls.namaRombel : '-'}</td>
             </tr>
             <tr>
               <td style="font-weight: bold;">Guru Pengampu</td>
               <td>:</td>
-              <td>${currentUser ? currentUser.nama : '-'}</td>
-              <td style="font-weight: bold;">Tanggal Cetak</td>
+              <td>${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
+              <td style="font-weight: bold;">Semester / TA</td>
               <td>:</td>
-              <td>${todayStr}</td>
+              <td>${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
             </tr>
           </table>
 
-          <!-- TABEL HASIL PENILAIAN -->
-          <table style="width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 14px;">
+          <!-- TABEL HASIL PENILAIAN SESUAI TEMPLATE SCREENSHOT 1 -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 10px;">
             <thead>
-              <tr style="background-color: #f1f5f9; text-align: center;">
-                <th style="border: 1px solid #000; padding: 6px 4px; width: 35px;">No</th>
-                <th style="border: 1px solid #000; padding: 6px 4px; width: 75px;">NIS/NISN</th>
-                <th style="border: 1px solid #000; padding: 6px 6px; text-align: left;">Nama Lengkap Peserta Didik</th>
-                <th style="border: 1px solid #000; padding: 6px 4px; width: 140px;">Jenis & Topik Penilaian</th>
-                <th style="border: 1px solid #000; padding: 6px 4px; width: 55px;">Nilai</th>
-                <th style="border: 1px solid #000; padding: 6px 4px; width: 75px;">Ketuntasan</th>
-                <th style="border: 1px solid #000; padding: 6px 6px; text-align: left;">Catatan / Capaian</th>
+              <tr style="background-color: #1B365D; color: #FFFFFF; text-align: center;">
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 28px;">No</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 65px;">NIS</th>
+                <th style="border: 1px solid #000; padding: 5px 6px; text-align: left;">Nama Siswa</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 35px;">T1</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 35px;">T2</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 35px;">T3</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 38px;">UH1</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 38px;">UH2</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 38px;">PTS</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 38px;">PAS</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 45px;">Rata<br>Tugas</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 45px;">Rata<br>UH</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 45px;">Nilai<br>Akhir</th>
+                <th style="border: 1px solid #000; padding: 5px 3px; width: 35px;">Pred.</th>
+                <th style="border: 1px solid #000; padding: 5px 4px; width: 75px;">Keterangan</th>
               </tr>
             </thead>
             <tbody>
-              ${dataToPrint.map((n, idx) => {
-                const score = n.nilaiAngka !== undefined ? n.nilaiAngka : (n.nilaiAkhir || 0);
-                const isTuntas = score >= (n.kktp || 75);
-                return `
-                  <tr>
-                    <td style="border: 1px solid #000; padding: 5px 4px; text-align: center;">${idx + 1}</td>
-                    <td style="border: 1px solid #000; padding: 5px 4px; text-align: center; font-family: monospace;">${n.nis || '-'}<br>${n.nisn || '-'}</td>
-                    <td style="border: 1px solid #000; padding: 5px 6px; font-weight: bold;">${n.namaSiswa}</td>
-                    <td style="border: 1px solid #000; padding: 5px 4px;"><strong>${n.namaPenilaian || n.kategori || 'Asesmen'}</strong><br><span style="font-size: 8pt; color: #555;">${n.lingkupMateri || '-'}</span></td>
-                    <td style="border: 1px solid #000; padding: 5px 4px; text-align: center; font-weight: bold; font-size: 10pt;">${score}</td>
-                    <td style="border: 1px solid #000; padding: 5px 4px; text-align: center; font-weight: bold; color: ${isTuntas ? '#15803d' : '#b91c1c'};">${isTuntas ? 'TUNTAS' : 'REMEDIAL'}</td>
-                    <td style="border: 1px solid #000; padding: 5px 6px; font-size: 8pt;">${n.catatan || '-'}</td>
-                  </tr>
-                `;
-              }).join('')}
+              ${matrix.rows.map(r => `
+                <tr style="text-align: center;">
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.no}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-family: monospace;">${r.nis}</td>
+                  <td style="border: 1px solid #000; padding: 4px 6px; text-align: left; font-weight: bold;">${r.nama}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.t1 !== '' ? r.t1 : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.t2 !== '' ? r.t2 : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.t3 !== '' ? r.t3 : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.uh1 !== '' ? r.uh1 : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.uh2 !== '' ? r.uh2 : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.pts !== '' ? r.pts : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px;">${r.pas !== '' ? r.pas : '-'}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold;">${r.rataTugas.toFixed(1)}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold;">${r.rataUH.toFixed(1)}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'}; font-size: 8.5pt;">${r.nilaiAkhir.toFixed(1)}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'};">${r.predikat}</td>
+                  <td style="border: 1px solid #000; padding: 4px 3px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'};">${r.keterangan}</td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
 
-          <!-- STATISTIK RINGKASAN KELAS -->
-          <table style="width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 24px; border: 1px solid #000;">
-            <tr style="background-color: #f8fafc;">
-              <td style="padding: 6px; border: 1px solid #000; font-weight: bold; width: 25%;">Rata-rata Nilai Kelas</td>
-              <td style="padding: 6px; border: 1px solid #000; font-weight: bold; width: 25%; font-size: 11pt;">${avg}</td>
-              <td style="padding: 6px; border: 1px solid #000; font-weight: bold; width: 25%;">Ketuntasan Klasikal</td>
-              <td style="padding: 6px; border: 1px solid #000; font-weight: bold; width: 25%; font-size: 11pt; color: #15803d;">${tuntasPct}% (${tuntasCount} Siswa)</td>
-            </tr>
-            <tr>
-              <td style="padding: 6px; border: 1px solid #000;">Nilai Tertinggi</td>
-              <td style="padding: 6px; border: 1px solid #000; font-weight: bold;">${highest}</td>
-              <td style="padding: 6px; border: 1px solid #000;">Nilai Terendah</td>
-              <td style="padding: 6px; border: 1px solid #000; font-weight: bold;">${lowest}</td>
-            </tr>
-          </table>
+          <!-- STATISTIK RINGKASAN SESUAI TEMPLATE -->
+          <div style="background-color: #EBF3FA; border: 1px solid #000; padding: 4px 8px; font-size: 8pt; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span>Rata-rata kelas: ${matrix.stats.avg}</span>
+            <span>Tertinggi: ${matrix.stats.highest}</span>
+            <span>Terendah: ${matrix.stats.lowest}</span>
+            <span>Tuntas: ${matrix.stats.tuntasCount}</span>
+            <span>Belum tuntas: ${matrix.stats.belumTuntasCount}</span>
+            <span>Ketuntasan klasikal: ${matrix.stats.tuntasPct}%</span>
+          </div>
 
-          <!-- KOLOM TANDA TANGAN RESMI -->
-          <table style="width: 100%; font-size: 10pt; text-align: center; border-collapse: collapse; margin-top: 20px;">
+          <!-- KETERANGAN BOBOT & PREDIKAT -->
+          <div style="font-size: 7.5pt; color: #333; margin-bottom: 20px; line-height: 1.3;">
+            Keterangan: T = Tugas, UH = Ulangan Harian, PTS = Penilaian Tengah Semester, PAS = Penilaian Akhir Semester. Bobot: Tugas ${(schoolMetaConfig.bobotTugas*100)}%, UH ${(schoolMetaConfig.bobotUH*100)}%, PTS ${(schoolMetaConfig.bobotPTS*100)}%, PAS ${(schoolMetaConfig.bobotPAS*100)}%. KKM ${schoolMetaConfig.kkm}. Predikat: A ≥ 90, B 80–89, C ${schoolMetaConfig.kkm}–79, D < ${schoolMetaConfig.kkm}.
+          </div>
+
+          <!-- TANDA TANGAN DUA KOLOM SESUAI TEMPLATE SCREENSHOT -->
+          <table style="width: 100%; font-size: 9pt; text-align: center; border-collapse: collapse; margin-top: 15px;">
             <tr>
               <td style="width: 45%;">
                 Mengetahui,<br>
-                Kepala Sekolah ${sch.nama}
+                Kepala Sekolah
                 <br><br><br><br>
-                <strong><u>....................................................</u></strong><br>
-                NIP. .............................................
+                <strong><u>${schoolMetaConfig.kepalaSekolah}</u></strong><br>
+                NIP. ${schoolMetaConfig.nipKepalaSekolah}
               </td>
               <td style="width: 10%;"></td>
               <td style="width: 45%;">
                 Ambulu, ${todayStr}<br>
-                Guru Pengampu / Wali Kelas
+                Guru Mata Pelajaran / Guru Kelas
                 <br><br><br><br>
                 <strong><u>${currentUser ? currentUser.nama : 'Guru Pengampu'}</u></strong><br>
                 NIP. ${currentUser ? (currentUser.nip || '-') : '-'}
@@ -3208,9 +3468,87 @@
       switchNilaiSubTab('input');
     }
 
-    // --- PRESENSI SISWA GURU ---
+    // ==========================================
+    // 2. REKAP ABSENSI SISWA (SESUAI TEMPLATE RESMI)
+    // ==========================================
+    let activePresensiSubTab = 'daily'; // 'daily' atau 'rekap'
+
+    function switchPresensiSubTab(tab) {
+      activePresensiSubTab = tab;
+      const c = document.getElementById('moduleContentArea');
+      if (c && activeModuleKey === 'guru-presensi') {
+        renderModuleGuruPresensi(c);
+      }
+    }
+
+    function compileRekapAbsensi(actKls, students) {
+      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+
+      let totalSakit = 0;
+      let totalIzin = 0;
+      let totalAlpa = 0;
+      let totalHadir = 0;
+
+      const rows = students.map((s, idx) => {
+        const sPresensi = dbData.presensi.filter(p => p.idSiswa === s.id && p.idKelas === activeGuruClassId);
+        let sakit = sPresensi.filter(p => p.statusHadir === 'Sakit').length;
+        let izin = sPresensi.filter(p => p.statusHadir === 'Izin').length;
+        let alpa = sPresensi.filter(p => p.statusHadir === 'Alfa' || p.statusHadir === 'Alpa').length;
+        let hadir = sPresensi.filter(p => p.statusHadir === 'Hadir').length;
+
+        if (sPresensi.length < totalPertemuan) {
+          hadir = Math.max(0, totalPertemuan - (sakit + izin + alpa));
+        }
+
+        const pctHadirNum = totalPertemuan > 0 ? (hadir / totalPertemuan) : 1;
+        const pctHadirFormatted = (pctHadirNum * 100).toFixed(1) + '%';
+
+        let ket = 'Sangat Baik';
+        if (pctHadirNum >= 0.9) ket = 'Sangat Baik';
+        else if (pctHadirNum >= 0.75) ket = 'Baik';
+        else ket = 'Perlu Perhatian';
+
+        totalSakit += sakit;
+        totalIzin += izin;
+        totalAlpa += alpa;
+        totalHadir += hadir;
+
+        return {
+          no: idx + 1,
+          idSiswa: s.id,
+          nis: s.nis || '-',
+          nama: s.nama,
+          jk: (s.jenisKelamin === 'P' || s.jk === 'P') ? 'P' : 'L',
+          sakit: sakit,
+          izin: izin,
+          alpa: alpa,
+          hadir: hadir,
+          pctHadir: pctHadirFormatted,
+          pctHadirNum: pctHadirNum,
+          keterangan: ket,
+          isPerhatian: pctHadirNum < 0.75
+        };
+      });
+
+      const grandTotalPertemuanAll = students.length * totalPertemuan;
+      const avgPct = grandTotalPertemuanAll > 0 ? ((totalHadir / grandTotalPertemuanAll) * 100).toFixed(1) + '%' : '100%';
+
+      return {
+        rows: rows,
+        totals: {
+          sakit: totalSakit,
+          izin: totalIzin,
+          alpa: totalAlpa,
+          hadir: totalHadir,
+          avgPct: avgPct,
+          avgPctNum: grandTotalPertemuanAll > 0 ? (totalHadir / grandTotalPertemuanAll) : 1
+        }
+      };
+    }
+
     function renderModuleGuruPresensi(c) {
       const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const today = new Date().toISOString().slice(0, 10);
 
       if (myStudents.length === 0) {
@@ -3223,12 +3561,44 @@
         return;
       }
 
+      // SUB-NAV TAB SWITCHER: HARIAN vs REKAP SEMESTER
       c.innerHTML = `
+        <div class="space-y-4">
+          
+          <div class="bg-white rounded-2xl p-1.5 border border-violet-100/70 shadow-xs flex items-center gap-1 text-xs">
+            <button onclick="switchPresensiSubTab('daily')"
+              class="flex-1 py-2 px-3 rounded-xl font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5 ${activePresensiSubTab === 'daily' ? 'bg-brand-600 text-white shadow-xs' : 'text-brand-muted hover:text-brand-dark hover:bg-slate-50'}">
+              <span>📅</span> <span>Presensi Harian Siswa</span>
+            </button>
+            <button onclick="switchPresensiSubTab('rekap')"
+              class="flex-1 py-2 px-3 rounded-xl font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5 ${activePresensiSubTab === 'rekap' ? 'bg-brand-600 text-white shadow-xs' : 'text-brand-muted hover:text-brand-dark hover:bg-slate-50'}">
+              <span>📊</span> <span>Rekap Absensi Siswa (Template Resmi)</span>
+            </button>
+          </div>
+
+          <div id="presensiSubTabContentArea"></div>
+
+        </div>
+      `;
+
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (activePresensiSubTab === 'daily') {
+        renderPresensiHarianSubTab(subArea, actKls, myStudents, today);
+      } else {
+        renderPresensiRekapSubTab(subArea, actKls, myStudents);
+      }
+    }
+
+    function renderPresensiHarianSubTab(container, actKls, myStudents, today) {
+      container.innerHTML = `
         <div class="space-y-3">
           <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-violet-100/70 flex items-center justify-between text-xs shadow-xs">
-            <span class="font-extrabold text-brand-dark">Tanggal: ${today}</span>
-            <button onclick="markAllHadirToday()" class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 font-extrabold cursor-pointer hover:bg-emerald-100 shadow-2xs">
-              ✓ Tandai Semua Hadir
+            <div>
+              <span class="font-extrabold text-brand-dark block">Presensi Tanggal: ${today}</span>
+              <span class="text-[10px] text-brand-muted">${actKls ? actKls.namaRombel : '-'}</span>
+            </div>
+            <button onclick="markAllHadirToday()" class="px-3.5 py-2 rounded-full bg-emerald-50 text-emerald-800 font-extrabold cursor-pointer hover:bg-emerald-100 shadow-2xs">
+              ✓ Tandai Semua Hadir Hari Ini
             </button>
           </div>
 
@@ -3240,7 +3610,7 @@
                 <div class="bg-white p-3 sm:p-3.5 rounded-2xl border border-violet-100/70 flex items-center justify-between text-xs shadow-xs">
                   <div>
                     <span class="font-black text-brand-dark block">${s.nama}</span>
-                    <span class="text-[10px] text-brand-muted">NIS: ${s.nis || '-'}</span>
+                    <span class="text-[10px] text-brand-muted font-mono">NIS: ${s.nis || '-'} • ${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</span>
                   </div>
                   <div class="flex items-center gap-1">
                     ${['Hadir', 'Sakit', 'Izin', 'Alfa'].map(st => `
@@ -3256,6 +3626,255 @@
           </div>
         </div>
       `;
+    }
+
+    function renderPresensiRekapSubTab(container, actKls, myStudents) {
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', desa: 'Ambulu' };
+      const rekap = compileRekapAbsensi(actKls, myStudents);
+      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+
+      container.innerHTML = `
+        <div class="bg-white rounded-[26px] p-5 border border-violet-100/70 shadow-xs space-y-4">
+          
+          <!-- Toolbar Header Sesuai Template -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-violet-50 pb-3">
+            <div>
+              <h4 class="font-black text-brand-dark text-sm">Rekapitulasi Kehadiran Siswa</h4>
+              <p class="text-[11px] text-brand-muted">Target Semester: <strong>${totalPertemuan} Pertemuan</strong></p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="openSchoolMetaModal()"
+                class="px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 text-brand-700 font-extrabold text-xs border border-violet-200 shadow-2xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>⚙️</span> <span>Atur Pertemuan (${totalPertemuan})</span>
+              </button>
+              <button onclick="exportAbsensiToExcel()"
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>📊</span> <span>Ekspor Excel (.csv)</span>
+              </button>
+              <button onclick="printAbsensiPDF()"
+                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>🖨️</span> <span>Cetak / PDF Rapi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tampilan Tabel Rekap Absensi Siswa Sesuai Template Screenshot 2 -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse" id="tableOfficialRekapAbsensi">
+              <thead>
+                <tr class="bg-[#1B365D] text-white text-[11px] font-bold text-center">
+                  <th class="p-2 border border-slate-700 w-10">No</th>
+                  <th class="p-2 border border-slate-700 w-24">NIS</th>
+                  <th class="p-2 border border-slate-700 text-left min-w-[180px]">Nama Siswa</th>
+                  <th class="p-2 border border-slate-700 w-12">L/P</th>
+                  <th class="p-2 border border-slate-700 w-16">Sakit</th>
+                  <th class="p-2 border border-slate-700 w-16">Izin</th>
+                  <th class="p-2 border border-slate-700 w-16">Alpa</th>
+                  <th class="p-2 border border-slate-700 w-16 bg-[#162C4E]">Hadir</th>
+                  <th class="p-2 border border-slate-700 w-20 bg-[#0E1E36]">% Hadir</th>
+                  <th class="p-2 border border-slate-700 w-28">Keterangan</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 font-medium">
+                ${rekap.rows.map(r => `
+                  <tr class="hover:bg-[#F8F7FD] text-center">
+                    <td class="p-2 border border-slate-200 text-slate-500">${r.no}</td>
+                    <td class="p-2 border border-slate-200 font-mono text-[11px]">${r.nis}</td>
+                    <td class="p-2 border border-slate-200 text-left font-black text-brand-dark">${r.nama}</td>
+                    <td class="p-2 border border-slate-200">${r.jk}</td>
+                    <td class="p-2 border border-slate-200">${r.sakit}</td>
+                    <td class="p-2 border border-slate-200">${r.izin}</td>
+                    <td class="p-2 border border-slate-200">${r.alpa}</td>
+                    <td class="p-2 border border-slate-200 font-bold bg-slate-50">${r.hadir}</td>
+                    <td class="p-2 border border-slate-200 font-black text-xs ${r.isPerhatian ? 'text-rose-600' : 'text-brand-dark'} bg-slate-50">${r.pctHadir}</td>
+                    <td class="p-2 border border-slate-200 font-black text-[11px] ${r.isPerhatian ? 'text-rose-600' : 'text-emerald-700'}">${r.keterangan}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              <tfoot>
+                <tr class="bg-[#EBF3FA] font-black text-xs text-center border-t-2 border-slate-400">
+                  <td colspan="4" class="p-2 border border-slate-300 text-right pr-4">JUMLAH</td>
+                  <td class="p-2 border border-slate-300">${rekap.totals.sakit}</td>
+                  <td class="p-2 border border-slate-300">${rekap.totals.izin}</td>
+                  <td class="p-2 border border-slate-300">${rekap.totals.alpa}</td>
+                  <td class="p-2 border border-slate-300">${rekap.totals.hadir}</td>
+                  <td class="p-2 border border-slate-300 text-brand-700">${rekap.totals.avgPct}</td>
+                  <td class="p-2 border border-slate-300 text-emerald-800">Rata-rata</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function exportAbsensiToExcel() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', npsn: '-' };
+      const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const rekap = compileRekapAbsensi(actKls, students);
+      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+
+      let csv = '\uFEFF';
+      csv += 'REKAP ABSENSI SISWA,,,,,,,,,\r\n';
+      csv += `"${sch.nama}",,,,,,,,,\r\n`;
+      csv += `Mata Pelajaran,:,Tematik,,Total Pertemuan,,${totalPertemuan},,,\r\n`;
+      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,,,,,,\r\n`;
+      csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,,\r\n`;
+      csv += ',,,,,,,,,\r\n';
+      csv += 'No,NIS,Nama Siswa,L/P,Sakit,Izin,Alpa,Hadir,% Hadir,Keterangan\r\n';
+
+      rekap.rows.forEach(r => {
+        csv += `${r.no},"${r.nis}","${r.nama.replace(/"/g, '""')}",${r.jk},${r.sakit},${r.izin},${r.alpa},${r.hadir},${r.pctHadirNum.toFixed(4)},${r.keterangan}\r\n`;
+      });
+
+      csv += `JUMLAH,,,,${rekap.totals.sakit},${rekap.totals.izin},${rekap.totals.alpa},${rekap.totals.hadir},${rekap.totals.avgPctNum.toFixed(4)},\r\n`;
+      csv += ',,,,,,,,,\r\n';
+      csv += ',,,,,,,,,\r\n';
+      csv += ',"Mengetahui,",,,,,,Guru Mata Pelajaran,,\r\n';
+      csv += ',Kepala Sekolah,,,,,,,,\r\n';
+      csv += ',,,,,,,,,\r\n';
+      csv += ',,,,,,,,,\r\n';
+      csv += ',,,,,,,,,\r\n';
+      csv += `,"${schoolMetaConfig.kepalaSekolah}",,,,,,"${currentUser ? currentUser.nama : 'Guru'}",,\r\n`;
+      csv += `,NIP. ${schoolMetaConfig.nipKepalaSekolah},,,,,,NIP. ${currentUser ? (currentUser.nip || '-') : '-'},,\r\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Berkas Rekap Absensi Excel (.csv) berhasil diunduh.', 'success');
+    }
+
+    function printAbsensiPDF() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
+      const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const rekap = compileRekapAbsensi(actKls, students);
+      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
+
+      const printContainer = document.getElementById('printAreaContainer');
+      printContainer.innerHTML = `
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 10px; max-width: 950px; margin: 0 auto; line-height: 1.3;">
+          
+          <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
+            Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 2
+          </div>
+
+          <!-- KOP SURAT SEKOLAH -->
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+            <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${sch.nama}</h2>
+            <p style="margin: 2px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
+          </div>
+
+          <!-- JUDUL LAPORAN -->
+          <div style="text-align: center; margin-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">REKAP ABSENSI SISWA</h3>
+          </div>
+
+          <!-- IDENTITAS -->
+          <table style="width: 100%; font-size: 9pt; margin-bottom: 10px; border-collapse: collapse;">
+            <tr>
+              <td style="width: 18%; font-weight: bold;">Mata Pelajaran</td>
+              <td style="width: 2%;">:</td>
+              <td style="width: 35%;">Tematik / Guru Kelas</td>
+              <td style="width: 18%; font-weight: bold;">Total Pertemuan</td>
+              <td style="width: 2%;">:</td>
+              <td style="width: 25%; font-weight: bold;">${totalPertemuan} pertemuan</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold;">Guru Pengampu</td>
+              <td>:</td>
+              <td>${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
+              <td style="font-weight: bold;">Kelas</td>
+              <td>:</td>
+              <td>${actKls ? actKls.namaRombel : '-'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold;"></td>
+              <td></td>
+              <td></td>
+              <td style="font-weight: bold;">Semester / TA</td>
+              <td>:</td>
+              <td>${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
+            </tr>
+          </table>
+
+          <!-- TABEL ABSENSI SESUAI TEMPLATE SCREENSHOT 2 -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 12px;">
+            <thead>
+              <tr style="background-color: #1B365D; color: #FFFFFF; text-align: center;">
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 35px;">No</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 75px;">NIS</th>
+                <th style="border: 1px solid #000; padding: 6px 6px; text-align: left;">Nama Siswa</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 40px;">L/P</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 45px;">Sakit</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 45px;">Izin</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 45px;">Alpa</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 50px;">Hadir</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 60px;">% Hadir</th>
+                <th style="border: 1px solid #000; padding: 6px 6px; width: 100px;">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rekap.rows.map(r => `
+                <tr style="text-align: center;">
+                  <td style="border: 1px solid #000; padding: 5px 3px;">${r.no}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; font-family: monospace;">${r.nis}</td>
+                  <td style="border: 1px solid #000; padding: 5px 6px; text-align: left; font-weight: bold;">${r.nama}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px;">${r.jk}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px;">${r.sakit}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px;">${r.izin}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px;">${r.alpa}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; font-weight: bold;">${r.hadir}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; font-weight: bold; color: ${r.isPerhatian ? '#DC2626' : '#000000'};">${r.pctHadir}</td>
+                  <td style="border: 1px solid #000; padding: 5px 4px; font-weight: bold; color: ${r.isPerhatian ? '#DC2626' : '#000000'};">${r.keterangan}</td>
+                </tr>
+              `).join('')}
+              <tr style="background-color: #EBF3FA; font-weight: bold; text-align: center;">
+                <td colspan="4" style="border: 1px solid #000; padding: 5px 8px; text-align: right;">JUMLAH</td>
+                <td style="border: 1px solid #000; padding: 5px 3px;">${rekap.totals.sakit}</td>
+                <td style="border: 1px solid #000; padding: 5px 3px;">${rekap.totals.izin}</td>
+                <td style="border: 1px solid #000; padding: 5px 3px;">${rekap.totals.alpa}</td>
+                <td style="border: 1px solid #000; padding: 5px 3px;">${rekap.totals.hadir}</td>
+                <td style="border: 1px solid #000; padding: 5px 3px;">${rekap.totals.avgPct}</td>
+                <td style="border: 1px solid #000; padding: 5px 4px;"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- TANDA TANGAN DUA KOLOM -->
+          <table style="width: 100%; font-size: 9.5pt; text-align: center; border-collapse: collapse; margin-top: 25px;">
+            <tr>
+              <td style="width: 45%;">
+                Mengetahui,<br>
+                Kepala Sekolah
+                <br><br><br><br>
+                <strong><u>${schoolMetaConfig.kepalaSekolah}</u></strong><br>
+                NIP. ${schoolMetaConfig.nipKepalaSekolah}
+              </td>
+              <td style="width: 10%;"></td>
+              <td style="width: 45%;">
+                Ambulu, ${todayStr}<br>
+                Guru Mata Pelajaran / Guru Kelas
+                <br><br><br><br>
+                <strong><u>${currentUser ? currentUser.nama : 'Guru Pengampu'}</u></strong><br>
+                NIP. ${currentUser ? (currentUser.nip || '-') : '-'}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      `;
+
+      window.print();
     }
 
     async function recordPresensiGuru(sId, sNama, status) {
@@ -3277,7 +3896,13 @@
           statusHadir: status
         });
       }
-      refreshActiveModuleContent();
+
+      // Update tampilan tanpa reload penuh halaman
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (subArea && activePresensiSubTab === 'daily') {
+        const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+        renderPresensiHarianSubTab(subArea, actKls, myStudents, today);
+      }
 
       await executeDbWrite('updatePresensi', {
         idKelas: activeGuruClassId,
@@ -3323,18 +3948,110 @@
         };
       });
 
-      refreshActiveModuleContent();
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (subArea && activePresensiSubTab === 'daily') {
+        renderPresensiHarianSubTab(subArea, actKls, siswaList, today);
+      }
+
       await executeDbWrite('batchUpdatePresensi', { records }, `Presensi ${siswaList.length} siswa berhasil disimpan: Hadir.`);
     }
 
-    // --- JURNAL MENGAJAR GURU ---
+    // ==========================================
+    // 3. JURNAL MENGAJAR (SESUAI TEMPLATE RESMI)
+    // ==========================================
+    let activeJurnalSubTab = 'list'; // 'list' atau 'rekap'
+
+    function switchJurnalSubTab(tab) {
+      activeJurnalSubTab = tab;
+      const c = document.getElementById('moduleContentArea');
+      if (c && activeModuleKey === 'guru-jurnal') {
+        renderModuleGuruJurnal(c);
+      }
+    }
+
+    function compileRekapJurnal(actKls) {
+      const myJurnal = dbData.jurnal.filter(j => j.idKelas === activeGuruClassId);
+      const totalStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId).length || 30;
+
+      let totHadir = 0;
+      let totTidakHadir = 0;
+
+      const rows = myJurnal.map((j, idx) => {
+        const h = (j.hadir !== undefined && j.hadir !== '') ? Number(j.hadir) : (totalStudents - (j.tidakHadir || 0));
+        const th = (j.tidakHadir !== undefined && j.tidakHadir !== '') ? Number(j.tidakHadir) : 0;
+        totHadir += h;
+        totTidakHadir += th;
+
+        return {
+          no: idx + 1,
+          id: j.id,
+          tanggal: j.tanggal || '-',
+          kelas: j.namaKelas || (actKls ? actKls.namaRombel : 'Kelas IV-A'),
+          jamKe: j.jamKe || '1-2',
+          materiPokok: j.topikMateri || j.materiPokok || '-',
+          metode: j.metode || j.kegiatanPembelajaran || 'Ceramah & tanya jawab',
+          hadir: h,
+          tidakHadir: th,
+          catatan: j.catatanRefleksi || j.catatan || '-'
+        };
+      });
+
+      const count = rows.length;
+      const avgHadir = count > 0 ? (totHadir / count).toFixed(1) : totalStudents.toFixed(1);
+      const avgTidakHadir = count > 0 ? (totTidakHadir / count).toFixed(1) : '0.0';
+
+      return {
+        rows: rows,
+        avgHadir: avgHadir,
+        avgTidakHadir: avgTidakHadir
+      };
+    }
+
     function renderModuleGuruJurnal(c) {
-      if (dbData.jurnal.length === 0) {
-        c.innerHTML = `
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+
+      c.innerHTML = `
+        <div class="space-y-4">
+          
+          <div class="bg-white rounded-2xl p-1.5 border border-violet-100/70 shadow-xs flex items-center justify-between gap-1 text-xs">
+            <div class="flex items-center gap-1 flex-1">
+              <button onclick="switchJurnalSubTab('list')"
+                class="flex-1 py-2 px-3 rounded-xl font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5 ${activeJurnalSubTab === 'list' ? 'bg-brand-600 text-white shadow-xs' : 'text-brand-muted hover:text-brand-dark hover:bg-slate-50'}">
+                <span>📖</span> <span>Catatan Jurnal</span>
+              </button>
+              <button onclick="switchJurnalSubTab('rekap')"
+                class="flex-1 py-2 px-3 rounded-xl font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5 ${activeJurnalSubTab === 'rekap' ? 'bg-brand-600 text-white shadow-xs' : 'text-brand-muted hover:text-brand-dark hover:bg-slate-50'}">
+                <span>📊</span> <span>Rekap Jurnal Mengajar (Template Resmi)</span>
+              </button>
+            </div>
+
+            <button onclick="openFormJurnalModal()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-black text-xs shadow-xs cursor-pointer ml-1">
+              + Tulis Jurnal
+            </button>
+          </div>
+
+          <div id="jurnalSubTabContentArea"></div>
+
+        </div>
+      `;
+
+      const subArea = document.getElementById('jurnalSubTabContentArea');
+      if (activeJurnalSubTab === 'list') {
+        renderJurnalListSubTab(subArea, actKls);
+      } else {
+        renderJurnalRekapSubTab(subArea, actKls);
+      }
+    }
+
+    function renderJurnalListSubTab(container, actKls) {
+      const myJurnal = dbData.jurnal.filter(j => j.idKelas === activeGuruClassId);
+
+      if (myJurnal.length === 0) {
+        container.innerHTML = `
           <div class="bg-white rounded-[28px] p-8 border border-violet-100/70 text-center space-y-3 shadow-xs">
             <h4 class="text-base font-black text-brand-dark">Belum Ada Jurnal Pembelajaran</h4>
             <p class="text-xs text-brand-muted">Catat aktivitas mengajar harian, materi pokok, dan refleksi guru.</p>
-            <button onclick="openFormJurnalModal()" class="px-5 py-2.5 rounded-full bg-sky-600 text-white font-extrabold text-xs shadow-xs">
+            <button onclick="openFormJurnalModal()" class="px-5 py-2.5 rounded-full bg-sky-600 text-white font-extrabold text-xs shadow-xs cursor-pointer">
               + Tulis Jurnal Hari Ini
             </button>
           </div>
@@ -3342,55 +4059,313 @@
         return;
       }
 
-      c.innerHTML = `
+      container.innerHTML = `
         <div class="space-y-3">
-          ${dbData.jurnal.map(j => `
-            <div class="bg-white p-4 rounded-2xl border border-violet-100/70 space-y-1.5 text-xs shadow-xs">
+          ${myJurnal.map(j => `
+            <div class="bg-white p-4 sm:p-5 rounded-[24px] border border-violet-100/70 space-y-2 text-xs shadow-xs">
               <div class="flex items-center justify-between font-bold text-brand-muted">
-                <span>${j.tanggal} • Jam ${j.jamKe || '1-2'}</span>
-                <span class="text-sky-700 font-black">${j.mapel}</span>
+                <span>📅 ${j.tanggal} • Jam ${j.jamKe || '1-2'}</span>
+                <span class="text-sky-700 font-black px-2.5 py-0.5 rounded-full bg-sky-50">${j.mapel}</span>
               </div>
               <h4 class="font-black text-brand-dark text-sm">${j.topikMateri}</h4>
-              <p class="text-slate-600 leading-relaxed">${j.kegiatanPembelajaran}</p>
-              <p class="text-[11px] text-brand-muted italic">Refleksi: ${j.catatanRefleksi || '-'}</p>
+              <div class="text-slate-600 leading-relaxed bg-[#F8F7FD] p-2.5 rounded-xl border border-violet-50">
+                <span class="font-bold text-brand-dark block text-[11px] mb-0.5">Metode: ${j.metode || 'Ceramah & tanya jawab'}</span>
+                ${j.kegiatanPembelajaran || '-'}
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-brand-muted pt-1">
+                <span>Kehadiran: <strong>${j.hadir !== undefined ? j.hadir : '-'} Hadir</strong> / ${j.tidakHadir !== undefined ? j.tidakHadir : '0'} Tidak Hadir</span>
+                <span class="italic">Refleksi: ${j.catatanRefleksi || '-'}</span>
+              </div>
             </div>
           `).join('')}
         </div>
       `;
     }
 
+    function renderJurnalRekapSubTab(container, actKls) {
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', desa: 'Ambulu' };
+      const rekap = compileRekapJurnal(actKls);
+
+      container.innerHTML = `
+        <div class="bg-white rounded-[26px] p-5 border border-violet-100/70 shadow-xs space-y-4">
+          
+          <!-- Toolbar Header Sesuai Template -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-violet-50 pb-3">
+            <div>
+              <h4 class="font-black text-brand-dark text-sm">Lembar Rekap Jurnal Mengajar</h4>
+              <p class="text-[11px] text-brand-muted">${actKls ? actKls.namaRombel : '-'} • Semester ${actKls ? actKls.semester : 'Ganjil'}</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="exportJurnalToExcel()"
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>📊</span> <span>Ekspor Excel (.csv)</span>
+              </button>
+              <button onclick="printJurnalPDF()"
+                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>🖨️</span> <span>Cetak / PDF Rapi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tampilan Tabel Jurnal Mengajar Sesuai Template Screenshot 3 -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse" id="tableOfficialRekapJurnal">
+              <thead>
+                <tr class="bg-[#1B365D] text-white text-[11px] font-bold text-center">
+                  <th class="p-2 border border-slate-700 w-10">No</th>
+                  <th class="p-2 border border-slate-700 w-24">Tanggal</th>
+                  <th class="p-2 border border-slate-700 w-16">Kelas</th>
+                  <th class="p-2 border border-slate-700 w-16">Jam Ke</th>
+                  <th class="p-2 border border-slate-700 text-left min-w-[160px]">Materi Pokok</th>
+                  <th class="p-2 border border-slate-700 text-left min-w-[150px]">Metode</th>
+                  <th class="p-2 border border-slate-700 w-14">Hadir</th>
+                  <th class="p-2 border border-slate-700 w-16">Tidak Hadir</th>
+                  <th class="p-2 border border-slate-700 text-left min-w-[160px]">Catatan</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 font-medium">
+                ${rekap.rows.length === 0 ? `
+                  <tr>
+                    <td colspan="9" class="p-6 text-center text-slate-400">Belum ada catatan jurnal mengajar pada kelas ini.</td>
+                  </tr>
+                ` : rekap.rows.map(r => `
+                  <tr class="hover:bg-[#F8F7FD]">
+                    <td class="p-2 border border-slate-200 text-center text-slate-500">${r.no}</td>
+                    <td class="p-2 border border-slate-200 text-center font-mono text-[11px]">${r.tanggal}</td>
+                    <td class="p-2 border border-slate-200 text-center font-bold">${r.kelas}</td>
+                    <td class="p-2 border border-slate-200 text-center">${r.jamKe}</td>
+                    <td class="p-2 border border-slate-200 font-black text-brand-dark">${r.materiPokok}</td>
+                    <td class="p-2 border border-slate-200">${r.metode}</td>
+                    <td class="p-2 border border-slate-200 text-center font-bold">${r.hadir}</td>
+                    <td class="p-2 border border-slate-200 text-center">${r.tidakHadir}</td>
+                    <td class="p-2 border border-slate-200 text-slate-600 text-[11px]">${r.catatan}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              ${rekap.rows.length > 0 ? `
+                <tfoot>
+                  <tr class="bg-[#EBF3FA] font-black text-xs border-t-2 border-slate-400">
+                    <td colspan="6" class="p-2 border border-slate-300 text-right pr-4">Rata-rata kehadiran per Pertemuan</td>
+                    <td class="p-2 border border-slate-300 text-center text-brand-700">${rekap.avgHadir}</td>
+                    <td class="p-2 border border-slate-300 text-center">${rekap.avgTidakHadir}</td>
+                    <td class="p-2 border border-slate-300"></td>
+                  </tr>
+                </tfoot>
+              ` : ''}
+            </table>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function exportJurnalToExcel() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', npsn: '-' };
+      const rekap = compileRekapJurnal(actKls);
+
+      let csv = '\uFEFF';
+      csv += 'JURNAL MENGAJAR,,,,,,,,\r\n';
+      csv += `"${sch.nama}",,,,,,,,\r\n`;
+      csv += 'Mata Pelajaran,:,Tematik,,,,,,,\r\n';
+      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,,,,,\r\n`;
+      csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,\r\n`;
+      csv += ',,,,,,,,\r\n';
+      csv += 'No,Tanggal,Kelas,Jam Ke,Materi Pokok,Metode,Hadir,Tidak Hadir,Catatan\r\n';
+
+      rekap.rows.forEach(r => {
+        csv += `${r.no},${r.tanggal},"${r.kelas}","${r.jamKe}","${r.materiPokok.replace(/"/g, '""')}","${r.metode.replace(/"/g, '""')}",${r.hadir},${r.tidakHadir},"${r.catatan.replace(/"/g, '""')}"\r\n`;
+      });
+
+      csv += `Rata-rata Kehadiran per Pertemuan,,,,,,${rekap.avgHadir},${rekap.avgTidakHadir},\r\n`;
+      csv += ',,,,,,,,\r\n';
+      csv += ',,,,,,,,\r\n';
+      csv += ',"Mengetahui,",,,,,,Guru Mata Pelajaran,\r\n';
+      csv += ',Kepala Sekolah,,,,,,,\r\n';
+      csv += ',,,,,,,,\r\n';
+      csv += ',,,,,,,,\r\n';
+      csv += ',,,,,,,,\r\n';
+      csv += `,"${schoolMetaConfig.kepalaSekolah}",,,,,,"${currentUser ? currentUser.nama : 'Guru'}",\r\n`;
+      csv += `,NIP. ${schoolMetaConfig.nipKepalaSekolah},,,,,,NIP. ${currentUser ? (currentUser.nip || '-') : '-'},\r\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Rekap_Jurnal_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Berkas Rekap Jurnal Excel (.csv) berhasil diunduh.', 'success');
+    }
+
+    function printJurnalPDF() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
+      const rekap = compileRekapJurnal(actKls);
+      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
+
+      const printContainer = document.getElementById('printAreaContainer');
+      printContainer.innerHTML = `
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 10px; max-width: 950px; margin: 0 auto; line-height: 1.3;">
+          
+          <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
+            Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 3
+          </div>
+
+          <!-- KOP SURAT SEKOLAH -->
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+            <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${sch.nama}</h2>
+            <p style="margin: 2px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
+          </div>
+
+          <!-- JUDUL LAPORAN -->
+          <div style="text-align: center; margin-bottom: 12px;">
+            <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">JURNAL MENGAJAR</h3>
+          </div>
+
+          <!-- IDENTITAS -->
+          <table style="width: 100%; font-size: 9pt; margin-bottom: 10px; border-collapse: collapse;">
+            <tr>
+              <td style="width: 18%; font-weight: bold;">Mata Pelajaran</td>
+              <td style="width: 2%;">:</td>
+              <td style="width: 38%;">Tematik / Guru Kelas</td>
+              <td style="width: 15%; font-weight: bold;">Kelas</td>
+              <td style="width: 2%;">:</td>
+              <td style="width: 25%;">${actKls ? actKls.namaRombel : '-'}</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold;">Guru Pengampu</td>
+              <td>:</td>
+              <td>${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
+              <td style="font-weight: bold;">Semester / TA</td>
+              <td>:</td>
+              <td>${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
+            </tr>
+          </table>
+
+          <!-- TABEL JURNAL SESUAI TEMPLATE SCREENSHOT 3 -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 12px;">
+            <thead>
+              <tr style="background-color: #1B365D; color: #FFFFFF; text-align: center;">
+                <th style="border: 1px solid #000; padding: 6px 3px; width: 30px;">No</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 75px;">Tanggal</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 50px;">Kelas</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 45px;">Jam Ke</th>
+                <th style="border: 1px solid #000; padding: 6px 6px; text-align: left;">Materi Pokok</th>
+                <th style="border: 1px solid #000; padding: 6px 6px; text-align: left;">Metode</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 45px;">Hadir</th>
+                <th style="border: 1px solid #000; padding: 6px 4px; width: 50px;">Tidak<br>Hadir</th>
+                <th style="border: 1px solid #000; padding: 6px 6px; text-align: left;">Catatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rekap.rows.map(r => `
+                <tr>
+                  <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${r.no}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; text-align: center; font-family: monospace;">${r.tanggal}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${r.kelas}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${r.jamKe}</td>
+                  <td style="border: 1px solid #000; padding: 5px 6px; font-weight: bold;">${r.materiPokok}</td>
+                  <td style="border: 1px solid #000; padding: 5px 6px;">${r.metode}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${r.hadir}</td>
+                  <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${r.tidakHadir}</td>
+                  <td style="border: 1px solid #000; padding: 5px 6px; font-size: 8pt; color: #333;">${r.catatan}</td>
+                </tr>
+              `).join('')}
+              <tr style="background-color: #EBF3FA; font-weight: bold;">
+                <td colspan="6" style="border: 1px solid #000; padding: 5px 8px; text-align: right;">Rata-rata kehadiran</td>
+                <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${rekap.avgHadir}</td>
+                <td style="border: 1px solid #000; padding: 5px 3px; text-align: center;">${rekap.avgTidakHadir}</td>
+                <td style="border: 1px solid #000; padding: 5px 4px;"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- TANDA TANGAN DUA KOLOM -->
+          <table style="width: 100%; font-size: 9.5pt; text-align: center; border-collapse: collapse; margin-top: 25px;">
+            <tr>
+              <td style="width: 45%;">
+                Mengetahui,<br>
+                Kepala Sekolah
+                <br><br><br><br>
+                <strong><u>${schoolMetaConfig.kepalaSekolah}</u></strong><br>
+                NIP. ${schoolMetaConfig.nipKepalaSekolah}
+              </td>
+              <td style="width: 10%;"></td>
+              <td style="width: 45%;">
+                Genteng, ${todayStr}<br>
+                Guru Mata Pelajaran / Guru Kelas
+                <br><br><br><br>
+                <strong><u>${currentUser ? currentUser.nama : 'Guru Pengampu'}</u></strong><br>
+                NIP. ${currentUser ? (currentUser.nip || '-') : '-'}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      `;
+
+      window.print();
+    }
+
     function openFormJurnalModal() {
+      const actKls = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const totalSiswa = myStudents.length || 30;
+      const mapels = getTeacherMapelList();
+      const today = new Date().toISOString().slice(0, 10);
+
       const content = `
         <form onsubmit="handleSaveJurnalTeacher(event)" class="space-y-3.5 text-xs">
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block font-bold mb-1">Mata Pelajaran *</label>
-              <input type="text" id="fjMapel" required value="Matematika" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+              <label class="block font-bold mb-1">Tanggal *</label>
+              <input type="date" id="fjTanggal" required value="${today}" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
             </div>
             <div>
-              <label class="block font-bold mb-1">Jam Ke</label>
-              <input type="text" id="fjJam" value="1 - 2 (07.00 - 08.10)" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+              <label class="block font-bold mb-1">Jam Ke *</label>
+              <input type="text" id="fjJam" value="1 - 2" placeholder="Contoh: 1-2" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
             </div>
           </div>
 
           <div>
-            <label class="block font-bold mb-1">Topik / Materi Pembelajaran *</label>
-            <input type="text" id="fjTopik" required placeholder="Contoh: Eksplorasi Pecahan Senilai" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+            <label class="block font-bold mb-1">Mata Pelajaran *</label>
+            <select id="fjMapel" required class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+              ${mapels.map(m => `<option value="${m}">${m}</option>`).join('')}
+            </select>
           </div>
 
           <div>
-            <label class="block font-bold mb-1">Kegiatan Pembelajaran</label>
-            <textarea id="fjKegiatan" rows="3" placeholder="Deskripsi aktivitas kelas dan metode pembelajaran..." class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium"></textarea>
+            <label class="block font-bold mb-1">Materi Pokok Pembelajaran *</label>
+            <input type="text" id="fjTopik" required placeholder="Contoh: Pengenalan bilangan bulat" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
           </div>
 
           <div>
-            <label class="block font-bold mb-1">Refleksi & Catatan Guru</label>
-            <input type="text" id="fjRefleksi" placeholder="Contoh: Siswa aktif, 3 siswa butuh bimbingan tambahan" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+            <label class="block font-bold mb-1">Metode Pembelajaran *</label>
+            <input type="text" id="fjMetode" required value="Ceramah & tanya jawab" placeholder="Contoh: Diskusi kelompok / Demonstrasi / Problem based learning" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold mb-1">Jumlah Siswa Hadir *</label>
+              <input type="number" id="fjHadir" required min="0" value="${totalSiswa}" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center">
+            </div>
+            <div>
+              <label class="block font-bold mb-1">Jumlah Tidak Hadir *</label>
+              <input type="number" id="fjTidakHadir" required min="0" value="0" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold mb-1">Catatan / Refleksi Guru</label>
+            <textarea id="fjRefleksi" rows="2" placeholder="Contoh: Siswa aktif, perlu pengulangan konsep" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium"></textarea>
           </div>
 
           <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
-            <button type="submit" class="px-5 py-2 bg-sky-600 text-white font-bold rounded-full cursor-pointer hover:bg-sky-700 shadow-xs">
+            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold cursor-pointer">Batal</button>
+            <button type="submit" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-full cursor-pointer shadow-xs">
               Simpan Jurnal
             </button>
           </div>
@@ -3406,12 +4381,17 @@
         id: 'JRN-' + Date.now().toString().slice(-5),
         idKelas: activeGuruClassId,
         namaKelas: actKls ? actKls.namaRombel : 'Kelas IV-A',
-        tanggal: new Date().toISOString().slice(0, 10),
+        tanggal: document.getElementById('fjTanggal')?.value || new Date().toISOString().slice(0, 10),
         jamKe: document.getElementById('fjJam').value.trim(),
         mapel: document.getElementById('fjMapel').value.trim(),
         topikMateri: document.getElementById('fjTopik').value.trim(),
-        kegiatanPembelajaran: document.getElementById('fjKegiatan').value.trim(),
-        catatanRefleksi: document.getElementById('fjRefleksi').value.trim()
+        materiPokok: document.getElementById('fjTopik').value.trim(),
+        metode: document.getElementById('fjMetode').value.trim(),
+        hadir: Number(document.getElementById('fjHadir').value || 0),
+        tidakHadir: Number(document.getElementById('fjTidakHadir').value || 0),
+        kegiatanPembelajaran: document.getElementById('fjMetode').value.trim(),
+        catatanRefleksi: document.getElementById('fjRefleksi').value.trim(),
+        catatan: document.getElementById('fjRefleksi').value.trim()
       };
 
       dbData.jurnal.unshift(jObj);
@@ -3618,14 +4598,8 @@
       });
 
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          syncState.isTabActive = false;
-          stopAutoSync();
-        } else {
-          syncState.isTabActive = true;
-          startAutoSync();
-          syncBackendData();
-        }
+        // Jangan merefresh aplikasi secara otomatis saat ganti tab / kembali ke tab
+        syncState.isTabActive = !document.hidden;
       });
     });
   </script>
