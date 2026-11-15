@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SiGuru SD - Platform Administrasi Pendidikan Kecamatan Ambulu</title>
   <meta name="theme-color" content="#7C6EE6">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -56,21 +56,28 @@
       box-sizing: border-box;
     }
     html {
+      height: 100%;
       overflow-x: hidden;
-      overscroll-behavior-y: none;
-      overscroll-behavior-x: none;
-      overscroll-behavior: none;
-      -webkit-overscroll-behavior: none;
+      /* Mencegah browser trigger pull-to-refresh reload tanpa mematikan scrolling vertikal native */
+      overscroll-behavior-y: contain;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
     }
     body {
+      min-height: 100%;
+      margin: 0;
       background-color: #F0EEF9;
       color: #1E1B4B;
-      overflow-x: hidden;
-      overscroll-behavior-y: none;
-      overscroll-behavior-x: none;
-      overscroll-behavior: none;
-      -webkit-overscroll-behavior: none;
+      /* overflow-x: clip dan overflow-y: visible agar tidak membuat nested scroll container ganda */
+      overflow-x: clip;
+      overflow-y: visible;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+    }
+    body.modal-open {
+      overflow: hidden !important;
+      touch-action: none !important;
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -78,6 +85,13 @@
     .no-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
+    }
+
+    /* Mencegah tabel horizontal menelan atau mengunci gesture swipe vertikal */
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+      overscroll-behavior-x: contain;
     }
 
     /* Soft Pastel Glassmorphism */
@@ -113,10 +127,24 @@
       animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Hardware accelerated bottom nav to prevent scrolling flicker */
+    /* Aksesibilitas: Hormati prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto !important;
+      }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Floating bottom nav dengan perlindungan Safe Area Inset & isolasi layer GPU */
     nav.fixed {
-      transform: translate3d(-50%, 0, 0);
-      -webkit-transform: translate3d(-50%, 0, 0);
+      left: 50% !important;
+      bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+      transform: translate3d(-50%, 0, 0) !important;
+      -webkit-transform: translate3d(-50%, 0, 0) !important;
       will-change: transform;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
@@ -177,7 +205,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#F0EEF9] text-brand-dark selection:bg-brand-600 selection:text-white pb-28">
+<body class="min-h-screen flex flex-col bg-[#F0EEF9] text-brand-dark selection:bg-brand-600 selection:text-white">
 
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed top-4 right-4 z-[110] flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print"></div>
@@ -186,7 +214,7 @@
        1. HALAMAN LOGIN: NPSN + KODE UNIK + PIN GURU (OPSI C)
        (MURNI GURU SAJA - PORTAL ADMIN TERISOLASI DI /admin)
        ============================================================ -->
-  <section id="loginScreen" class="min-h-screen flex flex-col justify-between items-center px-4 py-8 relative overflow-hidden no-print"
+  <section id="loginScreen" class="min-h-screen w-full flex flex-col justify-between items-center px-4 py-8 relative no-print overflow-x-hidden"
            style="background: linear-gradient(135deg, #EBE8F9 0%, #DFDAF7 45%, #D5CDF4 100%);">
     
     <!-- Ambient Pastel Light Blobs -->
@@ -459,7 +487,7 @@
     </header>
 
     <!-- AREA VIEW 1: PORTAL DASHBOARD UTAMA GURU -->
-    <main id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-2 space-y-4 animate-fade-in pb-28">
+    <main id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-2 space-y-4 animate-fade-in pb-6">
       
       <!-- 1. SEARCH PILL BAR -->
       <div class="w-full bg-white rounded-full px-4 py-2.5 shadow-xs border border-violet-100/70 flex items-center justify-between text-xs">
@@ -495,7 +523,7 @@
     </main>
 
     <!-- AREA VIEW 2: HALAMAN MODUL TERSENDIRI -->
-    <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-3 space-y-4 animate-fade-in pb-28">
+    <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-3 space-y-4 animate-fade-in pb-6">
       
       <!-- Header Modul Aktif -->
       <div class="bg-white rounded-[26px] p-4 sm:p-5 shadow-xs border border-violet-100/70 flex flex-wrap items-center justify-between gap-3 no-print">
@@ -577,15 +605,15 @@
   <!-- ============================================================
        MODAL UNIVERSAL
        ============================================================ -->
-  <div id="universalModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4 overflow-y-auto no-print">
-    <div class="bg-white rounded-[28px] max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-violet-100 animate-fade-in relative flex flex-col">
-      <div class="sticky top-0 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-violet-100 flex items-center justify-between z-10">
+  <div id="universalModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4 overflow-y-auto no-print overscroll-contain">
+    <div class="bg-white rounded-[28px] max-w-xl w-full max-h-[88vh] shadow-2xl border border-violet-100 animate-fade-in relative flex flex-col overflow-hidden">
+      <div class="sticky top-0 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-violet-100 flex items-center justify-between z-10 shrink-0">
         <h3 class="text-sm sm:text-base font-black text-brand-dark" id="universalModalTitle">Modal Title</h3>
         <button onclick="closeUniversalModal()" class="w-8 h-8 rounded-full bg-[#F0EEF9] hover:bg-violet-100 text-brand-muted hover:text-brand-dark flex items-center justify-center transition cursor-pointer">
           ✕
         </button>
       </div>
-      <div class="p-5 sm:p-6 flex-1 text-xs" id="universalModalBody"></div>
+      <div class="p-5 sm:p-6 flex-1 overflow-y-auto text-xs" id="universalModalBody"></div>
     </div>
   </div>
 
@@ -4846,12 +4874,14 @@
       const m = document.getElementById('universalModal');
       m.classList.remove('hidden');
       m.classList.add('flex');
+      document.body.classList.add('modal-open');
     }
 
     function closeUniversalModal() {
       const m = document.getElementById('universalModal');
       m.classList.add('hidden');
       m.classList.remove('flex');
+      document.body.classList.remove('modal-open');
     }
 
     function showToast(msg, type = 'info') {

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>👑 Admin Portal - SiGuru SD Kecamatan Ambulu</title>
   
   <!-- Tailwind CSS CDN -->
@@ -37,10 +37,27 @@
   </script>
 
   <style>
+    html {
+      height: 100%;
+      overflow-x: hidden;
+      overscroll-behavior-y: contain;
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
     body {
       background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
-      min-height: 100vh;
+      min-height: 100%;
       color: #f8fafc;
+      overflow-x: clip;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+      overscroll-behavior-x: contain;
     }
     .glass-box {
       background: rgba(30, 41, 59, 0.7);
@@ -50,6 +67,14 @@
     }
     .gold-gradient {
       background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto !important; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 
