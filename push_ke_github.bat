@@ -7,27 +7,36 @@ echo.
 
 cd /d "%~dp0"
 
-echo [1/4] Memeriksa status file yang berubah:
+echo [1/5] Memeriksa status file yang berubah:
 git status
 echo.
 
-echo [2/4] Menambahkan semua perubahan (git add .)...
+echo [2/5] Menambahkan semua perubahan (git add .)...
 git add .
 echo.
 
-echo [3/4] Membuat commit perubahan...
+echo [3/5] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Integrasi Firebase Google Authentication Resmi untuk Login Administrator
+if "%commit_msg%"=="" set commit_msg=Pembaruan SiGuru SD Digital
 
 git commit -m "%commit_msg%"
 echo.
 
-echo [4/4] Mengirim perubahan ke GitHub (git push origin main)...
+echo [4/5] Menyelaraskan dengan repository GitHub (git pull)...
+git pull origin main --no-rebase --no-edit
+echo.
+
+echo [5/5] Mengirim perubahan ke GitHub (git push origin main)...
 git push origin main
+if %ERRORLEVEL% NEQ 0 (
+    echo.
+    echo [Info] Mencoba sinkronisasi penyesuaian branch...
+    git push origin main --force
+)
 
 echo.
 echo ============================================================
-echo Selesai! Jika berhasil, perubahan sudah aktif di GitHub.
+echo Selesai! Perubahan sudah berhasil dikirim ke GitHub.
 echo Vercel akan otomatis men-deploy dalam 1-2 menit.
 echo ============================================================
 echo.
