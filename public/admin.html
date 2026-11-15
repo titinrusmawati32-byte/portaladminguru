@@ -115,35 +115,55 @@
           <p class="text-xs text-slate-400 mt-0.5">Khusus Akun Google Pemilik Database Google Spreadsheet</p>
         </div>
 
-        <!-- TOMBOL PILIH AKUN GOOGLE (GOOGLE ACCOUNT CHOOSER POP-UP) -->
-        <div class="space-y-3">
-          <button type="button" id="btnGoogleOwnerLogin" onclick="handleGoogleAccountChooserLogin()"
-            class="w-full py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-outfit font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/15 hover:shadow-cyan-400/25 active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-3 border border-white">
+        <!-- OPSI 1: MASUK OTOMATIS 1-KLIK VIA SESI GOOGLE AKTIF -->
+        <div class="space-y-2.5">
+          <button type="button" id="btnGoogleOwnerLogin" onclick="handleGoogleDirectAuth()"
+            class="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-outfit font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/15 hover:shadow-cyan-400/25 active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-3 border border-white">
             <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <span id="txtGoogleBtn">Masuk dengan Akun Google Administrator</span>
+            <span id="txtGoogleBtn">Masuk dengan Akun Google Pemilik</span>
           </button>
 
-          <div id="googleAutoDetectStatus" class="p-3 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 text-center text-xs text-cyan-300 font-mono flex items-center justify-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <span id="googleAutoDetectMsg">Klik tombol di atas untuk memilih Akun Google yang terdaftar</span>
+          <!-- Status Auto-Detect -->
+          <div id="googleAutoDetectStatus" class="p-2.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-center text-xs text-cyan-300 font-mono flex items-center justify-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            <span id="googleAutoDetectMsg">Siap memverifikasi Akun Google terdaftar</span>
           </div>
         </div>
 
-        <!-- INFO KEAMANAN AKUN GOOGLE -->
-        <div class="p-3.5 bg-slate-900/70 border border-white/10 rounded-2xl text-[11px] text-slate-300 space-y-1.5 leading-relaxed">
-          <div class="flex items-center gap-1.5 font-bold text-white">
-            <span class="text-cyan-400">🛡️</span>
-            <span>Verifikasi Akun Google Resmi:</span>
-          </div>
-          <p class="text-slate-400">
-            Jendela pop-up Google akan muncul untuk memilih akun Google Anda. Jika di perangkat belum ada akun login, Anda dapat mengisi email & sandi Google. Hanya Akun Google pemilik/pengelola terdaftar yang diizinkan masuk.
-          </p>
+        <!-- DIVIDER MULTI-AKUN -->
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-white/10"></div>
+          <span class="shrink mx-3 text-slate-400 text-[10px] uppercase font-bold tracking-wider font-outfit">atau pilih akun jika multi-login</span>
+          <div class="flex-grow border-t border-white/10"></div>
         </div>
+
+        <!-- FORM PILIH EMAIL GOOGLE PEMILIK (UNTUK MULTI-AKUN DI CHROME) -->
+        <form onsubmit="handleVerifySpecificGoogleEmail(event)" class="space-y-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">
+              Pilih / Masukkan Email Google Pemilik Spreadsheet:
+            </label>
+            <div class="relative">
+              <input type="email" id="inpGoogleOwnerEmail" required placeholder="nama@gmail.com"
+                class="w-full p-3 bg-slate-900/90 border border-white/15 rounded-2xl text-white font-mono focus:outline-none focus:ring-2 focus:ring-cyan-500">
+              <span class="absolute right-3.5 top-3.5 text-slate-400 text-sm">✉️</span>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">
+              Gunakan opsi ini jika browser Anda sedang login banyak akun Google sekaligus.
+            </p>
+          </div>
+
+          <button type="submit" id="btnVerifyEmailSubmit"
+            class="w-full py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black text-xs shadow-lg shadow-cyan-600/20 active:scale-98 transition cursor-pointer flex items-center justify-center gap-2">
+            <span>Verifikasi Akun & Masuk Dashboard</span>
+            <span>➔</span>
+          </button>
+        </form>
 
         <div class="pt-1 text-center">
           <a href="/" class="text-xs text-slate-400 hover:text-white transition underline flex items-center justify-center gap-1">
@@ -350,44 +370,34 @@
       perangkatList: []
     };
 
-    let authPopupWindow = null;
-
     // ==========================================
     // INITIALIZATION & SESSION RESTORE
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       populateSchoolFilterDropdown();
-      setupAuthMessageListener();
+      
+      // Muat email pemilik yang pernah tersimpan di perangkat ini jika ada
+      const savedEmail = localStorage.getItem('siguru_saved_owner_email');
+      const inp = document.getElementById('inpGoogleOwnerEmail');
+      if (inp && savedEmail) inp.value = savedEmail;
+
       const restored = restoreAdminSession();
       if (restored) {
         showDashboard();
         fetchAllAdminData();
       } else {
         showLoginScreen();
-        // CATATAN KEAMANAN: Tidak ada auto-login otomatis diam-diam!
-        // Pengguna diwajibkan memilih Akun Google melalui jendela pop-up resmi.
       }
     });
-
-    function setupAuthMessageListener() {
-      window.addEventListener('message', async (event) => {
-        if (!event.data) return;
-
-        if (event.data.type === 'SIGURU_GOOGLE_AUTH_SUCCESS') {
-          const authData = event.data.data || {};
-          handleSuccessfulGoogleLogin(authData);
-        } else if (event.data.type === 'SIGURU_GOOGLE_AUTH_FAILED') {
-          const errMsg = event.data.message || 'Akun Google ini tidak terdaftar sebagai Administrator.';
-          const email = event.data.email || '';
-          handleFailedGoogleLogin(errMsg, email);
-        }
-      });
-    }
 
     async function handleSuccessfulGoogleLogin(authData) {
       adminState.isLoggedIn = true;
       adminState.isGoogleOwner = true;
-      adminState.adminEmail = authData.email || 'Pemilik Aplikasi';
+      adminState.adminEmail = authData.adminEmail || authData.email || 'Pemilik Aplikasi';
+      if (authData.schools && authData.schools.length > 0) adminState.schools = authData.schools;
+      adminState.pendingTeachers = authData.pendingTeachers || [];
+      adminState.verifiedTeachers = authData.verifiedTeachers || [];
+      adminState.rejectedTeachers = authData.rejectedTeachers || [];
 
       sessionStorage.setItem('siguru_admin_session', JSON.stringify({
         username: 'admin',
@@ -405,19 +415,6 @@
       updateMetricsUI();
       renderActiveAdminTabContent();
       fetchAllAdminData();
-    }
-
-    function handleFailedGoogleLogin(errMsg, email) {
-      const statusMsg = document.getElementById('googleAutoDetectMsg');
-      if (statusMsg) {
-        statusMsg.innerHTML = `<span class="text-rose-400 font-bold">⛔ Akses Ditolak:</span> Akun Google ${email ? '<strong>(' + email + ')</strong>' : ''} tidak memiliki izin Administrator SiGuru SD.`;
-      }
-      showAdminToast(`Akses Ditolak: Akun Google ${email || ''} bukan pemilik/pengelola terdaftar.`, 'error');
-
-      const btn = document.getElementById('btnGoogleOwnerLogin');
-      const txtBtn = document.getElementById('txtGoogleBtn');
-      if (btn) btn.disabled = false;
-      if (txtBtn) txtBtn.textContent = 'Pilih Akun Google Lain';
     }
 
     function showLoginScreen() {
@@ -459,9 +456,9 @@
     }
 
     // ==========================================
-    // ACTION: GOOGLE ACCOUNT CHOOSER (POP-UP RESMI)
+    // ACTION 1: MASUK LANGSUNG VIA AKUN GOOGLE AKTIF (1-KLIK)
     // ==========================================
-    function handleGoogleAccountChooserLogin() {
+    async function handleGoogleDirectAuth() {
       const btn = document.getElementById('btnGoogleOwnerLogin');
       const txtBtn = document.getElementById('txtGoogleBtn');
       const statusMsg = document.getElementById('googleAutoDetectMsg');
@@ -471,58 +468,75 @@
         return;
       }
 
-      if (txtBtn) txtBtn.textContent = 'Membuka Pemilih Akun Google...';
+      if (txtBtn) txtBtn.textContent = 'Memeriksa Akun Google...';
       if (btn) btn.disabled = true;
-      if (statusMsg) statusMsg.textContent = 'Silakan pilih Akun Google Anda pada jendela pop-up...';
+      if (statusMsg) statusMsg.textContent = 'Menghubungkan ke Google Spreadsheet database pusat...';
+      showAdminToast('Memverifikasi akun Google pemilik...', 'info');
 
-      // Buat URL resmi Google Account Chooser
-      const continueTarget = GAS_URL + (GAS_URL.includes('?') ? '&' : '?') + 'action=authGoogleOwnerWindow';
-      const chooserUrl = 'https://accounts.google.com/AccountChooser?continue=' + encodeURIComponent(continueTarget);
-
-      // Buka Pop-up tepat di tengah layar browser
-      const w = 520, h = 620;
-      const left = Math.max(0, (window.screen.width - w) / 2);
-      const top = Math.max(0, (window.screen.height - h) / 2);
-
-      if (authPopupWindow && !authPopupWindow.closed) {
-        authPopupWindow.focus();
-      } else {
-        authPopupWindow = window.open(
-          chooserUrl,
-          'google_account_chooser_siguru',
-          `width=${w},height=${h},top=${top},left=${left},scrollbars=yes,status=no,resizable=yes`
-        );
-      }
-
-      // Deteksi jika pop-up diblokir oleh browser
-      if (!authPopupWindow || authPopupWindow.closed || typeof authPopupWindow.closed === 'undefined') {
-        if (txtBtn) txtBtn.textContent = 'Buka Pemilih Akun (Pop-up Diblokir)';
-        if (btn) btn.disabled = false;
-        if (statusMsg) {
-          statusMsg.innerHTML = 'Pop-up terblokir oleh browser. <a href="' + chooserUrl + '" target="_blank" class="underline text-amber-300 font-bold">Klik di sini untuk membuka jendela Google</a>';
+      try {
+        const res = await callAdminApi('loginGoogleOwnerAdmin', {});
+        if (res && res.success) {
+          await handleSuccessfulGoogleLogin(res);
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Akun Google aktif bukan pemilik spreadsheet.', 'warning');
+          if (statusMsg) {
+            statusMsg.innerHTML = '<span class="text-amber-300">Akun default Chrome bukan pemilik. Silakan ketik email pemilik di bawah.</span>';
+          }
         }
-        showAdminToast('Pop-up browser terblokir. Izinkan pop-up untuk melanjutkan.', 'warning');
+      } catch (err) {
+        showAdminToast('Gagal memverifikasi: ' + err.message, 'error');
+        if (statusMsg) {
+          statusMsg.textContent = 'Koneksi gagal. Silakan gunakan isian email Google di bawah.';
+        }
+      } finally {
+        if (btn) btn.disabled = false;
+        if (txtBtn) txtBtn.textContent = 'Masuk dengan Akun Google Pemilik';
+      }
+    }
+
+    // ==========================================
+    // ACTION 2: VERIFIKASI EMAIL GOOGLE SPESIFIK (MULTI-AKUN DI CHROME)
+    // ==========================================
+    async function handleVerifySpecificGoogleEmail(e) {
+      e.preventDefault();
+      const inp = document.getElementById('inpGoogleOwnerEmail');
+      const email = inp ? inp.value.trim().toLowerCase() : '';
+      const btn = document.getElementById('btnVerifyEmailSubmit');
+      const originalText = btn.innerHTML;
+      const statusMsg = document.getElementById('googleAutoDetectMsg');
+
+      if (!email || !email.includes('@')) {
+        showAdminToast('Masukkan alamat email Google yang valid.', 'warning');
         return;
       }
 
-      // Pantau jika jendela ditutup oleh pengguna sebelum selesai login
-      const checkPopupClosed = setInterval(() => {
-        if (!authPopupWindow || authPopupWindow.closed) {
-          clearInterval(checkPopupClosed);
-          if (!adminState.isLoggedIn) {
-            if (btn) btn.disabled = false;
-            if (txtBtn) txtBtn.textContent = 'Masuk dengan Akun Google Administrator';
-            if (statusMsg && !statusMsg.textContent.includes('Ditolak')) {
-              statusMsg.textContent = 'Jendela login ditutup. Klik tombol untuk mencoba lagi.';
-            }
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Memeriksa keabsahan akun...</span>';
+      showAdminToast('Mencocokkan akun ' + email + ' dengan pemilik spreadsheet...', 'info');
+      if (statusMsg) statusMsg.textContent = 'Memverifikasi kepemilikan akun Google: ' + email;
+
+      try {
+        const res = await callAdminApi('loginGoogleOwnerAdmin', { email: email });
+        if (res && res.success) {
+          localStorage.setItem('siguru_saved_owner_email', email);
+          await handleSuccessfulGoogleLogin(res);
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Akses Ditolak: Akun ini bukan pemilik spreadsheet.', 'error');
+          if (statusMsg) {
+            statusMsg.innerHTML = `<span class="text-rose-400 font-bold">⛔ Akses Ditolak:</span> Akun (${email}) tidak terdaftar sebagai pemilik spreadsheet.`;
           }
         }
-      }, 1000);
+      } catch (err) {
+        showAdminToast('Error memverifikasi email: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
     }
 
-    // Fallback cadangan untuk auto-login jika sudah terverifikasi sebelumnya
-    async function handleGoogleOwnerAutoLogin(isSilent = false) {
-      handleGoogleAccountChooserLogin();
+    // Kompatibilitas tombol lama
+    async function handleGoogleOwnerAutoLogin() {
+      handleGoogleDirectAuth();
     }
 
     function restoreAdminSession() {
