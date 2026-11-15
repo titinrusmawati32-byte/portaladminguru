@@ -17,7 +17,7 @@ echo.
 
 echo [3/4] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Update Admin: Login 1-Klik Akun Google Pemilik Spreadsheet, Font Outfit, dan Resilient Backend Fallback (Tanpa Mengubah Portal Guru)
+if "%commit_msg%"=="" set commit_msg=Update Admin: Login Akses Eksklusif Akun Google Pemilik (Hapus Form Username dan Password Manual)
 
 git commit -m "%commit_msg%"
 echo.
