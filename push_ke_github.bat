@@ -17,7 +17,7 @@ echo.
 
 echo [3/4] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Update UI: Menu Grid 2 Saf Baris di HP, Font Modern Outfit, dan Glowing Dark Mode Cyber-Clean
+if "%commit_msg%"=="" set commit_msg=Update: Hero Widget Jam Tanggal Digital Glowing, Grafik Interaktif 7 Hari, dan Perbaikan Kontras Warna Mode Gelap Modal/Login
 
 git commit -m "%commit_msg%"
 echo.
