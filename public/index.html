@@ -20,6 +20,10 @@
   <!-- Konfigurasi Platform & Master Data NPSN Kecamatan Ambulu -->
   <script src="config.js"></script>
 
+  <!-- Library Scanner Kamera QR Code & QR Generator Card -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -614,6 +618,77 @@
         </button>
       </div>
       <div class="p-5 sm:p-6 flex-1 overflow-y-auto text-xs" id="universalModalBody"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL PEMINDAI KAMERA QR CODE PRESENSI SISWA
+       ============================================================ -->
+  <div id="qrScannerModal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center p-3 sm:p-4 no-print overscroll-contain">
+    <div class="bg-white rounded-[28px] max-w-lg w-full max-h-[95vh] shadow-2xl border border-violet-100 flex flex-col overflow-hidden animate-fade-in relative">
+      
+      <!-- Top Scanner Header -->
+      <div class="bg-white px-5 py-3.5 border-b border-violet-100 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-violet-100 text-brand-700 flex items-center justify-center font-bold text-base shadow-xs">
+            📷
+          </div>
+          <div>
+            <h3 class="text-xs sm:text-sm font-black text-brand-dark leading-tight">Scanner QR Presensi Siswa</h3>
+            <p class="text-[10px] text-brand-muted">Arahkan kartu ke dalam kotak bidik kamera</p>
+          </div>
+        </div>
+        <button onclick="stopQrScanner()" title="Tutup Kamera" class="w-8 h-8 rounded-full bg-[#F0EEF9] hover:bg-rose-100 text-brand-muted hover:text-rose-600 flex items-center justify-center font-bold text-xs transition cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <!-- Viewport Kamera Scanner -->
+      <div class="relative bg-slate-950 flex-1 flex flex-col items-center justify-center min-h-[300px] sm:min-h-[340px] overflow-hidden">
+        
+        <!-- Video Mount Container -->
+        <div id="qrReader" class="w-full h-full min-h-[300px]"></div>
+
+        <!-- Guided Aim Reticle Frame Overlay -->
+        <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
+          <div class="relative w-56 h-56 sm:w-64 sm:h-64 border-2 border-emerald-400/80 rounded-2xl shadow-[0_0_30px_rgba(52,211,153,0.35)] flex items-center justify-center">
+            <!-- Laser Scanning Beam -->
+            <div class="absolute inset-x-2 top-2 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent rounded-full shadow-[0_0_15px_#34D399] animate-pulse"></div>
+            <!-- Corner Brackets -->
+            <div class="absolute -top-1 -left-1 w-5 h-5 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg"></div>
+            <div class="absolute -top-1 -right-1 w-5 h-5 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg"></div>
+            <div class="absolute -bottom-1 -left-1 w-5 h-5 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg"></div>
+            <div class="absolute -bottom-1 -right-1 w-5 h-5 border-b-4 border-r-4 border-emerald-400 rounded-br-lg"></div>
+          </div>
+        </div>
+
+        <!-- Banner Responsif Hasil Scan Melayang -->
+        <div id="qrScanResultBanner" class="absolute bottom-3 inset-x-3 transition-all transform z-20">
+          <div class="bg-slate-900/90 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl border border-white/20 text-center shadow-lg">
+            <span class="text-[11px] font-bold text-slate-200">🔍 Menunggu kartu QR Code siswa...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Toolbar Pemindai -->
+      <div class="bg-white p-3.5 sm:p-4 border-t border-violet-100 flex flex-wrap items-center justify-between gap-2.5 text-xs shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-brand-muted font-bold text-[11px]">Kamera:</span>
+          <select id="selectQrCameraDevice" onchange="switchQrCameraDevice(this.value)"
+            class="bg-[#F8F7FD] border border-violet-100 text-brand-dark font-bold text-[11px] px-2.5 py-1.5 rounded-xl focus:outline-none">
+            <option value="environment">Kamera Belakang (Utama)</option>
+            <option value="user">Kamera Depan (Webcam)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="stopQrScanner()"
+            class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer">
+            Selesai Scan
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1982,6 +2057,9 @@
           titleEl.textContent = 'Buku Induk Data Siswa';
           subEl.textContent = 'Kelola siswa kelas aktif: input manual atau impor Excel/CSV';
           actionEl.innerHTML = `
+            <button onclick="printKartuQRSiswaA4()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5">
+              <span>🪪</span> <span>Cetak Kartu QR (A4)</span>
+            </button>
             <button onclick="openImportExcelModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5">
               <span>📥</span> <span>Impor Excel</span>
             </button>
@@ -2333,6 +2411,9 @@
                       ` : ''}
                     </td>
                     <td class="py-2.5 text-right space-x-1">
+                      <button onclick="printSingleKartuQR('${s.id}')" title="Cetak Kartu QR Siswa" class="px-2.5 py-1 rounded-full bg-violet-50 hover:bg-violet-100 text-brand-700 font-bold text-[11px] cursor-pointer inline-flex items-center gap-1">
+                        <span>🪪</span> <span>Kartu</span>
+                      </button>
                       <button onclick="openFormSiswaModal('${s.id}')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] cursor-pointer">
                         Edit
                       </button>
@@ -3903,14 +3984,24 @@
     function renderPresensiHarianSubTab(container, actKls, myStudents, today) {
       container.innerHTML = `
         <div class="space-y-3">
-          <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-violet-100/70 flex items-center justify-between text-xs shadow-xs">
+          <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-violet-100/70 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
             <div>
               <span class="font-extrabold text-brand-dark block">Presensi Tanggal: ${today}</span>
-              <span class="text-[10px] text-brand-muted">${actKls ? actKls.namaRombel : '-'}</span>
+              <span class="text-[10px] text-brand-muted">${actKls ? actKls.namaRombel : '-'} • Kurikulum Merdeka</span>
             </div>
-            <button onclick="markAllHadirToday()" class="px-3.5 py-2 rounded-full bg-emerald-50 text-emerald-800 font-extrabold cursor-pointer hover:bg-emerald-100 shadow-2xs">
-              ✓ Tandai Semua Hadir Hari Ini
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="confirmOpenQrScannerModal()"
+                class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-black cursor-pointer shadow-md shadow-brand-500/25 flex items-center gap-1.5 transition active:scale-95">
+                <span>📷</span> <span>Scan QR Presensi</span>
+              </button>
+              <button onclick="printKartuQRSiswaA4()"
+                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold cursor-pointer border border-violet-200 shadow-2xs flex items-center gap-1.5 transition">
+                <span>🖨️</span> <span>Cetak Kartu QR (A4)</span>
+              </button>
+              <button onclick="markAllHadirToday()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold cursor-pointer shadow-2xs transition">
+                ✓ Hadir Semua
+              </button>
+            </div>
           </div>
 
           <div class="space-y-2">
@@ -3930,6 +4021,10 @@
                         ${st}
                       </button>
                     `).join('')}
+                    <button onclick="printSingleKartuQR('${s.id}')" title="Cetak Kartu QR Siswa"
+                      class="ml-1 w-7 h-7 rounded-full bg-violet-50 hover:bg-violet-100 text-brand-700 flex items-center justify-center font-bold text-xs transition cursor-pointer" title="Cetak Kartu Siswa">
+                      🪪
+                    </button>
                   </div>
                 </div>
               `;
@@ -4195,13 +4290,16 @@
       const today = new Date().toISOString().slice(0, 10);
       const actKls = dbData.kelas.find(c => c.id === activeGuruClassId);
       const kNama = actKls ? actKls.namaRombel : 'Kelas IV-A';
+      const pId = 'PRS-' + sId + '-' + today;
 
       let existing = dbData.presensi.find(p => p.idSiswa === sId && p.tanggal === today);
       if (existing) {
         existing.statusHadir = status;
+        existing.namaSiswa = sNama;
+        existing.namaKelas = kNama;
       } else {
         dbData.presensi.push({
-          id: 'PRS-' + Date.now().toString().slice(-4),
+          id: pId,
           tanggal: today,
           idKelas: activeGuruClassId,
           namaKelas: kNama,
@@ -4218,7 +4316,10 @@
         renderPresensiHarianSubTab(subArea, actKls, myStudents, today);
       }
 
+      // Kirim data ke backend Google Apps Script / Google Sheets
       await executeDbWrite('updatePresensi', {
+        id: existing ? existing.id : pId,
+        tanggal: today,
         idKelas: activeGuruClassId,
         namaKelas: kNama,
         idSiswa: sId,
@@ -4239,12 +4340,13 @@
       }
 
       const records = siswaList.map(s => {
+        const pId = 'PRS-' + s.id + '-' + today;
         let existing = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === today);
         if (existing) {
           existing.statusHadir = 'Hadir';
         } else {
           dbData.presensi.push({
-            id: 'PRS-' + Date.now().toString().slice(-4) + Math.random().toString(36).substr(2, 3),
+            id: pId,
             tanggal: today,
             idKelas: activeGuruClassId,
             namaKelas: kNama,
@@ -4254,6 +4356,8 @@
           });
         }
         return {
+          id: pId,
+          tanggal: today,
           idKelas: activeGuruClassId,
           namaKelas: kNama,
           idSiswa: s.id,
@@ -4267,7 +4371,582 @@
         renderPresensiHarianSubTab(subArea, actKls, siswaList, today);
       }
 
-      await executeDbWrite('batchUpdatePresensi', { records }, `Presensi ${siswaList.length} siswa berhasil disimpan: Hadir.`);
+      await executeDbWrite('batchUpdatePresensi', { 
+        records: records, 
+        tanggal: today,
+        idKelas: activeGuruClassId,
+        namaKelas: kNama
+      }, `Presensi ${siswaList.length} siswa berhasil disimpan: Hadir.`);
+    }
+
+    // ==========================================
+    // SISTEM PRESENSI QR CODE RESPONSIF & CETAK KARTU ID SISWA
+    // ==========================================
+    let html5QrScannerInstance = null;
+    let isQrScanningActive = false;
+    let selectedCameraFacing = 'environment'; // 'environment' = kamera belakang, 'user' = kamera depan
+    let lastScannedData = null;
+    let lastScannedTimestamp = 0;
+
+    // 1. Audio Beep Web Audio API (Zero Latency & 100% Offline)
+    function playBeepSound(type = 'success') {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+          // Nada ganda ceria beresolusi tinggi (A5 -> E6)
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.35, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.28);
+        } else {
+          // Nada peringatan rendah (G3)
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.22);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.22);
+        }
+      } catch (e) {}
+    }
+
+    // 2. Dialog Izin Eksplisit Kamera (Allow or Disallow)
+    function confirmOpenQrScannerModal() {
+      const actKls = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = actKls ? actKls.namaRombel : 'Kelas Aktif';
+
+      const content = `
+        <div class="text-center space-y-4 py-2 text-xs">
+          <div class="w-16 h-16 rounded-3xl lavender-gradient text-white flex items-center justify-center mx-auto text-3xl shadow-md">
+            📷
+          </div>
+          
+          <div class="space-y-1">
+            <h4 class="text-base font-black text-brand-dark">Izinkan Akses Kamera untuk Presensi?</h4>
+            <p class="text-brand-muted max-w-sm mx-auto leading-relaxed">
+              Aplikasi membutuhkan izin untuk menggunakan kamera HP / laptop guna memindai QR Code kartu siswa <strong>${kNama}</strong> secara instan.
+            </p>
+          </div>
+
+          <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-left space-y-1.5 text-emerald-900">
+            <div class="font-extrabold flex items-center gap-1.5 text-emerald-800 text-[11px]">
+              <span>⚡</span> <span>Presensi Cepat & Langsung ke Database</span>
+            </div>
+            <p class="text-[11px] text-emerald-700 leading-relaxed">
+              Begitu kartu siswa diarahkan ke kamera, sistem langsung mencatat <strong>Hadir</strong>, membunyikan konfirmasi suara, dan menyimpannya secara otomatis ke database Google Sheets sekolah.
+            </p>
+          </div>
+
+          <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+            <button type="button" onclick="closeUniversalModal()"
+              class="w-full sm:w-auto px-5 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer">
+              Batal / Gunakan Manual
+            </button>
+            <button type="button" onclick="handlePermissionAcceptedAndStartCamera()"
+              class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-black shadow-md shadow-brand-500/25 transition active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+              <span>✅ Izinkan & Buka Kamera</span>
+            </button>
+          </div>
+        </div>
+      `;
+      openUniversalModal('📷 Izin Kamera Presensi QR Code', content);
+    }
+
+    // 3. Membuka Kamera Setelah Guru Menyetujui Izin
+    async function handlePermissionAcceptedAndStartCamera() {
+      closeUniversalModal();
+
+      const modal = document.getElementById('qrScannerModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('modal-open');
+      }
+
+      updateQrScanBanner('Menghubungkan ke sensor kamera...', 'info');
+
+      // Cek apakah library Html5Qrcode tersedia
+      if (typeof Html5Qrcode === 'undefined') {
+        updateQrScanBanner('⚠️ Library scanner belum termuat. Pastikan koneksi internet aktif.', 'error');
+        return;
+      }
+
+      await startHtml5QrScanner(selectedCameraFacing);
+    }
+
+    // 4. Inisialisasi & Start Kamera Html5Qrcode Responsif Ultra Cepat
+    async function startHtml5QrScanner(facing = 'environment') {
+      try {
+        if (html5QrScannerInstance && isQrScanningActive) {
+          try {
+            await html5QrScannerInstance.stop();
+          } catch (e) {}
+        }
+
+        let formats = undefined;
+        if (typeof Html5QrcodeSupportedFormats !== 'undefined' && Html5QrcodeSupportedFormats.QR_CODE) {
+          formats = [ Html5QrcodeSupportedFormats.QR_CODE ];
+        }
+
+        html5QrScannerInstance = new Html5Qrcode("qrReader", {
+          formatsToSupport: formats,
+          verbose: false,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
+        });
+
+        // Konfigurasi performa tinggi untuk scan super cepat responsif (<0.2 detik)
+        const config = {
+          fps: 24, // 24 frame per detik untuk pemindaian instan
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            const edgeSize = Math.floor(minEdge * 0.74);
+            return { width: edgeSize, height: edgeSize };
+          },
+          aspectRatio: 1.0,
+          showTorchButtonIfSupported: true
+        };
+
+        const cameraConfig = { facingMode: facing };
+
+        await html5QrScannerInstance.start(
+          cameraConfig,
+          config,
+          onQrCodeScannedSuccess,
+          onQrCodeScanError
+        );
+
+        isQrScanningActive = true;
+        updateQrScanBanner('🔍 Kamera Siap! Arahkan kartu QR siswa ke kotak bidik.', 'active');
+      } catch (err) {
+        console.warn('Gagal membuka kamera:', err);
+        isQrScanningActive = false;
+
+        let errorMsg = 'Gagal mengakses kamera.';
+        if (String(err).includes('NotAllowedError') || String(err).includes('Permission')) {
+          errorMsg = `
+            <div class="space-y-1.5 text-left p-1">
+              <strong class="block text-rose-300 font-extrabold text-xs">⚠️ Izin Kamera Ditolak Browser</strong>
+              <p class="text-[10px] text-slate-200 leading-relaxed">
+                Klik ikon gembok 🔒 di sebelah URL browser Anda > pilih <strong>Izin Situs</strong> > ubah <strong>Kamera</strong> menjadi <strong>Izinkan</strong>, lalu coba kembali.
+              </p>
+            </div>
+          `;
+        } else if (String(err).includes('NotFoundError') || String(err).includes('OverconstrainedError')) {
+          // Jika kamera belakang tidak ditemukan (misal di laptop), otomatis fallback ke kamera depan
+          if (facing === 'environment') {
+            selectedCameraFacing = 'user';
+            const selectEl = document.getElementById('selectQrCameraDevice');
+            if (selectEl) selectEl.value = 'user';
+            return startHtml5QrScanner('user');
+          }
+          errorMsg = 'Perangkat kamera tidak ditemukan di laptop/HP Anda.';
+        }
+
+        updateQrScanBanner(errorMsg, 'error');
+      }
+    }
+
+    // 5. Handler Saat QR Code Berhasil Dideteksi Secara Responsif
+    async function onQrCodeScannedSuccess(decodedText, decodedResult) {
+      const now = Date.now();
+      const rawText = String(decodedText || '').trim();
+
+      // Debounce anti-duplikasi: Hanya kunci jika mendeteksi siswa yang sama dalam rentang 2.5 detik.
+      // Jika kartu siswa yang disorot berbeda, scanner langsung memproses seketika!
+      if (lastScannedData === rawText && (now - lastScannedTimestamp) < 2500) {
+        return;
+      }
+
+      lastScannedData = rawText;
+      lastScannedTimestamp = now;
+
+      // Cari data siswa di rombel aktif
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const actKls = dbData.kelas.find(c => c.id === activeGuruClassId);
+      const kNama = actKls ? actKls.namaRombel : 'Kelas Aktif';
+
+      let student = null;
+
+      // Identifikasi cepat & akurat:
+      // a. Format resmi SIGURU:ID:NIS
+      if (rawText.startsWith('SIGURU:')) {
+        const parts = rawText.split(':');
+        const sId = parts[1];
+        student = myStudents.find(s => s.id === sId);
+        if (!student && parts[2]) {
+          student = myStudents.find(s => s.nis && s.nis === parts[2]);
+        }
+      }
+
+      // b. ID Siswa langsung
+      if (!student) {
+        student = myStudents.find(s => s.id === rawText || rawText.includes(s.id));
+      }
+      // c. Berdasarkan NIS
+      if (!student) {
+        student = myStudents.find(s => s.nis && (s.nis === rawText || rawText.includes(s.nis)));
+      }
+      // d. Berdasarkan NISN
+      if (!student) {
+        student = myStudents.find(s => s.nisn && (s.nisn === rawText || rawText.includes(s.nisn)));
+      }
+
+      if (student) {
+        // SUKSES TERDETEKSI SECARA RESPONSIF!
+        playBeepSound('success');
+
+        const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        updateQrScanBanner(`
+          <div class="flex items-center justify-between gap-2 text-left">
+            <div>
+              <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-black text-[9px] uppercase tracking-wider">
+                ✓ HADIR (${timeStr} WIB)
+              </span>
+              <h4 class="font-black text-white text-xs mt-0.5">${student.nama}</h4>
+              <p class="text-[10px] text-slate-300 font-mono">NIS: ${student.nis || '-'} • NISN: ${student.nisn || '-'} • ${kNama}</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center font-black text-xl shrink-0">
+              ✓
+            </div>
+          </div>
+        `, 'success');
+
+        // Rekam kehadiran ke database secara langsung (non-blocking ke Google Sheets)
+        recordPresensiGuru(student.id, student.nama, 'Hadir');
+      } else {
+        // Cek apakah siswa terdaftar di sekolah tetapi kelas lain
+        const otherStudent = dbData.siswa.find(s => s.id === rawText || (s.nis && rawText.includes(s.nis)) || (s.nisn && rawText.includes(s.nisn)));
+        playBeepSound('warning');
+
+        if (otherStudent) {
+          updateQrScanBanner(`
+            <div class="text-left text-amber-200">
+              <strong class="font-extrabold text-xs block">⚠️ Siswa Kelas Lain</strong>
+              <p class="text-[10px]">${otherStudent.nama} terdaftar di rombel lain (bukan ${kNama}).</p>
+            </div>
+          `, 'warning');
+        } else {
+          updateQrScanBanner(`
+            <div class="text-left text-rose-200">
+              <strong class="font-extrabold text-xs block">⚠️ Kartu QR Tidak Dikenali</strong>
+              <p class="text-[10px]">Data QR (${rawText.slice(0, 20)}) tidak terdaftar di rombel ${kNama}.</p>
+            </div>
+          `, 'error');
+        }
+      }
+    }
+
+    function onQrCodeScanError(errorMessage) {
+      // Abaikan error per-frame scanning rutin
+    }
+
+    function updateQrScanBanner(contentHtml, type = 'info') {
+      const banner = document.getElementById('qrScanResultBanner');
+      if (!banner) return;
+
+      let borderClass = 'border-white/20';
+      let bgClass = 'bg-slate-900/90';
+
+      if (type === 'success') {
+        borderClass = 'border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.3)] ring-2 ring-emerald-500/50';
+        bgClass = 'bg-slate-900/95';
+      } else if (type === 'warning') {
+        borderClass = 'border-amber-400 ring-1 ring-amber-400/40';
+        bgClass = 'bg-amber-950/90';
+      } else if (type === 'error') {
+        borderClass = 'border-rose-400 ring-1 ring-rose-400/40';
+        bgClass = 'bg-rose-950/90';
+      }
+
+      banner.innerHTML = `
+        <div class="${bgClass} backdrop-blur-md text-white px-4 py-2.5 rounded-2xl border ${borderClass} transition-all">
+          ${contentHtml}
+        </div>
+      `;
+    }
+
+    async function switchQrCameraDevice(facing) {
+      selectedCameraFacing = facing;
+      if (isQrScanningActive) {
+        updateQrScanBanner('Beralih kamera...', 'info');
+        await startHtml5QrScanner(facing);
+      }
+    }
+
+    async function stopQrScanner() {
+      if (html5QrScannerInstance) {
+        try {
+          if (isQrScanningActive) {
+            await html5QrScannerInstance.stop();
+          }
+          await html5QrScannerInstance.clear();
+        } catch (e) {}
+      }
+      isQrScanningActive = false;
+      html5QrScannerInstance = null;
+
+      const modal = document.getElementById('qrScannerModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.classList.remove('modal-open');
+      }
+    }
+
+    // ==========================================
+    // SISTEM CETAK KARTU IDENTITAS PRESENSI SISWA (A4 GRID)
+    // PERSIS SESUAI DESAIN MOCKUP REFERENSI (UKURAN RESMI CR80: 3.39" x 2.13" / 86 x 54 mm)
+    // ==========================================
+    function getQrCodeImageUrl(payloadText) {
+      return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=4&data=${encodeURIComponent(payloadText)}`;
+    }
+
+    function generateSingleStudentCardHTML(s, sch, actKls, qrUrl) {
+      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
+      const kNama = actKls ? actKls.namaRombel : 'Kelas IV-A';
+      const ta = actKls ? actKls.tahunAjaran : '2026/2027';
+
+      return `
+        <div class="id-card-wrapper" style="
+          width: 86mm;
+          height: 54mm;
+          background: #FFFFFF;
+          border: 1.5px solid #162447;
+          border-radius: 8px;
+          position: relative;
+          box-sizing: border-box;
+          overflow: hidden;
+          font-family: Arial, Helvetica, sans-serif;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          page-break-inside: avoid;
+          margin: 0;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        ">
+          <!-- Card Header Angled Banner (Persis Mockup Referensi) -->
+          <div style="
+            background: linear-gradient(135deg, #162447 0%, #1F4068 70%, #1B1A47 100%);
+            color: #FFFFFF;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2.5px solid #E43F5A;
+            position: relative;
+          ">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <div style="
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
+                background: #E43F5A;
+                color: #FFFFFF;
+                font-weight: 900;
+                font-size: 8pt;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+              ">🎓</div>
+              <div>
+                <div style="font-size: 7.5pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.1;">
+                  ${sch.nama || 'SD NEGERI AMBULU'}
+                </div>
+                <div style="font-size: 5.5pt; opacity: 0.9; line-height: 1; letter-spacing: 0.1px;">
+                  NPSN: ${sch.npsn || '-'} • Kec. Ambulu, Kab. Jember
+                </div>
+              </div>
+            </div>
+            <span style="
+              font-size: 5pt;
+              font-weight: 900;
+              background: rgba(255,255,255,0.18);
+              padding: 2px 5px;
+              border-radius: 3px;
+              text-transform: uppercase;
+              color: #FEE715;
+              letter-spacing: 0.3px;
+            ">KURIKULUM MERDEKA</span>
+          </div>
+
+          <!-- Card Body: Dua Kolom (Kiri: QR Code Besar, Kanan: Identitas Siswa) -->
+          <div style="
+            display: flex;
+            padding: 4px 7px 2px 7px;
+            gap: 6px;
+            align-items: center;
+            flex: 1;
+          ">
+            <!-- Kolom Kiri: QR Code Besar & Kontras Tinggi untuk Pemindaian Instan -->
+            <div style="
+              width: 32mm;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              text-align: center;
+              border: 1.2px solid #CBD5E1;
+              border-radius: 6px;
+              padding: 2px;
+              background: #F8FAFC;
+            ">
+              <img src="${qrUrl}" alt="QR" style="
+                width: 28mm;
+                height: 28mm;
+                display: block;
+                image-rendering: pixelated;
+              ">
+              <span style="
+                font-size: 5pt;
+                font-weight: 900;
+                color: #162447;
+                margin-top: 1px;
+                letter-spacing: 0.3px;
+              ">SCAN PRESENSI</span>
+            </div>
+
+            <!-- Kolom Kanan: Rincian Data Siswa -->
+            <div style="flex: 1; font-size: 7pt; color: #1E293B; line-height: 1.25;">
+              <div style="
+                font-size: 8.5pt;
+                font-weight: 900;
+                color: #162447;
+                text-transform: uppercase;
+                line-height: 1.15;
+                margin-bottom: 3px;
+                border-bottom: 1.5px solid #E2E8F0;
+                padding-bottom: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 44mm;
+              " title="${s.nama}">
+                ${s.nama}
+              </div>
+
+              <table style="width: 100%; border-collapse: collapse; font-size: 6.5pt; border: none; margin-bottom: 2px;">
+                <tr>
+                  <td style="width: 28%; font-weight: bold; color: #64748B; padding: 1px 0; border: none;">NIS</td>
+                  <td style="width: 5%; border: none; padding: 1px 0;">:</td>
+                  <td style="width: 67%; font-family: monospace; font-weight: bold; color: #0F172A; border: none; padding: 1px 0;">${s.nis || '-'}</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold; color: #64748B; padding: 1px 0; border: none;">NISN</td>
+                  <td style="border: none; padding: 1px 0;">:</td>
+                  <td style="font-family: monospace; font-weight: bold; color: #0F172A; border: none; padding: 1px 0;">${s.nisn || '-'}</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold; color: #64748B; padding: 1px 0; border: none;">Kelas</td>
+                  <td style="border: none; padding: 1px 0;">:</td>
+                  <td style="font-weight: bold; color: #1E40AF; border: none; padding: 1px 0;">${kNama} (${ta})</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold; color: #64748B; padding: 1px 0; border: none;">L / P</td>
+                  <td style="border: none; padding: 1px 0;">:</td>
+                  <td style="border: none; padding: 1px 0;">${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</td>
+                </tr>
+              </table>
+
+              <!-- Kolom Tanda Tangan Kepala Sekolah -->
+              <div style="margin-top: 1px; text-align: right; font-size: 5.5pt; color: #334155; line-height: 1.1;">
+                Ambulu, ${todayStr}<br>
+                Kepala Sekolah,
+                <div style="font-weight: 800; text-decoration: underline; margin-top: 8px; color: #0F172A;">
+                  ${schoolMetaConfig.kepalaSekolah}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Footer Strip -->
+          <div style="
+            background: #162447;
+            color: #94A3B8;
+            font-size: 5pt;
+            padding: 2.5px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          ">
+            <span>KARTU IDENTITAS PRESENSI SISWA</span>
+            <span style="color: #60A5FA; font-weight: 800;">SiGuru SD Digital</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateAllStudentCardsHTML(students) {
+      const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+
+      const cardsHtml = students.map(s => {
+        const payload = `SIGURU:${s.id}:${s.nis || ''}`;
+        const qrUrl = getQrCodeImageUrl(payload);
+        return `
+          <div style="padding: 2mm; box-sizing: border-box; display: inline-block; page-break-inside: avoid;">
+            <div style="border: 1px dashed #CBD5E1; padding: 1.5mm; border-radius: 10px; background: #F8FAFC;">
+              ${generateSingleStudentCardHTML(s, sch, actKls, qrUrl)}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div style="font-family: Arial, Helvetica, sans-serif; background: #ffffff; padding: 0; margin: 0 auto;">
+          <div class="no-print" style="text-align: center; margin-bottom: 12px; font-size: 8.5pt; color: #475569; border: 1px solid #E2E8F0; padding: 8px 12px; border-radius: 8px; background: #F8FAFC;">
+            <strong style="color: #1E293B; font-size: 9.5pt;">LEMBAR CETAK KARTU IDENTITAS PRESENSI QR SISWA (A4 GRID)</strong><br>
+            Format Standar ID Card (3.39" x 2.13" / 86 x 54 mm). Cetak di kertas tebal / kertas foto A4, potong mengikuti garis putus-putus abu-abu, lalu masukkan ke plastik mika gantungan tali kartu siswa (<em>lanyard</em>).
+          </div>
+
+          <div style="
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2mm 3mm;
+            justify-items: center;
+            align-items: center;
+            width: 100%;
+            max-width: 190mm;
+            margin: 0 auto;
+          ">
+            ${cardsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function printKartuQRSiswaA4() {
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+
+      if (myStudents.length === 0) {
+        showToast('Belum ada siswa di kelas ini untuk dicetak kartunya.', 'warning');
+        return;
+      }
+
+      showToast(`Menyiapkan lembar cetak kartu QR ${myStudents.length} siswa...`, 'info');
+      const html = generateAllStudentCardsHTML(myStudents);
+      openPrintInNewTab(html, `Kartu_QR_Siswa_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`, 'portrait');
+    }
+
+    function printSingleKartuQR(studentId) {
+      const student = dbData.siswa.find(s => s.id === studentId);
+      if (!student) return;
+
+      const html = generateAllStudentCardsHTML([student]);
+      openPrintInNewTab(html, `Kartu_QR_${student.nama.replace(/\s+/g, '_')}`, 'portrait');
     }
 
     // ==========================================
