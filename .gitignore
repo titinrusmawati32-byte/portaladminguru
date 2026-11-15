@@ -2,3 +2,8 @@ node_modules/
 .vercel/
 .DS_Store
 Thumbs.db
+
+# Helper Batch Scripts (Jangan diunggah ke GitHub)
+push_ke_github.bat
+*.bat
+*.cmd
