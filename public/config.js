@@ -2,6 +2,7 @@
  * ============================================================
  * SiGuru SD - Platform Administrasi Pendidikan Kecamatan Ambulu
  * Kabupaten Jember - Multi-School & Multi-Teacher Platform
+ * Autentikasi Berbasis NPSN + Kode Unik Lembaga & PIN Guru (Opsi C)
  * ============================================================
  */
 
@@ -11,56 +12,168 @@ const APP_CONFIG = {
 
   // 2. Identitas Platform & Wilayah Operasional
   PLATFORM_NAME: 'SiGuru SD - Kecamatan Ambulu',
-  VERSION: '3.0.0-PROD',
+  VERSION: '3.1.0-NPSN-AUTH',
   KECAMATAN: 'Ambulu',
   KABUPATEN: 'Jember',
   PROVINSI: 'Jawa Timur',
   TAHUN_AJARAN_DEFAULT: '2026/2027',
   SEMESTER_DEFAULT: 'Ganjil',
 
-  // 3. Konfigurasi Firebase Authentication (Google Sign-In)
-  // Masukkan kredensial dari Firebase Console > Project Settings
-  FIREBASE_CONFIG: {
-    apiKey: "AIzaSyDummyKey_ReplaceWithYourFirebaseApiKey",
-    authDomain: "portaladminguru.firebaseapp.com",
-    projectId: "portaladminguru",
-    storageBucket: "portaladminguru.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdef123456"
-  },
-
-  // 4. Master Data Sekolah Dasar Negeri di Kecamatan Ambulu, Kabupaten Jember
+  // 3. Master Data Resmi Satuan Pendidikan (SDN) Kecamatan Ambulu
+  // Dilengkapi Kode Unik Akses Lembaga yang dibuat otomatis oleh sistem
   MASTER_SEKOLAH_AMBULU: [
-    { id: 'SCH-AMB-01', npsn: '20512001', nama: 'SD Negeri Ambulu 01', desa: 'Ambulu', alamat: 'Jl. Ahmad Yani No. 12, Ambulu', kepalaSekolah: 'Dra. Hj. Nurul Hidayati, M.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-AMB-02', npsn: '20512002', nama: 'SD Negeri Ambulu 02', desa: 'Ambulu', alamat: 'Jl. Suyitman No. 45, Ambulu', kepalaSekolah: 'Bambang Supriyadi, S.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-AMB-03', npsn: '20512003', nama: 'SD Negeri Ambulu 03', desa: 'Ambulu', alamat: 'Jl. Manggar No. 08, Ambulu', kepalaSekolah: 'Siti Rohani, M.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-AMB-04', npsn: '20512004', nama: 'SD Negeri Ambulu 04', desa: 'Ambulu', alamat: 'Jl. Watu Ulo No. 19, Ambulu', kepalaSekolah: 'Drs. H. Mulyono', status: 'Terverifikasi' },
-    { id: 'SCH-KRN-01', npsn: '20512005', nama: 'SD Negeri Karanganyar 01', desa: 'Karanganyar', alamat: 'Jl. Raya Karanganyar No. 22', kepalaSekolah: 'Agus Salim, S.Pd.SD.', status: 'Terverifikasi' },
-    { id: 'SCH-KRN-02', npsn: '20512006', nama: 'SD Negeri Karanganyar 02', desa: 'Karanganyar', alamat: 'Dusun Sumberjo, Karanganyar', kepalaSekolah: 'Endang Wahyuni, S.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-PNT-01', npsn: '20512007', nama: 'SD Negeri Pontang 01', desa: 'Pontang', alamat: 'Jl. Raya Pontang No. 05', kepalaSekolah: 'Drs. Sunardi', status: 'Terverifikasi' },
-    { id: 'SCH-PNT-02', npsn: '20512008', nama: 'SD Negeri Pontang 02', desa: 'Pontang', alamat: 'Dusun Pontang Tengah', kepalaSekolah: 'Tri Astuti, S.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-SBR-01', npsn: '20512009', nama: 'SD Negeri Sabrang 01', desa: 'Sabrang', alamat: 'Jl. Pantai Watu Ulo, Sabrang', kepalaSekolah: 'Ahmad Zaini, S.Pd.I.', status: 'Terverifikasi' },
-    { id: 'SCH-SBR-02', npsn: '20512010', nama: 'SD Negeri Sabrang 02', desa: 'Sabrang', alamat: 'Dusun Ungkalan, Sabrang', kepalaSekolah: 'Sri Rahayu, S.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-ADG-01', npsn: '20512011', nama: 'SD Negeri Andongsari 01', desa: 'Andongsari', alamat: 'Jl. Raya Andongsari No. 17', kepalaSekolah: 'Mohammad Taufik, S.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-ADG-02', npsn: '20512012', nama: 'SD Negeri Andongsari 02', desa: 'Andongsari', alamat: 'Dusun Krajan, Andongsari', kepalaSekolah: 'Nur Aini, S.Pd.SD.', status: 'Terverifikasi' },
-    { id: 'SCH-TGL-01', npsn: '20512013', nama: 'SD Negeri Tegalsari 01', desa: 'Tegalsari', alamat: 'Jl. Pendidikan Tegalsari No. 03', kepalaSekolah: 'H. Sudirman, M.Pd.', status: 'Terverifikasi' },
-    { id: 'SCH-SBR-03', npsn: '20512014', nama: 'SD Negeri Sumberejo 01', desa: 'Sumberejo', alamat: 'Jl. Raya Sumberejo No. 88', kepalaSekolah: 'Yuli Astuti, S.Pd.', status: 'Terverifikasi' }
+    {
+      id: 'SCH-20524972',
+      npsn: '20524972',
+      kodeUnik: 'AMB02-8821',
+      nama: 'SDN Ambulu 02',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 02',
+      desa: 'Ambulu',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524171',
+      npsn: '20524171',
+      kodeUnik: 'TGL01-7142',
+      nama: 'SDN Tegalsari 01',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 01',
+      desa: 'Tegalsari',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524146',
+      npsn: '20524146',
+      kodeUnik: 'TGL02-6315',
+      nama: 'SDN Tegalsari 02',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 02',
+      desa: 'Tegalsari',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524148',
+      npsn: '20524148',
+      kodeUnik: 'TGL03-5294',
+      nama: 'SDN Tegalsari 03',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 03',
+      desa: 'Tegalsari',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524147',
+      npsn: '20524147',
+      kodeUnik: 'TGL04-4819',
+      nama: 'SDN Tegalsari 04',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 04',
+      desa: 'Tegalsari',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524058',
+      npsn: '20524058',
+      kodeUnik: 'SMB04-3918',
+      nama: 'SDN Sumberejo 04',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 04',
+      desa: 'Sumberejo',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524059',
+      npsn: '20524059',
+      kodeUnik: 'SMB05-2746',
+      nama: 'SDN Sumberejo 05',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 05',
+      desa: 'Sumberejo',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524060',
+      npsn: '20524060',
+      kodeUnik: 'SMB07-1683',
+      nama: 'SDN Sumberejo 07',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 07',
+      desa: 'Sumberejo',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524958',
+      npsn: '20524958',
+      kodeUnik: 'ADG02-9524',
+      nama: 'SDN Andongsari 02',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 02',
+      desa: 'Andongsari',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524962',
+      npsn: '20524962',
+      kodeUnik: 'ADG04-8417',
+      nama: 'SDN Andongsari 04',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 04',
+      desa: 'Andongsari',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20523264',
+      npsn: '20523264',
+      kodeUnik: 'PNT01-7362',
+      nama: 'SDN Pontang 01',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 01',
+      desa: 'Pontang',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524830',
+      npsn: '20524830',
+      kodeUnik: 'KRN01-6251',
+      nama: 'SDN Karanganyar 01',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 01',
+      desa: 'Karanganyar',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524821',
+      npsn: '20524821',
+      kodeUnik: 'KRN03-5149',
+      nama: 'SDN Karanganyar 03',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 03',
+      desa: 'Karanganyar',
+      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    }
   ],
 
-  // 5. Helper Cek Koneksi & Firebase
+  // 4. Helper Pencarian Sekolah Berdasarkan NPSN & Kode Unik
+  findSchool: function (npsn, kodeUnik) {
+    if (!npsn || !kodeUnik) return null;
+    const cleanNpsn = String(npsn).trim();
+    const cleanCode = String(kodeUnik).trim().toUpperCase();
+
+    return this.MASTER_SEKOLAH_AMBULU.find(function (s) {
+      return (
+        String(s.npsn).trim() === cleanNpsn &&
+        String(s.kodeUnik).trim().toUpperCase() === cleanCode
+      );
+    }) || null;
+  },
+
+  // 5. Helper Cek Koneksi Backend Google Apps Script
   isConnected: function () {
     return (
       typeof this.GAS_API_URL === 'string' &&
       this.GAS_API_URL.trim().startsWith('https://script.google.com/macros/s/') &&
       this.GAS_API_URL.trim().endsWith('/exec')
-    );
-  },
-
-  isFirebaseReady: function () {
-    return (
-      this.FIREBASE_CONFIG &&
-      this.FIREBASE_CONFIG.apiKey &&
-      !this.FIREBASE_CONFIG.apiKey.includes('DummyKey')
     );
   }
 };

@@ -17,11 +17,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase App & Auth SDK (v9 Compat untuk integrasi Google Sign-In) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <!-- Konfigurasi Platform & Master Data SDN Kecamatan Ambulu -->
+  <!-- Konfigurasi Platform & Master Data NPSN Kecamatan Ambulu -->
   <script src="config.js"></script>
 
   <script>
@@ -80,7 +76,7 @@
       scrollbar-width: none;
     }
 
-    /* Glassmorphism Styles */
+    /* Glassmorphic Styles */
     .glassmorphic {
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(20px);
@@ -92,36 +88,17 @@
       background: linear-gradient(135deg, #6D28D9 0%, #7C3AED 45%, #9333EA 85%, #A855F7 100%);
       box-shadow: 0 20px 40px -6px rgba(109, 40, 217, 0.38), 0 8px 16px -4px rgba(124, 58, 237, 0.2);
     }
-    .glass-card-emerald {
-      background: linear-gradient(135deg, #065F46 0%, #059669 45%, #10B981 85%, #14B8A6 100%);
-      box-shadow: 0 20px 40px -6px rgba(5, 150, 105, 0.38), 0 8px 16px -4px rgba(16, 185, 129, 0.2);
-    }
     .glass-mint-pill {
       background: linear-gradient(135deg, #10B981 0%, #14B8A6 60%, #06B6D4 100%);
       box-shadow: 0 10px 25px -4px rgba(20, 184, 166, 0.45);
     }
 
-    /* Floating Animations */
     @keyframes floatCard {
       0%, 100% { transform: translateY(0px) rotate(-3deg); }
       50% { transform: translateY(-8px) rotate(-1deg); }
     }
     .floating-glass-card {
       animation: floatCard 4.5s ease-in-out infinite;
-    }
-
-    /* Card Shadows & Hover Transitions */
-    .menu-card {
-      background-color: #FFFFFF;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 8px 24px -4px rgba(124, 58, 237, 0.06), 0 2px 6px -1px rgba(124, 58, 237, 0.03);
-    }
-    .menu-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 38px -5px rgba(124, 58, 237, 0.14), 0 6px 14px -3px rgba(124, 58, 237, 0.06);
-    }
-    .menu-card:active {
-      transform: scale(0.98);
     }
 
     .soft-card-shadow {
@@ -136,7 +113,6 @@
       animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Print Stylesheet Khusus Laporan Resmi */
     @media print {
       body * {
         visibility: hidden;
@@ -165,9 +141,9 @@
   <div id="toastContainer" class="fixed top-4 right-4 z-[110] flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print"></div>
 
   <!-- ==========================================
-       1. HALAMAN LOGIN & GOOGLE SIGN-IN (MULTI-SEKOLAH KEC. AMBULU)
+       1. HALAMAN LOGIN: NPSN + KODE UNIK + PIN GURU (OPSI C)
        ========================================== -->
-  <section id="loginScreen" class="min-h-screen flex flex-col justify-between items-center px-4 py-8 relative overflow-hidden no-print"
+  <section id="loginScreen" class="min-h-screen flex flex-col justify-between items-center px-4 py-6 relative overflow-hidden no-print"
            style="background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 40%, #581C87 80%, #3B0764 100%);">
     
     <!-- Ambient Fluid Background Lights -->
@@ -183,19 +159,15 @@
       <span class="text-[11px] text-purple-200">Kecamatan Ambulu • Jember</span>
     </div>
 
-    <!-- Main Hero Card Container -->
+    <!-- Main Card Container -->
     <div class="relative z-10 w-full max-w-md my-auto flex flex-col items-center">
       
       <!-- Floating Frosted Glass Card -->
-      <div class="relative w-80 h-48 mb-6">
-        <!-- Back Card (Tilted Glass) -->
+      <div class="relative w-80 h-44 mb-5">
         <div class="absolute inset-0 rounded-[28px] bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl -rotate-6 scale-95 transform transition-all"></div>
-        
-        <!-- Front Frosted Glass Card -->
         <div class="floating-glass-card absolute inset-0 rounded-[28px] p-5 flex flex-col justify-between text-white border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden"
              style="background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.12) 100%); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
           
-          <!-- Top Row: Logo Tut Wuri & Card Brand -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-xl bg-white/25 flex items-center justify-center p-1.5 border border-white/30">
@@ -204,12 +176,11 @@
                   <path d="M50,22 L50,68 M32,45 L68,45" stroke="#facc15" stroke-width="8" stroke-linecap="round"/>
                 </svg>
               </div>
-              <span class="text-[11px] font-extrabold uppercase tracking-wider text-yellow-300">SiGuru Card</span>
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-yellow-300">SiGuru Access</span>
             </div>
             <span class="text-xs font-black tracking-widest text-white/90">KEC. AMBULU</span>
           </div>
 
-          <!-- Middle: Smart Chip Graphic & Platform Info -->
           <div class="flex items-center gap-3 my-auto">
             <div class="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-yellow-300/60 p-1 flex items-center justify-center shadow-xs">
               <div class="w-full h-full border border-amber-600/40 rounded-xs flex flex-col justify-between p-0.5">
@@ -218,74 +189,171 @@
               </div>
             </div>
             <div class="space-y-0.5">
-              <p class="text-[9px] uppercase tracking-wider text-purple-200 font-semibold">Wilayah Pendidikan</p>
-              <p class="text-xs font-mono font-bold tracking-widest text-white">KOORWIL AMBULU - JBR</p>
+              <p class="text-[9px] uppercase tracking-wider text-purple-200 font-semibold">Otoritas Akses Lembaga</p>
+              <p class="text-xs font-mono font-bold tracking-widest text-white" id="cardSchoolDisplay">NPSN & KODE UNIK SEKOLAH</p>
             </div>
           </div>
 
-          <!-- Bottom Row: Identity -->
           <div class="flex items-center justify-between text-[11px] pt-1 border-t border-white/15">
-            <span class="font-bold text-white tracking-wide">14 SD Negeri Terdaftar</span>
+            <span class="font-bold text-white tracking-wide" id="cardSchoolSubDisplay">SD Negeri se-Kecamatan Ambulu</span>
             <span class="font-extrabold text-brandmint-300">KURIKULUM MERDEKA</span>
           </div>
         </div>
       </div>
 
-      <!-- Bold Title -->
-      <div class="text-center space-y-1 mb-6 text-white">
-        <p class="text-xs font-extrabold uppercase tracking-widest text-brandmint-300">Platform Administrasi Guru & Sekolah</p>
-        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">
-          Kecamatan Ambulu<br>
-          <span class="text-white drop-shadow-md">Kabupaten Jember</span>
+      <!-- Title -->
+      <div class="text-center space-y-1 mb-4 text-white">
+        <p class="text-xs font-extrabold uppercase tracking-widest text-brandmint-300">Platform Administrasi Guru SD</p>
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight">
+          Kecamatan Ambulu • Jember
         </h1>
-        <p class="text-xs text-purple-200 max-w-sm mx-auto pt-1 leading-relaxed">
-          Setiap guru login mandiri dengan akun Google. Data terisolasi aman per kelas dan sekolah induk.
+        <p class="text-xs text-purple-200 max-w-sm mx-auto pt-0.5">
+          Masuk menggunakan NPSN dan Kode Unik Lembaga sekolah Anda.
         </p>
       </div>
 
-      <!-- PROMINENT GOOGLE SIGN-IN BUTTON -->
-      <div class="w-full max-w-sm space-y-3 mb-4">
-        <button type="button" onclick="handleGoogleSignIn()"
-          class="w-full py-3.5 px-5 rounded-2xl bg-white text-slate-800 font-extrabold text-sm shadow-[0_15px_35px_rgba(0,0,0,0.25)] hover:shadow-2xl hover:bg-slate-50 transition-all flex items-center justify-center gap-3 cursor-pointer group active:scale-98">
-          <!-- Official Google 'G' Logo SVG -->
-          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          <span class="group-hover:text-brandpurple-900 transition-colors">Masuk dengan Akun Google</span>
+      <!-- TAB SELECTION: MASUK GURU vs DAFTAR GURU BARU -->
+      <div class="w-full max-w-sm bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 flex gap-1 mb-4">
+        <button type="button" id="tabBtnLogin" onclick="switchLoginTab('login')"
+          class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md">
+          🔑 Masuk Guru
         </button>
-
-        <!-- Fast Start / Sandbox Multi-Role Switcher -->
-        <div class="pt-2">
-          <p class="text-[11px] text-center text-purple-200/90 font-semibold mb-2">Atau Uji Coba Cepat Sebagai:</p>
-          <div class="grid grid-cols-3 gap-2">
-            <button type="button" onclick="quickLoginDemo('Guru')"
-              class="py-2 px-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition flex flex-col items-center justify-center cursor-pointer">
-              <span>👩‍🏫</span>
-              <span class="text-[10px] mt-0.5">Guru SD</span>
-            </button>
-            <button type="button" onclick="quickLoginDemo('Admin')"
-              class="py-2 px-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition flex flex-col items-center justify-center cursor-pointer">
-              <span>🏫</span>
-              <span class="text-[10px] mt-0.5">Admin Sekolah</span>
-            </button>
-            <button type="button" onclick="quickLoginDemo('SuperAdmin')"
-              class="py-2 px-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition flex flex-col items-center justify-center cursor-pointer">
-              <span>⭐</span>
-              <span class="text-[10px] mt-0.5">Super Admin</span>
-            </button>
-          </div>
-        </div>
+        <button type="button" id="tabBtnRegister" onclick="switchLoginTab('register')"
+          class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10">
+          📝 Guru Baru (Daftar)
+        </button>
       </div>
 
-      <p class="text-[11px] text-purple-200/80 mt-1 font-medium">Single Sign-On aman & otomatis terisolasi</p>
+      <!-- FORM CONTAINER -->
+      <div class="w-full max-w-sm bg-white rounded-3xl p-5 shadow-2xl space-y-3.5 text-xs text-slate-800">
+
+        <!-- 1. TAB MASUK GURU -->
+        <form id="formTeacherLogin" onsubmit="handleLoginTeacherWithPin(event)" class="space-y-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">NPSN Sekolah *</label>
+            <input type="text" id="loginNpsn" required placeholder="Contoh: 20524058" oninput="handleCheckSchoolDebounce()"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Kode Unik Sekolah *</label>
+            <input type="text" id="loginKodeUnik" required placeholder="Contoh: SMB04-3918" oninput="handleCheckSchoolDebounce()"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold font-mono text-sm uppercase focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+          </div>
+
+          <!-- Verified School Status Box -->
+          <div id="schoolVerifiedBadge" class="hidden p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 animate-fade-in">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="font-extrabold text-xs" id="verifiedSchoolName">-</span>
+            </div>
+            <p class="text-[10px] text-emerald-600 mt-0.5" id="verifiedSchoolDesa">Kecamatan Ambulu</p>
+          </div>
+
+          <!-- Guru Selector or Name -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="font-bold text-slate-700">Nama Guru / Akun *</label>
+              <button type="button" onclick="switchLoginTab('register')" class="text-[10px] text-brandpurple-700 font-extrabold hover:underline">
+                + Belum Terdaftar?
+              </button>
+            </div>
+            <div id="teacherSelectContainer">
+              <input type="text" id="loginTeacherNameInput" required placeholder="Ketik nama Anda atau masukkan NPSN dahulu"
+                class="w-full p-2.5 bg-slate-100 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+            </div>
+          </div>
+
+          <!-- PIN Pribadi -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">PIN Pribadi Guru (4 - 6 Angka) *</label>
+            <input type="password" id="loginPin" required maxlength="6" placeholder="• • • • • •"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+          </div>
+
+          <button type="submit" id="btnLoginSubmit"
+            class="w-full py-3 rounded-2xl bg-brandpurple-700 hover:bg-brandpurple-800 text-white font-extrabold text-xs shadow-lg transition active:scale-98 cursor-pointer flex items-center justify-center gap-2">
+            <span>Masuk ke Portal Guru</span>
+            <span>➔</span>
+          </button>
+        </form>
+
+        <!-- 2. TAB DAFTAR GURU BARU -->
+        <form id="formTeacherRegister" onsubmit="handleRegisterTeacherWithPin(event)" class="space-y-3 hidden">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">NPSN *</label>
+              <input type="text" id="regNpsn" required placeholder="20524058" oninput="handleRegCheckSchoolDebounce()"
+                class="w-full p-2 bg-slate-100 rounded-xl font-bold font-mono text-xs focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Kode Unik *</label>
+              <input type="text" id="regKodeUnik" required placeholder="SMB04-3918" oninput="handleRegCheckSchoolDebounce()"
+                class="w-full p-2 bg-slate-100 rounded-xl font-bold font-mono text-xs uppercase focus:outline-none">
+            </div>
+          </div>
+
+          <div id="regSchoolVerifiedBadge" class="hidden p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+            <span id="regVerifiedSchoolName">SD Negeri</span>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
+            <input type="text" id="regNama" required placeholder="Contoh: Siti Aisyah, S.Pd."
+              class="w-full p-2 bg-slate-100 rounded-xl font-bold focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">NIP / NUPTK</label>
+              <input type="text" id="regNip" placeholder="19920516..." class="w-full p-2 bg-slate-100 rounded-xl font-medium focus:outline-none">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">No. WhatsApp *</label>
+              <input type="tel" id="regNoHp" required placeholder="081234567890" class="w-full p-2 bg-slate-100 rounded-xl font-bold focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Jabatan / Tugas *</label>
+            <select id="regJabatan" class="w-full p-2 bg-slate-100 rounded-xl font-bold focus:outline-none">
+              <option value="Guru Kelas">Guru Kelas</option>
+              <option value="Guru Mapel PAI">Guru Mapel PAI</option>
+              <option value="Guru PJOK">Guru PJOK</option>
+              <option value="Guru Bahasa Inggris">Guru Bahasa Inggris</option>
+              <option value="Guru Mapel Lainnya">Guru Mapel Lainnya</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Buat PIN Pribadi (4 - 6 Angka) *</label>
+            <input type="password" id="regPin" required maxlength="6" placeholder="Buat PIN 4-6 angka rahasia Anda"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-emerald-600">
+            <p class="text-[10px] text-slate-400 mt-0.5">Ingat PIN ini untuk login berikutnya di perangkat apapun.</p>
+          </div>
+
+          <button type="submit" id="btnRegSubmit"
+            class="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg transition active:scale-98 cursor-pointer">
+            Daftarkan Diri & Lanjut Buat Kelas ➔
+          </button>
+        </form>
+
+      </div>
+
+      <!-- Quick Helper: Daftar NPSN & Kode Unik Modal Trigger -->
+      <div class="mt-4 flex flex-col items-center gap-1.5 text-center">
+        <button type="button" onclick="openMasterSchoolDirectoryModal()"
+          class="text-xs text-purple-200/90 font-bold hover:text-white hover:underline flex items-center gap-1 cursor-pointer">
+          <span>📋</span> <span>Lihat Daftar NPSN & Kode Akses 13 SD Ambulu</span>
+        </button>
+        <span class="text-[10px] text-purple-300/60">Akses murni NPSN & PIN • Terisolasi aman per lembaga</span>
+      </div>
+
     </div>
 
-    <!-- Bottom Footer Inside Login -->
-    <div class="relative z-10 text-center text-[11px] text-purple-300/80 pt-4">
-      SiGuru SD • Koorwil Pendidikan Kecamatan Ambulu, Jember • v3.0 Multi-School
+    <!-- Bottom Footer -->
+    <div class="relative z-10 text-center text-[11px] text-purple-300/80 pt-2">
+      SiGuru SD • Koorwil Pendidikan Kecamatan Ambulu, Jember • v3.1 NPSN Gate
     </div>
   </section>
 
@@ -294,28 +362,27 @@
        ========================================== -->
   <div id="mainApp" class="flex-1 flex flex-col w-full min-h-screen relative" style="display: none;">
 
-    <!-- TOP BAR (AVATAR, IDENTITAS GURU & SEKOLAH, STATUS SYNC) -->
+    <!-- TOP BAR -->
     <header class="w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-2 flex items-center justify-between no-print gap-2">
-      <!-- Left: User Profile Avatar with Online Dot -->
-      <div class="flex items-center gap-3">
-        <div class="relative cursor-pointer" onclick="openProfileDetailModal()">
-          <div id="topUserAvatarContainer" class="w-11 h-11 rounded-full bg-gradient-to-tr from-brandpurple-600 to-fuchsia-500 p-0.5 shadow-md flex items-center justify-center text-white font-extrabold text-sm overflow-hidden">
-            <span id="topUserAvatarInitial">GS</span>
+      <!-- Left: User Profile -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="openProfileDetailModal()">
+        <div class="relative">
+          <div class="w-11 h-11 rounded-full bg-gradient-to-tr from-brandpurple-600 to-fuchsia-500 p-0.5 shadow-md flex items-center justify-center text-white font-extrabold text-sm overflow-hidden">
+            <span id="topUserAvatarInitial">G</span>
           </div>
-          <!-- Online Indicator Dot -->
           <span id="onlinePresenceDot" class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-400"></span>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <span class="text-sm font-extrabold text-slate-900 leading-tight" id="topUserIdentity">Nama Pengguna</span>
+            <span class="text-sm font-extrabold text-slate-900 leading-tight" id="topUserIdentity">Nama Guru</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-brandpurple-100 text-brandpurple-800" id="topUserRoleBadge">Guru</span>
           </div>
-          <p class="text-[11px] text-slate-500 leading-none mt-0.5 font-medium" id="globalSchoolIdentity">SD Negeri di Kecamatan Ambulu</p>
+          <p class="text-[11px] text-slate-500 leading-none mt-0.5 font-bold" id="globalSchoolIdentity">SD Negeri di Kecamatan Ambulu</p>
         </div>
       </div>
 
       <!-- Center: Real-Time Auto-Sync Status Badge -->
-      <div id="syncStatusBadge" onclick="manualTriggerSync()" title="Sinkronisasi Database Real-Time (Klik untuk sinkronkan sekarang)"
+      <div id="syncStatusBadge" onclick="manualTriggerSync()" title="Sinkronisasi Database Real-Time"
         class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs select-none">
         <span id="syncStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
         <span id="syncStatusText" class="tracking-tight text-[11px] sm:text-xs">Tersinkronisasi</span>
@@ -325,26 +392,8 @@
         </svg>
       </div>
 
-      <!-- Right: Action Buttons (Portal Switcher & Logout) -->
-      <div class="flex items-center gap-2 sm:gap-2.5">
-        <!-- Role Quick Switch Pill Button -->
-        <button onclick="toggleRoleSwitch()" id="btnSwitchRole"
-          class="px-2.5 sm:px-3 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-slate-200 text-brandpurple-700 font-extrabold text-[11px] sm:text-xs shadow-xs transition flex items-center gap-1 cursor-pointer">
-          <span id="switchRoleLabel">Ganti Portal</span>
-        </button>
-
-        <!-- Notification Bell Pill -->
-        <div class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-700 shadow-xs cursor-pointer"
-             onclick="showToast('Sistem terhubung langsung dengan Google Sheets & Database Ambulu.', 'info')">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-brandmint-400 text-[10px] font-black text-slate-900 flex items-center justify-center shadow-xs">
-            ✓
-          </span>
-        </div>
-
-        <!-- Logout Button -->
+      <!-- Right: Action Buttons -->
+      <div class="flex items-center gap-2">
         <button onclick="handleLogout()" title="Keluar dari Aplikasi"
           class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center transition cursor-pointer shadow-xs">
           <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -354,7 +403,7 @@
       </div>
     </header>
 
-    <!-- AREA VIEW 1: PORTAL DASHBOARD (SUPER ADMIN, ADMIN, ATAU GURU) -->
+    <!-- AREA VIEW 1: PORTAL DASHBOARD (GURU MANDIRI) -->
     <main id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-2 space-y-6 animate-fade-in">
       <div id="portalHeroContainer"></div>
       <div id="portalCardsContainer"></div>
@@ -363,7 +412,6 @@
 
     <!-- AREA VIEW 2: HALAMAN MODUL TERSENDIRI -->
     <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-3 space-y-5 animate-fade-in">
-      <!-- Header Modul: Circular Back Button '<' + Filter Pills + Judul -->
       <div class="bg-white rounded-3xl p-4 sm:p-5 soft-card-shadow border border-slate-100 flex flex-wrap items-center justify-between gap-4 no-print">
         <div class="flex items-center gap-3.5">
           <button onclick="backToPortal()"
@@ -377,7 +425,6 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <div id="moduleHeaderFilterArea" class="hidden sm:flex items-center gap-2"></div>
           <div id="moduleHeaderActions" class="flex items-center gap-2"></div>
         </div>
       </div>
@@ -391,7 +438,6 @@
 
     <!-- FLOATING BOTTOM NAVIGATION DOCK -->
     <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-sm sm:max-w-md bg-white/95 backdrop-blur-xl border border-white/60 shadow-[0_12px_36px_rgba(124,58,237,0.18)] rounded-full px-5 py-2.5 flex items-center justify-between no-print">
-      <!-- 1. Home / Portal Button -->
       <button onclick="backToPortal()" class="flex flex-col items-center gap-0.5 text-brandpurple-700 cursor-pointer">
         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor">
           <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
@@ -399,17 +445,15 @@
         <span class="text-[10px] font-extrabold">Beranda</span>
       </button>
 
-      <!-- 2. Documents / Perangkat Button -->
-      <button onclick="openModule(currentRole === 'Guru' ? 'guru-perangkat' : 'admin-perangkat')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+      <button onclick="openModule('guru-perangkat')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
         <span class="text-[10px] font-bold">Perangkat</span>
       </button>
 
-      <!-- 3. Center Elevated Action Button -->
       <div class="-mt-8">
-        <button onclick="handleFloatingCenterAction()"
+        <button onclick="openFormInputNilaiModal()"
           class="w-13 h-13 rounded-2xl glass-card-purple text-white flex items-center justify-center text-xl font-bold shadow-[0_10px_25px_rgba(109,40,217,0.45)] hover:scale-105 active:scale-95 transition-all cursor-pointer">
           <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
@@ -417,15 +461,13 @@
         </button>
       </div>
 
-      <!-- 4. Grades / Nilai Button -->
-      <button onclick="openModule(currentRole === 'Guru' ? 'guru-nilai' : 'admin-nilai')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+      <button onclick="openModule('guru-nilai')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
         </svg>
         <span class="text-[10px] font-bold">Nilai</span>
       </button>
 
-      <!-- 5. Profile / Pengaturan Button -->
       <button onclick="openProfileDetailModal()" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -437,8 +479,8 @@
     <!-- BOTTOM DECORATIVE WAVY BANNER -->
     <div class="mt-auto w-full overflow-hidden leading-none no-print" id="bottomWaveContainer">
       <svg viewBox="0 0 1200 60" preserveAspectRatio="none" class="w-full h-8 sm:h-12">
-        <path d="M0,0 C300,45 600,10 900,40 C1050,55 1150,20 1200,30 L1200,60 L0,60 Z" fill="#0284c7" opacity="0.8"></path>
-        <path d="M0,20 C250,55 550,25 850,50 C1000,60 1120,35 1200,45 L1200,60 L0,60 Z" fill="#facc15" opacity="0.9"></path>
+        <path d="M0,0 C300,45 600,10 900,40 C1050,55 1150,20 1200,30 L1200,60 L0,60 Z" fill="#047857" opacity="0.3"></path>
+        <path d="M0,20 C250,55 550,25 850,50 C1000,60 1120,35 1200,45 L1200,60 L0,60 Z" fill="#0D9488" opacity="0.25"></path>
       </svg>
     </div>
 
@@ -463,30 +505,26 @@
   <div id="printAreaContainer" class="hidden"></div>
 
   <!-- ==========================================
-       JAVASCRIPT APPLICATION ENGINE
+       JAVASCRIPT APPLICATION ENGINE (OPSI C)
        ========================================== -->
   <script>
     // ==========================================
-    // DATA STATE LENGKAP & INTEGRASI MULTI-SEKOLAH
+    // DATA STATE LENGKAP & INTEGRASI NPSN
     // ==========================================
-    let currentUser = null;
-    let currentRole = 'Guru'; // 'SuperAdmin' | 'Admin' | 'Guru'
+    let currentUser = null; // Profile Guru yang sedang login
+    let currentSchool = null; // Data Sekolah terverifikasi (NPSN)
+    let currentRole = 'Guru';
     let activeGuruClassId = null;
 
     let dbData = {
       pengaturan: {
-        namaSekolah: 'SD Negeri Ambulu 01',
-        npsn: '20512001',
-        alamatSekolah: 'Jl. Ahmad Yani No. 12, Ambulu',
+        namaSekolah: 'SD Negeri di Kecamatan Ambulu',
+        npsn: '',
         kecamatan: 'Ambulu - Jember',
-        kepalaSekolah: 'Dra. Hj. Nurul Hidayati, M.Pd.',
-        nipKepalaSekolah: '19700512 199603 2 001',
         tahunAjaranAktif: '2026/2027',
-        semesterAktif: 'Ganjil',
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_Tut_Wuri_Handayani.png'
+        semesterAktif: 'Ganjil'
       },
-      schools: window.APP_CONFIG && window.APP_CONFIG.MASTER_SEKOLAH_AMBULU ? [...window.APP_CONFIG.MASTER_SEKOLAH_AMBULU] : [],
-      users: [],
+      schools: window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || [],
       kelas: [],
       siswa: [],
       presensi: [],
@@ -494,330 +532,415 @@
       jurnal: [],
       perangkat: [],
       pengumuman: [
-        { id: 'PGM-01', tanggal: '2026-11-14', judul: 'Edaran Penilaian Sumatif Akhir Semester (SAS)', isi: 'Seluruh guru SD se-Kecamatan Ambulu diharapkan menyelesaikan penilaian sumatif semester ganjil tepat waktu.', pengirim: 'Koorwil Pendidikan Ambulu' }
-      ],
-      logs: []
+        { id: 'PGM-01', tanggal: '2026-11-15', judul: 'Edaran Kurikulum Merdeka Semester Ganjil', isi: 'Bapak/Ibu Guru diharapkan memastikan data rombel dan capaian pembelajaran terisi lengkap.', pengirim: 'Koorwil Pendidikan Ambulu' }
+      ]
     };
 
     const GAS_URL = (window.APP_CONFIG && window.APP_CONFIG.GAS_API_URL) ? window.APP_CONFIG.GAS_API_URL : '';
     const IS_CONNECTED = !!(window.APP_CONFIG && window.APP_CONFIG.isConnected && window.APP_CONFIG.isConnected());
 
     // ==========================================
-    // FIREBASE AUTHENTICATION (GOOGLE SIGN-IN)
+    // TAB LOGIN SWITCHER (MASUK vs DAFTAR)
     // ==========================================
-    let firebaseAuth = null;
-    function initFirebase() {
-      if (window.APP_CONFIG && window.APP_CONFIG.isFirebaseReady()) {
-        try {
-          if (!firebase.apps.length) {
-            firebase.initializeApp(window.APP_CONFIG.FIREBASE_CONFIG);
-          }
-          firebaseAuth = firebase.auth();
-        } catch (e) {
-          console.warn('Firebase init warning:', e);
-        }
+    function switchLoginTab(tab) {
+      const btnLogin = document.getElementById('tabBtnLogin');
+      const btnReg = document.getElementById('tabBtnRegister');
+      const formLogin = document.getElementById('formTeacherLogin');
+      const formReg = document.getElementById('formTeacherRegister');
+
+      if (tab === 'login') {
+        btnLogin.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
+        btnReg.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10';
+        formLogin.classList.remove('hidden');
+        formReg.classList.add('hidden');
+      } else {
+        btnReg.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
+        btnLogin.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10';
+        formReg.classList.remove('hidden');
+        formLogin.classList.add('hidden');
       }
     }
 
-    async function handleGoogleSignIn() {
-      // 1. Cek apakah Firebase sudah terkonfigurasi
-      if (window.APP_CONFIG && window.APP_CONFIG.isFirebaseReady() && firebaseAuth) {
-        try {
-          showToast('Menghubungkan ke Google Sign-In...', 'info');
-          const provider = new firebase.auth.GoogleAuthProvider();
-          const result = await firebaseAuth.signInWithPopup(provider);
-          const user = result.user;
-          const idToken = await user.getIdToken();
+    // Debounce Cek Verifikasi Sekolah di Form Login
+    let checkSchoolTimer = null;
+    function handleCheckSchoolDebounce() {
+      if (checkSchoolTimer) clearTimeout(checkSchoolTimer);
+      checkSchoolTimer = setTimeout(checkSchoolLoginBadge, 400);
+    }
 
-          await processGoogleUserSession({
-            uid: user.uid,
-            email: user.email,
-            nama: user.displayName || user.email.split('@')[0],
-            fotoUrl: user.photoURL || '',
-            idToken: idToken
-          });
-          return;
-        } catch (err) {
-          console.error('Firebase Auth Error:', err);
-          showToast('Login Google dibatalkan atau gagal: ' + err.message, 'error');
-        }
+    let checkRegSchoolTimer = null;
+    function handleRegCheckSchoolDebounce() {
+      if (checkRegSchoolTimer) clearTimeout(checkRegSchoolTimer);
+      checkRegSchoolTimer = setTimeout(checkSchoolRegBadge, 400);
+    }
+
+    function checkSchoolLoginBadge() {
+      const npsn = document.getElementById('loginNpsn').value.trim();
+      const code = document.getElementById('loginKodeUnik').value.trim();
+      const badge = document.getElementById('schoolVerifiedBadge');
+      const nameEl = document.getElementById('verifiedSchoolName');
+      const desaEl = document.getElementById('verifiedSchoolDesa');
+      const cardTitle = document.getElementById('cardSchoolDisplay');
+      const cardSub = document.getElementById('cardSchoolSubDisplay');
+
+      const found = window.APP_CONFIG.findSchool(npsn, code);
+      if (found) {
+        badge.classList.remove('hidden');
+        nameEl.textContent = found.nama;
+        desaEl.textContent = `NPSN: ${found.npsn} • Desa ${found.desa}, Kecamatan Ambulu`;
+        cardTitle.textContent = found.nama.toUpperCase();
+        cardSub.textContent = `NPSN ${found.npsn} • ${found.desa}`;
+        currentSchool = found;
+        fetchTeachersForSchoolDropdown(found.npsn, found.kodeUnik);
+      } else {
+        badge.classList.add('hidden');
+        cardTitle.textContent = 'NPSN & KODE UNIK SEKOLAH';
+        cardSub.textContent = 'SD Negeri se-Kecamatan Ambulu';
       }
-
-      // 2. Fallback Mode Cepat / Uji Coba Multi-Guru Langsung
-      openDirectGoogleEmailPrompt();
     }
 
-    function openDirectGoogleEmailPrompt() {
-      const content = `
-        <div class="space-y-4 text-xs">
-          <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-800">
-            <strong>Mode Cepat / Uji Coba Multi-Guru:</strong><br>
-            Kredensial Firebase Console belum diatur di <code class="font-bold">config.js</code>. Anda dapat memasukkan email Google apa saja untuk menguji isolasi data antar-guru secara nyata.
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Email Google Anda (Guru SD):</label>
-            <input type="email" id="promptGoogleEmail" value="guru.ambulu@gmail.com" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar:</label>
-            <input type="text" id="promptGoogleName" value="Dewi Rahmawati, S.Pd." class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-          </div>
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
-            <button type="button" onclick="submitDirectGoogleEmailPrompt()" class="px-5 py-2 bg-brandpurple-700 text-white rounded-full font-bold cursor-pointer">
-              Lanjutkan Masuk
-            </button>
-          </div>
-        </div>
-      `;
-      openUniversalModal('Masuk dengan Akun Google (Mode Cepat)', content);
+    function checkSchoolRegBadge() {
+      const npsn = document.getElementById('regNpsn').value.trim();
+      const code = document.getElementById('regKodeUnik').value.trim();
+      const badge = document.getElementById('regSchoolVerifiedBadge');
+      const nameEl = document.getElementById('regVerifiedSchoolName');
+
+      const found = window.APP_CONFIG.findSchool(npsn, code);
+      if (found) {
+        badge.classList.remove('hidden');
+        nameEl.textContent = `✅ Terhubung: ${found.nama} (${found.desa})`;
+      } else {
+        badge.classList.add('hidden');
+      }
     }
 
-    async function submitDirectGoogleEmailPrompt() {
-      const email = document.getElementById('promptGoogleEmail').value.trim();
-      const nama = document.getElementById('promptGoogleName').value.trim();
-      if (!email) return;
-
-      closeUniversalModal();
-      // Buat UID deterministik berdasarkan email
-      const mockUid = 'UID-GGL-' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 16);
-      await processGoogleUserSession({
-        uid: mockUid,
-        email: email,
-        nama: nama,
-        fotoUrl: '',
-        idToken: 'mock-token-' + mockUid
-      });
-    }
-
-    async function processGoogleUserSession(gUser) {
-      showToast('Memverifikasi akun Google ke database pusat...', 'info');
+    async function fetchTeachersForSchoolDropdown(npsn, kodeUnik) {
+      const container = document.getElementById('teacherSelectContainer');
       try {
-        const res = await apiPost('authGoogle', gUser);
-        if (res && res.success) {
-          if (res.isNewUser || !res.profile || !res.profile.schoolId) {
-            // Tampilkan Modal Registrasi Profil Guru Baru
-            openTeacherRegistrationModal(gUser);
-          } else {
-            // Pengguna lama yang sudah terdaftar
-            completeLoginSuccess(res.profile);
-          }
-        } else {
-          // Jika backend baru atau profile belum ada, arahkan registrasi
-          openTeacherRegistrationModal(gUser);
-        }
-      } catch (e) {
-        console.warn('Auth check error, open register modal:', e);
-        openTeacherRegistrationModal(gUser);
-      }
-    }
-
-    function openTeacherRegistrationModal(userObj) {
-      const schools = (dbData.schools && dbData.schools.length) ? dbData.schools : (window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || []);
-      const content = `
-        <form onsubmit="handleSaveTeacherRegistration(event)" class="space-y-3.5 text-xs">
-          <div class="p-3 bg-purple-50 rounded-2xl border border-purple-200 text-purple-900 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-brandpurple-600 text-white flex items-center justify-center font-black text-sm shrink-0">
-              ${(userObj.nama || 'G')[0]}
-            </div>
-            <div>
-              <div class="font-extrabold text-sm">${userObj.nama || 'Guru SD'}</div>
-              <div class="text-[11px] text-purple-700">${userObj.email}</div>
-            </div>
-          </div>
-
-          <input type="hidden" id="regUid" value="${userObj.uid}">
-          <input type="hidden" id="regEmail" value="${userObj.email}">
-          <input type="hidden" id="regFoto" value="${userObj.fotoUrl || ''}">
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
-            <input type="text" id="regNama" required value="${userObj.nama || ''}" placeholder="Contoh: Siti Aisyah, S.Pd.SD." class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">NIP / NUPTK</label>
-              <input type="text" id="regNip" placeholder="19920516 202012 2 004" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Nomor WhatsApp Aktif *</label>
-              <input type="tel" id="regNoHp" required placeholder="081234567890" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-            </div>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Sekolah Induk di Kecamatan Ambulu *</label>
-            <select id="regSchoolId" required class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-              ${schools.map(s => `<option value="${s.id}|${s.nama}">${s.nama} (${s.desa})</option>`).join('')}
-              <option value="NEW_SCHOOL">+ Ajukan Sekolah Baru (Verifikasi Super Admin)</option>
+        const res = await apiPost('verifySchoolByNpsn', { npsn: npsn, kodeUnik: kodeUnik });
+        if (res && res.success && res.teachers && res.teachers.length > 0) {
+          container.innerHTML = `
+            <select id="loginTeacherSelect" required class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+              <option value="">-- Pilih Nama Anda --</option>
+              ${res.teachers.map(t => `<option value="${t.id}">${t.nama} (${t.jabatan || 'Guru'})</option>`).join('')}
             </select>
-          </div>
+          `;
+          return;
+        }
+      } catch (e) {}
 
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Tugas / Jabatan *</label>
-              <select id="regJabatan" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-                <option value="Guru Kelas">Guru Kelas</option>
-                <option value="Guru Mapel PAI">Guru Mapel PAI</option>
-                <option value="Guru PJOK">Guru PJOK</option>
-                <option value="Guru Bahasa Inggris">Guru Bahasa Inggris</option>
-                <option value="Guru Mapel Lainnya">Guru Mapel Lainnya</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Status Kepegawaian *</label>
-              <select id="regStatus" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-                <option value="PNS">PNS</option>
-                <option value="PPPK">PPPK</option>
-                <option value="Guru Tetap Yayasan">Guru Tetap Yayasan</option>
-                <option value="Honorer / GTT">Honorer / GTT</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
-            <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-full font-bold cursor-pointer hover:bg-emerald-700">
-              Simpan Profil & Masuk Portal
-            </button>
-          </div>
-        </form>
+      // Fallback: input teks nama jika belum ada guru terdaftar di sekolah ini
+      container.innerHTML = `
+        <input type="text" id="loginTeacherNameInput" required placeholder="Masukkan Nama Lengkap Anda"
+          class="w-full p-2.5 bg-slate-100 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
       `;
-      openUniversalModal('Registrasi Profil Guru - Kecamatan Ambulu', content);
     }
 
-    async function handleSaveTeacherRegistration(e) {
+    // ==========================================
+    // ACTION: LOGIN GURU (OPSI C)
+    // ==========================================
+    async function handleLoginTeacherWithPin(e) {
       e.preventDefault();
-      const sVal = document.getElementById('regSchoolId').value.split('|');
-      const schoolId = sVal[0];
-      const namaSekolah = sVal[1] || 'SD Negeri di Kecamatan Ambulu';
+      const npsn = document.getElementById('loginNpsn').value.trim();
+      const kodeUnik = document.getElementById('loginKodeUnik').value.trim();
+      const pin = document.getElementById('loginPin').value.trim();
 
-      const payload = {
-        uid: document.getElementById('regUid').value,
-        nama: document.getElementById('regNama').value.trim(),
-        email: document.getElementById('regEmail').value.trim(),
-        fotoUrl: document.getElementById('regFoto').value,
-        nip: document.getElementById('regNip').value.trim(),
-        noHp: document.getElementById('regNoHp').value.trim(),
-        schoolId: schoolId,
-        namaSekolah: namaSekolah,
-        jabatan: document.getElementById('regJabatan').value,
-        statusKepegawaian: document.getElementById('regStatus').value,
-        role: 'Guru'
-      };
+      // Cek apakah select atau input teks
+      const selectEl = document.getElementById('loginTeacherSelect');
+      const inputEl = document.getElementById('loginTeacherNameInput');
+      const teacherIdOrName = selectEl ? selectEl.value : (inputEl ? inputEl.value.trim() : '');
 
-      closeUniversalModal();
-      showToast('Menyimpan data profil guru...', 'info');
+      if (!npsn || !kodeUnik || !teacherIdOrName || !pin) {
+        showToast('Lengkapi seluruh kolom login.', 'warning');
+        return;
+      }
+
+      const school = window.APP_CONFIG.findSchool(npsn, kodeUnik);
+      if (!school) {
+        showToast('Kombinasi NPSN dan Kode Unik Sekolah tidak valid.', 'error');
+        return;
+      }
+
+      showToast('Memverifikasi akun guru dan PIN...', 'info');
 
       try {
-        const res = await apiPost('registerTeacherProfile', payload);
+        const res = await apiPost('loginTeacherWithPin', {
+          npsn: npsn,
+          kodeUnik: kodeUnik,
+          teacherId: teacherIdOrName,
+          pin: pin
+        });
+
         if (res && res.success) {
-          completeLoginSuccess(res.profile || payload);
+          completeLoginTeacher(res.teacher, school, res);
         } else {
-          completeLoginSuccess(payload);
+          // Fallback lokal jika backend belum tersinkronisasi
+          completeLoginTeacher({
+            id: 'GUR-' + npsn + '-LOCAL',
+            nama: selectEl ? selectEl.options[selectEl.selectedIndex].text : teacherIdOrName,
+            schoolId: school.id,
+            namaSekolah: school.nama,
+            npsn: school.npsn,
+            jabatan: 'Guru Kelas',
+            role: 'Guru'
+          }, school);
         }
       } catch (err) {
-        completeLoginSuccess(payload);
+        completeLoginTeacher({
+          id: 'GUR-' + npsn + '-LOCAL',
+          nama: teacherIdOrName,
+          schoolId: school.id,
+          namaSekolah: school.nama,
+          npsn: school.npsn,
+          jabatan: 'Guru Kelas',
+          role: 'Guru'
+        }, school);
       }
     }
 
-    function quickLoginDemo(role) {
-      if (role === 'SuperAdmin') {
-        completeLoginSuccess({
-          uid: 'UID-SUPER-ADMIN',
-          nama: 'Drs. H. Mulyadi, M.Pd.',
-          email: 'koorwil.ambulu@kemdikbud.go.id',
-          role: 'SuperAdmin',
-          schoolId: 'KEC-AMBULU',
-          namaSekolah: 'Koorwil Pendidikan Kecamatan Ambulu',
-          jabatan: 'Koordinator Wilayah Bidang Pendidikan'
-        });
-      } else if (role === 'Admin') {
-        completeLoginSuccess({
-          uid: 'UID-ADMIN-SCH01',
-          nama: 'Budi Santoso, S.Pd.SD.',
-          email: 'admin.ambulu01@sekolah.id',
-          role: 'Admin',
-          schoolId: 'SCH-AMB-01',
-          namaSekolah: 'SD Negeri Ambulu 01',
-          jabatan: 'Admin Sekolah'
-        });
-      } else {
-        completeLoginSuccess({
-          uid: 'UID-GURU-DEWI',
-          nama: 'Dewi Rahmawati, S.Pd.',
-          email: 'dewi.rahmawati@guru.sd.belajar.id',
-          role: 'Guru',
-          schoolId: 'SCH-AMB-01',
-          namaSekolah: 'SD Negeri Ambulu 01',
-          jabatan: 'Guru Kelas'
-        });
+    // ==========================================
+    // ACTION: REGISTRASI GURU BARU (OPSI C)
+    // ==========================================
+    async function handleRegisterTeacherWithPin(e) {
+      e.preventDefault();
+      const npsn = document.getElementById('regNpsn').value.trim();
+      const kodeUnik = document.getElementById('regKodeUnik').value.trim();
+      const nama = document.getElementById('regNama').value.trim();
+      const nip = document.getElementById('regNip').value.trim();
+      const noHp = document.getElementById('regNoHp').value.trim();
+      const jabatan = document.getElementById('regJabatan').value;
+      const pin = document.getElementById('regPin').value.trim();
+
+      if (!npsn || !kodeUnik || !nama || !pin) {
+        showToast('NPSN, Kode Unik, Nama, dan PIN wajib diisi.', 'warning');
+        return;
+      }
+
+      const school = window.APP_CONFIG.findSchool(npsn, kodeUnik);
+      if (!school) {
+        showToast('NPSN atau Kode Unik Sekolah tidak cocok dengan 13 SDN Ambulu.', 'error');
+        return;
+      }
+
+      showToast('Mendaftarkan profil guru ke sistem lembaga...', 'info');
+
+      const payload = {
+        npsn: npsn,
+        kodeUnik: kodeUnik,
+        nama: nama,
+        nip: nip,
+        noHp: noHp,
+        jabatan: jabatan,
+        statusKepegawaian: nip ? 'PNS' : 'Honorer / GTT',
+        pin: pin
+      };
+
+      try {
+        const res = await apiPost('registerTeacherWithPin', payload);
+        const profile = (res && res.teacher) ? res.teacher : {
+          id: 'GUR-' + npsn + '-' + Date.now().toString().slice(-4),
+          nama: nama,
+          nip: nip,
+          noHp: noHp,
+          schoolId: school.id,
+          namaSekolah: school.nama,
+          npsn: school.npsn,
+          jabatan: jabatan,
+          role: 'Guru'
+        };
+
+        completeLoginTeacher(profile, school, null, true);
+      } catch (err) {
+        completeLoginTeacher({
+          id: 'GUR-' + npsn + '-' + Date.now().toString().slice(-4),
+          nama: nama,
+          nip: nip,
+          noHp: noHp,
+          schoolId: school.id,
+          namaSekolah: school.nama,
+          npsn: school.npsn,
+          jabatan: jabatan,
+          role: 'Guru'
+        }, school, null, true);
       }
     }
 
-    function completeLoginSuccess(profile) {
-      currentUser = profile;
-      currentRole = profile.role || 'Guru';
+    function completeLoginTeacher(teacher, school, backendData = null, isNew = false) {
+      currentUser = teacher;
+      currentSchool = school;
+      currentRole = 'Guru';
 
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'flex';
 
       updateHeaderUserUI();
       saveSessionState();
-      renderPortal();
 
-      // Sinkronkan data terisolasi dari database pusat Google Sheets
+      if (backendData) {
+        if (backendData.classes) dbData.kelas = backendData.classes;
+        if (backendData.students) dbData.siswa = backendData.students;
+        if (backendData.attendance) dbData.presensi = backendData.attendance;
+        if (backendData.grades) dbData.nilai = backendData.grades;
+        if (backendData.journals) dbData.jurnal = backendData.journals;
+      }
+
+      if (dbData.kelas.length > 0) {
+        activeGuruClassId = dbData.kelas[0].id;
+      }
+
+      renderPortal();
       syncBackendData();
       startAutoSync();
-      showToast(`Selamat datang, ${currentUser.nama.split(',')[0]}!`, 'success');
-    }
 
-    function toggleRoleSwitch() {
-      if (!currentUser) return;
-      if (currentUser.role === 'SuperAdmin') {
-        currentRole = currentRole === 'SuperAdmin' ? 'Admin' : (currentRole === 'Admin' ? 'Guru' : 'SuperAdmin');
-      } else if (currentUser.role === 'Admin') {
-        currentRole = currentRole === 'Admin' ? 'Guru' : 'Admin';
-      } else {
-        showToast('Anda berada di Portal Guru Mandiri.', 'info');
-        return;
-      }
-      updateHeaderUserUI();
-      renderPortal();
-      showToast(`Beralih ke Portal ${currentRole}`, 'info');
-    }
+      showToast(`Berhasil masuk ke ${school.nama}!`, 'success');
 
-    function handleFloatingCenterAction() {
-      if (currentRole === 'Guru') {
-        openFormInputNilaiModal();
-      } else if (currentRole === 'Admin') {
-        openFormPenugasanModal();
-      } else {
-        openFormPengajuanSekolahModal();
+      // JIKA GURU BARU / BELUM MEMILIKI KELAS: Buka Modal Pembuatan Kelas Pertama Mandiri
+      if (isNew || dbData.kelas.length === 0) {
+        setTimeout(openFirstClassCreationWizard, 500);
       }
-    }
-
-    function handleLogout() {
-      currentUser = null;
-      activeGuruClassId = null;
-      stopAutoSync();
-      sessionStorage.removeItem('siguru_session');
-      if (firebaseAuth) {
-        try { firebaseAuth.signOut(); } catch (e) {}
-      }
-      document.getElementById('mainApp').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
-      window.scrollTo(0, 0);
-      showToast('Sesi Anda telah diakhiri.', 'info');
     }
 
     // ==========================================
-    // API CALLS (PROXIED & DIRECT GAS FALLBACK)
+    // WIZARD WAJIB: BUAT KELAS PERTAMA KALI
+    // ==========================================
+    function openFirstClassCreationWizard() {
+      const schName = currentSchool ? currentSchool.nama : 'Sekolah';
+      const content = `
+        <div class="space-y-4 text-xs">
+          <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 space-y-1">
+            <h4 class="font-extrabold text-sm">Selamat Datang di ${schName}!</h4>
+            <p class="text-slate-600 leading-relaxed">
+              Sebelum mulai mengelola administrasi, silakan tentukan rombongan belajar / kelas yang Anda ampu terlebih dahulu.
+            </p>
+          </div>
+
+          <form onsubmit="handleSaveFirstClassWizard(event)" class="space-y-3.5">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Tingkat Kelas *</label>
+              <select id="wzTingkat" required class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
+                <option value="I">Kelas I (Fase A)</option>
+                <option value="II">Kelas II (Fase A)</option>
+                <option value="III">Kelas III (Fase B)</option>
+                <option value="IV" selected>Kelas IV (Fase B)</option>
+                <option value="V">Kelas V (Fase C)</option>
+                <option value="VI">Kelas VI (Fase C)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Nama Rombongan Belajar (Rombel) *</label>
+              <input type="text" id="wzNama" required value="Kelas IV-A" placeholder="Contoh: Kelas IV-A" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Tahun Ajaran *</label>
+                <input type="text" id="wzTahun" required value="2026/2027" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Semester *</label>
+                <select id="wzSemester" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
+                  <option value="Ganjil" selected>Ganjil</option>
+                  <option value="Genap">Genap</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-2xl shadow-lg transition cursor-pointer mt-2">
+              Simpan & Mulai Gunakan Aplikasi ➔
+            </button>
+          </form>
+        </div>
+      `;
+      openUniversalModal('Buat Kelas Mengajar Pertama Anda', content);
+    }
+
+    async function handleSaveFirstClassWizard(e) {
+      e.preventDefault();
+      const tingkat = document.getElementById('wzTingkat').value;
+      const nama = document.getElementById('wzNama').value.trim();
+      const tahun = document.getElementById('wzTahun').value.trim();
+      const semester = document.getElementById('wzSemester').value;
+
+      const newId = 'KLS-' + Date.now().toString().slice(-5);
+      const kObj = {
+        id: newId,
+        tingkat: tingkat,
+        namaRombel: nama,
+        tahunAjaran: tahun,
+        semester: semester,
+        statusKelas: 'Aktif'
+      };
+
+      dbData.kelas.push(kObj);
+      activeGuruClassId = newId;
+
+      closeUniversalModal();
+      renderPortal();
+      showToast(`Kelas ${nama} berhasil diaktifkan!`, 'success');
+
+      await executeDbWrite('saveClassTeacher', kObj, `Kelas ${nama} tersimpan di database.`);
+    }
+
+    // ==========================================
+    // MODAL DIRECTORY KODE UNIK 13 SD AMBULU
+    // ==========================================
+    function openMasterSchoolDirectoryModal() {
+      const schools = window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || [];
+      const content = `
+        <div class="space-y-4 text-xs">
+          <div class="p-3 bg-purple-50 rounded-2xl border border-purple-200 text-purple-900 leading-relaxed">
+            <strong>Daftar NPSN & Kode Unik Akses Lembaga:</strong><br>
+            Setiap guru cukup memasukkan NPSN dan Kode Unik sekolah masing-masing untuk terhubung ke lembaganya.
+          </div>
+
+          <div class="max-h-72 overflow-y-auto space-y-2 pr-1">
+            ${schools.map(s => `
+              <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-between gap-2">
+                <div>
+                  <h4 class="font-extrabold text-slate-900 text-xs">${s.nama}</h4>
+                  <div class="font-mono text-[11px] text-slate-500">
+                    NPSN: <strong class="text-slate-800">${s.npsn}</strong> • Desa ${s.desa}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="inline-block px-2.5 py-1 rounded-lg bg-brandpurple-100 text-brandpurple-800 font-mono font-black text-xs">
+                    ${s.kodeUnik}
+                  </span>
+                  <button onclick="applySchoolCode('${s.npsn}', '${s.kodeUnik}')" class="block mt-1 text-[10px] text-emerald-600 font-extrabold hover:underline">
+                    Gunakan Ini ➔
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button onclick="closeUniversalModal()" class="px-5 py-2 bg-slate-100 rounded-full font-bold">
+              Tutup
+            </button>
+          </div>
+        </div>
+      `;
+      openUniversalModal('Daftar NPSN & Kode Akses 13 SD Ambulu', content);
+    }
+
+    function applySchoolCode(npsn, kode) {
+      document.getElementById('loginNpsn').value = npsn;
+      document.getElementById('loginKodeUnik').value = kode;
+      document.getElementById('regNpsn').value = npsn;
+      document.getElementById('regKodeUnik').value = kode;
+      closeUniversalModal();
+      checkSchoolLoginBadge();
+      checkSchoolRegBadge();
+      showToast(`NPSN ${npsn} terpasang.`, 'info');
+    }
+
+    // ==========================================
+    // API CALLS & SINKRONISASI
     // ==========================================
     async function apiGet(action, params = {}) {
       if (!IS_CONNECTED) return null;
-      // 1. Coba via proxy serverless Vercel (/api/gas)
       try {
         const proxyUrl = new URL('/api/gas', window.location.origin);
         proxyUrl.searchParams.set('action', action);
@@ -828,11 +951,8 @@
           const data = await res.json();
           if (data && data.success) return data;
         }
-      } catch (e) {
-        console.warn('Proxy GET info:', e.message);
-      }
+      } catch (e) {}
 
-      // 2. Fallback: Direct GET ke Google Apps Script Web App
       try {
         const directUrl = new URL(GAS_URL);
         directUrl.searchParams.set('action', action);
@@ -840,9 +960,7 @@
         const dRes = await fetch(directUrl.toString(), { redirect: 'follow' });
         const dJson = await dRes.json();
         if (dJson && dJson.success) return dJson;
-      } catch (err) {
-        console.warn('Direct GAS GET info:', err.message);
-      }
+      } catch (err) {}
       return null;
     }
 
@@ -855,82 +973,60 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ gasUrl: GAS_URL, action: action, payload: payload })
         });
-        
         const text = await res.text();
         let data = null;
         try {
           data = JSON.parse(text);
         } catch (pe) {
-          throw new Error('Respons backend bukan JSON: ' + (text ? text.slice(0, 120) : 'Respons kosong'));
+          throw new Error('Respons backend bukan JSON');
         }
-
-        if (res.ok && data && data.success) {
-          return data;
-        } else {
-          const msg = (data && data.message) ? data.message : ('Server error (HTTP ' + res.status + ')');
-          throw new Error(msg);
-        }
+        if (res.ok && data && data.success) return data;
+        throw new Error(data && data.message ? data.message : 'Server error');
       } catch (e) {
-        console.error('API POST Error:', e);
         throw e;
       }
     }
 
-    // Helper Eksekusi Tulis Terpusat dengan Verifikasi Backend
     async function executeDbWrite(action, payload, successMsg = 'Data berhasil disimpan.') {
       setSyncStatus('syncing', 'Menyimpan ke server...');
       try {
         const enrichedPayload = {
           ...payload,
-          ownerUid: currentUser ? (currentUser.uid || currentUser.id) : '',
-          schoolId: currentUser ? currentUser.schoolId : '',
-          namaSekolah: currentUser ? currentUser.namaSekolah : ''
+          ownerUid: currentUser ? (currentUser.id || currentUser.uid) : '',
+          schoolId: currentSchool ? currentSchool.id : (currentUser ? currentUser.schoolId : ''),
+          namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : '')
         };
         const res = await apiPost(action, enrichedPayload);
         if (res && res.success) {
-          if (res.version) {
-            syncState.clientVersion = Number(res.version);
-            syncState.serverVersion = Number(res.version);
-          } else {
-            syncState.clientVersion += 1;
-          }
           syncState.lastSyncTime = new Date();
           setSyncStatus('synced', 'Tersinkronisasi');
           if (successMsg) showToast(successMsg, 'success');
           return { success: true, res };
         } else {
-          const errMsg = (res && res.message) ? res.message : 'Penyimpanan backend gagal.';
           setSyncStatus('error', 'Gagal Menyimpan');
-          showToast(errMsg, 'error');
-          return { success: false, message: errMsg };
+          showToast((res && res.message) ? res.message : 'Gagal simpan', 'error');
+          return { success: false };
         }
       } catch (err) {
         setSyncStatus('error', 'Gagal Menyimpan');
-        showToast('Koneksi penyimpanan gagal: ' + err.message, 'error');
-        return { success: false, message: err.message };
+        return { success: false };
       }
     }
 
     // ==========================================
-    // SISTEM SINKRONISASI DATA REAL-TIME
+    // AUTO-SYNC STATUS
     // ==========================================
     let activeModuleKey = null;
-
     const syncState = {
       clientVersion: 0,
       serverVersion: 0,
       lastSyncTime: null,
       isSyncing: false,
       pollTimer: null,
-      isTabActive: true,
-      status: 'synced',
-      statusMessage: 'Tersinkronisasi'
+      isTabActive: true
     };
 
     function setSyncStatus(status, message) {
-      syncState.status = status;
-      syncState.statusMessage = message;
-
       const badge = document.getElementById('syncStatusBadge');
       const dot = document.getElementById('syncStatusDot');
       const text = document.getElementById('syncStatusText');
@@ -938,12 +1034,11 @@
       const spin = document.getElementById('syncIconSpin');
 
       if (!badge || !dot || !text) return;
-
       badge.className = 'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer shadow-xs select-none ';
       dot.className = 'w-2.5 h-2.5 rounded-full ';
       if (spin) spin.classList.remove('animate-spin');
 
-      const nowStr = syncState.lastSyncTime ? syncState.lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '--:--';
+      const nowStr = syncState.lastSyncTime ? syncState.lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
       if (time) time.textContent = nowStr;
 
       if (status === 'synced') {
@@ -955,102 +1050,50 @@
         dot.className += 'bg-amber-500';
         if (spin) spin.classList.add('animate-spin');
         text.textContent = message || 'Menyinkronkan...';
-      } else if (status === 'offline') {
-        badge.className += 'bg-slate-100 text-slate-700 border border-slate-300';
-        dot.className += 'bg-rose-500';
-        text.textContent = message || 'Koneksi terputus';
       } else if (status === 'error') {
         badge.className += 'bg-rose-50 text-rose-800 border border-rose-200';
-        dot.className += 'bg-rose-600 animate-ping';
+        dot.className += 'bg-rose-600';
         text.textContent = message || 'Gagal menyimpan';
       }
     }
 
-    async function syncBackendData(silent = false) {
+    async function syncBackendData() {
       if (!IS_CONNECTED || !currentUser) return false;
       if (syncState.isSyncing) return false;
       syncState.isSyncing = true;
-      if (!silent) setSyncStatus('syncing', 'Menyinkronkan...');
 
       try {
-        let endpoint = 'getTeacherData';
-        let params = {
-          teacherUid: currentUser.uid || currentUser.id || '',
-          schoolId: currentUser.schoolId || ''
-        };
-
-        if (currentRole === 'SuperAdmin') {
-          endpoint = 'getSuperAdminData';
-          params = {};
-        } else if (currentRole === 'Admin') {
-          endpoint = 'getSchoolAdminData';
-          params = { schoolId: currentUser.schoolId || '' };
-        }
-
-        const res = await apiGet(endpoint, params);
+        const res = await apiGet('getTeacherData', {
+          teacherUid: currentUser.id || currentUser.uid || '',
+          schoolId: currentSchool ? currentSchool.id : (currentUser.schoolId || '')
+        });
         if (res && res.success) {
-          // Merge data sesuai hak akses & isolasi tenant
           if (res.kelas) dbData.kelas = res.kelas;
           if (res.siswa) dbData.siswa = res.siswa;
           if (res.presensi) dbData.presensi = res.presensi;
           if (res.nilai) dbData.nilai = res.nilai;
           if (res.jurnal) dbData.jurnal = res.jurnal;
           if (res.perangkat) dbData.perangkat = res.perangkat;
-          if (res.schools) dbData.schools = res.schools;
-          if (res.teachers) dbData.users = res.teachers;
 
-          // Default set active class jika ada kelas
           if (dbData.kelas.length > 0 && (!activeGuruClassId || !dbData.kelas.find(k => k.id === activeGuruClassId))) {
             activeGuruClassId = dbData.kelas[0].id;
           }
 
-          if (res.version) {
-            syncState.clientVersion = Number(res.version);
-            syncState.serverVersion = Number(res.version);
-          }
           syncState.lastSyncTime = new Date();
           setSyncStatus('synced', 'Tersinkronisasi');
-
           refreshActiveModuleContent();
           return true;
-        } else {
-          if (!silent) setSyncStatus('error', 'Gagal Sinkronisasi');
-          return false;
         }
-      } catch (err) {
-        console.warn('Sync backend error:', err);
-        if (!silent) setSyncStatus('error', 'Koneksi Terputus');
-        return false;
+      } catch (e) {
       } finally {
         syncState.isSyncing = false;
       }
-    }
-
-    async function checkSyncHeartbeat() {
-      if (!currentUser || !navigator.onLine || !syncState.isTabActive || syncState.isSyncing) return;
-      try {
-        const res = await apiGet('checkSyncStatus', { clientVersion: syncState.clientVersion });
-        if (res && res.success) {
-          syncState.serverVersion = Number(res.serverVersion || 0);
-          if (res.hasUpdates) {
-            const activeEl = document.activeElement;
-            const isUserTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
-            if (!isUserTyping) {
-              await syncBackendData(true);
-            }
-          } else {
-            syncState.lastSyncTime = new Date();
-            setSyncStatus('synced', 'Tersinkronisasi');
-          }
-        }
-      } catch (e) {
-        console.warn('Heartbeat error:', e);
-      }
+      return false;
     }
 
     function startAutoSync() {
       if (syncState.pollTimer) clearInterval(syncState.pollTimer);
-      syncState.pollTimer = setInterval(checkSyncHeartbeat, 6500);
+      syncState.pollTimer = setInterval(syncBackendData, 8000);
     }
 
     function stopAutoSync() {
@@ -1062,7 +1105,7 @@
 
     function manualTriggerSync() {
       showToast('Memeriksa pembaruan database...', 'info');
-      syncBackendData(false);
+      syncBackendData();
     }
 
     // ==========================================
@@ -1072,38 +1115,24 @@
       if (!currentUser) return;
       const idEl = document.getElementById('topUserIdentity');
       const badgeEl = document.getElementById('topUserRoleBadge');
-      const avatarContainer = document.getElementById('topUserAvatarContainer');
-      const switchEl = document.getElementById('switchRoleLabel');
+      const avatarEl = document.getElementById('topUserAvatarInitial');
       const schoolEl = document.getElementById('globalSchoolIdentity');
 
       if (idEl) idEl.textContent = currentUser.nama.split(',')[0];
-      if (badgeEl) {
-        badgeEl.textContent = currentRole === 'SuperAdmin' ? 'Super Admin' : (currentRole === 'Admin' ? 'Admin Sekolah' : 'Guru');
-      }
-      if (avatarContainer) {
-        if (currentUser.fotoUrl) {
-          avatarContainer.innerHTML = `<img src="${currentUser.fotoUrl}" class="w-full h-full object-cover rounded-full">`;
-        } else {
-          avatarContainer.innerHTML = `<span>${(currentUser.nama || 'G')[0]}</span>`;
-        }
-      }
-      if (switchEl) {
-        switchEl.textContent = currentRole === 'SuperAdmin' ? 'Portal Admin' : (currentRole === 'Admin' ? 'Portal Guru' : 'Ganti Portal');
-      }
-      if (schoolEl) {
-        schoolEl.textContent = currentUser.namaSekolah || 'SD Negeri di Kecamatan Ambulu';
-      }
+      if (badgeEl) badgeEl.textContent = currentUser.jabatan || 'Guru';
+      if (avatarEl) avatarEl.textContent = (currentUser.nama || 'G')[0];
+      if (schoolEl) schoolEl.textContent = currentSchool ? currentSchool.nama : (currentUser.namaSekolah || 'SDN di Ambulu');
     }
 
     function saveSessionState() {
       if (!currentUser) {
-        sessionStorage.removeItem('siguru_session');
+        sessionStorage.removeItem('siguru_npsn_session');
         return;
       }
       try {
-        sessionStorage.setItem('siguru_session', JSON.stringify({
+        sessionStorage.setItem('siguru_npsn_session', JSON.stringify({
           user: currentUser,
-          role: currentRole,
+          school: currentSchool,
           activeClassId: activeGuruClassId,
           activeModule: activeModuleKey,
           time: Date.now()
@@ -1113,12 +1142,12 @@
 
     function restoreSession() {
       try {
-        const raw = sessionStorage.getItem('siguru_session');
+        const raw = sessionStorage.getItem('siguru_npsn_session');
         if (!raw) return false;
         const s = JSON.parse(raw);
-        if (s && s.user) {
+        if (s && s.user && s.school) {
           currentUser = s.user;
-          currentRole = s.role || 'Guru';
+          currentSchool = s.school;
           activeGuruClassId = s.activeClassId || null;
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('mainApp').style.display = 'flex';
@@ -1128,18 +1157,29 @@
           } else {
             renderPortal();
           }
-          syncBackendData(true);
+          syncBackendData();
           startAutoSync();
           return true;
         }
-      } catch (e) {
-        console.warn('Gagal pulihkan sesi:', e);
-      }
+      } catch (e) {}
       return false;
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      currentSchool = null;
+      activeGuruClassId = null;
+      stopAutoSync();
+      sessionStorage.removeItem('siguru_npsn_session');
+      document.getElementById('mainApp').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      window.scrollTo(0, 0);
+      showToast('Sesi Anda telah diakhiri.', 'info');
     }
 
     function openProfileDetailModal() {
       if (!currentUser) return;
+      const sch = currentSchool || { nama: currentUser.namaSekolah, npsn: currentUser.npsn, desa: '-' };
       const content = `
         <div class="space-y-4 text-xs">
           <div class="flex items-center gap-3.5 p-4 bg-purple-50 rounded-2xl border border-purple-200">
@@ -1148,17 +1188,17 @@
             </div>
             <div>
               <h4 class="font-extrabold text-slate-900 text-sm">${currentUser.nama}</h4>
-              <p class="text-purple-800 font-semibold">${currentUser.email}</p>
+              <p class="text-purple-800 font-semibold">${sch.nama}</p>
               <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-brandpurple-700 text-white">
-                ${currentRole} • ${currentUser.jabatan || 'Guru'}
+                ${currentUser.jabatan || 'Guru Kelas'}
               </span>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
             <div>
-              <span class="text-slate-400 font-bold block">Sekolah Induk</span>
-              <span class="font-extrabold text-slate-800">${currentUser.namaSekolah || '-'}</span>
+              <span class="text-slate-400 font-bold block">NPSN Lembaga</span>
+              <span class="font-mono font-extrabold text-slate-800">${sch.npsn || '-'}</span>
             </div>
             <div>
               <span class="text-slate-400 font-bold block">NIP / NUPTK</span>
@@ -1169,8 +1209,8 @@
               <span class="font-extrabold text-slate-800">${currentUser.noHp || '-'}</span>
             </div>
             <div>
-              <span class="text-slate-400 font-bold block">Status Pegawai</span>
-              <span class="font-extrabold text-slate-800">${currentUser.statusKepegawaian || 'PNS'}</span>
+              <span class="text-slate-400 font-bold block">Desa</span>
+              <span class="font-extrabold text-slate-800">${sch.desa || 'Ambulu'}</span>
             </div>
           </div>
 
@@ -1181,11 +1221,11 @@
           </div>
         </div>
       `;
-      openUniversalModal('Profil Pengguna', content);
+      openUniversalModal('Profil Guru & Identitas Lembaga', content);
     }
 
     // ==========================================
-    // RENDER PORTAL UTAMA (SUPER ADMIN / ADMIN / GURU)
+    // RENDER PORTAL GURU UTAMA (8 KARTU)
     // ==========================================
     function renderPortal() {
       activeModuleKey = null;
@@ -1194,174 +1234,8 @@
       document.getElementById('moduleView').classList.add('hidden');
       window.scrollTo(0, 0);
 
-      if (currentRole === 'SuperAdmin') {
-        renderPortalSuperAdmin();
-      } else if (currentRole === 'Admin') {
-        renderPortalAdmin();
-      } else {
-        renderPortalGuru();
-      }
-    }
-
-    function backToPortal() {
-      renderPortal();
-    }
-
-    // ------------------------------------------
-    // A. PORTAL SUPER ADMIN KECAMATAN AMBULU
-    // ------------------------------------------
-    function renderPortalSuperAdmin() {
-      // Bottom Wavy
-      document.getElementById('bottomWaveContainer').innerHTML = `
-        <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#7C3AED" opacity="0.3"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#2563EB" opacity="0.3"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F8FAFC"></path>
-        </svg>
-      `;
-
-      // Hero Super Admin
-      document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="relative w-full rounded-[32px] p-6 sm:p-8 text-white shadow-[0_20px_45px_rgba(88,28,135,0.35)] overflow-hidden"
-             style="background: linear-gradient(135deg, #3B0764 0%, #581C87 40%, #7C3AED 100%);">
-          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-start gap-4 sm:gap-5 max-w-xl">
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/15 backdrop-blur-md p-2 flex items-center justify-center shrink-0 border border-white/20 shadow-md">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
-                  <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="#F59E0B" stroke="#FDE68A" stroke-width="3"/>
-                  <circle cx="50" cy="50" r="30" fill="#FFF"/>
-                  <path d="M50 20 L55 35 L45 35 Z" fill="#D97706"/>
-                </svg>
-              </div>
-              <div class="space-y-1">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400/30 text-yellow-200 border border-amber-300/30 uppercase tracking-wider">
-                  Koorwil Pendidikan
-                </span>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Portal Super Admin Kecamatan</h1>
-                <p class="text-xs sm:text-sm text-purple-100 font-medium">Kecamatan Ambulu, Kabupaten Jember • Jawa Timur</p>
-              </div>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center min-w-[140px]">
-              <span class="text-[10px] font-bold uppercase text-purple-200">Total SDN Ambulu</span>
-              <div class="text-2xl font-black text-white mt-0.5">14 Sekolah</div>
-              <span class="text-[10px] text-brandmint-300 font-semibold">Aktif & Terverifikasi</span>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // 8 Cards Super Admin
-      document.getElementById('portalCardsContainer').innerHTML = `
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Modul Koordinasi Kecamatan</h3>
-            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-purple-50 text-purple-700 border border-purple-200">
-              8 Menu Super Admin
-            </span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            ${createPortalCard('super-sekolah', 'Sekolah Dasar', 'Daftar 14 SDN & pengajuan baru', 'emerald', '🏫')}
-            ${createPortalCard('super-guru', 'Direktori Guru', 'Database guru se-Kecamatan Ambulu', 'blue', '👨‍🏫')}
-            ${createPortalCard('super-verifikasi', 'Verifikasi Akun', 'Persetujuan pendaftaran guru', 'amber', '✅')}
-            ${createPortalCard('super-statistik', 'Statistik Wilayah', 'Grafik & rekapitulasi siswa', 'purple', '📊')}
-            ${createPortalCard('admin-nilai', 'Rekap Nilai SD', 'Pantau nilai rapor antar sekolah', 'rose', '📈')}
-            ${createPortalCard('admin-absensi', 'Rekap Kehadiran', 'Rekapitulasi absensi wilayah', 'teal', '📅')}
-            ${createPortalCard('admin-perangkat', 'Bank Dokumen', 'Pusat kurikulum & perangkat ajar', 'sky', '📁')}
-            ${createPortalCard('super-audit', 'Audit & Backup', 'Riwayat aktivitas & backup data', 'indigo', '🛡️')}
-          </div>
-        </div>
-      `;
-
-      renderWelcomeBar('Super Admin Koorwil Ambulu', 'Kecamatan Ambulu - Jember');
-    }
-
-    // ------------------------------------------
-    // B. PORTAL ADMIN SEKOLAH
-    // ------------------------------------------
-    function renderPortalAdmin() {
-      const schName = currentUser ? (currentUser.namaSekolah || dbData.pengaturan.namaSekolah) : dbData.pengaturan.namaSekolah;
-
-      // Bottom Wavy
-      document.getElementById('bottomWaveContainer').innerHTML = `
-        <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#EAB308" opacity="0.4"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#2563EB" opacity="0.3"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F8FAFC"></path>
-        </svg>
-      `;
-
-      // Hero Admin
-      document.getElementById('portalHeroContainer').innerHTML = `
-        <div class="relative w-full rounded-[32px] p-6 sm:p-8 text-white shadow-[0_20px_45px_rgba(15,43,92,0.35)] overflow-hidden"
-             style="background: linear-gradient(135deg, #091E42 0%, #0F3470 50%, #1754B5 100%);">
-          <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-start gap-4 sm:gap-5 max-w-xl">
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/10 backdrop-blur-md p-2 flex items-center justify-center shrink-0 border border-white/20 shadow-md">
-                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow">
-                  <polygon points="50,4 93,27 93,73 50,96 7,73 7,27" fill="#0284C7" stroke="#38BDF8" stroke-width="3"/>
-                  <circle cx="50" cy="50" r="34" fill="#F8FAFC"/>
-                  <path d="M50 18 L55 35 L45 35 Z" fill="#EAB308"/>
-                  <circle cx="50" cy="40" r="4.5" fill="#DC2626"/>
-                </svg>
-              </div>
-              <div class="space-y-1">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-500/30 text-blue-200 border border-blue-400/30 uppercase tracking-wider">
-                  Portal Administrasi Sekolah
-                </span>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">${schName}</h1>
-                <p class="text-xs sm:text-sm text-blue-200 font-medium">"Kelola dengan bijak, wujudkan sekolah yang lebih baik"</p>
-              </div>
-            </div>
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-center min-w-[140px]">
-              <span class="text-[10px] font-bold uppercase text-blue-200">Tahun Ajaran</span>
-              <div class="text-xl font-black text-white mt-0.5">2026/2027</div>
-              <span class="text-[10px] text-yellow-300 font-semibold">Semester Ganjil</span>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // 8 Cards Admin
-      document.getElementById('portalCardsContainer').innerHTML = `
-        <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Menu Administrasi Sekolah</h3>
-            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
-              8 Modul Tersedia
-            </span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            ${createPortalCard('admin-guru', 'Manajemen Guru', 'Kelola data dan penugasan guru', 'blue', '👥')}
-            ${createPortalCard('admin-kelas', 'Manajemen Kelas', 'Atur kelas dan wali kelas', 'emerald', '🏫')}
-            ${createPortalCard('admin-penugasan', 'Pembagian Guru & Kelas', 'Tentukan penugasan per kelas', 'amber', '📋')}
-            ${createPortalCard('admin-nilai', 'Rekapitulasi Nilai', 'Lihat dan cetak rekap nilai', 'purple', '📈')}
-            ${createPortalCard('admin-absensi', 'Rekapitulasi Absensi', 'Lihat dan cetak rekap absensi', 'emerald', '📅')}
-            ${createPortalCard('admin-laporan', 'Laporan Sekolah', 'Generate laporan sekolah lengkap', 'rose', '📑')}
-            ${createPortalCard('admin-perangkat', 'Bank Perangkat Ajar', 'Kelola bahan ajar untuk guru', 'sky', '📚')}
-            ${createPortalCard('admin-pengaturan', 'Pengaturan Sekolah', 'Identitas dan konfigurasi sistem', 'indigo', '⚙️')}
-          </div>
-        </div>
-      `;
-
-      renderWelcomeBar('Kepala Sekolah & Operator', schName);
-    }
-
-    // ------------------------------------------
-    // C. PORTAL GURU MANDIRI
-    // ------------------------------------------
-    function renderPortalGuru() {
-      const schName = currentUser ? (currentUser.namaSekolah || dbData.pengaturan.namaSekolah) : dbData.pengaturan.namaSekolah;
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', desa: 'Ambulu', npsn: '' };
       const myClasses = dbData.kelas;
-      const activeClass = myClasses.find(k => k.id === activeGuruClassId);
-
-      // Bottom Wavy
-      document.getElementById('bottomWaveContainer').innerHTML = `
-        <svg viewBox="0 0 1200 65" preserveAspectRatio="none" class="w-full h-10 sm:h-14">
-          <path d="M0,25 C200,60 400,10 650,40 C850,65 1050,15 1200,35 L1200,65 L0,65 Z" fill="#047857" opacity="0.25"></path>
-          <path d="M0,35 C250,15 500,65 750,30 C950,5 1100,50 1200,45 L1200,65 L0,65 Z" fill="#0D9488" opacity="0.2"></path>
-          <path d="M0,45 C300,75 600,20 900,55 C1050,65 1150,35 1200,45 L1200,65 L0,65 Z" fill="#F8FAFC"></path>
-        </svg>
-      `;
 
       // Hero Guru
       document.getElementById('portalHeroContainer').innerHTML = `
@@ -1378,15 +1252,15 @@
               </div>
               <div class="space-y-1">
                 <h1 class="text-2xl sm:text-3xl font-black text-white">Portal <span class="text-yellow-300">Guru</span></h1>
-                <h2 class="text-sm sm:text-base font-bold text-emerald-100">${schName}</h2>
-                <p class="text-xs sm:text-sm text-emerald-100/80 italic">"Mengajar dengan hati, mendidik dengan teknologi"</p>
+                <h2 class="text-sm sm:text-base font-bold text-emerald-100">${sch.nama}</h2>
+                <p class="text-xs sm:text-sm text-emerald-100/80 italic">NPSN: ${sch.npsn} • "Mengajar dengan hati, mendidik dengan teknologi"</p>
               </div>
             </div>
 
             <!-- Class Quick Selector Pill -->
-            <div class="bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/20 flex flex-col gap-1.5 min-w-[200px]">
+            <div class="bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/20 flex flex-col gap-1.5 min-w-[210px]">
               <div class="flex items-center justify-between text-[11px] font-extrabold text-emerald-100">
-                <span>KELAS AKTIF SAYA:</span>
+                <span>KELAS AKTIF:</span>
                 <button onclick="openFormKelasModal()" class="text-yellow-300 hover:underline">+ Buat Kelas</button>
               </div>
               <select onchange="setActiveClassId(this.value)" class="w-full bg-emerald-950/60 text-white font-extrabold text-xs p-2 rounded-xl border border-white/20 focus:outline-none">
@@ -1411,8 +1285,8 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             ${createPortalCard('guru-dashboard', 'Dashboard', 'Ringkasan aktivitas kelas Anda', 'blue', '🏠')}
             ${createPortalCard('guru-kelas', 'Kelas Saya', 'Kelola rombel & tahun ajaran', 'teal', '🏫')}
-            ${createPortalCard('guru-siswa', 'Data Siswa', 'Buku induk & impor Excel', 'emerald', '👥')}
-            ${createPortalCard('guru-nilai', 'Input Nilai', 'Masukkan dan kelola nilai siswa', 'amber', '📝')}
+            ${createPortalCard('guru-siswa', 'Data Siswa', 'Buku induk & impor Excel/CSV', 'emerald', '👥')}
+            ${createPortalCard('guru-nilai', 'Input Nilai', 'Masukkan dan olah nilai siswa', 'amber', '📝')}
             ${createPortalCard('guru-presensi', 'Presensi Siswa', 'Kelola kehadiran siswa harian', 'purple', '📅')}
             ${createPortalCard('guru-jurnal', 'Jurnal Mengajar', 'Catat kegiatan pembelajaran', 'teal', '📖')}
             ${createPortalCard('guru-perangkat', 'Perangkat Ajar', 'Akses modul & bahan ajar', 'rose', '📄')}
@@ -1421,7 +1295,29 @@
         </div>
       `;
 
-      renderWelcomeBar('Bapak/Ibu Guru', schName);
+      // Welcome Bar
+      document.getElementById('portalWelcomeBarContainer').innerHTML = `
+        <div class="bg-white rounded-3xl p-4 sm:px-6 sm:py-3.5 soft-card-shadow border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-9 h-9 rounded-full bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm shrink-0">
+              i
+            </div>
+            <div>
+              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, ${currentUser.nama.split(',')[0]}!</h4>
+              <p class="text-xs text-slate-500">Anda mengelola administrasi pembelajaran secara mandiri di ${sch.nama}.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200 shrink-0 text-base">
+              🏫
+            </div>
+            <div class="text-right sm:text-left">
+              <div class="font-extrabold text-slate-900 text-xs">${sch.nama}</div>
+              <div class="text-[10px] text-slate-400">NPSN: ${sch.npsn} • Kec. Ambulu</div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function createPortalCard(moduleKey, title, desc, colorTheme, iconText) {
@@ -1456,36 +1352,15 @@
       `;
     }
 
-    function renderWelcomeBar(greetingName, schoolName) {
-      document.getElementById('portalWelcomeBarContainer').innerHTML = `
-        <div class="bg-white rounded-3xl p-4 sm:px-6 sm:py-3.5 soft-card-shadow border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3.5">
-            <div class="w-9 h-9 rounded-full bg-brandpurple-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm shrink-0">
-              i
-            </div>
-            <div>
-              <h4 class="font-extrabold text-slate-900 text-sm">Selamat Datang, ${greetingName}!</h4>
-              <p class="text-xs text-slate-500">Mari wujudkan tata kelola administrasi pendidikan yang rapi, transparan, dan terintegrasi.</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center border border-slate-200 shrink-0 text-base">
-              🏫
-            </div>
-            <div class="text-right sm:text-left">
-              <div class="font-extrabold text-slate-900 text-xs">${schoolName}</div>
-              <div class="text-[10px] text-slate-400">Kecamatan Ambulu - Jember</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
     function setActiveClassId(classId) {
       activeGuruClassId = classId;
       saveSessionState();
       showToast(`Kelas aktif diubah.`, 'info');
       refreshActiveModuleContent();
+    }
+
+    function backToPortal() {
+      renderPortal();
     }
 
     // ==========================================
@@ -1501,26 +1376,22 @@
       const titleEl = document.getElementById('moduleViewTitle');
       const subEl = document.getElementById('moduleViewSubtitle');
       const actionEl = document.getElementById('moduleHeaderActions');
-      const filterEl = document.getElementById('moduleHeaderFilterArea');
       const chartEl = document.getElementById('moduleAnalyticsChartContainer');
       const contentEl = document.getElementById('moduleContentArea');
-
       actionEl.innerHTML = '';
-      filterEl.innerHTML = '';
 
-      // Chart Mini Bar
       chartEl.innerHTML = `
         <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-3 animate-fade-in">
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Statistik Pembelajaran & Capaian</h3>
-              <p class="text-[11px] text-slate-400">Monitoring data real-time terpusat di Google Sheets</p>
+              <h3 class="text-sm font-extrabold text-slate-900 tracking-tight">Statistik Pembelajaran Kelas</h3>
+              <p class="text-[11px] text-slate-400">Monitoring data real-time terisolasi per rombel</p>
             </div>
-            <span class="px-3 py-1 rounded-full bg-brandpurple-50 text-brandpurple-800 font-extrabold text-xs">
-              Kurikulum Merdeka
+            <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 font-extrabold text-xs">
+              ${currentSchool ? currentSchool.nama : 'SDN'}
             </span>
           </div>
-          <div class="flex items-end justify-between gap-3 h-24 px-2 sm:px-6 pt-2">
+          <div class="flex items-end justify-between gap-3 h-20 px-2 sm:px-6 pt-2">
             <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
               <div class="w-6 rounded-full bg-cyan-400" style="height: 65%;"></div>
               <span class="text-[10px] font-bold text-slate-400">Kls 1</span>
@@ -1550,48 +1421,6 @@
       `;
 
       switch (moduleKey) {
-        // --- MODUL SUPER ADMIN ---
-        case 'super-sekolah':
-          titleEl.textContent = 'Manajemen Sekolah Dasar Kecamatan Ambulu';
-          subEl.textContent = 'Daftar 14 SD Negeri dan persetujuan penambahan sekolah baru';
-          actionEl.innerHTML = `
-            <button onclick="openFormPengajuanSekolahModal()" class="bg-brandpurple-700 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-brandpurple-800 transition">
-              + Ajukan Sekolah Baru
-            </button>
-          `;
-          renderModuleSuperSekolah(contentEl);
-          break;
-
-        case 'super-guru':
-          titleEl.textContent = 'Direktori Pendidik & Tenaga Kependidikan';
-          subEl.textContent = 'Data seluruh guru SD yang terdaftar di wilayah Kecamatan Ambulu';
-          renderModuleSuperGuru(contentEl);
-          break;
-
-        case 'super-verifikasi':
-          titleEl.textContent = 'Verifikasi Guru & Sekolah Baru';
-          subEl.textContent = 'Persetujuan status pendaftaran mandiri guru dan sekolah binaan';
-          renderModuleSuperVerifikasi(contentEl);
-          break;
-
-        case 'super-statistik':
-          titleEl.textContent = 'Statistik Wilayah Pendidikan Ambulu';
-          subEl.textContent = 'Rekapitulasi total rombel, peserta didik, dan pendidik';
-          renderModuleSuperStatistik(contentEl);
-          break;
-
-        case 'super-audit':
-          titleEl.textContent = 'Audit Trail & Snapshot Database';
-          subEl.textContent = 'Log aktivitas perubahan data dan backup database Google Sheets';
-          actionEl.innerHTML = `
-            <button onclick="triggerBackupDatabase()" class="bg-indigo-600 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-indigo-700 transition">
-              💾 Buat Backup Database
-            </button>
-          `;
-          renderModuleSuperAudit(contentEl);
-          break;
-
-        // --- MODUL GURU MANDIRI ---
         case 'guru-dashboard':
           titleEl.textContent = 'Dashboard Pembelajaran Guru';
           subEl.textContent = 'Ringkasan kelas aktif dan rekap tugas mengajar Anda';
@@ -1672,70 +1501,6 @@
           subEl.textContent = 'Edaran resmi Koorwil Ambulu dan agenda akademik sekolah';
           renderModuleGuruPengumuman(contentEl);
           break;
-
-        // --- MODUL ADMIN SEKOLAH ---
-        case 'admin-guru':
-          titleEl.textContent = 'Manajemen Guru & Ketenagaan Sekolah';
-          subEl.textContent = 'Daftar guru terdaftar pada sekolah binaan Anda';
-          renderModuleAdminGuru(contentEl);
-          break;
-
-        case 'admin-kelas':
-          titleEl.textContent = 'Manajemen Kelas Sekolah';
-          subEl.textContent = 'Struktur kelas rombel I-VI di sekolah induk Anda';
-          actionEl.innerHTML = `
-            <button onclick="openFormKelasModal()" class="bg-navy-900 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-navy-800 transition">
-              + Tambah Kelas Baru
-            </button>
-          `;
-          renderModuleAdminKelas(contentEl);
-          break;
-
-        case 'admin-penugasan':
-          titleEl.textContent = 'Pembagian Guru & Penugasan Kelas';
-          subEl.textContent = 'Penetapan wali kelas dan guru mata pelajaran';
-          actionEl.innerHTML = `
-            <button onclick="openFormPenugasanModal()" class="bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-orange-700 transition">
-              + Tetapkan Penugasan
-            </button>
-          `;
-          renderModuleAdminPenugasan(contentEl);
-          break;
-
-        case 'admin-nilai':
-          titleEl.textContent = 'Rekapitulasi Nilai Seluruh Kelas';
-          subEl.textContent = 'Monitoring capaian nilai siswa per rombel';
-          renderModuleAdminNilai(contentEl);
-          break;
-
-        case 'admin-absensi':
-          titleEl.textContent = 'Rekapitulasi Kehadiran Siswa';
-          subEl.textContent = 'Laporan persentase kehadiran sekolah';
-          renderModuleAdminAbsensi(contentEl);
-          break;
-
-        case 'admin-laporan':
-          titleEl.textContent = 'Pusat Laporan Resmi Sekolah';
-          subEl.textContent = 'Cetak dokumen resmi dengan Kop Surat & Tanda Tangan Kepala Sekolah';
-          renderModuleAdminLaporan(contentEl);
-          break;
-
-        case 'admin-perangkat':
-          titleEl.textContent = 'Bank Perangkat Ajar Sekolah';
-          subEl.textContent = 'Kelola dokumen ajar dan repositori bahan ajar';
-          actionEl.innerHTML = `
-            <button onclick="openUploadPerangkatModal()" class="bg-sky-600 text-white font-bold text-xs px-4 py-2 rounded-full cursor-pointer hover:bg-sky-700 transition">
-              + Unggah Berkas Baru
-            </button>
-          `;
-          renderModuleAdminPerangkat(contentEl);
-          break;
-
-        case 'admin-pengaturan':
-          titleEl.textContent = 'Pengaturan Profil & Identitas Sekolah';
-          subEl.textContent = 'Nama sekolah, NPSN, alamat, kepala sekolah, tahun ajaran aktif';
-          renderModuleAdminPengaturan(contentEl);
-          break;
       }
     }
 
@@ -1752,13 +1517,14 @@
     }
 
     // ==========================================
-    // 6. IMPLEMENTASI MODUL GURU MANDIRI
+    // IMPLEMENTASI MODUL-MODUL GURU MANDIRI
     // ==========================================
 
     function renderModuleGuruDashboard(c) {
       const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
       const myClasses = dbData.kelas;
       const actKls = myClasses.find(k => k.id === activeGuruClassId);
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu' };
 
       c.innerHTML = `
         <div class="space-y-4">
@@ -1766,7 +1532,7 @@
             <div>
               <span class="text-xs font-bold text-slate-400">Rombel Aktif</span>
               <h3 class="text-lg font-extrabold text-slate-900">${actKls ? actKls.namaRombel : 'Belum Memilih Kelas'}</h3>
-              <p class="text-xs text-slate-500">${currentUser.namaSekolah || '-'}</p>
+              <p class="text-xs text-slate-500 font-semibold">${sch.nama}</p>
             </div>
             <button onclick="openModule('guru-kelas')" class="px-4 py-2 rounded-full bg-emerald-50 text-emerald-800 font-extrabold text-xs hover:bg-emerald-100 cursor-pointer">
               Ganti / Buat Kelas
@@ -1795,7 +1561,6 @@
       `;
     }
 
-    // --- KELAS SAYA ---
     function renderModuleGuruKelas(c) {
       const myClasses = dbData.kelas;
 
@@ -2217,7 +1982,6 @@
       lines.forEach(line => {
         const clean = line.trim();
         if (!clean) return;
-        // Split by tab (Excel paste) or comma/semicolon (CSV)
         let cols = clean.split('\t');
         if (cols.length === 1) cols = clean.split(',');
         if (cols.length === 1) cols = clean.split(';');
@@ -2273,7 +2037,6 @@
       if (!parsedImportStudents || parsedImportStudents.length === 0) return;
       const count = parsedImportStudents.length;
 
-      // Masukkan ke state lokal
       parsedImportStudents.forEach((s, i) => {
         s.id = 'SIS-' + (Date.now() + i).toString().slice(-6);
         dbData.siswa.push(s);
@@ -2281,7 +2044,7 @@
 
       closeUniversalModal();
       openModule('guru-siswa');
-      showToast(`Mengimpor ${count} siswa ke database pusat...`, 'info');
+      showToast(`Mengimpor ${count} siswa ke database...`, 'info');
 
       await executeDbWrite('batchImportStudents', {
         students: parsedImportStudents,
@@ -2670,302 +2433,8 @@
     }
 
     // ==========================================
-    // 7. IMPLEMENTASI MODUL SUPER ADMIN
+    // UPLOAD PERANGKAT AJAR
     // ==========================================
-
-    function renderModuleSuperSekolah(c) {
-      const schools = (dbData.schools && dbData.schools.length) ? dbData.schools : (window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || []);
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-4 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-extrabold text-slate-700">Daftar Sekolah Dasar di Wilayah Kecamatan Ambulu</span>
-            <span class="px-3 py-1 rounded-full bg-purple-50 text-brandpurple-700 font-bold">${schools.length} Sekolah Terdaftar</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            ${schools.map(s => `
-              <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <h4 class="font-extrabold text-slate-900 text-sm">${s.nama}</h4>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">${s.status || 'Terverifikasi'}</span>
-                </div>
-                <p class="text-slate-500 font-medium">NPSN: ${s.npsn || '-'} • Desa: ${s.desa || '-'}</p>
-                <p class="text-slate-600">KS: ${s.kepalaSekolah || '-'}</p>
-                <p class="text-[11px] text-slate-400">${s.alamat || '-'}</p>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderModuleSuperGuru(c) {
-      const teachers = dbData.users;
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-4 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-extrabold text-slate-700">Database Guru SD se-Kecamatan Ambulu</span>
-            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">${teachers.length} Guru Terdaftar</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left">
-              <thead>
-                <tr class="border-b text-slate-400 font-bold">
-                  <th class="pb-2">Nama Guru</th>
-                  <th class="pb-2">Sekolah Induk</th>
-                  <th class="pb-2">Jabatan</th>
-                  <th class="pb-2">Status</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y font-medium">
-                ${teachers.map(t => `
-                  <tr>
-                    <td class="py-2.5">
-                      <div class="font-extrabold text-slate-900">${t.nama}</div>
-                      <div class="text-[10px] text-slate-400">${t.email || '-'}</div>
-                    </td>
-                    <td class="py-2.5 text-slate-700 font-semibold">${t.namaSekolah || '-'}</td>
-                    <td class="py-2.5">${t.jabatan || 'Guru'}</td>
-                    <td class="py-2.5">
-                      <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700">
-                        ${t.statusVerifikasi || 'Terverifikasi'}
-                      </span>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderModuleSuperVerifikasi(c) {
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-6 soft-card-shadow border border-slate-100 text-center space-y-3">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto text-2xl">
-            ✅
-          </div>
-          <h4 class="text-base font-extrabold text-slate-900">Semua Pendaftaran Telah Terverifikasi</h4>
-          <p class="text-xs text-slate-500 max-w-sm mx-auto">
-            Seluruh guru dari 14 SD Negeri Kecamatan Ambulu yang mendaftar mandiri via Google Sign-In telah aktif dan otomatis terisolasi.
-          </p>
-        </div>
-      `;
-    }
-
-    function renderModuleSuperStatistik(c) {
-      c.innerHTML = `
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-          <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-card-shadow">
-            <span class="text-slate-400 font-bold block">SD Negeri Ambulu</span>
-            <span class="text-2xl font-black text-brandpurple-700 mt-1 block">14</span>
-          </div>
-          <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-card-shadow">
-            <span class="text-slate-400 font-bold block">Pendidik Terdaftar</span>
-            <span class="text-2xl font-black text-emerald-700 mt-1 block">${dbData.users.length || 14}</span>
-          </div>
-          <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-card-shadow">
-            <span class="text-slate-400 font-bold block">Rombel Aktif</span>
-            <span class="text-2xl font-black text-blue-700 mt-1 block">${dbData.kelas.length || 84}</span>
-          </div>
-          <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-card-shadow">
-            <span class="text-slate-400 font-bold block">Wilayah</span>
-            <span class="text-2xl font-black text-orange-700 mt-1 block">Ambulu</span>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderModuleSuperAudit(c) {
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-4 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-extrabold text-slate-700">Audit Trail & Riwayat Operasi Sistem</span>
-            <button onclick="triggerBackupDatabase()" class="px-4 py-1.5 rounded-full bg-brandpurple-700 text-white font-bold hover:bg-brandpurple-800 cursor-pointer">
-              Snapshot Sekarang
-            </button>
-          </div>
-          <p class="text-slate-500">Database utama tersimpan di Google Sheets dan di-cache secara sinkron pada seluruh perangkat guru.</p>
-        </div>
-      `;
-    }
-
-    async function triggerBackupDatabase() {
-      showToast('Membuat snapshot backup database Google Sheets...', 'info');
-      const res = await apiPost('backupDatabase', {});
-      if (res && res.success) {
-        showToast('Backup berhasil dibuat: ' + (res.backupSpreadsheetUrl || 'Database Snapshot'), 'success');
-      } else {
-        showToast('Snapshot database tersimpan.', 'success');
-      }
-    }
-
-    function openFormPengajuanSekolahModal() {
-      const content = `
-        <form onsubmit="handlePengajuanSekolah(event)" class="space-y-3.5 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Sekolah Dasar *</label>
-            <input type="text" id="fpschNama" required placeholder="Contoh: SD Negeri Ambulu 05" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">NPSN (8 Digit)</label>
-              <input type="text" id="fpschNpsn" placeholder="20512015" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Desa di Ambulu</label>
-              <input type="text" id="fpschDesa" placeholder="Ambulu / Pontang / Sabrang" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Alamat Lengkap</label>
-            <input type="text" id="fpschAlamat" placeholder="Jl. Raya Ambulu..." class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Kepala Sekolah</label>
-            <input type="text" id="fpschKS" placeholder="Nama Kepala Sekolah beserta gelar" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-          </div>
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
-            <button type="submit" class="px-5 py-2 bg-brandpurple-700 text-white rounded-full font-bold cursor-pointer hover:bg-brandpurple-800">
-              Kirim Pengajuan
-            </button>
-          </div>
-        </form>
-      `;
-      openUniversalModal('Pengajuan Sekolah Baru ke Koorwil', content);
-    }
-
-    async function handlePengajuanSekolah(e) {
-      e.preventDefault();
-      const payload = {
-        nama: document.getElementById('fpschNama').value.trim(),
-        npsn: document.getElementById('fpschNpsn').value.trim(),
-        desa: document.getElementById('fpschDesa').value.trim(),
-        alamat: document.getElementById('fpschAlamat').value.trim(),
-        kepalaSekolah: document.getElementById('fpschKS').value.trim()
-      };
-      closeUniversalModal();
-      await executeDbWrite('requestNewSchool', payload, 'Pengajuan sekolah baru berhasil dikirim.');
-    }
-
-    // ==========================================
-    // 8. IMPLEMENTASI MODUL ADMIN SEKOLAH
-    // ==========================================
-
-    function renderModuleAdminGuru(c) {
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-4 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-extrabold text-slate-700">Daftar Guru di ${currentUser.namaSekolah || 'Sekolah'}</span>
-            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold">${dbData.users.length} Guru</span>
-          </div>
-          <div class="space-y-2">
-            ${dbData.users.map(g => `
-              <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
-                <div>
-                  <h4 class="font-extrabold text-slate-900">${g.nama}</h4>
-                  <p class="text-slate-400 font-medium">${g.jabatan || 'Guru'} • ${g.email || '-'}</p>
-                </div>
-                <span class="px-2.5 py-1 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">
-                  ${g.statusKepegawaian || 'PNS'}
-                </span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderModuleAdminKelas(c) {
-      renderModuleGuruKelas(c);
-    }
-
-    function renderModuleAdminPenugasan(c) {
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-5 soft-card-shadow border border-slate-100 space-y-3 text-xs">
-          <h4 class="font-extrabold text-slate-900">Pembagian Tugas Guru</h4>
-          <p class="text-slate-500">Seluruh guru dapat menentukan kelas ampuannya secara mandiri melalui Portal Guru.</p>
-        </div>
-      `;
-    }
-
-    function renderModuleAdminNilai(c) {
-      renderModuleGuruNilai(c);
-    }
-
-    function renderModuleAdminAbsensi(c) {
-      renderModuleGuruPresensi(c);
-    }
-
-    function renderModuleAdminLaporan(c) {
-      c.innerHTML = `
-        <div class="bg-white rounded-3xl p-6 soft-card-shadow border border-slate-100 text-center space-y-3 text-xs">
-          <h4 class="text-base font-extrabold text-slate-900">Pusat Cetak Dokumen Resmi</h4>
-          <p class="text-slate-500">Cetak dokumen laporan rekapitulasi nilai dan presensi dengan format resmi Kop Surat Sekolah.</p>
-          <button onclick="window.print()" class="px-5 py-2.5 rounded-full bg-navy-900 text-white font-extrabold cursor-pointer hover:bg-navy-800">
-            🖨️ Cetak Laporan PDF
-          </button>
-        </div>
-      `;
-    }
-
-    function renderModuleAdminPerangkat(c) {
-      renderModuleGuruPerangkat(c);
-    }
-
-    function renderModuleAdminPengaturan(c) {
-      const p = dbData.pengaturan;
-      c.innerHTML = `
-        <form onsubmit="handleSavePengaturan(event)" class="bg-white rounded-3xl p-6 soft-card-shadow border border-slate-100 space-y-4 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Satuan Pendidikan *</label>
-            <input type="text" id="fpsNama" required value="${p.namaSekolah}" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">NPSN</label>
-              <input type="text" id="fpsNpsn" value="${p.npsn}" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Kecamatan & Kabupaten</label>
-              <input type="text" id="fpsKec" value="${p.kecamatan}" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Nama Kepala Sekolah</label>
-              <input type="text" id="fpsKS" value="${p.kepalaSekolah}" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">NIP Kepala Sekolah</label>
-              <input type="text" id="fpsNipKS" value="${p.nipKepalaSekolah}" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-          </div>
-          <div class="pt-2 flex justify-end">
-            <button type="submit" class="px-5 py-2 bg-navy-900 text-white rounded-full font-bold cursor-pointer hover:bg-navy-800">
-              Simpan Pengaturan
-            </button>
-          </div>
-        </form>
-      `;
-    }
-
-    async function handleSavePengaturan(e) {
-      e.preventDefault();
-      dbData.pengaturan.namaSekolah = document.getElementById('fpsNama').value.trim();
-      dbData.pengaturan.npsn = document.getElementById('fpsNpsn').value.trim();
-      dbData.pengaturan.kecamatan = document.getElementById('fpsKec').value.trim();
-      dbData.pengaturan.kepalaSekolah = document.getElementById('fpsKS').value.trim();
-      dbData.pengaturan.nipKepalaSekolah = document.getElementById('fpsNipKS').value.trim();
-
-      document.getElementById('globalSchoolIdentity').textContent = dbData.pengaturan.namaSekolah;
-      await executeDbWrite('savePengaturanSekolah', dbData.pengaturan, 'Pengaturan identitas sekolah tersimpan.');
-    }
-
-    // --- UPLOAD PERANGKAT AJAR ---
     let selectedUploadFile = null;
     let selectedUploadBase64 = '';
     let selectedFormatDoc = 'Word';
@@ -3050,7 +2519,7 @@
       dbData.perangkat.unshift(dObj);
       closeUniversalModal();
       openModule('guru-perangkat');
-      await executeDbWrite('uploadPerangkat', dObj, 'Dokumen berhasil diunggah ke Google Drive!');
+      await executeDbWrite('uploadPerangkat', dObj, 'Dokumen berhasil diunggah!');
     }
 
     // ==========================================
@@ -3087,8 +2556,6 @@
     // INITIALIZATION ON DOM READY
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
-      initFirebase();
-
       const restored = restoreSession();
       if (!restored) {
         document.getElementById('loginScreen').style.display = 'flex';
@@ -3105,8 +2572,7 @@
       window.addEventListener('offline', () => {
         const dot = document.getElementById('onlinePresenceDot');
         if (dot) dot.className = 'absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-rose-500 border-2 border-white ring-1 ring-rose-400';
-        setSyncStatus('offline', 'Offline (Terputus)');
-        showToast('Koneksi internet terputus. Berjalan dalam mode offline.', 'error');
+        setSyncStatus('error', 'Offline');
       });
 
       document.addEventListener('visibilitychange', () => {
@@ -3116,7 +2582,7 @@
         } else {
           syncState.isTabActive = true;
           startAutoSync();
-          checkSyncHeartbeat();
+          syncBackendData();
         }
       });
     });

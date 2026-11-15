@@ -1,69 +1,57 @@
-# 🎓 SiGuru SD — Platform Administrasi Guru & Sekolah Multi-Satuan Pendidikan
-### Wilayah Binaan: Kecamatan Ambulu, Kabupaten Jember, Jawa Timur
-**Versi 3.0.0-PROD • Kurikulum Merdeka & Multi-Teacher Self Service**
-
-Frontend di-deploy di **Vercel** (`portaladminguru.vercel.app`) • Backend REST API di **Google Apps Script** • Database di **Google Sheets** • Autentikasi dengan **Firebase Authentication (Google Sign-In)** • Berkas di **Google Drive**
+# 🎓 SiGuru SD — Platform Administrasi Pendidikan Kecamatan Ambulu
+### Kabupaten Jember, Jawa Timur • Versi 3.1.0-NPSN-AUTH
+**Sistem Autentikasi: NPSN + Kode Unik Lembaga & PIN Pribadi Guru (Opsi C)**
 
 ---
 
-## 🌟 Fitur Utama Platform Multi-Sekolah Kecamatan Ambulu
+## 🔑 Direktori Resmi 13 SD Negeri & Kode Unik Akses Lembaga
 
-1. **Google Sign-In Mandiri**:
-   - Setiap guru SD di Kecamatan Ambulu dapat masuk langsung menggunakan akun Google masing-masing tanpa perlu dibuatkan akun manual oleh Admin.
-   - Pendaftaran profil mandiri saat login pertama: Nama Lengkap & Gelar, NIP/NUPTK, Nomor WhatsApp, Sekolah Induk (14 SDN Ambulu), Tugas/Jabatan, dan Status Kepegawaian.
+Berikut adalah daftar 13 SD Negeri resmi di Kecamatan Ambulu beserta **Kode Unik Akses Lembaga** yang telah di-generate secara otomatis oleh sistem untuk dibagikan kepada guru di masing-masing sekolah:
 
-2. **Isolasi Data Aman & Terpusat (Multi-Tenant)**:
-   - Data kelas, siswa, nilai, presensi, dan jurnal mengajar diisolasi berdasarkan `owner_uid` dan `school_id`.
-   - Guru hanya dapat melihat dan mengelola data kelas dan siswa ampuannya sendiri.
-   - Admin Sekolah dapat memantau seluruh kelas dan rekapitulasi nilai/absensi di sekolahnya.
-   - Super Admin Koorwil Ambulu memiliki akses supervisi menyeluruh terhadap 14 SD Negeri se-Kecamatan Ambulu.
-
-3. **Manajemen Rombel & Siswa Mandiri**:
-   - Guru dapat membuat rombel/kelas mengajar sendiri (+ Buat Kelas Baru).
-   - Pengisian siswa fleksibel: input manual satu per satu atau **📥 Impor Massal dari Excel / CSV** (salin & tempel tabel nama, NISN, wali murid).
-
-4. **Tiga Portal Terintegrasi**:
-   - 👑 **Portal Super Admin Kecamatan**: Koorwil Ambulu (Direktori guru, verifikasi sekolah & guru, statistik wilayah, audit database).
-   - 🏫 **Portal Admin Sekolah**: Kepala Sekolah & Operator (Manajemen rombel, penugasan, cetak laporan resmi Kop Surat).
-   - 👩‍🏫 **Portal Guru Mandiri**: Administrasi pembelajaran (Dashboard kelas, rombel saya, data siswa, input nilai, presensi, jurnal mengajar, perangkat ajar).
-
----
-
-## 🏫 Direktori 14 SD Negeri Kecamatan Ambulu
-
-| ID Sekolah | NPSN | Nama Satuan Pendidikan | Desa |
-|---|---|---|---|
-| `SCH-AMB-01` | 20512001 | SD Negeri Ambulu 01 | Ambulu |
-| `SCH-AMB-02` | 20512002 | SD Negeri Ambulu 02 | Ambulu |
-| `SCH-AMB-03` | 20512003 | SD Negeri Ambulu 03 | Ambulu |
-| `SCH-AMB-04` | 20512004 | SD Negeri Ambulu 04 | Ambulu |
-| `SCH-KRN-01` | 20512005 | SD Negeri Karanganyar 01 | Karanganyar |
-| `SCH-KRN-02` | 20512006 | SD Negeri Karanganyar 02 | Karanganyar |
-| `SCH-PNT-01` | 20512007 | SD Negeri Pontang 01 | Pontang |
-| `SCH-PNT-02` | 20512008 | SD Negeri Pontang 02 | Pontang |
-| `SCH-SBR-01` | 20512009 | SD Negeri Sabrang 01 | Sabrang |
-| `SCH-SBR-02` | 20512010 | SD Negeri Sabrang 02 | Sabrang |
-| `SCH-ADG-01` | 20512011 | SD Negeri Andongsari 01 | Andongsari |
-| `SCH-ADG-02` | 20512012 | SD Negeri Andongsari 02 | Andongsari |
-| `SCH-TGL-01` | 20512013 | SD Negeri Tegalsari 01 | Tegalsari |
-| `SCH-SBR-03` | 20512014 | SD Negeri Sumberejo 01 | Sumberejo |
+| No | NPSN | Nama Satuan Pendidikan | Desa | Kode Unik Akses |
+|:---:|:---:|---|---|:---:|
+| 1 | **20524972** | UPTD Satuan Pendidikan SDN Ambulu 02 | Ambulu | `AMB02-8821` |
+| 2 | **20524171** | UPTD Satuan Pendidikan SDN Tegalsari 01 | Tegalsari | `TGL01-7142` |
+| 3 | **20524146** | UPTD Satuan Pendidikan SDN Tegalsari 02 | Tegalsari | `TGL02-6315` |
+| 4 | **20524148** | UPTD Satuan Pendidikan SDN Tegalsari 03 | Tegalsari | `TGL03-5294` |
+| 5 | **20524147** | UPTD Satuan Pendidikan SDN Tegalsari 04 | Tegalsari | `TGL04-4819` |
+| 6 | **20524058** | UPTD Satuan Pendidikan SDN Sumberejo 04 | Sumberejo | `SMB04-3918` |
+| 7 | **20524059** | UPTD Satuan Pendidikan SDN Sumberejo 05 | Sumberejo | `SMB05-2746` |
+| 8 | **20524060** | UPTD Satuan Pendidikan SDN Sumberejo 07 | Sumberejo | `SMB07-1683` |
+| 9 | **20524958** | UPTD Satuan Pendidikan SDN Andongsari 02 | Andongsari | `ADG02-9524` |
+| 10 | **20524962** | UPTD Satuan Pendidikan SDN Andongsari 04 | Andongsari | `ADG04-8417` |
+| 11 | **20523264** | UPTD Satuan Pendidikan SDN Pontang 01 | Pontang | `PNT01-7362` |
+| 12 | **20524830** | UPTD Satuan Pendidikan SDN Karanganyar 01 | Karanganyar | `KRN01-6251` |
+| 13 | **20524821** | UPTD Satuan Pendidikan SDN Karanganyar 03 | Karanganyar | `KRN03-5149` |
 
 ---
 
-## 🚀 Panduan Deploy & Sinkronisasi
+## 🚀 Alur Kerja Guru (Opsi C)
 
-### Langkah 1: Perbarui Google Apps Script (Backend)
-1. Buka Google Spreadsheet database, klik menu **Ekstensi** > **Apps Script**.
-2. Salin seluruh isi [`gas/Code.gs`](gas/Code.gs) dan tempelkan menggantikan seluruh isi editor Apps Script.
-3. Simpan perubahan (**Ctrl + S**).
-4. *(Opsional - pertama kali)* Jalankan fungsi **`setupDatabaseMultiSchool`** untuk memastikan seluruh sheet master terinisialisasi bersih.
-5. Klik **Deploy** > **Manage deployments** > Ikon **Pensil (Edit)** > Versi: **New version** > Akses: **Anyone** > Klik **Deploy**.
+1. **Buka Aplikasi**: Guru membuka tautan portal.
+2. **Guru Baru (Pertama Kali)**:
+   - Pilih tab **"📝 Guru Baru (Daftar)"**.
+   - Masukkan **NPSN** (misal: `20524058`) dan **Kode Unik Sekolah** (`SMB04-3918`).
+   - Sistem memvalidasi lembaga: *"✅ Terhubung: SDN Sumberejo 04"*.
+   - Guru mengisi Nama Lengkap, NIP (opsional), No. WhatsApp, Jabatan, dan membuat **PIN Pribadi (4 - 6 digit)**.
+   - Klik **"Daftarkan Diri & Lanjut Buat Kelas ➔"**.
+3. **Wizard Pembuatan Kelas Pertama Mandiri**:
+   - Guru wajib menentukan tingkat (I - VI), nama rombel (misal: *Kelas IV-A*), dan tahun ajaran.
+   - Setelah kelas disimpan, seluruh modul (Data Siswa, Presensi, Nilai, Jurnal, Modul Ajar) langsung aktif dan siap digunakan.
+4. **Login Berulang (Keesokan Harinya / Beda HP / Komputer)**:
+   - Pilih tab **"🔑 Masuk Guru"**.
+   - Masukkan NPSN dan Kode Unik Sekolah.
+   - Pilih nama guru dari dropdown dan masukkan PIN Pribadinya.
+   - Masuk langsung ke rombel dan data yang telah dikelola.
 
-### Langkah 2: Deploy Frontend ke GitHub & Vercel
-Jalankan perintah berikut di PowerShell terminal:
+---
+
+## 🛠️ Langkah Sinkronisasi & Deployment
+
+Jalankan perintah berikut di PowerShell untuk memperbarui repository GitHub & Vercel:
 ```bash
 git add .
-git commit -m "feat: multi-school multi-teacher platform for kecamatan ambulu jember"
+git commit -m "feat: implement npsn + unique school code + teacher pin auth (Option C)"
 git push origin main --force
 ```
-*Catatan: `--force` digunakan untuk menyinkronkan branch remote GitHub dengan repositori lokal yang telah diperbarui.*
+Update juga kode `gas/Code.gs` pada editor Google Apps Script spreadsheet Anda (**Deploy > Manage deployments > Edit > New version > Deploy**).
