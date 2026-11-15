@@ -127,7 +127,7 @@
        ============================================================ */
     @media print {
       /* Sembunyikan seluruh UI frontend saat cetak */
-      body > *:not(#printAreaContainer) {
+      body > *:not(#printAreaContainer):not(#printDedicatedIframe) {
         display: none !important;
         visibility: hidden !important;
         height: 0 !important;
@@ -145,6 +145,8 @@
         padding: 0 !important;
         width: 100% !important;
         height: auto !important;
+        min-height: 0 !important;
+        display: block !important;
         overflow: visible !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -169,7 +171,7 @@
         color-adjust: exact !important;
       }
       @page {
-        size: A4 portrait;
+        size: A4 landscape;
         margin: 6mm 10mm;
       }
     }
@@ -3223,12 +3225,8 @@
               </select>
             </div>
 
-            <!-- Tombol Ekspor Excel & Cetak PDF Rapi Sesuai Template Resmi -->
-            <div class="flex items-center gap-2">
-              <button onclick="openSchoolMetaModal()"
-                class="px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 text-brand-700 font-extrabold text-xs border border-violet-200 shadow-2xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>⚙️</span> <span>Atur KKM & Kepsek</span>
-              </button>
+            <!-- Tombol Ekspor Excel, Cetak PDF Rapi, & Buka Tab PDF Sesuai Template Resmi -->
+            <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportNilaiToExcel('${currentSelectedMapel}')"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
@@ -3236,6 +3234,10 @@
               <button onclick="printRekapNilaiPDF('${currentSelectedMapel}')"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>🖨️</span> <span>Cetak / PDF Rapi</span>
+              </button>
+              <button onclick="openPrintInNewTab(generateRekapNilaiHTML('${currentSelectedMapel}'), 'Rekap_Nilai_${currentSelectedMapel}', 'landscape')"
+                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition border border-violet-200">
+                <span>📄</span> <span>Buka Tab PDF</span>
               </button>
             </div>
           </div>
@@ -3385,41 +3387,105 @@
 
     // ==========================================
     // CETAK & EKSPOR PDF ENGINE (SESUAI TEMPLATE RESMI)
+    // MENGGUNAKAN ISOLATED HIDDEN IFRAME (A4 LANDSCAPE DEFAULT)
     // ==========================================
-    function executePrintDocument(htmlContent, docTitle = 'Dokumen_Administrasi_Guru') {
+    function executePrintDocument(htmlContent, docTitle = 'Dokumen_Administrasi_Guru', orientation = 'landscape') {
+      // 1. Simpan salinan ke container cadangan halaman utama tanpa timer penghapusan
       let printContainer = document.getElementById('printAreaContainer');
       if (!printContainer) {
         printContainer = document.createElement('div');
         printContainer.id = 'printAreaContainer';
         document.body.appendChild(printContainer);
       }
-
       printContainer.innerHTML = htmlContent;
       printContainer.classList.remove('hidden');
       printContainer.style.display = 'block';
       printContainer.style.visibility = 'visible';
 
-      const prevTitle = document.title;
-      document.title = docTitle.replace(/[^a-zA-Z0-9_\-]/g, '_');
+      // 2. Buat / perbarui Hidden Iframe Terisolasi (bebas total dari Tailwind CSS, flexbox body, & overflow scroll)
+      let iframe = document.getElementById('printDedicatedIframe');
+      if (iframe) {
+        try { iframe.remove(); } catch (e) {}
+      }
 
-      // Beri sedikit jeda agar DOM, background tabel (#1B365D & #EBF3FA), dan font selesai ter-render
+      iframe = document.createElement('iframe');
+      iframe.id = 'printDedicatedIframe';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0px';
+      iframe.style.height = '0px';
+      iframe.style.border = '0';
+      iframe.style.visibility = 'hidden';
+      iframe.style.zIndex = '-9999';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <title>${docTitle}</title>
+          <style>
+            @page {
+              size: A4 ${orientation};
+              margin: 8mm 10mm;
+            }
+            * {
+              box-sizing: border-box;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: #ffffff !important;
+              color: #000000 !important;
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 8.5pt;
+              width: 100%;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              page-break-inside: auto;
+            }
+            tr {
+              page-break-inside: avoid;
+              page-break-after: auto;
+            }
+            th, td {
+              border: 1px solid #000;
+            }
+          </style>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+        </html>
+      `);
+      doc.close();
+
+      // Tunggu 350ms agar dokumen terisolasi selesai dirender, lalu fokus dan cetak
       setTimeout(() => {
-        window.print();
-        setTimeout(() => {
-          document.title = prevTitle;
-          printContainer.classList.add('hidden');
-          printContainer.style.display = 'none';
-          printContainer.style.visibility = 'hidden';
-          printContainer.innerHTML = '';
-        }, 1500);
-      }, 250);
+        try {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+        } catch (err) {
+          console.warn('Iframe print error, beralih ke openPrintInNewTab:', err);
+          openPrintInNewTab(htmlContent, docTitle, orientation);
+        }
+      }, 350);
     }
 
-    function openPrintInNewTab(htmlContent, docTitle = 'Dokumen_Administrasi_Guru') {
+    function openPrintInNewTab(htmlContent, docTitle = 'Dokumen_Administrasi_Guru', orientation = 'landscape') {
       const w = window.open('', '_blank');
       if (!w) {
-        showToast('Pop-up browser terblokir. Menjalankan cetak langsung...', 'info');
-        executePrintDocument(htmlContent, docTitle);
+        showToast('Pop-up browser terblokir. Menjalankan cetak langsung di halaman ini...', 'info');
+        executePrintDocument(htmlContent, docTitle, orientation);
         return;
       }
       w.document.write(`
@@ -3429,19 +3495,112 @@
           <meta charset="UTF-8">
           <title>${docTitle}</title>
           <style>
-            @page { size: A4 portrait; margin: 8mm 10mm; }
-            * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            body { font-family: Arial, Helvetica, sans-serif; color: #000; margin: 0; padding: 10px; background: #fff; }
+            @page {
+              size: A4 ${orientation};
+              margin: 8mm 10mm;
+            }
+            * {
+              box-sizing: border-box;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+            }
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: #f1f5f9;
+              color: #000000;
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 8.5pt;
+            }
+            .screen-toolbar {
+              position: sticky;
+              top: 0;
+              background: #1B365D;
+              color: #ffffff;
+              padding: 10px 20px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+              z-index: 1000;
+            }
+            .btn-action {
+              background: #4F46E5;
+              color: #fff;
+              border: none;
+              padding: 8px 16px;
+              border-radius: 8px;
+              font-weight: bold;
+              font-size: 13px;
+              cursor: pointer;
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+            }
+            .btn-action:hover {
+              background: #4338CA;
+            }
+            .btn-close {
+              background: rgba(255,255,255,0.15);
+              color: #fff;
+              border: none;
+              padding: 8px 14px;
+              border-radius: 8px;
+              font-weight: bold;
+              font-size: 13px;
+              cursor: pointer;
+            }
+            .btn-close:hover {
+              background: rgba(255,255,255,0.25);
+            }
+            .print-paper {
+              background: #ffffff;
+              max-width: 1100px;
+              margin: 20px auto;
+              padding: 12mm 15mm;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+              border-radius: 4px;
+            }
             @media print {
-              body { padding: 0 !important; }
+              .screen-toolbar {
+                display: none !important;
+              }
+              body {
+                background: #ffffff !important;
+              }
+              .print-paper {
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+              }
             }
           </style>
         </head>
         <body>
-          ${htmlContent}
+          <div class="screen-toolbar">
+            <div style="font-weight: bold; font-size: 14px;">
+              📄 Pratinjau Dokumen Siap Cetak (A4 Landscape)
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-action" onclick="window.print()">
+                🖨️ Cetak / Simpan PDF
+              </button>
+              <button class="btn-close" onclick="window.close()">
+                ✕ Tutup Tab
+              </button>
+            </div>
+          </div>
+          <div class="print-paper">
+            ${htmlContent}
+          </div>
           <script>
             window.onload = function() {
-              setTimeout(function() { window.print(); }, 250);
+              setTimeout(function() {
+                window.print();
+              }, 300);
             };
           <\/script>
         </body>
@@ -3450,54 +3609,54 @@
       w.document.close();
     }
 
-    function printRekapNilaiPDF(filterMapel = 'ALL') {
+    function generateRekapNilaiHTML(selectedMapel = 'ALL') {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
       const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
-      const selectedMapel = filterMapel === 'ALL' ? (getTeacherMapelList()[0] || 'Matematika') : filterMapel;
-      const matrix = compileRekapNilaiMatrix(actKls, students, selectedMapel);
+      const mapel = selectedMapel === 'ALL' ? (getTeacherMapelList()[0] || 'Matematika') : selectedMapel;
+      const matrix = compileRekapNilaiMatrix(actKls, students, mapel);
       const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
-      const printHTML = `
-        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 5px; max-width: 1050px; margin: 0 auto; line-height: 1.3;">
+      return `
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 0; max-width: 100%; margin: 0 auto; line-height: 1.3;">
           
           <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
             Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 1
           </div>
 
           <!-- KOP SURAT SEKOLAH (PERSIS TEMPLATE PDF) -->
-          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px;">
             <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">${sch.nama}</h2>
-            <p style="margin: 2px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
+            <p style="margin: 3px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
           </div>
 
           <!-- JUDUL LAPORAN -->
-          <div style="text-align: center; margin-bottom: 12px;">
+          <div style="text-align: center; margin-bottom: 10px;">
             <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">REKAP NILAI SISWA</h3>
           </div>
 
           <!-- IDENTITAS KELAS -->
-          <table style="width: 100%; font-size: 9pt; margin-bottom: 10px; border-collapse: collapse;">
+          <table style="width: 100%; font-size: 9pt; margin-bottom: 8px; border-collapse: collapse; border: none;">
             <tr>
-              <td style="width: 15%; font-weight: bold;">Mata Pelajaran</td>
-              <td style="width: 2%;">:</td>
-              <td style="width: 38%;">${selectedMapel}</td>
-              <td style="width: 15%; font-weight: bold;">Kelas</td>
-              <td style="width: 2%;">:</td>
-              <td style="width: 28%;">${actKls ? actKls.namaRombel : '-'}</td>
+              <td style="width: 15%; font-weight: bold; border: none; padding: 2px 0;">Mata Pelajaran</td>
+              <td style="width: 2%; border: none; padding: 2px 0;">:</td>
+              <td style="width: 38%; border: none; padding: 2px 0;">${mapel}</td>
+              <td style="width: 15%; font-weight: bold; border: none; padding: 2px 0;">Kelas</td>
+              <td style="width: 2%; border: none; padding: 2px 0;">:</td>
+              <td style="width: 28%; border: none; padding: 2px 0;">${actKls ? actKls.namaRombel : '-'}</td>
             </tr>
             <tr>
-              <td style="font-weight: bold;">Guru Pengampu</td>
-              <td>:</td>
-              <td>${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
-              <td style="font-weight: bold;">Semester / TA</td>
-              <td>:</td>
-              <td>${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Guru Pengampu</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Semester / TA</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
             </tr>
           </table>
 
           <!-- TABEL HASIL PENILAIAN SESUAI TEMPLATE RESMI (15 KOLOM PERSIS TEMPLATE PDF) -->
-          <table style="width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 6px;">
             <thead>
               <tr style="background-color: #1B365D !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #FFFFFF; text-align: center;">
                 <th style="border: 1px solid #000; padding: 5px 3px; width: 28px;">No</th>
@@ -3530,9 +3689,9 @@
                   <td style="border: 1px solid #000; padding: 4px 2px;">${r.uh2 !== '' ? r.uh2 : '-'}</td>
                   <td style="border: 1px solid #000; padding: 4px 2px;">${r.pts !== '' ? r.pts : '-'}</td>
                   <td style="border: 1px solid #000; padding: 4px 2px;">${r.pas !== '' ? r.pas : '-'}</td>
-                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold;">${r.rataTugas.toFixed(1)}</td>
-                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold;">${r.rataUH.toFixed(1)}</td>
-                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'}; font-size: 8.5pt;">${r.nilaiAkhir.toFixed(1)}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold;">${typeof r.rataTugas === 'number' ? r.rataTugas.toFixed(1) : r.rataTugas}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold;">${typeof r.rataUH === 'number' ? r.rataUH.toFixed(1) : r.rataUH}</td>
+                  <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'}; font-size: 8.5pt;">${typeof r.nilaiAkhir === 'number' ? r.nilaiAkhir.toFixed(1) : r.nilaiAkhir}</td>
                   <td style="border: 1px solid #000; padding: 4px 2px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'};">${r.predikat}</td>
                   <td style="border: 1px solid #000; padding: 4px 3px; font-weight: bold; color: ${r.isTuntas ? '#000000' : '#DC2626'};">${r.keterangan}</td>
                 </tr>
@@ -3551,22 +3710,22 @@
           </div>
 
           <!-- KETERANGAN BOBOT & PREDIKAT -->
-          <div style="font-size: 7.5pt; color: #333; margin-bottom: 16px; line-height: 1.3;">
+          <div style="font-size: 7.5pt; color: #333; margin-bottom: 14px; line-height: 1.3;">
             Keterangan: T = Tugas, UH = Ulangan Harian, PTS = Penilaian Tengah Semester, PAS = Penilaian Akhir Semester. Bobot: Tugas ${(schoolMetaConfig.bobotTugas*100)}%, UH ${(schoolMetaConfig.bobotUH*100)}%, PTS ${(schoolMetaConfig.bobotPTS*100)}%, PAS ${(schoolMetaConfig.bobotPAS*100)}%. KKM ${schoolMetaConfig.kkm}. Predikat: A ≥ 90, B 80–89, C ${schoolMetaConfig.kkm}–79, D < ${schoolMetaConfig.kkm}.
           </div>
 
           <!-- TANDA TANGAN DUA KOLOM SESUAI TEMPLATE PDF -->
-          <table style="width: 100%; font-size: 9pt; text-align: center; border-collapse: collapse; margin-top: 15px;">
+          <table style="width: 100%; font-size: 9pt; text-align: center; border-collapse: collapse; margin-top: 15px; border: none;">
             <tr>
-              <td style="width: 45%;">
+              <td style="width: 45%; border: none; padding: 0;">
                 Mengetahui,<br>
                 Kepala Sekolah
                 <br><br><br><br>
                 <strong><u>${schoolMetaConfig.kepalaSekolah}</u></strong><br>
                 NIP. ${schoolMetaConfig.nipKepalaSekolah}
               </td>
-              <td style="width: 10%;"></td>
-              <td style="width: 45%;">
+              <td style="width: 10%; border: none; padding: 0;"></td>
+              <td style="width: 45%; border: none; padding: 0;">
                 ${sch.desa || 'Ambulu'}, ${todayStr}<br>
                 Guru Mata Pelajaran
                 <br><br><br><br>
@@ -3578,8 +3737,13 @@
 
         </div>
       `;
+    }
 
-      executePrintDocument(printHTML, `Rekap_Nilai_${selectedMapel}_${(actKls ? actKls.namaRombel : 'Kelas')}`);
+    function printRekapNilaiPDF(filterMapel = 'ALL') {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const selectedMapel = filterMapel === 'ALL' ? (getTeacherMapelList()[0] || 'Matematika') : filterMapel;
+      const html = generateRekapNilaiHTML(selectedMapel);
+      executePrintDocument(html, `Rekap_Nilai_${selectedMapel}_${(actKls ? actKls.namaRombel : 'Kelas')}`, 'landscape');
     }
 
     function openFormInputNilaiModal() {
@@ -3762,11 +3926,7 @@
               <p class="text-[11px] text-brand-muted">Target Semester: <strong>${totalPertemuan} Pertemuan</strong></p>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button onclick="openSchoolMetaModal()"
-                class="px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 text-brand-700 font-extrabold text-xs border border-violet-200 shadow-2xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>⚙️</span> <span>Atur Pertemuan (${totalPertemuan})</span>
-              </button>
+            <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportAbsensiToExcel()"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
@@ -3774,6 +3934,10 @@
               <button onclick="printAbsensiPDF()"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>🖨️</span> <span>Cetak / PDF Rapi</span>
+              </button>
+              <button onclick="openPrintInNewTab(generateRekapAbsensiHTML(), 'Rekap_Absensi', 'landscape')"
+                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition border border-violet-200">
+                <span>📄</span> <span>Buka Tab PDF</span>
               </button>
             </div>
           </div>
@@ -3871,7 +4035,7 @@
       showToast('Berkas Rekap Absensi Excel (.csv) berhasil diunduh.', 'success');
     }
 
-    function printAbsensiPDF() {
+    function generateRekapAbsensiHTML() {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
       const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
@@ -3879,50 +4043,49 @@
       const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
       const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
-      const printContainer = document.getElementById('printAreaContainer');
-      printContainer.innerHTML = `
-        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 10px; max-width: 950px; margin: 0 auto; line-height: 1.3;">
+      return `
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 0; max-width: 100%; margin: 0 auto; line-height: 1.3;">
           
           <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
             Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 2
           </div>
 
-          <!-- KOP SURAT SEKOLAH -->
-          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+          <!-- KOP SURAT SEKOLAH (PERSIS TEMPLATE PDF) -->
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px;">
             <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${sch.nama}</h2>
-            <p style="margin: 2px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
+            <p style="margin: 3px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
           </div>
 
           <!-- JUDUL LAPORAN -->
-          <div style="text-align: center; margin-bottom: 12px;">
+          <div style="text-align: center; margin-bottom: 10px;">
             <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">REKAP ABSENSI SISWA</h3>
           </div>
 
           <!-- IDENTITAS -->
-          <table style="width: 100%; font-size: 9pt; margin-bottom: 10px; border-collapse: collapse;">
+          <table style="width: 100%; font-size: 9pt; margin-bottom: 8px; border-collapse: collapse; border: none;">
             <tr>
-              <td style="width: 18%; font-weight: bold;">Mata Pelajaran</td>
-              <td style="width: 2%;">:</td>
-              <td style="width: 35%;">Tematik / Guru Kelas</td>
-              <td style="width: 18%; font-weight: bold;">Total Pertemuan</td>
-              <td style="width: 2%;">:</td>
-              <td style="width: 25%; font-weight: bold;">${totalPertemuan} pertemuan</td>
+              <td style="width: 18%; font-weight: bold; border: none; padding: 2px 0;">Mata Pelajaran</td>
+              <td style="width: 2%; border: none; padding: 2px 0;">:</td>
+              <td style="width: 35%; border: none; padding: 2px 0;">Tematik / Guru Kelas</td>
+              <td style="width: 18%; font-weight: bold; border: none; padding: 2px 0;">Total Pertemuan</td>
+              <td style="width: 2%; border: none; padding: 2px 0;">:</td>
+              <td style="width: 25%; font-weight: bold; border: none; padding: 2px 0;">${totalPertemuan} pertemuan</td>
             </tr>
             <tr>
-              <td style="font-weight: bold;">Guru Pengampu</td>
-              <td>:</td>
-              <td>${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
-              <td style="font-weight: bold;">Kelas</td>
-              <td>:</td>
-              <td>${actKls ? actKls.namaRombel : '-'}</td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Guru Pengampu</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Kelas</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${actKls ? actKls.namaRombel : '-'}</td>
             </tr>
             <tr>
-              <td style="font-weight: bold;"></td>
-              <td></td>
-              <td></td>
-              <td style="font-weight: bold;">Semester / TA</td>
-              <td>:</td>
-              <td>${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
+              <td style="border: none; padding: 2px 0;"></td>
+              <td style="border: none; padding: 2px 0;"></td>
+              <td style="border: none; padding: 2px 0;"></td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Semester / TA</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
             </tr>
           </table>
 
@@ -3970,17 +4133,17 @@
           </table>
 
           <!-- TANDA TANGAN DUA KOLOM -->
-          <table style="width: 100%; font-size: 9.5pt; text-align: center; border-collapse: collapse; margin-top: 25px;">
+          <table style="width: 100%; font-size: 9.5pt; text-align: center; border-collapse: collapse; margin-top: 25px; border: none;">
             <tr>
-              <td style="width: 45%;">
+              <td style="width: 45%; border: none; padding: 0;">
                 Mengetahui,<br>
                 Kepala Sekolah
                 <br><br><br><br>
                 <strong><u>${schoolMetaConfig.kepalaSekolah}</u></strong><br>
                 NIP. ${schoolMetaConfig.nipKepalaSekolah}
               </td>
-              <td style="width: 10%;"></td>
-              <td style="width: 45%;">
+              <td style="width: 10%; border: none; padding: 0;"></td>
+              <td style="width: 45%; border: none; padding: 0;">
                 ${sch.desa || 'Ambulu'}, ${todayStr}<br>
                 Guru Mata Pelajaran / Guru Kelas
                 <br><br><br><br>
@@ -3992,8 +4155,12 @@
 
         </div>
       `;
+    }
 
-      executePrintDocument(printContainer.innerHTML, `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`);
+    function printAbsensiPDF() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const html = generateRekapAbsensiHTML();
+      executePrintDocument(html, `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`, 'landscape');
     }
 
     async function recordPresensiGuru(sId, sNama, status) {
@@ -4215,7 +4382,7 @@
               <p class="text-[11px] text-brand-muted">${actKls ? actKls.namaRombel : '-'} • Semester ${actKls ? actKls.semester : 'Ganjil'}</p>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportJurnalToExcel()"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
@@ -4223,6 +4390,10 @@
               <button onclick="printJurnalPDF()"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>🖨️</span> <span>Cetak / PDF Rapi</span>
+              </button>
+              <button onclick="openPrintInNewTab(generateRekapJurnalHTML(), 'Rekap_Jurnal_Mengajar', 'landscape')"
+                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition border border-violet-200">
+                <span>📄</span> <span>Buka Tab PDF</span>
               </button>
             </div>
           </div>
@@ -4319,48 +4490,47 @@
       showToast('Berkas Rekap Jurnal Excel (.csv) berhasil diunduh.', 'success');
     }
 
-    function printJurnalPDF() {
+    function generateRekapJurnalHTML() {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
       const rekap = compileRekapJurnal(actKls);
       const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
-      const printContainer = document.getElementById('printAreaContainer');
-      printContainer.innerHTML = `
-        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 10px; max-width: 950px; margin: 0 auto; line-height: 1.3;">
+      return `
+        <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 0; max-width: 100%; margin: 0 auto; line-height: 1.3;">
           
           <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
             Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 3
           </div>
 
-          <!-- KOP SURAT SEKOLAH -->
-          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+          <!-- KOP SURAT SEKOLAH (PERSIS TEMPLATE PDF) -->
+          <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px;">
             <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${sch.nama}</h2>
-            <p style="margin: 2px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
+            <p style="margin: 3px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
           </div>
 
           <!-- JUDUL LAPORAN -->
-          <div style="text-align: center; margin-bottom: 12px;">
+          <div style="text-align: center; margin-bottom: 10px;">
             <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">JURNAL MENGAJAR</h3>
           </div>
 
           <!-- IDENTITAS -->
-          <table style="width: 100%; font-size: 9pt; margin-bottom: 10px; border-collapse: collapse;">
+          <table style="width: 100%; font-size: 9pt; margin-bottom: 8px; border-collapse: collapse; border: none;">
             <tr>
-              <td style="width: 18%; font-weight: bold;">Mata Pelajaran</td>
-              <td style="width: 2%;">:</td>
-              <td style="width: 38%;">Tematik / Guru Kelas</td>
-              <td style="width: 15%; font-weight: bold;">Kelas</td>
-              <td style="width: 2%;">:</td>
-              <td style="width: 25%;">${actKls ? actKls.namaRombel : '-'}</td>
+              <td style="width: 18%; font-weight: bold; border: none; padding: 2px 0;">Mata Pelajaran</td>
+              <td style="width: 2%; border: none; padding: 2px 0;">:</td>
+              <td style="width: 38%; border: none; padding: 2px 0;">Tematik / Guru Kelas</td>
+              <td style="width: 15%; font-weight: bold; border: none; padding: 2px 0;">Kelas</td>
+              <td style="width: 2%; border: none; padding: 2px 0;">:</td>
+              <td style="width: 25%; border: none; padding: 2px 0;">${actKls ? actKls.namaRombel : '-'}</td>
             </tr>
             <tr>
-              <td style="font-weight: bold;">Guru Pengampu</td>
-              <td>:</td>
-              <td>${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
-              <td style="font-weight: bold;">Semester / TA</td>
-              <td>:</td>
-              <td>${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Guru Pengampu</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${currentUser ? currentUser.nama : 'Guru Pengampu'}</td>
+              <td style="font-weight: bold; border: none; padding: 2px 0;">Semester / TA</td>
+              <td style="border: none; padding: 2px 0;">:</td>
+              <td style="border: none; padding: 2px 0;">${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'}</td>
             </tr>
           </table>
 
@@ -4403,17 +4573,17 @@
           </table>
 
           <!-- TANDA TANGAN DUA KOLOM -->
-          <table style="width: 100%; font-size: 9.5pt; text-align: center; border-collapse: collapse; margin-top: 25px;">
+          <table style="width: 100%; font-size: 9.5pt; text-align: center; border-collapse: collapse; margin-top: 25px; border: none;">
             <tr>
-              <td style="width: 45%;">
+              <td style="width: 45%; border: none; padding: 0;">
                 Mengetahui,<br>
                 Kepala Sekolah
                 <br><br><br><br>
                 <strong><u>${schoolMetaConfig.kepalaSekolah}</u></strong><br>
                 NIP. ${schoolMetaConfig.nipKepalaSekolah}
               </td>
-              <td style="width: 10%;"></td>
-              <td style="width: 45%;">
+              <td style="width: 10%; border: none; padding: 0;"></td>
+              <td style="width: 45%; border: none; padding: 0;">
                 ${sch.desa || 'Ambulu'}, ${todayStr}<br>
                 Guru Mata Pelajaran / Guru Kelas
                 <br><br><br><br>
@@ -4425,8 +4595,12 @@
 
         </div>
       `;
+    }
 
-      executePrintDocument(printContainer.innerHTML, `Rekap_Jurnal_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`);
+    function printJurnalPDF() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const html = generateRekapJurnalHTML();
+      executePrintDocument(html, `Rekap_Jurnal_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`, 'landscape');
     }
 
     function openFormJurnalModal() {
