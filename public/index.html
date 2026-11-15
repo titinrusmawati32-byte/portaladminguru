@@ -212,15 +212,19 @@
         </p>
       </div>
 
-      <!-- TAB SELECTION: MASUK GURU vs DAFTAR GURU BARU -->
+      <!-- TAB SELECTION: MASUK GURU vs DAFTAR GURU BARU vs VERIFIKASI ADMIN -->
       <div class="w-full max-w-sm bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 flex gap-1 mb-4">
         <button type="button" id="tabBtnLogin" onclick="switchLoginTab('login')"
-          class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md">
+          class="flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-brandpurple-900 shadow-md">
           🔑 Masuk Guru
         </button>
         <button type="button" id="tabBtnRegister" onclick="switchLoginTab('register')"
-          class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10">
-          📝 Guru Baru (Daftar)
+          class="flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer text-white hover:bg-white/10">
+          📝 Guru Baru
+        </button>
+        <button type="button" id="tabBtnAdmin" onclick="switchLoginTab('admin')"
+          class="flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer text-yellow-300 hover:bg-white/10">
+          👑 Admin Sekolah
         </button>
       </div>
 
@@ -253,13 +257,13 @@
           <!-- Guru Selector or Name -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="font-bold text-slate-700">Nama Guru / Akun *</label>
+              <label class="font-bold text-slate-700">Nama Guru / Akun Terverifikasi *</label>
               <button type="button" onclick="switchLoginTab('register')" class="text-[10px] text-brandpurple-700 font-extrabold hover:underline">
                 + Belum Terdaftar?
               </button>
             </div>
             <div id="teacherSelectContainer">
-              <input type="text" id="loginTeacherNameInput" required placeholder="Ketik nama Anda atau masukkan NPSN dahulu"
+              <input type="text" id="loginTeacherNameInput" required placeholder="Ketik nama Anda / masukkan NPSN dulu"
                 class="w-full p-2.5 bg-slate-100 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
             </div>
           </div>
@@ -278,8 +282,12 @@
           </button>
         </form>
 
-        <!-- 2. TAB DAFTAR GURU BARU -->
+        <!-- 2. TAB DAFTAR GURU BARU (WAJIB VERIFIKASI ADMIN) -->
         <form id="formTeacherRegister" onsubmit="handleRegisterTeacherWithPin(event)" class="space-y-3 hidden">
+          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] leading-relaxed">
+            📢 <strong>Ketentuan:</strong> Setelah mendaftar, akun Anda berstatus <strong>Menunggu Verifikasi</strong>. Anda baru dapat login setelah disetujui Admin Sekolah.
+          </div>
+
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block font-bold text-slate-700 mb-1">NPSN *</label>
@@ -315,7 +323,7 @@
           </div>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Jabatan / Tugas *</label>
+            <label class="block font-bold text-slate-700 mb-1">Jabatan / Penugasan *</label>
             <select id="regJabatan" class="w-full p-2 bg-slate-100 rounded-xl font-bold focus:outline-none">
               <option value="Guru Kelas">Guru Kelas</option>
               <option value="Guru Mapel PAI">Guru Mapel PAI</option>
@@ -329,12 +337,48 @@
             <label class="block font-bold text-slate-700 mb-1">Buat PIN Pribadi (4 - 6 Angka) *</label>
             <input type="password" id="regPin" required maxlength="6" placeholder="Buat PIN 4-6 angka rahasia Anda"
               class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-emerald-600">
-            <p class="text-[10px] text-slate-400 mt-0.5">Ingat PIN ini untuk login berikutnya di perangkat apapun.</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">PIN ini digunakan untuk login setelah akun disetujui Admin.</p>
           </div>
 
           <button type="submit" id="btnRegSubmit"
             class="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-lg transition active:scale-98 cursor-pointer">
-            Daftarkan Diri & Lanjut Buat Kelas ➔
+            Ajukan Pendaftaran Guru (Menunggu Verifikasi) ➔
+          </button>
+        </form>
+
+        <!-- 3. TAB PORTAL ADMIN SEKOLAH (VERIFIKASI GURU) -->
+        <form id="formAdminLogin" onsubmit="handleLoginAdmin(event)" class="space-y-3 hidden">
+          <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-[11px] leading-relaxed">
+            👑 <strong>Akses Admin Sekolah:</strong> Digunakan oleh Kepala Sekolah atau Operator untuk memverifikasi pendaftaran guru dan mengelola database lembaga.
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">NPSN Sekolah *</label>
+            <input type="text" id="adminNpsn" required placeholder="Contoh: 20524058" oninput="handleAdminCheckSchoolDebounce()"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Kode Unik Sekolah *</label>
+            <input type="text" id="adminKodeUnik" required placeholder="Contoh: SMB04-3918" oninput="handleAdminCheckSchoolDebounce()"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold font-mono text-sm uppercase focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+          </div>
+
+          <div id="adminSchoolVerifiedBadge" class="hidden p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+            <span id="adminVerifiedSchoolName">SD Negeri</span>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">PIN Admin Sekolah *</label>
+            <input type="password" id="adminPin" required placeholder="PIN Admin (default: admin123)"
+              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
+            <p class="text-[10px] text-slate-400 mt-0.5">PIN default sekolah baru: <code class="text-brandpurple-700 font-bold">admin123</code></p>
+          </div>
+
+          <button type="submit" id="btnAdminSubmit"
+            class="w-full py-3 rounded-2xl bg-gradient-to-r from-brandpurple-900 to-indigo-900 hover:from-purple-950 hover:to-indigo-950 text-yellow-300 font-extrabold text-xs shadow-lg transition active:scale-98 cursor-pointer flex items-center justify-center gap-2">
+            <span>Buka Panel Verifikasi Pendaftaran Guru</span>
+            <span>➔</span>
           </button>
         </form>
 
@@ -344,7 +388,7 @@
       <div class="mt-4 flex flex-col items-center gap-1.5 text-center">
         <button type="button" onclick="openMasterSchoolDirectoryModal()"
           class="text-xs text-purple-200/90 font-bold hover:text-white hover:underline flex items-center gap-1 cursor-pointer">
-          <span>📋</span> <span>Lihat Daftar NPSN & Kode Akses 13 SD Ambulu</span>
+          <span>📋</span> <span>Lihat Daftar NPSN & Kode Akses 14 SD Ambulu</span>
         </button>
         <span class="text-[10px] text-purple-300/60">Akses murni NPSN & PIN • Terisolasi aman per lembaga</span>
       </div>
@@ -353,7 +397,7 @@
 
     <!-- Bottom Footer -->
     <div class="relative z-10 text-center text-[11px] text-purple-300/80 pt-2">
-      SiGuru SD • Koorwil Pendidikan Kecamatan Ambulu, Jember • v3.1 NPSN Gate
+      SiGuru SD • Koorwil Pendidikan Kecamatan Ambulu, Jember • v3.3 Strict Multi-Tenant
     </div>
   </section>
 
@@ -540,24 +584,33 @@
     const IS_CONNECTED = !!(window.APP_CONFIG && window.APP_CONFIG.isConnected && window.APP_CONFIG.isConnected());
 
     // ==========================================
-    // TAB LOGIN SWITCHER (MASUK vs DAFTAR)
+    // TAB LOGIN SWITCHER (MASUK vs DAFTAR vs ADMIN)
     // ==========================================
     function switchLoginTab(tab) {
       const btnLogin = document.getElementById('tabBtnLogin');
       const btnReg = document.getElementById('tabBtnRegister');
+      const btnAdmin = document.getElementById('tabBtnAdmin');
       const formLogin = document.getElementById('formTeacherLogin');
       const formReg = document.getElementById('formTeacherRegister');
+      const formAdmin = document.getElementById('formAdminLogin');
+
+      // Reset style tombol
+      [btnLogin, btnReg, btnAdmin].forEach(b => {
+        if (b) b.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer text-white hover:bg-white/10';
+      });
+      [formLogin, formReg, formAdmin].forEach(f => {
+        if (f) f.classList.add('hidden');
+      });
 
       if (tab === 'login') {
-        btnLogin.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
-        btnReg.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10';
+        btnLogin.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
         formLogin.classList.remove('hidden');
-        formReg.classList.add('hidden');
-      } else {
-        btnReg.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
-        btnLogin.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10';
+      } else if (tab === 'register') {
+        btnReg.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-emerald-800 shadow-md';
         formReg.classList.remove('hidden');
-        formLogin.classList.add('hidden');
+      } else if (tab === 'admin') {
+        btnAdmin.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-indigo-950 shadow-md';
+        formAdmin.classList.remove('hidden');
       }
     }
 
@@ -572,6 +625,12 @@
     function handleRegCheckSchoolDebounce() {
       if (checkRegSchoolTimer) clearTimeout(checkRegSchoolTimer);
       checkRegSchoolTimer = setTimeout(checkSchoolRegBadge, 400);
+    }
+
+    let checkAdminSchoolTimer = null;
+    function handleAdminCheckSchoolDebounce() {
+      if (checkAdminSchoolTimer) clearTimeout(checkAdminSchoolTimer);
+      checkAdminSchoolTimer = setTimeout(checkSchoolAdminBadge, 400);
     }
 
     function checkSchoolLoginBadge() {
@@ -614,6 +673,21 @@
       }
     }
 
+    function checkSchoolAdminBadge() {
+      const npsn = document.getElementById('adminNpsn').value.trim();
+      const code = document.getElementById('adminKodeUnik').value.trim();
+      const badge = document.getElementById('adminSchoolVerifiedBadge');
+      const nameEl = document.getElementById('adminVerifiedSchoolName');
+
+      const found = window.APP_CONFIG.findSchool(npsn, code);
+      if (found) {
+        badge.classList.remove('hidden');
+        nameEl.textContent = `👑 Admin Lembaga: ${found.nama} (${found.desa})`;
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
     async function fetchTeachersForSchoolDropdown(npsn, kodeUnik) {
       const container = document.getElementById('teacherSelectContainer');
       try {
@@ -621,7 +695,7 @@
         if (res && res.success && res.teachers && res.teachers.length > 0) {
           container.innerHTML = `
             <select id="loginTeacherSelect" required class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
-              <option value="">-- Pilih Nama Anda --</option>
+              <option value="">-- Pilih Akun Guru Terverifikasi --</option>
               ${res.teachers.map(t => `<option value="${t.id}">${t.nama} (${t.jabatan || 'Guru'})</option>`).join('')}
             </select>
           `;
@@ -631,13 +705,13 @@
 
       // Fallback: input teks nama jika belum ada guru terdaftar di sekolah ini
       container.innerHTML = `
-        <input type="text" id="loginTeacherNameInput" required placeholder="Masukkan Nama Lengkap Anda"
+        <input type="text" id="loginTeacherNameInput" required placeholder="Masukkan Nama Lengkap / NIP Anda"
           class="w-full p-2.5 bg-slate-100 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
       `;
     }
 
     // ==========================================
-    // ACTION: LOGIN GURU (OPSI C)
+    // ACTION: LOGIN GURU (KETAT: HANYA TERVERIFIKASI)
     // ==========================================
     async function handleLoginTeacherWithPin(e) {
       e.preventDefault();
@@ -645,7 +719,6 @@
       const kodeUnik = document.getElementById('loginKodeUnik').value.trim();
       const pin = document.getElementById('loginPin').value.trim();
 
-      // Cek apakah select atau input teks
       const selectEl = document.getElementById('loginTeacherSelect');
       const inputEl = document.getElementById('loginTeacherNameInput');
       const teacherIdOrName = selectEl ? selectEl.value : (inputEl ? inputEl.value.trim() : '');
@@ -661,7 +734,7 @@
         return;
       }
 
-      showToast('Memverifikasi akun guru dan PIN...', 'info');
+      showToast('Memverifikasi akun guru dan status verifikasi...', 'info');
 
       try {
         const res = await apiPost('loginTeacherWithPin', {
@@ -673,33 +746,81 @@
 
         if (res && res.success) {
           completeLoginTeacher(res.teacher, school, res);
+        } else if (res && res.isPending) {
+          openUniversalModal(
+            'Akses Ditolak: Menunggu Verifikasi',
+            `
+            <div class="text-center space-y-4 py-3">
+              <div class="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-3xl shadow-xs">
+                ⏳
+              </div>
+              <div class="space-y-1">
+                <h4 class="text-base font-extrabold text-slate-900">Akun Anda Menunggu Verifikasi</h4>
+                <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                  ${res.message || 'Pendaftaran Anda di ' + school.nama + ' saat ini masih berstatus "Menunggu Verifikasi" oleh Admin Sekolah.'}
+                </p>
+              </div>
+              <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[11px] text-amber-900 text-left leading-relaxed">
+                📢 <strong>Keamanan Lembaga:</strong> Guru hanya dapat masuk setelah disetujui (diverifikasi) oleh Admin / Kepala Sekolah ${school.nama}. Silakan hubungi Admin Sekolah Anda untuk menyetujui akun Anda di tab <strong>👑 Admin Sekolah</strong>.
+              </div>
+              <div class="pt-2">
+                <button onclick="closeUniversalModal()" class="px-6 py-2.5 rounded-full bg-slate-800 text-white font-extrabold text-xs cursor-pointer">
+                  Saya Mengerti
+                </button>
+              </div>
+            </div>
+            `
+          );
+        } else if (res && res.isRejected) {
+          openUniversalModal(
+            'Pendaftaran Ditolak',
+            `
+            <div class="text-center space-y-4 py-3">
+              <div class="w-16 h-16 rounded-3xl bg-rose-100 text-rose-700 flex items-center justify-center mx-auto text-3xl">
+                ✕
+              </div>
+              <h4 class="text-base font-extrabold text-slate-900">Pendaftaran Anda Ditolak</h4>
+              <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                ${res.message || 'Pendaftaran akun Anda telah ditolak oleh Admin Sekolah.'}
+              </p>
+              <div class="pt-2">
+                <button onclick="closeUniversalModal()" class="px-6 py-2.5 rounded-full bg-rose-600 text-white font-extrabold text-xs cursor-pointer">
+                  Tutup
+                </button>
+              </div>
+            </div>
+            `
+          );
+        } else if (res && res.notRegistered) {
+          openUniversalModal(
+            'Akun Belum Terdaftar',
+            `
+            <div class="text-center space-y-4 py-3">
+              <div class="w-16 h-16 rounded-3xl bg-blue-100 text-blue-700 flex items-center justify-center mx-auto text-3xl">
+                📝
+              </div>
+              <h4 class="text-base font-extrabold text-slate-900">Belum Terdaftar di ${school.nama}</h4>
+              <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                Data guru belum ditemukan untuk sekolah ini. Silakan mendaftar terlebih dahulu pada tab "Guru Baru".
+              </p>
+              <div class="pt-2">
+                <button onclick="closeUniversalModal(); switchLoginTab('register');" class="px-6 py-2.5 rounded-full bg-emerald-600 text-white font-extrabold text-xs cursor-pointer">
+                  Daftar Sekarang ➔
+                </button>
+              </div>
+            </div>
+            `
+          );
         } else {
-          // Fallback lokal jika backend belum tersinkronisasi
-          completeLoginTeacher({
-            id: 'GUR-' + npsn + '-LOCAL',
-            nama: selectEl ? selectEl.options[selectEl.selectedIndex].text : teacherIdOrName,
-            schoolId: school.id,
-            namaSekolah: school.nama,
-            npsn: school.npsn,
-            jabatan: 'Guru Kelas',
-            role: 'Guru'
-          }, school);
+          showToast((res && res.message) ? res.message : 'Kombinasi NPSN, Akun, atau PIN tidak cocok.', 'error');
         }
       } catch (err) {
-        completeLoginTeacher({
-          id: 'GUR-' + npsn + '-LOCAL',
-          nama: teacherIdOrName,
-          schoolId: school.id,
-          namaSekolah: school.nama,
-          npsn: school.npsn,
-          jabatan: 'Guru Kelas',
-          role: 'Guru'
-        }, school);
+        showToast('Gagal menghubungi server database: ' + err.message, 'error');
       }
     }
 
     // ==========================================
-    // ACTION: REGISTRASI GURU BARU (OPSI C)
+    // ACTION: REGISTRASI GURU BARU (STATUS: MENUNGGU VERIFIKASI)
     // ==========================================
     async function handleRegisterTeacherWithPin(e) {
       e.preventDefault();
@@ -718,11 +839,11 @@
 
       const school = window.APP_CONFIG.findSchool(npsn, kodeUnik);
       if (!school) {
-        showToast('NPSN atau Kode Unik Sekolah tidak cocok dengan 13 SDN Ambulu.', 'error');
+        showToast('NPSN atau Kode Unik Sekolah tidak cocok dengan 14 SDN Ambulu.', 'error');
         return;
       }
 
-      showToast('Mendaftarkan profil guru ke sistem lembaga...', 'info');
+      showToast('Mengajukan pendaftaran guru ke database lembaga...', 'info');
 
       const payload = {
         npsn: npsn,
@@ -737,31 +858,298 @@
 
       try {
         const res = await apiPost('registerTeacherWithPin', payload);
-        const profile = (res && res.teacher) ? res.teacher : {
-          id: 'GUR-' + npsn + '-' + Date.now().toString().slice(-4),
-          nama: nama,
-          nip: nip,
-          noHp: noHp,
-          schoolId: school.id,
-          namaSekolah: school.nama,
-          npsn: school.npsn,
-          jabatan: jabatan,
-          role: 'Guru'
-        };
 
-        completeLoginTeacher(profile, school, null, true);
+        if (res && res.success && res.isPending) {
+          // Tampilkan Modal Pendaftaran Berhasil & Menunggu Verifikasi
+          openUniversalModal(
+            'Pendaftaran Berhasil Diajukan',
+            `
+            <div class="text-center space-y-4 py-3">
+              <div class="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-3xl shadow-xs">
+                ⏳
+              </div>
+              <div class="space-y-1">
+                <h4 class="text-base font-extrabold text-slate-900">Status: Menunggu Verifikasi</h4>
+                <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                  Pendaftaran guru atas nama <strong class="text-slate-900">${nama}</strong> di <strong class="text-slate-900">${school.nama}</strong> telah berhasil disimpan di database pusat.
+                </p>
+              </div>
+              <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[11px] text-amber-900 text-left leading-relaxed">
+                ⚠️ <strong>PENTING:</strong> Sesuai protokol keamanan sistem, akun Anda <strong>belum dapat digunakan untuk masuk</strong> sebelum disetujui (diverifikasi) oleh Admin / Operator Sekolah <strong>${school.nama}</strong>. Silakan hubungi Admin Sekolah Anda.
+              </div>
+              <div class="pt-2">
+                <button onclick="closeUniversalModal(); switchLoginTab('login');" class="px-6 py-2.5 rounded-full bg-brandpurple-700 hover:bg-brandpurple-800 text-white font-extrabold text-xs shadow-md cursor-pointer">
+                  Ke Halaman Masuk ➔
+                </button>
+              </div>
+            </div>
+            `
+          );
+          document.getElementById('formTeacherRegister').reset();
+          switchLoginTab('login');
+        } else if (res && res.isPending) {
+          openUniversalModal('Pendaftaran Sudah Tercatat', `<p class="text-xs p-3">${res.message}</p>`);
+        } else if (res && res.isVerified) {
+          showToast(res.message, 'info');
+          switchLoginTab('login');
+        } else {
+          showToast((res && res.message) ? res.message : 'Gagal mengajukan pendaftaran.', 'error');
+        }
       } catch (err) {
-        completeLoginTeacher({
-          id: 'GUR-' + npsn + '-' + Date.now().toString().slice(-4),
-          nama: nama,
-          nip: nip,
-          noHp: noHp,
-          schoolId: school.id,
-          namaSekolah: school.nama,
-          npsn: school.npsn,
-          jabatan: jabatan,
-          role: 'Guru'
-        }, school, null, true);
+        showToast('Gagal mengajukan pendaftaran: ' + err.message, 'error');
+      }
+    }
+
+    // ==========================================
+    // ACTION: LOGIN ADMIN SEKOLAH & PANEL VERIFIKASI
+    // ==========================================
+    async function handleLoginAdmin(e) {
+      e.preventDefault();
+      const npsn = document.getElementById('adminNpsn').value.trim();
+      const kodeUnik = document.getElementById('adminKodeUnik').value.trim();
+      const pin = document.getElementById('adminPin').value.trim();
+
+      if (!npsn || !kodeUnik || !pin) {
+        showToast('NPSN, Kode Unik, dan PIN Admin wajib diisi.', 'warning');
+        return;
+      }
+
+      const school = window.APP_CONFIG.findSchool(npsn, kodeUnik);
+      if (!school) {
+        showToast('NPSN atau Kode Unik tidak cocok dengan data resmi Kecamatan Ambulu.', 'error');
+        return;
+      }
+
+      showToast('Memverifikasi akses Admin Lembaga...', 'info');
+
+      try {
+        const res = await apiPost('loginAdminSchool', {
+          npsn: npsn,
+          kodeUnik: kodeUnik,
+          pinAdmin: pin
+        });
+
+        if (res && res.success) {
+          openAdminVerificationPanelModal(
+            res.school,
+            res.pendingTeachers || [],
+            res.verifiedTeachers || [],
+            res.rejectedTeachers || []
+          );
+        } else {
+          showToast((res && res.message) ? res.message : 'PIN Admin salah atau akses ditolak.', 'error');
+        }
+      } catch (err) {
+        showToast('Gagal memverifikasi Admin: ' + err.message, 'error');
+      }
+    }
+
+    function openAdminVerificationPanelModal(school, pending, verified, rejected) {
+      const content = `
+        <div class="space-y-4 text-xs">
+          <!-- Header Sekolah -->
+          <div class="p-3.5 bg-gradient-to-r from-brandpurple-900 to-indigo-900 text-white rounded-2xl flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase font-mono tracking-widest text-brandmint-300">PANEL VERIFIKASI ADMIN SEKOLAH</span>
+              <h3 class="font-extrabold text-sm leading-tight">${school.nama}</h3>
+              <p class="text-[11px] text-purple-200">NPSN: ${school.npsn} • Desa ${school.desa}</p>
+            </div>
+            <div class="text-right">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-amber-400 text-slate-900">
+                ${pending.length} Menunggu
+              </span>
+            </div>
+          </div>
+
+          <!-- TAB VERIFIKASI ADMIN -->
+          <div class="flex gap-1.5 border-b border-slate-100 pb-2">
+            <button onclick="switchAdminTab('pending')" id="tabAdmPending" class="font-extrabold text-xs px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 cursor-pointer">
+              ⏳ Menunggu Verifikasi (${pending.length})
+            </button>
+            <button onclick="switchAdminTab('verified')" id="tabAdmVerified" class="font-bold text-xs px-3 py-1.5 rounded-xl text-slate-500 hover:bg-slate-100 cursor-pointer">
+              ✅ Terverifikasi (${verified.length})
+            </button>
+            <button onclick="switchAdminTab('rejected')" id="tabAdmRejected" class="font-bold text-xs px-3 py-1.5 rounded-xl text-slate-500 hover:bg-slate-100 cursor-pointer">
+              ✕ Ditolak (${rejected.length})
+            </button>
+          </div>
+
+          <!-- KONTEN 1: MENUNGGU VERIFIKASI -->
+          <div id="admAreaPending" class="space-y-2.5 max-h-80 overflow-y-auto">
+            ${pending.length === 0 ? `
+              <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-2xl">
+                Tidak ada permohonan pendaftaran guru yang menunggu verifikasi saat ini.
+              </div>
+            ` : pending.map(t => `
+              <div class="p-3 bg-white rounded-2xl border border-amber-200 soft-card-shadow flex items-center justify-between gap-3">
+                <div class="space-y-0.5">
+                  <div class="font-extrabold text-slate-900 text-xs">${t.nama}</div>
+                  <div class="text-[11px] text-slate-500 font-mono">
+                    NIP: ${t.nip || '-'} • WA: <a href="https://wa.me/62${t.noHp.replace(/^0/,'')}" target="_blank" class="text-emerald-600 font-bold hover:underline">${t.noHp}</a>
+                  </div>
+                  <div class="text-[10px] text-slate-400">
+                    Jabatan: <span class="font-bold text-slate-700">${t.jabatan}</span> • Tgl: ${t.tanggalDaftar || '-'}
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="handleAdminActionVerify('${t.id}', '${school.npsn}', '${school.kodeUnik}', 'Terverifikasi', '${t.nama}')"
+                    class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] shadow-xs cursor-pointer">
+                    ✓ Setujui
+                  </button>
+                  <button onclick="handleAdminActionVerify('${t.id}', '${school.npsn}', '${school.kodeUnik}', 'Ditolak', '${t.nama}')"
+                    class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] cursor-pointer">
+                    ✕ Tolak
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- KONTEN 2: TERVERIFIKASI -->
+          <div id="admAreaVerified" class="hidden space-y-2.5 max-h-80 overflow-y-auto">
+            ${verified.length === 0 ? `
+              <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-2xl">
+                Belum ada guru yang terverifikasi.
+              </div>
+            ` : verified.map(t => `
+              <div class="p-3 bg-white rounded-2xl border border-slate-200 flex items-center justify-between gap-3">
+                <div class="space-y-0.5">
+                  <div class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                    <span>${t.nama}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">Aktif</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 font-mono">
+                    NIP: ${t.nip || '-'} • WA: ${t.noHp}
+                  </div>
+                  <div class="text-[10px] text-slate-400">
+                    Jabatan: <span class="font-bold text-slate-700">${t.jabatan}</span>
+                  </div>
+                </div>
+                <div>
+                  <button onclick="handleAdminResetPinPrompt('${t.id}', '${school.npsn}', '${t.nama}')"
+                    class="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] cursor-pointer">
+                    🔑 Reset PIN
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- KONTEN 3: DITOLAK -->
+          <div id="admAreaRejected" class="hidden space-y-2.5 max-h-80 overflow-y-auto">
+            ${rejected.length === 0 ? `
+              <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-2xl">
+                Tidak ada data pendaftaran yang ditolak.
+              </div>
+            ` : rejected.map(t => `
+              <div class="p-3 bg-white rounded-2xl border border-rose-100 flex items-center justify-between gap-3">
+                <div class="space-y-0.5">
+                  <div class="font-extrabold text-slate-900 text-xs">${t.nama}</div>
+                  <div class="text-[11px] text-slate-500 font-mono">NIP: ${t.nip || '-'} • WA: ${t.noHp}</div>
+                </div>
+                <div>
+                  <button onclick="handleAdminActionVerify('${t.id}', '${school.npsn}', '${school.kodeUnik}', 'Terverifikasi', '${t.nama}')"
+                    class="px-3 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] cursor-pointer">
+                    Pulihkan & Setujui
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="pt-2 flex justify-between items-center border-t border-slate-100">
+            <span class="text-[11px] text-slate-400">Sheet: <strong>DB_${school.npsn}_${school.nama.replace(/[^a-zA-Z0-9]/g, '_')}</strong></span>
+            <button onclick="closeUniversalModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold cursor-pointer">
+              Tutup
+            </button>
+          </div>
+        </div>
+      `;
+      openUniversalModal(`Verifikasi Pendaftaran Guru • ${school.nama}`, content);
+    }
+
+    function switchAdminTab(t) {
+      const bP = document.getElementById('tabAdmPending');
+      const bV = document.getElementById('tabAdmVerified');
+      const bR = document.getElementById('tabAdmRejected');
+      const aP = document.getElementById('admAreaPending');
+      const aV = document.getElementById('admAreaVerified');
+      const aR = document.getElementById('admAreaRejected');
+
+      [bP, bV, bR].forEach(b => {
+        if (b) b.className = 'font-bold text-xs px-3 py-1.5 rounded-xl text-slate-500 hover:bg-slate-100 cursor-pointer';
+      });
+      [aP, aV, aR].forEach(a => {
+        if (a) a.classList.add('hidden');
+      });
+
+      if (t === 'pending') {
+        bP.className = 'font-extrabold text-xs px-3 py-1.5 rounded-xl bg-amber-100 text-amber-900 cursor-pointer';
+        aP.classList.remove('hidden');
+      } else if (t === 'verified') {
+        bV.className = 'font-extrabold text-xs px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 cursor-pointer';
+        aV.classList.remove('hidden');
+      } else if (t === 'rejected') {
+        bR.className = 'font-extrabold text-xs px-3 py-1.5 rounded-xl bg-rose-100 text-rose-900 cursor-pointer';
+        aR.classList.remove('hidden');
+      }
+    }
+
+    async function handleAdminActionVerify(teacherId, npsn, kodeUnik, newStatus, teacherName) {
+      if (!confirm(`Ubah status pendaftaran ${teacherName} menjadi "${newStatus}"?`)) return;
+      showToast(`Memproses verifikasi ${teacherName}...`, 'info');
+      try {
+        const res = await apiPost('verifyTeacherRegistration', {
+          teacherId: teacherId,
+          npsn: npsn,
+          kodeUnik: kodeUnik,
+          status: newStatus,
+          adminName: 'Admin ' + (currentSchool ? currentSchool.nama : 'Sekolah')
+        });
+        if (res && res.success) {
+          showToast(`Pendaftaran ${teacherName} berhasil disetujui!`, 'success');
+          // Reload data admin
+          const refreshRes = await apiPost('loginAdminSchool', {
+            npsn: npsn,
+            kodeUnik: kodeUnik,
+            pinAdmin: 'admin123'
+          });
+          if (refreshRes && refreshRes.success) {
+            openAdminVerificationPanelModal(
+              refreshRes.school,
+              refreshRes.pendingTeachers || [],
+              refreshRes.verifiedTeachers || [],
+              refreshRes.rejectedTeachers || []
+            );
+          }
+        } else {
+          showToast((res && res.message) ? res.message : 'Gagal verifikasi.', 'error');
+        }
+      } catch (e) {
+        showToast('Gagal verifikasi: ' + e.message, 'error');
+      }
+    }
+
+    async function handleAdminResetPinPrompt(teacherId, npsn, teacherName) {
+      const newPin = prompt(`Masukkan PIN baru untuk ${teacherName} (4 - 6 digit):`, '123456');
+      if (!newPin || newPin.trim().length < 4) {
+        if (newPin !== null) showToast('PIN minimal 4 angka.', 'warning');
+        return;
+      }
+      showToast('Memperbarui PIN...', 'info');
+      try {
+        const res = await apiPost('resetTeacherPinByAdmin', {
+          teacherId: teacherId,
+          npsn: npsn,
+          newPin: newPin.trim()
+        });
+        if (res && res.success) {
+          showToast(`PIN ${teacherName} berhasil direset: ${newPin.trim()}`, 'success');
+        } else {
+          showToast((res && res.message) ? res.message : 'Gagal reset PIN.', 'error');
+        }
+      } catch (e) {
+        showToast('Gagal reset PIN: ' + e.message, 'error');
       }
     }
 
@@ -883,15 +1271,15 @@
     }
 
     // ==========================================
-    // MODAL DIRECTORY KODE UNIK 13 SD AMBULU
+    // MODAL DIRECTORY KODE UNIK 14 SD AMBULU
     // ==========================================
     function openMasterSchoolDirectoryModal() {
       const schools = window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || [];
       const content = `
         <div class="space-y-4 text-xs">
           <div class="p-3 bg-purple-50 rounded-2xl border border-purple-200 text-purple-900 leading-relaxed">
-            <strong>Daftar NPSN & Kode Unik Akses Lembaga:</strong><br>
-            Setiap guru cukup memasukkan NPSN dan Kode Unik sekolah masing-masing untuk terhubung ke lembaganya.
+            <strong>Daftar 14 SD Negeri Resmi Kecamatan Ambulu & Kode Unik:</strong><br>
+            Setiap lembaga memiliki NPSN resmi dan Kode Akses unik rahasia yang mengisolasi database sekolah secara mandiri.
           </div>
 
           <div class="max-h-72 overflow-y-auto space-y-2 pr-1">
@@ -916,23 +1304,27 @@
           </div>
 
           <div class="pt-2 flex justify-end">
-            <button onclick="closeUniversalModal()" class="px-5 py-2 bg-slate-100 rounded-full font-bold">
+            <button onclick="closeUniversalModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold cursor-pointer">
               Tutup
             </button>
           </div>
         </div>
       `;
-      openUniversalModal('Daftar NPSN & Kode Akses 13 SD Ambulu', content);
+      openUniversalModal('Daftar NPSN & Kode Akses 14 SD Ambulu', content);
     }
 
     function applySchoolCode(npsn, kode) {
-      document.getElementById('loginNpsn').value = npsn;
-      document.getElementById('loginKodeUnik').value = kode;
-      document.getElementById('regNpsn').value = npsn;
-      document.getElementById('regKodeUnik').value = kode;
+      if (document.getElementById('loginNpsn')) document.getElementById('loginNpsn').value = npsn;
+      if (document.getElementById('loginKodeUnik')) document.getElementById('loginKodeUnik').value = kode;
+      if (document.getElementById('regNpsn')) document.getElementById('regNpsn').value = npsn;
+      if (document.getElementById('regKodeUnik')) document.getElementById('regKodeUnik').value = kode;
+      if (document.getElementById('adminNpsn')) document.getElementById('adminNpsn').value = npsn;
+      if (document.getElementById('adminKodeUnik')) document.getElementById('adminKodeUnik').value = kode;
+
       closeUniversalModal();
       checkSchoolLoginBadge();
       checkSchoolRegBadge();
+      checkSchoolAdminBadge();
       showToast(`NPSN ${npsn} terpasang.`, 'info');
     }
 
@@ -992,9 +1384,10 @@
       try {
         const enrichedPayload = {
           ...payload,
+          npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
+          namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : ''),
           ownerUid: currentUser ? (currentUser.id || currentUser.uid) : '',
-          schoolId: currentSchool ? currentSchool.id : (currentUser ? currentUser.schoolId : ''),
-          namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : '')
+          schoolId: currentSchool ? currentSchool.id : (currentUser ? currentUser.schoolId : '')
         };
         const res = await apiPost(action, enrichedPayload);
         if (res && res.success) {
@@ -1065,7 +1458,9 @@
       try {
         const res = await apiGet('getTeacherData', {
           teacherUid: currentUser.id || currentUser.uid || '',
-          schoolId: currentSchool ? currentSchool.id : (currentUser.schoolId || '')
+          schoolId: currentSchool ? currentSchool.id : (currentUser.schoolId || ''),
+          npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
+          namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : '')
         });
         if (res && res.success) {
           if (res.kelas) dbData.kelas = res.kelas;
@@ -1146,6 +1541,10 @@
         if (!raw) return false;
         const s = JSON.parse(raw);
         if (s && s.user && s.school) {
+          if (s.user.statusVerifikasi && s.user.statusVerifikasi !== 'Terverifikasi') {
+            sessionStorage.removeItem('siguru_npsn_session');
+            return false;
+          }
           currentUser = s.user;
           currentSchool = s.school;
           activeGuruClassId = s.activeClassId || null;

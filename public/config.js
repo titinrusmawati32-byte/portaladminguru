@@ -1,8 +1,8 @@
 /**
  * ============================================================
  * SiGuru SD - Platform Administrasi Pendidikan Kecamatan Ambulu
- * Kabupaten Jember - Multi-School & Multi-Teacher Platform
- * Autentikasi Berbasis NPSN + Kode Unik Lembaga & PIN Guru (Opsi C)
+ * Kabupaten Jember - Multi-School & Multi-Tenant Database
+ * Autentikasi: NPSN + Kode Unik Lembaga & PIN Guru dengan Verifikasi Admin
  * ============================================================
  */
 
@@ -12,7 +12,7 @@ const APP_CONFIG = {
 
   // 2. Identitas Platform & Wilayah Operasional
   PLATFORM_NAME: 'SiGuru SD - Kecamatan Ambulu',
-  VERSION: '3.1.0-NPSN-AUTH',
+  VERSION: '3.2.0-STRICT-AUTH',
   KECAMATAN: 'Ambulu',
   KABUPATEN: 'Jember',
   PROVINSI: 'Jawa Timur',
@@ -23,63 +23,12 @@ const APP_CONFIG = {
   // Dilengkapi Kode Unik Akses Lembaga yang dibuat otomatis oleh sistem
   MASTER_SEKOLAH_AMBULU: [
     {
-      id: 'SCH-20524972',
-      npsn: '20524972',
-      kodeUnik: 'AMB02-8821',
-      nama: 'SDN Ambulu 02',
-      namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 02',
-      desa: 'Ambulu',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
-      status: 'Terverifikasi'
-    },
-    {
-      id: 'SCH-20524171',
-      npsn: '20524171',
-      kodeUnik: 'TGL01-7142',
-      nama: 'SDN Tegalsari 01',
-      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 01',
-      desa: 'Tegalsari',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
-      status: 'Terverifikasi'
-    },
-    {
-      id: 'SCH-20524146',
-      npsn: '20524146',
-      kodeUnik: 'TGL02-6315',
-      nama: 'SDN Tegalsari 02',
-      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 02',
-      desa: 'Tegalsari',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
-      status: 'Terverifikasi'
-    },
-    {
-      id: 'SCH-20524148',
-      npsn: '20524148',
-      kodeUnik: 'TGL03-5294',
-      nama: 'SDN Tegalsari 03',
-      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 03',
-      desa: 'Tegalsari',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
-      status: 'Terverifikasi'
-    },
-    {
-      id: 'SCH-20524147',
-      npsn: '20524147',
-      kodeUnik: 'TGL04-4819',
-      nama: 'SDN Tegalsari 04',
-      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 04',
-      desa: 'Tegalsari',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
-      status: 'Terverifikasi'
-    },
-    {
       id: 'SCH-20524058',
       npsn: '20524058',
       kodeUnik: 'SMB04-3918',
       nama: 'SDN Sumberejo 04',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 04',
       desa: 'Sumberejo',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
       status: 'Terverifikasi'
     },
     {
@@ -89,7 +38,6 @@ const APP_CONFIG = {
       nama: 'SDN Sumberejo 05',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 05',
       desa: 'Sumberejo',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
       status: 'Terverifikasi'
     },
     {
@@ -99,7 +47,51 @@ const APP_CONFIG = {
       nama: 'SDN Sumberejo 07',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 07',
       desa: 'Sumberejo',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524972',
+      npsn: '20524972',
+      kodeUnik: 'AMB02-8821',
+      nama: 'SDN Ambulu 02',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 02',
+      desa: 'Ambulu',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524171',
+      npsn: '20524171',
+      kodeUnik: 'TGL01-7142',
+      nama: 'SDN Tegalsari 01',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 01',
+      desa: 'Tegalsari',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524146',
+      npsn: '20524146',
+      kodeUnik: 'TGL02-6315',
+      nama: 'SDN Tegalsari 02',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 02',
+      desa: 'Tegalsari',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524148',
+      npsn: '20524148',
+      kodeUnik: 'TGL03-5294',
+      nama: 'SDN Tegalsari 03',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 03',
+      desa: 'Tegalsari',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20524147',
+      npsn: '20524147',
+      kodeUnik: 'TGL04-4819',
+      nama: 'SDN Tegalsari 04',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 04',
+      desa: 'Tegalsari',
       status: 'Terverifikasi'
     },
     {
@@ -109,7 +101,6 @@ const APP_CONFIG = {
       nama: 'SDN Andongsari 02',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 02',
       desa: 'Andongsari',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
       status: 'Terverifikasi'
     },
     {
@@ -119,7 +110,6 @@ const APP_CONFIG = {
       nama: 'SDN Andongsari 04',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 04',
       desa: 'Andongsari',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
       status: 'Terverifikasi'
     },
     {
@@ -129,7 +119,6 @@ const APP_CONFIG = {
       nama: 'SDN Pontang 01',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 01',
       desa: 'Pontang',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
       status: 'Terverifikasi'
     },
     {
@@ -139,7 +128,6 @@ const APP_CONFIG = {
       nama: 'SDN Karanganyar 01',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 01',
       desa: 'Karanganyar',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
       status: 'Terverifikasi'
     },
     {
@@ -149,7 +137,15 @@ const APP_CONFIG = {
       nama: 'SDN Karanganyar 03',
       namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 03',
       desa: 'Karanganyar',
-      alamat: 'Kecamatan Ambulu, Kabupaten Jember',
+      status: 'Terverifikasi'
+    },
+    {
+      id: 'SCH-20512009',
+      npsn: '20512009',
+      kodeUnik: 'SBR01-8312',
+      nama: 'SDN Sabrang 01',
+      namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 01',
+      desa: 'Sabrang',
       status: 'Terverifikasi'
     }
   ],
@@ -178,5 +174,4 @@ const APP_CONFIG = {
   }
 };
 
-// Pasang ke window object
 window.APP_CONFIG = APP_CONFIG;

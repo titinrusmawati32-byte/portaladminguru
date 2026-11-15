@@ -1,13 +1,35 @@
 /**
  * ============================================================
  * SiGuru SD - Platform Administrasi Pendidikan Kecamatan Ambulu
- * Kabupaten Jember, Jawa Timur - Versi 3.1.0-NPSN-AUTH
- * Sistem Autentikasi: NPSN + Kode Unik Lembaga & PIN Pribadi Guru (Opsi C)
+ * Kabupaten Jember, Jawa Timur - Versi 3.3.0-STRICT-ADMIN-MULTI-TENANT
+ * Sistem Autentikasi: NPSN + Kode Unik Lembaga & PIN Guru dengan Verifikasi Admin
+ * Database Terisolasi Per Lembaga (Sheet DB_[NPSN]_[NamaSekolah])
  * ============================================================
  */
 
 var PLATFORM_TITLE = 'SiGuru SD - Kecamatan Ambulu, Kabupaten Jember';
 var DRIVE_FOLDER_NAME = 'SiGuru_SD_Ambulu_Perangkat_Ajar';
+var DEFAULT_ADMIN_PIN = 'admin123';
+
+// ============================================================
+// DAFTAR 14 SD NEGERI RESMI KECAMATAN AMBULU (SESUAI EXCEL)
+// ============================================================
+var OFFICIAL_SCHOOLS_AMBULU = [
+  { npsn: '20524058', kode: 'SMB04-3918', nama: 'SDN Sumberejo 04', desa: 'Sumberejo' },
+  { npsn: '20524059', kode: 'SMB05-2746', nama: 'SDN Sumberejo 05', desa: 'Sumberejo' },
+  { npsn: '20524060', kode: 'SMB07-1683', nama: 'SDN Sumberejo 07', desa: 'Sumberejo' },
+  { npsn: '20524972', kode: 'AMB02-8821', nama: 'SDN Ambulu 02', desa: 'Ambulu' },
+  { npsn: '20524171', kode: 'TGL01-7142', nama: 'SDN Tegalsari 01', desa: 'Tegalsari' },
+  { npsn: '20524146', kode: 'TGL02-6315', nama: 'SDN Tegalsari 02', desa: 'Tegalsari' },
+  { npsn: '20524148', kode: 'TGL03-5294', nama: 'SDN Tegalsari 03', desa: 'Tegalsari' },
+  { npsn: '20524147', kode: 'TGL04-4819', nama: 'SDN Tegalsari 04', desa: 'Tegalsari' },
+  { npsn: '20524958', kode: 'ADG02-9524', nama: 'SDN Andongsari 02', desa: 'Andongsari' },
+  { npsn: '20524962', kode: 'ADG04-8417', nama: 'SDN Andongsari 04', desa: 'Andongsari' },
+  { npsn: '20523264', kode: 'PNT01-7362', nama: 'SDN Pontang 01', desa: 'Pontang' },
+  { npsn: '20524830', kode: 'KRN01-6251', nama: 'SDN Karanganyar 01', desa: 'Karanganyar' },
+  { npsn: '20524821', kode: 'KRN03-5149', nama: 'SDN Karanganyar 03', desa: 'Karanganyar' },
+  { npsn: '20512009', kode: 'SBR01-8312', nama: 'SDN Sabrang 01', desa: 'Sabrang' }
+];
 
 // ============================================================
 // CONCURRENCY SCRIPT LOCK HELPER
@@ -40,20 +62,76 @@ function getOrCreateUploadFolder() {
   return folder;
 }
 
-// Helper Generator Kode Unik Sekolah Otomatis
-function generateUniqueSchoolCode(npsn, nama) {
-  var cleanName = (nama || 'SD').toUpperCase().replace(/[^A-Z0-9]/g, '');
-  var prefix = cleanName.indexOf('AMBULU') !== -1 ? 'AMB' :
-               (cleanName.indexOf('TEGALSARI') !== -1 ? 'TGL' :
-               (cleanName.indexOf('SUMBEREJO') !== -1 ? 'SMB' :
-               (cleanName.indexOf('ANDONGSARI') !== -1 ? 'ADG' :
-               (cleanName.indexOf('PONTANG') !== -1 ? 'PNT' :
-               (cleanName.indexOf('KARANGANYAR') !== -1 ? 'KRN' : 'SD')))));
+// ============================================================
+// MULTI-TENANT DATABASE HELPER: SHEET PER LEMBAGA (DB_[NPSN]_[Nama])
+// ============================================================
+function sanitizeSheetName(npsn, nama) {
+  var cleanName = (nama || 'Sekolah').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  var sheetName = 'DB_' + (npsn || '00000000') + '_' + cleanName;
+  if (sheetName.length > 95) {
+    sheetName = sheetName.substring(0, 95);
+  }
+  return sheetName;
+}
+
+function getOrCreateSchoolDbSheet(ss, npsn, namaSekolah) {
+  var sheetName = sanitizeSheetName(npsn, namaSekolah);
+  var sheet = ss.getSheetByName(sheetName);
   
-  var numSuffix = cleanName.match(/\d+/);
-  var numStr = numSuffix ? (numSuffix[0].length === 1 ? '0' + numSuffix[0] : numSuffix[0]) : '01';
-  var randomDigits = Math.floor(1000 + Math.random() * 9000);
-  return prefix + numStr + '-' + randomDigits;
+  if (!sheet) {
+    // Coba cari sheet dengan prefix NPSN jika nama sedikit berbeda
+    var allSheets = ss.getSheets();
+    var prefix = 'DB_' + npsn + '_';
+    for (var i = 0; i < allSheets.length; i++) {
+      if (allSheets[i].getName().indexOf(prefix) === 0) {
+        return allSheets[i];
+      }
+    }
+
+    sheet = ss.insertSheet(sheetName);
+    var headers = [
+      'ID',
+      'Tipe_Data',
+      'ID_Guru',
+      'Nama_Guru',
+      'ID_Kelas',
+      'Nama_Kelas',
+      'Periode_Atau_Tanggal',
+      'Label_Utama',
+      'Nilai_Atau_Status',
+      'Payload_JSON',
+      'Created_At',
+      'Updated_At'
+    ];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setFontWeight('bold')
+      .setBackground('#059669')
+      .setFontColor('#FFFFFF');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+/**
+ * Inisialisasi otomatis tab database untuk ke-14 SD di Ambulu
+ */
+function initAllAmbuluSchoolSheets() {
+  var ss = getActiveDb();
+  setupDatabaseMultiSchool();
+
+  var created = [];
+  OFFICIAL_SCHOOLS_AMBULU.forEach(function (sch) {
+    var s = getOrCreateSchoolDbSheet(ss, sch.npsn, sch.nama);
+    created.push(s.getName());
+  });
+
+  return {
+    success: true,
+    totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
+    sheetsCreated: created,
+    message: '14 Database per Lembaga berhasil disiapkan di Google Sheets.'
+  };
 }
 
 // ============================================================
@@ -69,7 +147,7 @@ function doGet(e) {
         result = {
           success: true,
           platform: PLATFORM_TITLE,
-          version: '3.1.0-NPSN-AUTH',
+          version: '3.3.0-STRICT-ADMIN-MULTI-TENANT',
           kecamatan: 'Ambulu',
           kabupaten: 'Jember',
           timestamp: new Date().toISOString()
@@ -101,20 +179,21 @@ function doGet(e) {
       case 'getTeacherData':
         var teacherUid = (e.parameter.teacherUid || e.parameter.teacherId || e.parameter.uid || '').trim();
         var schoolId = (e.parameter.schoolId || '').trim();
-        result = getTeacherDataBackend(teacherUid, schoolId);
+        var npsn = (e.parameter.npsn || '').trim();
+        var namaSekolah = (e.parameter.namaSekolah || '').trim();
+        result = getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah);
         break;
 
-      case 'getSuperAdminData':
-        result = getSuperAdminDataBackend();
-        break;
-
+      case 'getAdminData':
       case 'getSchoolAdminData':
-        var sId = (e.parameter.schoolId || '').trim();
-        result = getSchoolAdminDataBackend(sId);
+        var aNpsn = (e.parameter.npsn || '').trim();
+        var aKode = (e.parameter.kodeUnik || '').trim();
+        var aPin = (e.parameter.pinAdmin || '').trim();
+        result = getPendingTeachersForAdminBackend({ npsn: aNpsn, kodeUnik: aKode, pinAdmin: aPin });
         break;
 
-      case 'getAllAdminData':
-        result = getAllAdminDataLegacy();
+      case 'initAllSheets':
+        result = initAllAmbuluSchoolSheets();
         break;
 
       default:
@@ -141,97 +220,117 @@ function doPost(e) {
     var payload = body.payload || {};
 
     switch (action) {
-      // 1. Autentikasi NPSN + Kode Unik Lembaga & PIN (Opsi C)
+      // 1. Verifikasi Sekolah & Autentikasi
       case 'verifySchoolByNpsn':
         result = verifySchoolByNpsnBackend(payload);
+        break;
+
+      case 'registerTeacherWithPin':
+        result = withScriptLock('registerTeacherWithPin', function () {
+          return registerTeacherWithPinBackend(payload);
+        });
         break;
 
       case 'loginTeacherWithPin':
         result = loginTeacherWithPinBackend(payload);
         break;
 
-      case 'registerTeacherWithPin':
-        result = withScriptLock('registerTeacherWithPin', function () { return registerTeacherWithPinBackend(payload); });
+      // 2. Portal Admin Sekolah (Verifikasi Pendaftaran Guru)
+      case 'loginAdminSchool':
+      case 'getPendingTeachersForAdmin':
+        result = getPendingTeachersForAdminBackend(payload);
         break;
 
-      case 'uploadNpsnMaster':
-        result = withScriptLock('uploadNpsnMaster', function () { return uploadNpsnMasterBackend(payload); });
+      case 'verifyTeacherRegistration':
+        result = withScriptLock('verifyTeacherRegistration', function () {
+          return verifyTeacherRegistrationBackend(payload);
+        });
         break;
 
-      // 2. Multi-School Management
-      case 'requestNewSchool':
-        result = withScriptLock('requestNewSchool', function () { return requestNewSchoolBackend(payload); });
+      case 'resetTeacherPinByAdmin':
+        result = withScriptLock('resetTeacherPinByAdmin', function () {
+          return resetTeacherPinByAdminBackend(payload);
+        });
         break;
 
-      case 'verifySchool':
-        result = withScriptLock('verifySchool', function () { return verifySchoolBackend(payload); });
-        break;
-
-      case 'verifyTeacher':
-        result = withScriptLock('verifyTeacher', function () { return verifyTeacherBackend(payload); });
-        break;
-
-      // 3. Guru: Kelola Kelas Sendiri
+      // 3. Guru: Kelola Kelas Sendiri (Tersimpan di Sheet Per Lembaga)
       case 'saveClassTeacher':
       case 'saveKelas':
-        result = withScriptLock('saveClassTeacher', function () { return saveClassTeacherBackend(payload); });
+        result = withScriptLock('saveClassTeacher', function () {
+          return saveClassTeacherBackend(payload);
+        });
         break;
 
       case 'deleteClassTeacher':
-        result = withScriptLock('deleteClassTeacher', function () { return deleteClassTeacherBackend(payload); });
+        result = withScriptLock('deleteClassTeacher', function () {
+          return deleteClassTeacherBackend(payload);
+        });
         break;
 
-      // 4. Guru: Kelola Siswa Kelas Sendiri (Manual & Import Excel)
+      // 4. Guru: Kelola Siswa Kelas Sendiri
       case 'saveStudentTeacher':
       case 'addSiswa':
       case 'editSiswa':
-        result = withScriptLock('saveStudentTeacher', function () { return saveStudentTeacherBackend(payload); });
+        result = withScriptLock('saveStudentTeacher', function () {
+          return saveStudentTeacherBackend(payload);
+        });
         break;
 
       case 'batchImportStudents':
-        result = withScriptLock('batchImportStudents', function () { return batchImportStudentsBackend(payload); });
+        result = withScriptLock('batchImportStudents', function () {
+          return batchImportStudentsBackend(payload);
+        });
         break;
 
       case 'deleteStudentTeacher':
       case 'deleteSiswa':
-        result = withScriptLock('deleteStudentTeacher', function () { return deleteStudentTeacherBackend(payload); });
+        result = withScriptLock('deleteStudentTeacher', function () {
+          return deleteStudentTeacherBackend(payload);
+        });
         break;
 
-      // 5. Guru: Presensi & Nilai Terikat Kelas & Owner UID
+      // 5. Guru: Presensi & Nilai
       case 'updatePresensi':
-        result = withScriptLock('updatePresensi', function () { return updatePresensiBackend(payload); });
+        result = withScriptLock('updatePresensi', function () {
+          return updatePresensiBackend(payload);
+        });
         break;
 
       case 'batchUpdatePresensi':
-        result = withScriptLock('batchUpdatePresensi', function () { return batchUpdatePresensiBackend(payload); });
+        result = withScriptLock('batchUpdatePresensi', function () {
+          return batchUpdatePresensiBackend(payload);
+        });
         break;
 
       case 'addNilai':
       case 'saveNilai':
-        result = withScriptLock('addNilai', function () { return addNilaiBackend(payload); });
+        result = withScriptLock('addNilai', function () {
+          return addNilaiBackend(payload);
+        });
         break;
 
       // 6. Guru: Jurnal Mengajar & Bahan Ajar
       case 'addJurnal':
       case 'saveJurnal':
-        result = withScriptLock('addJurnal', function () { return addJurnalBackend(payload); });
+        result = withScriptLock('addJurnal', function () {
+          return addJurnalBackend(payload);
+        });
         break;
 
       case 'uploadPerangkat':
-        result = withScriptLock('uploadPerangkat', function () { return uploadPerangkatBackend(payload); });
+        result = withScriptLock('uploadPerangkat', function () {
+          return uploadPerangkatBackend(payload);
+        });
         break;
 
       case 'deletePerangkat':
-        result = withScriptLock('deletePerangkat', function () { return deleteRowByIdBackend('Perangkat_Ajar', payload.id || payload.docId); });
+        result = withScriptLock('deletePerangkat', function () {
+          return deletePerangkatBackend(payload);
+        });
         break;
 
-      // 7. Pengaturan Sekolah & Utilitas
-      case 'savePengaturanSekolah':
-        result = withScriptLock('savePengaturanSekolah', function () { return savePengaturanSekolahBackend(payload); });
-        break;
-
-      case 'backupDatabase':
-        result = withScriptLock('backupDatabase', function () { return backupDatabaseBackend(); });
+      case 'initAllSheets':
+        result = initAllAmbuluSchoolSheets();
         break;
 
       default:
@@ -242,7 +341,7 @@ function doPost(e) {
     result = { success: false, message: 'Error doPost: ' + err.message };
   }
 
-  // Tambahkan nomor versi terbaru ke setiap respons write
+  // Increment sinkronisasi versi jika operasi write berhasil
   if (result && result.success) {
     var vInfo = incrementDataVersion();
     result.version = vInfo.version;
@@ -254,7 +353,7 @@ function doPost(e) {
 }
 
 // ============================================================
-// VERIFIKASI SEKOLAH BERDASARKAN NPSN & KODE UNIK (OPSI C)
+// VERIFIKASI SEKOLAH BERDASARKAN NPSN & KODE UNIK
 // ============================================================
 function verifySchoolByNpsnBackend(p) {
   try {
@@ -265,54 +364,66 @@ function verifySchoolByNpsnBackend(p) {
       return { success: false, message: 'NPSN dan Kode Unik Sekolah wajib diisi.' };
     }
 
-    var ss = getActiveDb();
-    var sSheet = ss.getSheetByName('Schools');
-    if (!sSheet) {
-      return { success: false, message: 'Tabel master Schools tidak ditemukan.' };
-    }
-
-    var sData = sSheet.getDataRange().getValues();
     var matchedSchool = null;
-
-    // Format Kolom Schools:
-    // [ID_Sekolah(0), Nama_Sekolah(1), NPSN(2), Kode_Unik(3), Alamat(4), Desa(5), Kecamatan(6), Kabupaten(7), Kepala_Sekolah(8), NIP_KS(9), Status(10), Tanggal(11)]
-    for (var i = 1; i < sData.length; i++) {
-      var rowNpsn = String(sData[i][2]).trim();
-      var rowKode = String(sData[i][3]).trim().toUpperCase();
-
-      if (rowNpsn === npsn && rowKode === kodeUnik) {
+    for (var k = 0; k < OFFICIAL_SCHOOLS_AMBULU.length; k++) {
+      var item = OFFICIAL_SCHOOLS_AMBULU[k];
+      if (item.npsn === npsn && item.kode.toUpperCase() === kodeUnik) {
         matchedSchool = {
-          id: String(sData[i][0]).trim(),
-          nama: String(sData[i][1]).trim(),
-          npsn: rowNpsn,
-          kodeUnik: rowKode,
-          desa: String(sData[i][5] || sData[i][4] || '').trim(),
-          kepalaSekolah: String(sData[i][8] || '').trim(),
-          status: String(sData[i][10] || 'Terverifikasi').trim()
+          id: 'SCH-' + item.npsn,
+          nama: item.nama,
+          npsn: item.npsn,
+          kodeUnik: item.kode,
+          desa: item.desa,
+          status: 'Terverifikasi'
         };
         break;
+      }
+    }
+
+    // Jika tidak ditemukan di konstanta, periksa di sheet Schools
+    if (!matchedSchool) {
+      var ss = getActiveDb();
+      var sSheet = ss.getSheetByName('Schools');
+      if (sSheet) {
+        var sData = sSheet.getDataRange().getValues();
+        for (var i = 1; i < sData.length; i++) {
+          var rNpsn = String(sData[i][2]).trim();
+          var rKode = String(sData[i][3]).trim().toUpperCase();
+          if (rNpsn === npsn && rKode === kodeUnik) {
+            matchedSchool = {
+              id: String(sData[i][0]).trim(),
+              nama: String(sData[i][1]).trim(),
+              npsn: rNpsn,
+              kodeUnik: rKode,
+              desa: String(sData[i][5] || sData[i][4] || '').trim(),
+              status: String(sData[i][10] || 'Terverifikasi').trim()
+            };
+            break;
+          }
+        }
       }
     }
 
     if (!matchedSchool) {
       return {
         success: false,
-        message: 'Kombinasi NPSN (' + npsn + ') dan Kode Unik Sekolah tidak cocok atau belum terdaftar.'
+        message: 'Kombinasi NPSN (' + npsn + ') dan Kode Unik Sekolah tidak cocok dengan data resmi Kecamatan Ambulu.'
       };
     }
 
-    // Ambil daftar guru yang sudah terdaftar di sekolah ini
-    var pSheet = ss.getSheetByName('Teacher_Profiles');
-    var teachers = [];
+    // Ambil guru yang SUDAH TERVERIFIKASI saja untuk dropdown login
+    var ssDb = getActiveDb();
+    var pSheet = ssDb.getSheetByName('Teacher_Profiles');
+    var verifiedTeachers = [];
+
     if (pSheet) {
       var pData = pSheet.getDataRange().getValues();
       for (var j = 1; j < pData.length; j++) {
-        // [ID_Guru(0), Nama_Lengkap(1), NIP(2), No_HP(3), ID_Sekolah(4), Nama_Sekolah(5), NPSN(6), Jabatan(7), Status_Kepegawaian(8), PIN(9), Status_Verifikasi(10)]
-        var tSchoolId = String(pData[j][4]).trim();
         var tNpsn = String(pData[j][6]).trim();
+        var tStatus = String(pData[j][10] || '').trim();
 
-        if (tSchoolId === matchedSchool.id || tNpsn === matchedSchool.npsn) {
-          teachers.push({
+        if (tNpsn === matchedSchool.npsn && tStatus === 'Terverifikasi') {
+          verifiedTeachers.push({
             id: String(pData[j][0]).trim(),
             nama: String(pData[j][1]).trim(),
             nip: String(pData[j][2]).trim(),
@@ -325,7 +436,7 @@ function verifySchoolByNpsnBackend(p) {
     return {
       success: true,
       school: matchedSchool,
-      teachers: teachers,
+      teachers: verifiedTeachers,
       message: 'Sekolah terverifikasi: ' + matchedSchool.nama
     };
   } catch (err) {
@@ -334,80 +445,7 @@ function verifySchoolByNpsnBackend(p) {
 }
 
 // ============================================================
-// LOGIN GURU MENGGUNAKAN PIN PRIBADI (OPSI C)
-// ============================================================
-function loginTeacherWithPinBackend(p) {
-  try {
-    var npsn = (p.npsn || '').trim();
-    var kodeUnik = (p.kodeUnik || '').trim().toUpperCase();
-    var teacherId = (p.teacherId || p.id || '').trim();
-    var pin = String(p.pin || '').trim();
-
-    if (!npsn || !kodeUnik || !teacherId || !pin) {
-      return { success: false, message: 'NPSN, Kode Unik Sekolah, Pilihan Guru, dan PIN wajib diisi.' };
-    }
-
-    // 1. Verifikasi Sekolah
-    var vSch = verifySchoolByNpsnBackend({ npsn: npsn, kodeUnik: kodeUnik });
-    if (!vSch.success) {
-      return vSch;
-    }
-
-    // 2. Verifikasi Guru & PIN
-    var ss = getActiveDb();
-    var pSheet = ss.getSheetByName('Teacher_Profiles');
-    var pData = pSheet.getDataRange().getValues();
-    var teacherProfile = null;
-
-    for (var i = 1; i < pData.length; i++) {
-      var rowId = String(pData[i][0]).trim();
-      var rowPin = String(pData[i][9]).trim();
-
-      if (rowId === teacherId) {
-        if (rowPin !== pin) {
-          return { success: false, message: 'PIN Pribadi yang Anda masukkan salah.' };
-        }
-        teacherProfile = {
-          id: rowId,
-          uid: rowId,
-          nama: String(pData[i][1]).trim(),
-          nip: String(pData[i][2]).trim(),
-          noHp: String(pData[i][3]).trim(),
-          schoolId: String(pData[i][4]).trim(),
-          namaSekolah: String(pData[i][5]).trim(),
-          npsn: String(pData[i][6]).trim(),
-          jabatan: String(pData[i][7] || 'Guru Kelas').trim(),
-          statusKepegawaian: String(pData[i][8] || 'PNS').trim(),
-          role: 'Guru'
-        };
-        break;
-      }
-    }
-
-    if (!teacherProfile) {
-      return { success: false, message: 'Data guru tidak ditemukan pada sekolah ini.' };
-    }
-
-    // 3. Ambil data terisolasi kelas & siswa milik guru ini
-    var teacherData = getTeacherDataBackend(teacherProfile.id, teacherProfile.schoolId);
-
-    return {
-      success: true,
-      teacher: teacherProfile,
-      classes: teacherData.kelas || [],
-      students: teacherData.siswa || [],
-      attendance: teacherData.presensi || [],
-      grades: teacherData.nilai || [],
-      journals: teacherData.jurnal || [],
-      message: 'Selamat datang kembali, ' + teacherProfile.nama
-    };
-  } catch (err) {
-    return { success: false, message: 'Gagal login guru: ' + err.message };
-  }
-}
-
-// ============================================================
-// REGISTRASI GURU BARU DENGAN PIN PRIBADI (OPSI C)
+// 1. REGISTRASI GURU BARU (STATUS WAJIB: MENUNGGU VERIFIKASI)
 // ============================================================
 function registerTeacherWithPinBackend(p) {
   try {
@@ -424,7 +462,7 @@ function registerTeacherWithPinBackend(p) {
       return { success: false, message: 'NPSN, Kode Unik Sekolah, Nama Lengkap, dan PIN wajib diisi.' };
     }
 
-    // 1. Verifikasi Sekolah
+    // Validasi Sekolah
     var vSch = verifySchoolByNpsnBackend({ npsn: npsn, kodeUnik: kodeUnik });
     if (!vSch.success) {
       return vSch;
@@ -433,15 +471,53 @@ function registerTeacherWithPinBackend(p) {
 
     var ss = getActiveDb();
     var pSheet = ss.getSheetByName('Teacher_Profiles');
-    var uSheet = ss.getSheetByName('Users');
+    if (!pSheet) {
+      setupDatabaseMultiSchool();
+      pSheet = ss.getSheetByName('Teacher_Profiles');
+    }
+
     var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+    var pData = pSheet.getDataRange().getValues();
+
+    // Periksa apakah guru sudah pernah mendaftar (berdasarkan NIP atau No HP di sekolah ini)
+    for (var i = 1; i < pData.length; i++) {
+      var rowNpsn = String(pData[i][6]).trim();
+      var rowNip = String(pData[i][2]).trim();
+      var rowHp = String(pData[i][3]).trim();
+      var rowStatus = String(pData[i][10]).trim();
+
+      if (rowNpsn === npsn) {
+        var matchIdent = (nip && rowNip === nip) || (noHp && rowHp === noHp);
+        if (matchIdent) {
+          if (rowStatus === 'Menunggu Verifikasi') {
+            return {
+              success: false,
+              isPending: true,
+              message: 'Pendaftaran Anda dengan NIP/No. HP ini sudah tercatat dan saat ini sedang MENUNGGU VERIFIKASI oleh Admin Sekolah ' + school.nama + '. Mohon hubungi Admin Sekolah.'
+            };
+          } else if (rowStatus === 'Terverifikasi') {
+            return {
+              success: false,
+              isVerified: true,
+              message: 'Akun Anda sudah TERDAFTAR dan TERVERIFIKASI. Silakan langsung masuk melalui tab "Masuk Guru".'
+            };
+          } else if (rowStatus === 'Ditolak') {
+            return {
+              success: false,
+              isRejected: true,
+              message: 'Pendaftaran Anda sebelumnya DITOLAK oleh Admin Sekolah. Silakan hubungi Admin Sekolah jika ini adalah kekeliruan.'
+            };
+          }
+        }
+      }
+    }
 
     // Buat ID Guru Unik
-    var teacherId = 'GUR-' + npsn + '-' + Date.now().toString().slice(-5);
+    var teacherId = 'GUR-' + npsn + '-' + Date.now().toString().slice(-6);
 
-    // 1. Simpan ke Teacher_Profiles
-    // [ID_Guru(0), Nama_Lengkap(1), NIP(2), No_HP(3), ID_Sekolah(4), Nama_Sekolah(5), NPSN(6), Jabatan(7), Status_Kepegawaian(8), PIN(9), Status_Verifikasi(10), Tanggal_Daftar(11)]
-    var profileRow = [
+    // KETENTUAN UTAMA: Status awal WAJIB 'Menunggu Verifikasi'
+    // Kolom: [ID_Guru(0), Nama_Lengkap(1), NIP(2), No_HP(3), ID_Sekolah(4), Nama_Sekolah(5), NPSN(6), Jabatan(7), Status_Kepegawaian(8), PIN(9), Status_Verifikasi(10), Tanggal_Daftar(11), Tanggal_Verifikasi(12), Diverifikasi_Oleh(13)]
+    var newRow = [
       teacherId,
       nama,
       nip,
@@ -452,138 +528,387 @@ function registerTeacherWithPinBackend(p) {
       jabatan,
       statusKepegawaian,
       pin,
-      'Terverifikasi',
-      nowStr
+      'Menunggu Verifikasi',
+      nowStr,
+      '', // Belum diverifikasi
+      ''  // Belum diverifikasi
     ];
-    pSheet.appendRow(profileRow);
 
-    // 2. Simpan ke Users
-    if (uSheet) {
-      uSheet.appendRow([
-        'USR-' + Date.now().toString().slice(-5),
-        teacherId,
-        nip || (nama.toLowerCase().replace(/[^a-z]/g, '') + '@sd.id'),
-        nama,
-        'Guru',
-        school.id,
-        school.nama,
-        'Aktif',
-        nowStr,
-        nowStr
-      ]);
-    }
+    pSheet.appendRow(newRow);
 
-    logActivity(teacherId, nama, 'Guru', school.id, 'Registrasi Guru Mandiri', 'Guru baru terdaftar di ' + school.nama);
+    // Pastikan database per lembaga sudah tersedia
+    getOrCreateSchoolDbSheet(ss, school.npsn, school.nama);
 
-    var teacherProfile = {
-      id: teacherId,
-      uid: teacherId,
-      nama: nama,
-      nip: nip,
-      noHp: noHp,
-      schoolId: school.id,
-      namaSekolah: school.nama,
-      npsn: school.npsn,
-      jabatan: jabatan,
-      statusKepegawaian: statusKepegawaian,
-      role: 'Guru'
-    };
+    logActivity(teacherId, nama, 'Guru', school.id, 'Pendaftaran Guru Baru', 'Mengajukan pendaftaran di ' + school.nama + ' (Menunggu Verifikasi Admin)');
 
     return {
       success: true,
-      teacher: teacherProfile,
-      isNewUser: true,
-      message: 'Pendaftaran berhasil. Silakan buat kelas mengajar Anda terlebih dahulu.'
+      isPending: true,
+      teacherId: teacherId,
+      nama: nama,
+      school: school,
+      message: 'Pendaftaran berhasil diajukan! Status akun Anda: MENUNGGU VERIFIKASI oleh Admin Sekolah ' + school.nama + '. Anda baru dapat masuk setelah Admin menyetujui pendaftaran Anda.'
     };
   } catch (err) {
-    return { success: false, message: 'Gagal mendaftarkan guru: ' + err.message };
+    return { success: false, message: 'Gagal mengajukan pendaftaran: ' + err.message };
   }
 }
 
 // ============================================================
-// UPLOAD / TAMBAH NPSN & GENERATE KODE UNIK (SUPER ADMIN)
+// 2. LOGIN GURU (KETAT: HANYA YANG TERVERIFIKASI + PIN COCOK)
 // ============================================================
-function uploadNpsnMasterBackend(p) {
+function loginTeacherWithPinBackend(p) {
   try {
-    var schools = p.schools || [];
-    if (!schools || schools.length === 0) {
-      return { success: false, message: 'Daftar sekolah kosong.' };
+    var npsn = (p.npsn || '').trim();
+    var kodeUnik = (p.kodeUnik || '').trim().toUpperCase();
+    var teacherIdentifier = (p.teacherId || p.identifier || p.nip || p.noHp || '').trim();
+    var pin = String(p.pin || '').trim();
+
+    if (!npsn || !kodeUnik || !teacherIdentifier || !pin) {
+      return { success: false, message: 'NPSN, Kode Unik Sekolah, Pilihan Guru/NIP, dan PIN wajib diisi.' };
+    }
+
+    // 1. Verifikasi Sekolah
+    var vSch = verifySchoolByNpsnBackend({ npsn: npsn, kodeUnik: kodeUnik });
+    if (!vSch.success) {
+      return vSch;
+    }
+    var school = vSch.school;
+
+    // 2. Cari Akun Guru di Teacher_Profiles
+    var ss = getActiveDb();
+    var pSheet = ss.getSheetByName('Teacher_Profiles');
+    if (!pSheet) {
+      return { success: false, message: 'Tabel Teacher_Profiles belum siap.' };
+    }
+
+    var pData = pSheet.getDataRange().getValues();
+    var matchedTeacher = null;
+
+    for (var i = 1; i < pData.length; i++) {
+      var rId = String(pData[i][0]).trim();
+      var rNama = String(pData[i][1]).trim().toLowerCase();
+      var rNip = String(pData[i][2]).trim();
+      var rHp = String(pData[i][3]).trim();
+      var rNpsn = String(pData[i][6]).trim();
+
+      if (rNpsn === npsn) {
+        var match = (rId === teacherIdentifier) ||
+                    (rNip && rNip === teacherIdentifier) ||
+                    (rHp && rHp === teacherIdentifier) ||
+                    (rNama === teacherIdentifier.toLowerCase());
+
+        if (match) {
+          matchedTeacher = {
+            rowIdx: i + 1,
+            id: rId,
+            nama: String(pData[i][1]).trim(),
+            nip: rNip,
+            noHp: rHp,
+            schoolId: String(pData[i][4]).trim(),
+            namaSekolah: String(pData[i][5]).trim(),
+            npsn: rNpsn,
+            jabatan: String(pData[i][7] || 'Guru Kelas').trim(),
+            statusKepegawaian: String(pData[i][8] || 'PNS').trim(),
+            pin: String(pData[i][9]).trim(),
+            statusVerifikasi: String(pData[i][10] || '').trim(),
+            tanggalDaftar: String(pData[i][11] || '').trim(),
+            role: 'Guru'
+          };
+          break;
+        }
+      }
+    }
+
+    if (!matchedTeacher) {
+      return {
+        success: false,
+        notRegistered: true,
+        message: 'Data Guru tidak ditemukan untuk sekolah ini. Silakan mendaftar terlebih dahulu pada tab "Guru Baru (Daftar)".'
+      };
+    }
+
+    // 3. CEK STATUS VERIFIKASI SECARA KETAT
+    if (matchedTeacher.statusVerifikasi === 'Menunggu Verifikasi') {
+      return {
+        success: false,
+        isPending: true,
+        message: 'Akun Anda masih dalam status "Menunggu Verifikasi" oleh Admin Sekolah. Anda belum dapat login sebelum Admin menyetujui pendaftaran Anda. Silakan hubungi Admin Sekolah.'
+      };
+    }
+
+    if (matchedTeacher.statusVerifikasi === 'Ditolak') {
+      return {
+        success: false,
+        isRejected: true,
+        message: 'Pendaftaran akun Anda telah ditolak oleh Admin Sekolah. Silakan hubungi Admin Sekolah jika terdapat kekeliruan.'
+      };
+    }
+
+    if (matchedTeacher.statusVerifikasi !== 'Terverifikasi') {
+      return {
+        success: false,
+        isPending: true,
+        message: 'Status akun: ' + matchedTeacher.statusVerifikasi + '. Hanya akun berstatus "Terverifikasi" yang diizinkan masuk.'
+      };
+    }
+
+    // 4. CEK PIN PRIBADI
+    if (matchedTeacher.pin !== pin) {
+      return {
+        success: false,
+        message: 'PIN Pribadi yang Anda masukkan salah. Silakan coba lagi.'
+      };
+    }
+
+    // 5. AMBIL DATA TERISOLASI GURU DARI DATABASE PER LEMBAGA
+    var teacherData = getTeacherDataBackend(matchedTeacher.id, matchedTeacher.schoolId, school.npsn, school.nama);
+
+    logActivity(matchedTeacher.id, matchedTeacher.nama, 'Guru', school.id, 'Login Sukses', 'Guru berhasil masuk ke portal ' + school.nama);
+
+    return {
+      success: true,
+      teacher: matchedTeacher,
+      school: school,
+      classes: teacherData.kelas || [],
+      students: teacherData.siswa || [],
+      attendance: teacherData.presensi || [],
+      grades: teacherData.nilai || [],
+      journals: teacherData.jurnal || [],
+      perangkat: teacherData.perangkat || [],
+      message: 'Selamat datang kembali, ' + matchedTeacher.nama
+    };
+  } catch (err) {
+    return { success: false, message: 'Gagal login guru: ' + err.message };
+  }
+}
+
+// ============================================================
+// 3. PORTAL ADMIN SEKOLAH (VERIFIKASI & APPROVAL PENDAFTARAN)
+// ============================================================
+function getPendingTeachersForAdminBackend(p) {
+  try {
+    var npsn = (p.npsn || '').trim();
+    var kodeUnik = (p.kodeUnik || '').trim().toUpperCase();
+    var pinAdmin = (p.pinAdmin || '').trim();
+
+    if (!npsn || !kodeUnik) {
+      return { success: false, message: 'NPSN dan Kode Unik Sekolah wajib diisi.' };
+    }
+
+    // Validasi Sekolah
+    var vSch = verifySchoolByNpsnBackend({ npsn: npsn, kodeUnik: kodeUnik });
+    if (!vSch.success) {
+      return vSch;
+    }
+    var school = vSch.school;
+
+    // Validasi PIN Admin (default admin123 jika belum diubah)
+    var validPin = DEFAULT_ADMIN_PIN;
+    if (pinAdmin && pinAdmin !== validPin) {
+      return { success: false, message: 'PIN Admin Sekolah salah.' };
     }
 
     var ss = getActiveDb();
-    var sSheet = ss.getSheetByName('Schools');
-    if (!sSheet) {
-      return { success: false, message: 'Tabel master Schools tidak ditemukan.' };
-    }
+    var pSheet = ss.getSheetByName('Teacher_Profiles');
+    var pendingList = [];
+    var verifiedList = [];
+    var rejectedList = [];
 
-    var sData = sSheet.getDataRange().getValues();
-    var existingNpsnMap = {};
-    for (var i = 1; i < sData.length; i++) {
-      existingNpsnMap[String(sData[i][2]).trim()] = true;
-    }
+    if (pSheet) {
+      var pData = pSheet.getDataRange().getValues();
+      for (var i = 1; i < pData.length; i++) {
+        var rNpsn = String(pData[i][6]).trim();
+        if (rNpsn === npsn) {
+          var item = {
+            id: String(pData[i][0]).trim(),
+            nama: String(pData[i][1]).trim(),
+            nip: String(pData[i][2]).trim(),
+            noHp: String(pData[i][3]).trim(),
+            jabatan: String(pData[i][7] || 'Guru Kelas').trim(),
+            statusKepegawaian: String(pData[i][8] || 'PNS').trim(),
+            statusVerifikasi: String(pData[i][10] || 'Menunggu Verifikasi').trim(),
+            tanggalDaftar: String(pData[i][11] || '').trim(),
+            tanggalVerifikasi: String(pData[i][12] || '').trim(),
+            diverifikasiOleh: String(pData[i][13] || '').trim()
+          };
 
-    var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-    var addedCount = 0;
-
-    for (var j = 0; j < schools.length; j++) {
-      var s = schools[j];
-      var cleanNpsn = String(s.npsn || '').trim();
-      var cleanNama = String(s.nama || s.namaSekolah || '').trim();
-
-      if (cleanNpsn && !existingNpsnMap[cleanNpsn]) {
-        var schoolId = 'SCH-' + cleanNpsn;
-        var kodeUnik = String(s.kodeUnik || '').trim() || generateUniqueSchoolCode(cleanNpsn, cleanNama);
-        var desa = String(s.desa || '-').trim();
-        var alamat = String(s.alamat || '-').trim();
-        var ks = String(s.kepalaSekolah || '-').trim();
-
-        sSheet.appendRow([
-          schoolId,
-          cleanNama,
-          cleanNpsn,
-          kodeUnik,
-          alamat,
-          desa,
-          'Ambulu',
-          'Jember',
-          ks,
-          '-',
-          'Terverifikasi',
-          nowStr
-        ]);
-
-        existingNpsnMap[cleanNpsn] = true;
-        addedCount++;
+          if (item.statusVerifikasi === 'Menunggu Verifikasi') {
+            pendingList.push(item);
+          } else if (item.statusVerifikasi === 'Terverifikasi') {
+            verifiedList.push(item);
+          } else if (item.statusVerifikasi === 'Ditolak') {
+            rejectedList.push(item);
+          }
+        }
       }
     }
 
     return {
       success: true,
-      addedCount: addedCount,
-      message: 'Berhasil mengunggah dan membuatkan kode unik untuk ' + addedCount + ' sekolah.'
+      school: school,
+      pendingTeachers: pendingList,
+      verifiedTeachers: verifiedList,
+      rejectedTeachers: rejectedList,
+      totalPending: pendingList.length,
+      totalVerified: verifiedList.length,
+      message: 'Data administrasi guru untuk ' + school.nama + ' berhasil dimuat.'
     };
   } catch (err) {
-    return { success: false, message: 'Gagal unggah NPSN: ' + err.message };
+    return { success: false, message: 'Gagal memuat data admin: ' + err.message };
+  }
+}
+
+function verifyTeacherRegistrationBackend(p) {
+  try {
+    var npsn = (p.npsn || '').trim();
+    var kodeUnik = (p.kodeUnik || '').trim().toUpperCase();
+    var teacherId = (p.teacherId || '').trim();
+    var newStatus = (p.status || 'Terverifikasi').trim(); // 'Terverifikasi' atau 'Ditolak'
+    var adminName = (p.adminName || 'Admin Sekolah').trim();
+
+    if (!npsn || !teacherId) {
+      return { success: false, message: 'NPSN dan ID Guru wajib disertakan.' };
+    }
+
+    var ss = getActiveDb();
+    var pSheet = ss.getSheetByName('Teacher_Profiles');
+    if (!pSheet) {
+      return { success: false, message: 'Tabel Teacher_Profiles tidak ditemukan.' };
+    }
+
+    var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+    var pData = pSheet.getDataRange().getValues();
+    var rowUpdated = false;
+    var teacherName = '';
+
+    for (var i = 1; i < pData.length; i++) {
+      var rId = String(pData[i][0]).trim();
+      var rNpsn = String(pData[i][6]).trim();
+
+      if (rId === teacherId && rNpsn === npsn) {
+        teacherName = String(pData[i][1]).trim();
+        // Update kolom Status_Verifikasi (kolom 11 / K), Tanggal_Verifikasi (kolom 13 / M), Diverifikasi_Oleh (kolom 14 / N)
+        pSheet.getRange(i + 1, 11).setValue(newStatus);
+        pSheet.getRange(i + 1, 13).setValue(nowStr);
+        pSheet.getRange(i + 1, 14).setValue(adminName);
+        rowUpdated = true;
+        break;
+      }
+    }
+
+    if (!rowUpdated) {
+      return { success: false, message: 'Data guru dengan ID ' + teacherId + ' tidak ditemukan di sekolah ini.' };
+    }
+
+    logActivity('ADMIN-' + npsn, adminName, 'Admin Sekolah', 'SCH-' + npsn, 'Verifikasi Guru', 'Mengubah status ' + teacherName + ' menjadi ' + newStatus);
+
+    return {
+      success: true,
+      teacherId: teacherId,
+      status: newStatus,
+      message: 'Pendaftaran Guru (' + teacherName + ') berhasil diverifikasi dengan status: ' + newStatus
+    };
+  } catch (err) {
+    return { success: false, message: 'Gagal memproses verifikasi guru: ' + err.message };
+  }
+}
+
+function resetTeacherPinByAdminBackend(p) {
+  try {
+    var npsn = (p.npsn || '').trim();
+    var teacherId = (p.teacherId || '').trim();
+    var newPin = String(p.newPin || '123456').trim();
+
+    if (!npsn || !teacherId || !newPin) {
+      return { success: false, message: 'NPSN, ID Guru, dan PIN baru wajib diisi.' };
+    }
+
+    var ss = getActiveDb();
+    var pSheet = ss.getSheetByName('Teacher_Profiles');
+    var pData = pSheet.getDataRange().getValues();
+    var found = false;
+
+    for (var i = 1; i < pData.length; i++) {
+      if (String(pData[i][0]).trim() === teacherId && String(pData[i][6]).trim() === npsn) {
+        pSheet.getRange(i + 1, 10).setValue(newPin);
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      return { success: false, message: 'Guru tidak ditemukan.' };
+    }
+
+    return { success: true, message: 'PIN Guru berhasil direset menjadi: ' + newPin };
+  } catch (err) {
+    return { success: false, message: 'Gagal reset PIN: ' + err.message };
   }
 }
 
 // ============================================================
-// ISOLASI DATA GURU (GURU HANYA AKSES DATA MILIKNYA)
+// 4. PENGAMBILAN DATA DARI SHEET PER LEMBAGA (DB_[NPSN]_[Nama])
 // ============================================================
-function getTeacherDataBackend(teacherUid, schoolId) {
+function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
   try {
     var ss = getActiveDb();
     var uid = (teacherUid || '').trim();
 
-    // 1. Data Kelas Milik Guru
-    var kSheet = ss.getSheetByName('Data_Kelas');
     var myKelas = [];
+    var mySiswa = [];
+    var myPresensi = [];
+    var myNilai = [];
+    var myJurnal = [];
+    var myPerangkat = [];
+
+    // Jika NPSN diberikan, baca langsung dari Sheet Tab khusus Per Lembaga
+    if (npsn) {
+      var sDbSheet = getOrCreateSchoolDbSheet(ss, npsn, namaSekolah);
+      if (sDbSheet && sDbSheet.getLastRow() > 1) {
+        var rows = sDbSheet.getDataRange().getValues();
+        for (var i = 1; i < rows.length; i++) {
+          var r = rows[i];
+          // [ID(0), Tipe_Data(1), ID_Guru(2), Nama_Guru(3), ID_Kelas(4), Nama_Kelas(5), Periode(6), Label(7), Nilai/Status(8), Payload_JSON(9), Created(10), Updated(11)]
+          var rTipe = String(r[1]).trim().toUpperCase();
+          var rGuru = String(r[2]).trim();
+          var jsonStr = String(r[9] || '{}');
+
+          // Filter data milik guru ini (atau seluruh kelas di lembaga jika tanpa filter ketat)
+          if (!uid || rGuru === uid) {
+            try {
+              var payload = JSON.parse(jsonStr);
+              if (rTipe === 'KELAS') myKelas.push(payload);
+              else if (rTipe === 'SISWA') mySiswa.push(payload);
+              else if (rTipe === 'PRESENSI') myPresensi.push(payload);
+              else if (rTipe === 'NILAI') myNilai.push(payload);
+              else if (rTipe === 'JURNAL') myJurnal.push(payload);
+              else if (rTipe === 'PERANGKAT') myPerangkat.push(payload);
+            } catch (errPayload) {}
+          }
+        }
+
+        return {
+          success: true,
+          source: 'School_Dedicated_Sheet',
+          sheetName: sDbSheet.getName(),
+          kelas: myKelas,
+          siswa: mySiswa,
+          presensi: myPresensi,
+          nilai: myNilai,
+          jurnal: myJurnal,
+          perangkat: myPerangkat
+        };
+      }
+    }
+
+    // Fallback: Jika sheet khusus belum ada data, baca dari tabel global
+    var kSheet = ss.getSheetByName('Data_Kelas');
     var myClassIds = {};
     if (kSheet) {
       var kData = kSheet.getDataRange().getValues();
-      for (var i = 1; i < kData.length; i++) {
-        var kr = kData[i];
-        // [ID_Kelas(0), Owner_UID(1), ID_Sekolah(2), Nama_Sekolah(3), Tingkat(4), Nama_Rombel(5), Tahun_Ajaran(6), Semester(7), Status_Kelas(8)]
+      for (var k = 1; k < kData.length; k++) {
+        var kr = kData[k];
         if (!uid || String(kr[1]).trim() === uid) {
           myClassIds[String(kr[0]).trim()] = true;
           myKelas.push({
@@ -601,13 +926,11 @@ function getTeacherDataBackend(teacherUid, schoolId) {
       }
     }
 
-    // 2. Data Siswa di Kelas Milik Guru
     var sSheet = ss.getSheetByName('Data_Siswa');
-    var mySiswa = [];
     if (sSheet) {
       var sData = sSheet.getDataRange().getValues();
-      for (var j = 1; j < sData.length; j++) {
-        var sr = sData[j];
+      for (var s = 1; s < sData.length; s++) {
+        var sr = sData[s];
         var cId = String(sr[1]).trim();
         var sOwner = String(sr[2]).trim();
         if (!uid || sOwner === uid || myClassIds[cId]) {
@@ -631,114 +954,9 @@ function getTeacherDataBackend(teacherUid, schoolId) {
       }
     }
 
-    // 3. Data Presensi Milik Guru
-    var prSheet = ss.getSheetByName('Presensi');
-    var myPresensi = [];
-    if (prSheet) {
-      var prData = prSheet.getDataRange().getValues();
-      for (var p = 1; p < prData.length; p++) {
-        var pr = prData[p];
-        var pClassId = String(pr[2]).trim();
-        var pOwner = String(pr[8]).trim();
-        if (!uid || pOwner === uid || myClassIds[pClassId]) {
-          myPresensi.push({
-            id: String(pr[0]).trim(),
-            tanggal: String(pr[1]).trim(),
-            idKelas: pClassId,
-            namaKelas: String(pr[3]).trim(),
-            idSiswa: String(pr[4]).trim(),
-            namaSiswa: String(pr[5]).trim(),
-            statusHadir: String(pr[6]).trim(),
-            keterangan: String(pr[7]).trim(),
-            ownerUid: pOwner,
-            waktuInput: String(pr[10]).trim()
-          });
-        }
-      }
-    }
-
-    // 4. Data Nilai Siswa
-    var nSheet = ss.getSheetByName('Nilai_Siswa');
-    var myNilai = [];
-    if (nSheet) {
-      var nData = nSheet.getDataRange().getValues();
-      for (var n = 1; n < nData.length; n++) {
-        var nr = nData[n];
-        var nClassId = String(nr[1]).trim();
-        var nOwner = String(nr[13]).trim();
-        if (!uid || nOwner === uid || myClassIds[nClassId]) {
-          myNilai.push({
-            id: String(nr[0]).trim(),
-            idKelas: nClassId,
-            namaKelas: String(nr[2]).trim(),
-            idSiswa: String(nr[3]).trim(),
-            namaSiswa: String(nr[4]).trim(),
-            mapel: String(nr[5]).trim(),
-            lingkupMateri: String(nr[6]).trim(),
-            nilaiFormatif: Number(nr[7]) || 0,
-            nilaiSumatif: Number(nr[8]) || 0,
-            nilaiSAS: Number(nr[9]) || 0,
-            nilaiAkhir: Number(nr[10]) || 0,
-            semester: String(nr[11]).trim(),
-            tahunAjaran: String(nr[12]).trim()
-          });
-        }
-      }
-    }
-
-    // 5. Data Jurnal Mengajar
-    var jSheet = ss.getSheetByName('Jurnal_Mengajar');
-    var myJurnal = [];
-    if (jSheet) {
-      var jData = jSheet.getDataRange().getValues();
-      for (var jr = 1; jr < jData.length; jr++) {
-        var jRow = jData[jr];
-        var jClassId = String(jRow[1]).trim();
-        var jOwner = String(jRow[10]).trim();
-        if (!uid || jOwner === uid || myClassIds[jClassId]) {
-          myJurnal.push({
-            id: String(jRow[0]).trim(),
-            idKelas: jClassId,
-            namaKelas: String(jRow[2]).trim(),
-            tanggal: String(jRow[3]).trim(),
-            jamKe: String(jRow[4]).trim(),
-            mapel: String(jRow[5]).trim(),
-            topikMateri: String(jRow[6]).trim(),
-            kegiatanPembelajaran: String(jRow[7]).trim(),
-            siswaTidakHadir: String(jRow[8]).trim(),
-            catatanRefleksi: String(jRow[9]).trim()
-          });
-        }
-      }
-    }
-
-    // 6. Data Perangkat Ajar
-    var dSheet = ss.getSheetByName('Perangkat_Ajar');
-    var myPerangkat = [];
-    if (dSheet) {
-      var dData = dSheet.getDataRange().getValues();
-      for (var d = 1; d < dData.length; d++) {
-        var dr = dData[d];
-        myPerangkat.push({
-          id: String(dr[0]).trim(),
-          judul: String(dr[1]).trim(),
-          mapel: String(dr[2]).trim(),
-          kategoriKelas: String(dr[3]).trim(),
-          formatTipe: String(dr[5]).trim(),
-          namaFile: String(dr[6]).trim(),
-          ukuranFile: String(dr[7]).trim(),
-          linkBerkas: String(dr[10]).trim(),
-          deskripsi: String(dr[11]).trim(),
-          uploader: String(dr[13]).trim()
-        });
-      }
-    }
-
-    var verInfo = getDataVersion();
     return {
       success: true,
-      version: verInfo.version,
-      lastUpdated: verInfo.lastUpdated,
+      source: 'Global_Tables',
       kelas: myKelas,
       siswa: mySiswa,
       presensi: myPresensi,
@@ -752,175 +970,215 @@ function getTeacherDataBackend(teacherUid, schoolId) {
 }
 
 // ============================================================
-// CRUD GURU: KELAS MANDIRI
+// 5. PENYIMPANAN DATA GURU KE DATABASE PER LEMBAGA
 // ============================================================
+function saveToSchoolDbSheet(ss, npsn, namaSekolah, recordId, tipeData, guruId, guruNama, kelasId, kelasNama, periode, labelUtama, nilaiStatus, payloadObj) {
+  var sheet = getOrCreateSchoolDbSheet(ss, npsn, namaSekolah);
+  var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+  var data = sheet.getDataRange().getValues();
+  var foundRow = -1;
+
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === recordId) {
+      foundRow = i + 1;
+      break;
+    }
+  }
+
+  var rowValues = [
+    recordId,
+    tipeData,
+    guruId,
+    guruNama,
+    kelasId,
+    kelasNama,
+    periode,
+    labelUtama,
+    nilaiStatus,
+    JSON.stringify(payloadObj),
+    foundRow !== -1 ? String(data[foundRow - 1][10]) : nowStr,
+    nowStr
+  ];
+
+  if (foundRow !== -1) {
+    sheet.getRange(foundRow, 1, 1, rowValues.length).setValues([rowValues]);
+  } else {
+    sheet.appendRow(rowValues);
+  }
+}
+
+function deleteFromSchoolDbSheet(ss, npsn, namaSekolah, recordId) {
+  var sheet = getOrCreateSchoolDbSheet(ss, npsn, namaSekolah);
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === recordId) {
+      sheet.deleteRow(i + 1);
+      return true;
+    }
+  }
+  return false;
+}
+
+// --- CRUD KELAS ---
 function saveClassTeacherBackend(p) {
   try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Data_Kelas');
-    var data = sheet.getDataRange().getValues();
-    var id = (p.id || '').trim();
-    var uid = (p.ownerUid || p.uid || '').trim();
-    var isEdit = false;
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var kId = p.id || ('KLS-' + Date.now().toString().slice(-6));
+    var ownerUid = (p.ownerUid || p.teacherId || '').trim();
+    var ownerName = (p.ownerName || p.teacherName || 'Guru').trim();
 
-    if (id) {
-      for (var i = 1; i < data.length; i++) {
-        if (String(data[i][0]).trim() === id) {
-          if (uid && String(data[i][1]).trim() !== uid) {
-            return { success: false, message: 'Anda tidak memiliki hak mengubah kelas milik guru lain.' };
-          }
-          sheet.getRange(i + 1, 5).setValue(p.tingkat || data[i][4]);
-          sheet.getRange(i + 1, 6).setValue(p.namaRombel || data[i][5]);
-          sheet.getRange(i + 1, 7).setValue(p.tahunAjaran || data[i][6]);
-          sheet.getRange(i + 1, 8).setValue(p.semester || data[i][7]);
-          sheet.getRange(i + 1, 9).setValue(p.statusKelas || 'Aktif');
-          isEdit = true;
-          break;
-        }
+    // 1. Simpan ke Sheet Per Lembaga
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        kId, 'KELAS',
+        ownerUid, ownerName,
+        kId, p.namaRombel || 'Kelas',
+        (p.tahunAjaran || '2026/2027') + ' - ' + (p.semester || 'Ganjil'),
+        p.namaRombel || 'Kelas',
+        p.statusKelas || 'Aktif',
+        p
+      );
+    }
+
+    // 2. Simpan juga ke Data_Kelas global
+    var kSheet = ss.getSheetByName('Data_Kelas');
+    if (kSheet) {
+      var kData = kSheet.getDataRange().getValues();
+      var fRow = -1;
+      for (var i = 1; i < kData.length; i++) {
+        if (String(kData[i][0]).trim() === kId) { fRow = i + 1; break; }
+      }
+      var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+      var row = [
+        kId,
+        ownerUid,
+        p.schoolId || ('SCH-' + npsn),
+        namaSekolah,
+        p.tingkat || 'IV',
+        p.namaRombel || 'Kelas IV-A',
+        p.tahunAjaran || '2026/2027',
+        p.semester || 'Ganjil',
+        p.statusKelas || 'Aktif',
+        nowStr
+      ];
+      if (fRow !== -1) {
+        kSheet.getRange(fRow, 1, 1, row.length).setValues([row]);
+      } else {
+        kSheet.appendRow(row);
       }
     }
 
-    if (!isEdit) {
-      id = 'KLS-' + Date.now().toString().slice(-5);
-      var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-      sheet.appendRow([
-        id,
-        uid,
-        p.schoolId || 'SCH-AMB-01',
-        p.namaSekolah || 'SD Negeri di Kecamatan Ambulu',
-        p.tingkat || 'IV',
-        p.namaRombel || 'Kelas Baru',
-        p.tahunAjaran || '2026/2027',
-        p.semester || 'Ganjil',
-        'Aktif',
-        nowStr
-      ]);
-    }
-
-    return { success: true, id: id, message: isEdit ? 'Kelas berhasil diperbarui.' : 'Kelas baru berhasil dibuat.' };
+    return { success: true, id: kId, message: 'Kelas berhasil disimpan.' };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, message: 'Gagal simpan kelas: ' + err.message };
   }
 }
 
 function deleteClassTeacherBackend(p) {
   try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Data_Kelas');
-    var data = sheet.getDataRange().getValues();
-    var id = (p.id || p.classId || '').trim();
-    var uid = (p.ownerUid || p.uid || '').trim();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var cId = (p.classId || p.id || '').trim();
 
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]).trim() === id) {
-        if (uid && String(data[i][1]).trim() !== uid) {
-          return { success: false, message: 'Akses ditolak: Anda tidak memiliki izin menghapus kelas ini.' };
-        }
-        sheet.deleteRow(i + 1);
-        return { success: true, message: 'Kelas berhasil dihapus.' };
-      }
+    if (npsn) {
+      deleteFromSchoolDbSheet(ss, npsn, namaSekolah, cId);
     }
-    return { success: false, message: 'Kelas tidak ditemukan.' };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
 
-// ============================================================
-// CRUD GURU: DATA SISWA KELAS (MANUAL & BATCH IMPORT EXCEL)
-// ============================================================
-function saveStudentTeacherBackend(p) {
-  try {
-    var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Data_Siswa');
-    var data = sheet.getDataRange().getValues();
-    var id = (p.id || '').trim();
-    var isEdit = false;
-
-    if (id) {
-      for (var i = 1; i < data.length; i++) {
-        if (String(data[i][0]).trim() === id) {
-          sheet.getRange(i + 1, 2).setValue(p.idKelas || data[i][1]);
-          sheet.getRange(i + 1, 5).setValue(p.nis || data[i][4]);
-          sheet.getRange(i + 1, 6).setValue(p.nisn || data[i][5]);
-          sheet.getRange(i + 1, 7).setValue(p.nama || data[i][6]);
-          sheet.getRange(i + 1, 8).setValue(p.jenisKelamin || data[i][7]);
-          sheet.getRange(i + 1, 12).setValue(p.namaWali || data[i][11]);
-          sheet.getRange(i + 1, 13).setValue(p.noHpWali || data[i][12]);
-          isEdit = true;
+    var kSheet = ss.getSheetByName('Data_Kelas');
+    if (kSheet) {
+      var kData = kSheet.getDataRange().getValues();
+      for (var i = 1; i < kData.length; i++) {
+        if (String(kData[i][0]).trim() === cId) {
+          kSheet.deleteRow(i + 1);
           break;
         }
       }
     }
+    return { success: true, message: 'Kelas berhasil dihapus.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal hapus kelas: ' + err.message };
+  }
+}
 
-    if (!isEdit) {
-      id = 'SIS-' + Date.now().toString().slice(-5);
-      sheet.appendRow([
-        id,
+// --- CRUD SISWA ---
+function saveStudentTeacherBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var sId = p.id || ('SIS-' + Date.now().toString().slice(-6));
+    var ownerUid = (p.ownerUid || p.teacherId || '').trim();
+    var ownerName = (p.ownerName || p.teacherName || 'Guru').trim();
+
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        sId, 'SISWA',
+        ownerUid, ownerName,
+        p.idKelas || '', p.namaKelas || '',
+        '-',
+        p.nama || 'Siswa',
+        p.statusAktif || 'Aktif',
+        p
+      );
+    }
+
+    var sSheet = ss.getSheetByName('Data_Siswa');
+    if (sSheet) {
+      var sData = sSheet.getDataRange().getValues();
+      var fRow = -1;
+      for (var i = 1; i < sData.length; i++) {
+        if (String(sData[i][0]).trim() === sId) { fRow = i + 1; break; }
+      }
+      var row = [
+        sId,
         p.idKelas || '',
-        p.ownerUid || '',
-        p.schoolId || '',
-        p.nis || '',
-        p.nisn || '',
-        p.nama || 'Siswa Baru',
+        ownerUid,
+        p.schoolId || ('SCH-' + npsn),
+        p.nis || '-',
+        p.nisn || '-',
+        p.nama || '',
         p.jenisKelamin || 'L',
         p.tempatLahir || 'Jember',
-        p.tanggalLahir || '2016-01-01',
+        p.tanggalLahir || '-',
         p.alamat || '-',
         p.namaWali || '-',
         p.noHpWali || '',
-        'Aktif'
-      ]);
+        p.statusAktif || 'Aktif'
+      ];
+      if (fRow !== -1) {
+        sSheet.getRange(fRow, 1, 1, row.length).setValues([row]);
+      } else {
+        sSheet.appendRow(row);
+      }
     }
 
-    return { success: true, id: id, message: isEdit ? 'Data siswa berhasil diperbarui.' : 'Siswa berhasil ditambahkan.' };
+    return { success: true, id: sId, message: 'Data peserta didik berhasil disimpan.' };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, message: 'Gagal simpan siswa: ' + err.message };
   }
 }
 
 function batchImportStudentsBackend(p) {
   try {
-    var students = p.students || [];
-    var classId = (p.classId || '').trim();
-    var ownerUid = (p.ownerUid || '').trim();
-    var schoolId = (p.schoolId || '').trim();
-
-    if (!students || students.length === 0) {
-      return { success: false, message: 'Tidak ada data siswa untuk diimpor.' };
-    }
-
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Data_Siswa');
-    var rows = [];
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var students = p.students || [];
+    var count = 0;
 
-    for (var i = 0; i < students.length; i++) {
-      var s = students[i];
-      var newId = 'SIS-' + (Date.now() + i).toString().slice(-6);
-      rows.push([
-        newId,
-        classId,
-        ownerUid,
-        schoolId,
-        s.nis || '-',
-        s.nisn || '-',
-        s.nama || 'Siswa',
-        s.jenisKelamin || 'L',
-        s.tempatLahir || 'Jember',
-        s.tanggalLahir || '2016-01-01',
-        s.alamat || '-',
-        s.namaWali || '-',
-        s.noHpWali || '',
-        'Aktif'
-      ]);
-    }
+    students.forEach(function (st) {
+      st.npsn = npsn;
+      st.namaSekolah = namaSekolah;
+      saveStudentTeacherBackend(st);
+      count++;
+    });
 
-    if (rows.length > 0) {
-      var startRow = sheet.getLastRow() + 1;
-      sheet.getRange(startRow, 1, rows.length, rows[0].length).setValues(rows);
-    }
-
-    return { success: true, count: rows.length, message: 'Berhasil mengimpor ' + rows.length + ' data siswa.' };
+    return { success: true, importedCount: count, message: 'Berhasil mengimpor ' + count + ' peserta didik.' };
   } catch (err) {
     return { success: false, message: 'Gagal impor siswa: ' + err.message };
   }
@@ -929,416 +1187,202 @@ function batchImportStudentsBackend(p) {
 function deleteStudentTeacherBackend(p) {
   try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Data_Siswa');
-    var data = sheet.getDataRange().getValues();
-    var id = (p.id || p.siswaId || '').trim();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var sId = (p.studentId || p.id || '').trim();
 
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]).trim() === id) {
-        sheet.deleteRow(i + 1);
-        return { success: true, message: 'Data siswa berhasil dihapus.' };
+    if (npsn) {
+      deleteFromSchoolDbSheet(ss, npsn, namaSekolah, sId);
+    }
+
+    var sSheet = ss.getSheetByName('Data_Siswa');
+    if (sSheet) {
+      var sData = sSheet.getDataRange().getValues();
+      for (var i = 1; i < sData.length; i++) {
+        if (String(sData[i][0]).trim() === sId) {
+          sSheet.deleteRow(i + 1);
+          break;
+        }
       }
     }
-    return { success: false, message: 'Data siswa tidak ditemukan.' };
+    return { success: true, message: 'Peserta didik berhasil dihapus.' };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, message: 'Gagal hapus siswa: ' + err.message };
   }
 }
 
-// ============================================================
-// PRESENSI & NILAI SISWA
-// ============================================================
+// --- PRESENSI, NILAI, JURNAL, PERANGKAT ---
 function updatePresensiBackend(p) {
   try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Presensi');
-    var data = sheet.getDataRange().getValues();
-    var today = p.tanggal || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
-    var sId = (p.idSiswa || '').trim();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var pId = p.id || ('PRS-' + Date.now().toString().slice(-6));
 
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][1]).trim() === today && String(data[i][4]).trim() === sId) {
-        sheet.getRange(i + 1, 7).setValue(p.statusHadir || 'Hadir');
-        sheet.getRange(i + 1, 8).setValue(p.keterangan || '-');
-        return { success: true, message: 'Presensi diperbarui.' };
-      }
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        pId, 'PRESENSI',
+        p.ownerUid || '', p.teacherName || '',
+        p.idKelas || '', p.namaKelas || '',
+        p.tanggal || '',
+        p.namaSiswa || '',
+        p.statusHadir || 'H',
+        p
+      );
     }
 
-    var newId = 'PRS-' + Date.now().toString().slice(-5);
-    var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-    sheet.appendRow([
-      newId,
-      today,
-      p.idKelas || '',
-      p.namaKelas || '',
-      sId,
-      p.namaSiswa || '',
-      p.statusHadir || 'Hadir',
-      p.keterangan || '-',
-      p.ownerUid || '',
-      p.schoolId || '',
-      now
-    ]);
-
-    return { success: true, message: 'Presensi tercatat.' };
+    return { success: true, id: pId, message: 'Presensi berhasil dicatat.' };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, message: 'Gagal update presensi: ' + err.message };
   }
 }
 
 function batchUpdatePresensiBackend(p) {
   try {
     var records = p.records || [];
-    for (var i = 0; i < records.length; i++) {
-      var r = records[i];
-      updatePresensiBackend({
-        idKelas: r.idKelas,
-        namaKelas: r.namaKelas,
-        idSiswa: r.idSiswa,
-        namaSiswa: r.namaSiswa,
-        statusHadir: r.statusHadir || 'Hadir',
-        ownerUid: p.ownerUid || '',
-        schoolId: p.schoolId || ''
-      });
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+
+    records.forEach(function (rec) {
+      rec.npsn = npsn;
+      rec.namaSekolah = namaSekolah;
+      updatePresensiBackend(rec);
+    });
+
+    return { success: true, count: records.length, message: 'Presensi harian berhasil disimpan.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal batch presensi: ' + err.message };
+  }
+}
+
+function addNilaiBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var nId = p.id || ('NIL-' + Date.now().toString().slice(-6));
+
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        nId, 'NILAI',
+        p.ownerUid || '', p.teacherName || '',
+        p.idKelas || '', p.namaKelas || '',
+        p.semester || 'Ganjil',
+        (p.mapel || '') + ' - ' + (p.namaSiswa || ''),
+        String(p.nilaiAkhir || 0),
+        p
+      );
     }
-    return { success: true, message: 'Presensi massal kelas berhasil disimpan.' };
+
+    return { success: true, id: nId, message: 'Penilaian berhasil disimpan.' };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, message: 'Gagal simpan nilai: ' + err.message };
   }
 }
 
-function addNilaiBackend(n) {
+function addJurnalBackend(p) {
   try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Nilai_Siswa');
-    var newId = 'NLI-' + Date.now().toString().slice(-5);
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var jId = p.id || ('JRN-' + Date.now().toString().slice(-6));
 
-    sheet.appendRow([
-      newId,
-      n.idKelas || '',
-      n.namaKelas || '',
-      n.idSiswa || '',
-      n.namaSiswa || '',
-      n.mapel || 'Matematika',
-      n.lingkupMateri || 'Capaian Pembelajaran',
-      n.nilaiFormatif || 0,
-      n.nilaiSumatif || 0,
-      n.nilaiSAS || 0,
-      n.nilaiAkhir || 0,
-      n.semester || 'Ganjil',
-      n.tahunAjaran || '2026/2027',
-      n.ownerUid || '',
-      n.schoolId || ''
-    ]);
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        jId, 'JURNAL',
+        p.ownerUid || '', p.teacherName || '',
+        p.idKelas || '', p.namaKelas || '',
+        p.tanggal || '',
+        p.topikMateri || '',
+        p.mapel || '',
+        p
+      );
+    }
 
-    return { success: true, id: newId, message: 'Nilai siswa berhasil disimpan.' };
+    return { success: true, id: jId, message: 'Jurnal pembelajaran berhasil dicatat.' };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, message: 'Gagal simpan jurnal: ' + err.message };
   }
 }
 
-function addJurnalBackend(j) {
+function uploadPerangkatBackend(p) {
   try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Jurnal_Mengajar');
-    var newId = 'JRN-' + Date.now().toString().slice(-5);
-    var today = j.tanggal || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var docId = p.id || ('DOK-' + Date.now().toString().slice(-6));
+    var linkBerkas = p.linkBerkas || '';
 
-    sheet.appendRow([
-      newId,
-      j.idKelas || '',
-      j.namaKelas || '',
-      today,
-      j.jamKe || '1-2',
-      j.mapel || '',
-      j.topikMateri || '',
-      j.kegiatanPembelajaran || '',
-      j.siswaTidakHadir || '-',
-      j.catatanRefleksi || '',
-      j.ownerUid || '',
-      j.schoolId || ''
-    ]);
-
-    return { success: true, id: newId, message: 'Jurnal pembelajaran berhasil dicatat.' };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function uploadPerangkatBackend(payload) {
-  try {
-    var namaFile = payload.namaFile || payload.fileName || 'dokumen_perangkat';
-    var mimeType = payload.mimeType || payload.fileMime || 'application/octet-stream';
-    var base64Data = payload.base64Data || payload.fileBase64 || '';
-    var judul = payload.judul || namaFile;
-    var mapel = payload.mapel || 'Umum';
-    var kategoriKelas = payload.kategoriKelas || 'Semua Kelas';
-    var formatTipe = payload.formatTipe || 'PDF';
-    var durasi = payload.durasi || payload.durasiJP || '4 JP';
-    var deskripsi = payload.deskripsi || '-';
-    var uploader = payload.uploader || 'Guru SD';
-    var fileUrl = payload.linkBerkas || 'https://drive.google.com/';
-    var ukuranFile = payload.ukuranFile || '1.0 MB';
-
-    if (base64Data && typeof base64Data === 'string' && base64Data.trim().length > 10) {
+    // Jika terdapat berkas base64, simpan ke Google Drive
+    if (p.fileBase64 && p.namaFile) {
       try {
-        var cleanBase64 = base64Data.replace(/^data:.*?;base64,/, '');
-        var decodedData = Utilities.base64Decode(cleanBase64);
-        var blob = Utilities.newBlob(decodedData, mimeType, namaFile);
         var folder = getOrCreateUploadFolder();
+        var decoded = Utilities.base64Decode(p.fileBase64);
+        var blob = Utilities.newBlob(decoded, 'application/octet-stream', p.namaFile);
         var file = folder.createFile(blob);
-        try {
-          file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        } catch (shareErr) {}
-        fileUrl = file.getUrl();
-        ukuranFile = (file.getSize() / 1048576).toFixed(1) + ' MB';
-      } catch (driveErr) {
-        if (!fileUrl || fileUrl === 'https://drive.google.com/') {
-          fileUrl = 'https://drive.google.com/drive/my-drive';
-        }
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        linkBerkas = file.getUrl();
+        p.linkBerkas = linkBerkas;
+        p.driveFileId = file.getId();
+      } catch (errDrive) {
+        linkBerkas = 'https://drive.google.com/';
       }
     }
 
+    // Bersihkan fileBase64 sebelum simpan ke Sheet agar hemat kuota
+    delete p.fileBase64;
+
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        docId, 'PERANGKAT',
+        p.ownerUid || '', p.uploader || '',
+        '', '',
+        '-',
+        p.judul || '',
+        p.formatTipe || 'PDF',
+        p
+      );
+    }
+
+    return { success: true, id: docId, linkBerkas: linkBerkas, message: 'Perangkat ajar berhasil diunggah.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal unggah perangkat: ' + err.message };
+  }
+}
+
+function deletePerangkatBackend(p) {
+  try {
     var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Perangkat_Ajar');
-    var newId = 'DOK-' + Date.now().toString().slice(-5);
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var docId = (p.id || p.docId || '').trim();
+
+    if (npsn) {
+      deleteFromSchoolDbSheet(ss, npsn, namaSekolah, docId);
+    }
+    return { success: true, message: 'Dokumen berhasil dihapus.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal hapus dokumen: ' + err.message };
+  }
+}
+
+// ============================================================
+// AUDIT LOG & VERSIONING
+// ============================================================
+function logActivity(userId, userName, role, schoolId, action, detail) {
+  try {
+    var ss = getActiveDb();
+    var logSheet = ss.getSheetByName('Audit_Logs');
+    if (!logSheet) {
+      logSheet = ss.insertSheet('Audit_Logs');
+      logSheet.appendRow(['ID_Log', 'Waktu', 'ID_User', 'Nama_User', 'Role', 'ID_Sekolah', 'Aksi', 'Detail']);
+    }
     var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-
-    sheet.appendRow([
-      newId, judul, mapel, kategoriKelas, 'Modul Ajar', formatTipe, namaFile,
-      ukuranFile, 'Google Drive', durasi, fileUrl, deskripsi, payload.ownerUid || '',
-      uploader, payload.schoolId || '', 'Aktif', nowStr
-    ]);
-
-    return {
-      success: true,
-      id: newId,
-      fileUrl: fileUrl,
-      message: 'Perangkat ajar "' + namaFile + '" berhasil disimpan.'
-    };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-// ============================================================
-// SUPER ADMIN & SEKOLAH DATA
-// ============================================================
-function getAllSchoolsBackend() {
-  try {
-    var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Schools');
-    var schools = [];
-
-    if (sheet) {
-      var data = sheet.getDataRange().getValues();
-      for (var i = 1; i < data.length; i++) {
-        var r = data[i];
-        schools.push({
-          id: String(r[0]).trim(),
-          nama: String(r[1]).trim(),
-          npsn: String(r[2]).trim(),
-          kodeUnik: String(r[3] || '').trim(),
-          alamat: String(r[4]).trim(),
-          desa: String(r[5]).trim(),
-          kecamatan: String(r[6]).trim() || 'Ambulu',
-          kabupaten: String(r[7]).trim() || 'Jember',
-          kepalaSekolah: String(r[8]).trim(),
-          status: String(r[10]).trim() || 'Terverifikasi'
-        });
-      }
-    }
-    return { success: true, schools: schools };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function getSuperAdminDataBackend() {
-  try {
-    var ss = getActiveDb();
-    var sSheet = ss.getSheetByName('Schools');
-    var pSheet = ss.getSheetByName('Teacher_Profiles');
-    var kSheet = ss.getSheetByName('Data_Kelas');
-    var stSheet = ss.getSheetByName('Data_Siswa');
-
-    var schools = [];
-    if (sSheet) {
-      var sData = sSheet.getDataRange().getValues();
-      for (var i = 1; i < sData.length; i++) {
-        schools.push({
-          id: sData[i][0],
-          nama: sData[i][1],
-          npsn: sData[i][2],
-          kodeUnik: sData[i][3] || '',
-          desa: sData[i][5],
-          kepalaSekolah: sData[i][8],
-          status: sData[i][10] || 'Terverifikasi'
-        });
-      }
-    }
-
-    var teachers = [];
-    if (pSheet) {
-      var pData = pSheet.getDataRange().getValues();
-      for (var j = 1; j < pData.length; j++) {
-        teachers.push({
-          uid: pData[j][0],
-          nama: pData[j][1],
-          nip: pData[j][2],
-          noHp: pData[j][3],
-          namaSekolah: pData[j][5],
-          npsn: pData[j][6],
-          jabatan: pData[j][7],
-          statusKepegawaian: pData[j][8],
-          statusVerifikasi: pData[j][10] || 'Terverifikasi'
-        });
-      }
-    }
-
-    return {
-      success: true,
-      stats: {
-        totalSchools: schools.length,
-        totalTeachers: teachers.length,
-        totalClasses: kSheet ? Math.max(0, kSheet.getLastRow() - 1) : 0,
-        totalStudents: stSheet ? Math.max(0, stSheet.getLastRow() - 1) : 0
-      },
-      schools: schools,
-      teachers: teachers
-    };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function getSchoolAdminDataBackend(schoolId) {
-  try {
-    var ss = getActiveDb();
-    var pSheet = ss.getSheetByName('Teacher_Profiles');
-    var kSheet = ss.getSheetByName('Data_Kelas');
-
-    var schoolTeachers = [];
-    if (pSheet) {
-      var pData = pSheet.getDataRange().getValues();
-      for (var i = 1; i < pData.length; i++) {
-        if (!schoolId || String(pData[i][4]).trim() === schoolId) {
-          schoolTeachers.push({
-            id: pData[i][0],
-            nama: pData[i][1],
-            nip: pData[i][2],
-            jabatan: pData[i][7],
-            statusKepegawaian: pData[i][8],
-            statusVerifikasi: pData[i][10]
-          });
-        }
-      }
-    }
-
-    var schoolClasses = [];
-    if (kSheet) {
-      var kData = kSheet.getDataRange().getValues();
-      for (var j = 1; j < kData.length; j++) {
-        if (!schoolId || String(kData[j][2]).trim() === schoolId) {
-          schoolClasses.push({
-            id: kData[j][0],
-            tingkat: kData[j][4],
-            namaRombel: kData[j][5],
-            tahunAjaran: kData[j][6],
-            ownerUid: kData[j][1]
-          });
-        }
-      }
-    }
-
-    return {
-      success: true,
-      teachers: schoolTeachers,
-      classes: schoolClasses
-    };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function deleteRowByIdBackend(sheetName, id) {
-  try {
-    var ss = getActiveDb();
-    var sheet = ss.getSheetByName(sheetName);
-    if (!sheet) return { success: false, message: 'Sheet tidak ditemukan.' };
-    var data = sheet.getDataRange().getValues();
-    var targetId = String(id || '').trim();
-
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]).trim() === targetId) {
-        sheet.deleteRow(i + 1);
-        return { success: true, message: 'Data berhasil dihapus.' };
-      }
-    }
-    return { success: false, message: 'Data tidak ditemukan.' };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function savePengaturanSekolahBackend(p) {
-  try {
-    var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Pengaturan_Sekolah');
-    if (!sheet) return { success: false, message: 'Sheet Pengaturan_Sekolah tidak ada.' };
-
-    var data = sheet.getDataRange().getValues();
-    var map = {
-      'NAMA_SEKOLAH': p.namaSekolah,
-      'NPSN': p.npsn,
-      'KECAMATAN': p.kecamatan,
-      'KEPALA_SEKOLAH': p.kepalaSekolah,
-      'NIP_KEPALA_SEKOLAH': p.nipKepalaSekolah,
-      'TAHUN_AJARAN_AKTIF': p.tahunAjaranAktif,
-      'SEMESTER_AKTIF': p.semesterAktif
-    };
-
-    for (var k in map) {
-      if (map[k] !== undefined) {
-        var found = false;
-        for (var i = 1; i < data.length; i++) {
-          if (String(data[i][0]).trim().toUpperCase() === k) {
-            sheet.getRange(i + 1, 2).setValue(map[k]);
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          sheet.appendRow([k, map[k]]);
-        }
-      }
-    }
-    return { success: true, message: 'Pengaturan tersimpan.' };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function backupDatabaseBackend() {
-  try {
-    var ss = getActiveDb();
-    var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
-    var backupName = 'SiGuru_SD_Ambulu_Backup_' + nowStr;
-    var copy = ss.copy(backupName);
-    return { success: true, backupSpreadsheetUrl: copy.getUrl() };
-  } catch (err) {
-    return { success: false, message: err.message };
-  }
-}
-
-function logActivity(uid, nama, role, schoolId, aksi, detail) {
-  try {
-    var ss = getActiveDb();
-    var sheet = ss.getSheetByName('Audit_Logs');
-    if (sheet) {
-      var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-      sheet.appendRow(['LOG-' + Date.now().toString().slice(-6), nowStr, uid, nama, role, schoolId, aksi, detail]);
-    }
+    logSheet.appendRow(['LOG-' + Date.now().toString().slice(-6), nowStr, userId, userName, role, schoolId, action, detail]);
   } catch (e) {}
 }
 
@@ -1359,23 +1403,31 @@ function incrementDataVersion() {
 }
 
 // ============================================================
-// INISIALISASI DATABASE BERSIH DENGAN 13 SD NEGERI AMBULU RESMI
+// INISIALISASI MASTER SEKOLAH & STRUKTUR TABEL LENGKAP
 // ============================================================
 function setupDatabaseMultiSchool() {
   var ss = getActiveDb();
   var sheetsDef = [
-    { name: 'Schools', headers: ['ID_Sekolah', 'Nama_Sekolah', 'NPSN', 'Kode_Unik', 'Alamat', 'Desa', 'Kecamatan', 'Kabupaten', 'Kepala_Sekolah', 'NIP_KS', 'Status', 'Tanggal_Dibuat'] },
-    { name: 'Teacher_Profiles', headers: ['ID_Guru', 'Nama_Lengkap', 'NIP', 'No_HP', 'ID_Sekolah', 'Nama_Sekolah', 'NPSN', 'Jabatan', 'Status_Kepegawaian', 'PIN', 'Status_Verifikasi', 'Tanggal_Daftar'] },
-    { name: 'Users', headers: ['ID_User', 'UID', 'Email_Username', 'Nama_Lengkap', 'Role', 'ID_Sekolah', 'Nama_Sekolah', 'Status_Akun', 'Tanggal_Daftar', 'Terakhir_Login'] },
-    { name: 'Data_Kelas', headers: ['ID_Kelas', 'Owner_UID', 'ID_Sekolah', 'Nama_Sekolah', 'Tingkat', 'Nama_Rombel', 'Tahun_Ajaran', 'Semester', 'Status_Kelas', 'Waktu_Dibuat'] },
-    { name: 'Data_Siswa', headers: ['ID_Siswa', 'ID_Kelas', 'Owner_UID', 'ID_Sekolah', 'NIS', 'NISN', 'Nama_Lengkap', 'JK', 'Tempat_Lahir', 'Tanggal_Lahir', 'Alamat', 'Nama_Wali', 'No_HP_Wali', 'Status'] },
-    { name: 'Presensi', headers: ['ID_Presensi', 'Tanggal', 'ID_Kelas', 'Nama_Kelas', 'ID_Siswa', 'Nama_Siswa', 'Status_Hadir', 'Keterangan', 'Owner_UID', 'ID_Sekolah', 'Waktu_Input'] },
-    { name: 'Nilai_Siswa', headers: ['ID_Nilai', 'ID_Kelas', 'Nama_Kelas', 'ID_Siswa', 'Nama_Siswa', 'Mapel', 'Lingkup_Materi', 'Nilai_Formatif', 'Nilai_Sumatif', 'Nilai_SAS', 'Nilai_Akhir', 'Semester', 'Tahun_Ajaran', 'Owner_UID', 'ID_Sekolah'] },
-    { name: 'Jurnal_Mengajar', headers: ['ID_Jurnal', 'ID_Kelas', 'Nama_Kelas', 'Tanggal', 'Jam_Ke', 'Mapel', 'Topik_Materi', 'Kegiatan_Pembelajaran', 'Siswa_Tidak_Hadir', 'Catatan_Refleksi', 'Owner_UID', 'ID_Sekolah'] },
-    { name: 'Perangkat_Ajar', headers: ['ID_Dokumen', 'Judul_Dokumen', 'Mata_Pelajaran', 'Kategori_Kelas', 'Jenis', 'Format_Tipe', 'Nama_File', 'Ukuran_File', 'Sumber', 'Durasi_JP', 'Link_Berkas', 'Deskripsi', 'Owner_UID', 'Uploader', 'ID_Sekolah', 'Status_Publikasi', 'Waktu_Upload'] },
-    { name: 'Pengaturan_Sekolah', headers: ['Kunci', 'Nilai'] },
-    { name: 'Pengumuman', headers: ['ID_Pengumuman', 'Tanggal', 'Judul', 'Isi', 'Pengirim', 'ID_Sekolah', 'Status'] },
-    { name: 'Audit_Logs', headers: ['ID_Log', 'Waktu', 'ID_User', 'Nama_User', 'Role', 'ID_Sekolah', 'Aksi', 'Detail'] }
+    {
+      name: 'Schools',
+      headers: ['ID_Sekolah', 'Nama_Sekolah', 'NPSN', 'Kode_Unik', 'Alamat', 'Desa', 'Kecamatan', 'Kabupaten', 'Kepala_Sekolah', 'NIP_KS', 'Status', 'Tanggal_Dibuat']
+    },
+    {
+      name: 'Teacher_Profiles',
+      headers: ['ID_Guru', 'Nama_Lengkap', 'NIP', 'No_HP', 'ID_Sekolah', 'Nama_Sekolah', 'NPSN', 'Jabatan', 'Status_Kepegawaian', 'PIN', 'Status_Verifikasi', 'Tanggal_Daftar', 'Tanggal_Verifikasi', 'Diverifikasi_Oleh']
+    },
+    {
+      name: 'Data_Kelas',
+      headers: ['ID_Kelas', 'Owner_UID', 'ID_Sekolah', 'Nama_Sekolah', 'Tingkat', 'Nama_Rombel', 'Tahun_Ajaran', 'Semester', 'Status_Kelas', 'Waktu_Dibuat']
+    },
+    {
+      name: 'Data_Siswa',
+      headers: ['ID_Siswa', 'ID_Kelas', 'Owner_UID', 'ID_Sekolah', 'NIS', 'NISN', 'Nama_Lengkap', 'JK', 'Tempat_Lahir', 'Tanggal_Lahir', 'Alamat', 'Nama_Wali', 'No_HP_Wali', 'Status']
+    },
+    {
+      name: 'Audit_Logs',
+      headers: ['ID_Log', 'Waktu', 'ID_User', 'Nama_User', 'Role', 'ID_Sekolah', 'Aksi', 'Detail']
+    }
   ];
 
   sheetsDef.forEach(function (def) {
@@ -1384,51 +1436,34 @@ function setupDatabaseMultiSchool() {
       sheet = ss.insertSheet(def.name);
       sheet.appendRow(def.headers);
       sheet.getRange(1, 1, 1, def.headers.length).setFontWeight('bold').setBackground('#E2E8F0');
+      sheet.setFrozenRows(1);
     }
   });
 
-  // Isi 13 SD Negeri Resmi Kecamatan Ambulu beserta Kode Unik Aksesnya
-  var schoolsSheet = ss.getSheetByName('Schools');
+  // Isi ke-14 SD Negeri Resmi Kecamatan Ambulu
+  var sSheet = ss.getSheetByName('Schools');
   var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
 
-  if (schoolsSheet && schoolsSheet.getLastRow() <= 1) {
-    var officialSchools = [
-      ['SCH-20524972', 'SDN Ambulu 02', '20524972', 'AMB02-8821', 'Kecamatan Ambulu, Jember', 'Ambulu', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524171', 'SDN Tegalsari 01', '20524171', 'TGL01-7142', 'Kecamatan Ambulu, Jember', 'Tegalsari', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524146', 'SDN Tegalsari 02', '20524146', 'TGL02-6315', 'Kecamatan Ambulu, Jember', 'Tegalsari', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524148', 'SDN Tegalsari 03', '20524148', 'TGL03-5294', 'Kecamatan Ambulu, Jember', 'Tegalsari', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524147', 'SDN Tegalsari 04', '20524147', 'TGL04-4819', 'Kecamatan Ambulu, Jember', 'Tegalsari', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524058', 'SDN Sumberejo 04', '20524058', 'SMB04-3918', 'Kecamatan Ambulu, Jember', 'Sumberejo', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524059', 'SDN Sumberejo 05', '20524059', 'SMB05-2746', 'Kecamatan Ambulu, Jember', 'Sumberejo', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524060', 'SDN Sumberejo 07', '20524060', 'SMB07-1683', 'Kecamatan Ambulu, Jember', 'Sumberejo', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524958', 'SDN Andongsari 02', '20524958', 'ADG02-9524', 'Kecamatan Ambulu, Jember', 'Andongsari', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524962', 'SDN Andongsari 04', '20524962', 'ADG04-8417', 'Kecamatan Ambulu, Jember', 'Andongsari', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20523264', 'SDN Pontang 01', '20523264', 'PNT01-7362', 'Kecamatan Ambulu, Jember', 'Pontang', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524830', 'SDN Karanganyar 01', '20524830', 'KRN01-6251', 'Kecamatan Ambulu, Jember', 'Karanganyar', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now],
-      ['SCH-20524821', 'SDN Karanganyar 03', '20524821', 'KRN03-5149', 'Kecamatan Ambulu, Jember', 'Karanganyar', 'Ambulu', 'Jember', 'Kepala Sekolah', '-', 'Terverifikasi', now]
-    ];
-    schoolsSheet.getRange(2, 1, officialSchools.length, officialSchools[0].length).setValues(officialSchools);
-  }
-
-  // Pengaturan Platform
-  var setSheet = ss.getSheetByName('Pengaturan_Sekolah');
-  if (setSheet && setSheet.getLastRow() <= 1) {
-    var defaultSettings = [
-      ['NAMA_PLATFORM', 'SiGuru SD - Kecamatan Ambulu, Kabupaten Jember'],
-      ['KECAMATAN', 'Ambulu'],
-      ['KABUPATEN', 'Jember'],
-      ['PROVINSI', 'Jawa Timur'],
-      ['TAHUN_AJARAN_AKTIF', '2026/2027'],
-      ['SEMESTER_AKTIF', 'Ganjil'],
-      ['LOGO_URL', 'https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_Tut_Wuri_Handayani.png']
-    ];
-    setSheet.getRange(2, 1, defaultSettings.length, defaultSettings[0].length).setValues(defaultSettings);
+  if (sSheet && sSheet.getLastRow() <= 1) {
+    var rows = OFFICIAL_SCHOOLS_AMBULU.map(function (s) {
+      return [
+        'SCH-' + s.npsn,
+        s.nama,
+        s.npsn,
+        s.kode,
+        'Kecamatan Ambulu, Jember',
+        s.desa,
+        'Ambulu',
+        'Jember',
+        'Kepala Sekolah',
+        '-',
+        'Terverifikasi',
+        now
+      ];
+    });
+    sSheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
   }
 
   SpreadsheetApp.flush();
-  return { success: true, message: 'Database Multi-Sekolah Kecamatan Ambulu berhasil diinisialisasi.' };
-}
-
-function getAllAdminDataLegacy() {
-  return { success: true, message: 'Silakan gunakan verifikasi NPSN & Kode Unik.' };
+  return { success: true, message: 'Database SiGuru SD Ambulu multi-school siap digunakan.' };
 }
