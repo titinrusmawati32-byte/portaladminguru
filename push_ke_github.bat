@@ -17,7 +17,7 @@ echo.
 
 echo [3/4] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Fix: Tombol Login Admin Responsif 100% dan Dialog Pemilih Akun Google
+if "%commit_msg%"=="" set commit_msg=Integrasi Firebase Google Authentication Resmi untuk Login Administrator
 
 git commit -m "%commit_msg%"
 echo.

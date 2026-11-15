@@ -81,6 +81,10 @@
 
   <!-- Konfigurasi Master -->
   <script src="/config.js"></script>
+
+  <!-- Firebase SDK v10 (Compat - Resmi Google) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body class="font-sans antialiased flex flex-col justify-between">
 
@@ -115,9 +119,9 @@
           <p class="text-xs text-slate-400 mt-0.5">Khusus Akun Google Pemilik Database Google Spreadsheet</p>
         </div>
 
-        <!-- TOMBOL PILIH AKUN GOOGLE (TRIGGER POP-UP PEMILIH AKUN) -->
+        <!-- TOMBOL PILIH AKUN GOOGLE (FIREBASE GOOGLE SSO) -->
         <div class="space-y-3">
-          <button type="button" id="btnGoogleOwnerLogin" onclick="openGoogleAccountPickerModal()"
+          <button type="button" id="btnGoogleOwnerLogin" onclick="handleAdminLoginClick(event)"
             class="w-full py-4 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-950 font-outfit font-black text-xs sm:text-sm shadow-xl shadow-cyan-500/15 hover:shadow-cyan-400/25 active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-3 border border-white">
             <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -336,53 +340,61 @@
   </div>
 
   <!-- ============================================================
-       MODAL PEMILIH AKUN GOOGLE (GOOGLE ACCOUNT CHOOSER DIALOG)
+       MODAL SETUP / AKTIVASI FIREBASE GOOGLE AUTHENTICATION
        ============================================================ -->
-  <div id="modalGoogleAccountPicker" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4" style="display: none; z-index: 99999;">
-    <div class="glass-box bg-slate-900/98 max-w-md w-full rounded-3xl border border-white/20 p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+  <div id="modalFirebaseSetup" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4" style="display: none; z-index: 99999;">
+    <div class="glass-box bg-slate-900/98 max-w-lg w-full rounded-3xl border border-cyan-500/30 p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-left">
       
-      <!-- Modal Header dengan Logo Google Resmi -->
-      <div class="text-center space-y-2 border-b border-white/10 pb-4">
-        <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center mx-auto shadow-lg shadow-white/10">
-          <svg class="w-7 h-7" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-xl font-bold border border-amber-500/30">
+            🔥
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-white font-outfit">Aktivasi Firebase Google Auth</h3>
+            <p class="text-xs text-slate-400">Konfigurasi Firebase Authentication belum terdeteksi</p>
+          </div>
         </div>
-        <h3 class="text-base font-extrabold text-white font-outfit">Pilih Akun Google Administrator</h3>
-        <p class="text-xs text-slate-400">Pilih akun Google Anda untuk mengakses panel admin:</p>
+        <button onclick="closeFirebaseSetupModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer text-xs">✕</button>
       </div>
 
-      <!-- DAFTAR PILIHAN AKUN GOOGLE -->
-      <div id="googleAccountsList" class="space-y-2.5">
-        <!-- Rendered by JavaScript -->
+      <!-- Langkah Singkat -->
+      <div class="p-3.5 bg-slate-950/80 rounded-2xl border border-white/10 text-xs text-slate-300 space-y-2">
+        <div class="font-bold text-amber-300">Langkah 3 Menit Mendapatkan Config (Gratis):</div>
+        <ol class="list-decimal list-inside space-y-1 text-slate-400 text-[11px] leading-relaxed">
+          <li>Buka <a href="https://console.firebase.google.com/" target="_blank" class="text-cyan-400 underline font-bold">Firebase Console</a> dan klik <strong>Tambah Proyek</strong>.</li>
+          <li>Masuk menu <strong>Authentication</strong> ➔ tab <strong>Sign-in method</strong> ➔ aktifkan <strong>Google</strong>.</li>
+          <li>Masuk ke <strong>Project settings (ikon gerigi)</strong> ➔ di bagian <em>Your apps</em> (Web App <code>&lt;/&gt;</code>), salin blok <code>firebaseConfig</code>.</li>
+        </ol>
       </div>
 
-      <!-- Form Akun Google Tambahan (Toggle) -->
-      <div id="boxCustomGoogleAccount" class="hidden space-y-2 pt-2 border-t border-white/10">
-        <label class="block text-xs font-bold text-slate-300">Pilih / Masukkan Akun Google Lain:</label>
-        <div class="flex gap-2">
-          <input type="email" id="inpModalCustomEmail" placeholder="nama@gmail.com"
-            class="flex-1 p-3 bg-slate-950 border border-white/20 rounded-2xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-cyan-500">
-          <button onclick="handleVerifyModalCustomEmail()" type="button"
-            class="px-4 py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs transition cursor-pointer">
-            Pilih ➔
-          </button>
-        </div>
+      <!-- Kotak Tempel firebaseConfig -->
+      <div class="space-y-2">
+        <label class="block text-xs font-bold text-slate-300">
+          Tempelkan Objek <code>firebaseConfig</code> Anda di Sini:
+        </label>
+        <textarea id="txtFirebaseConfigInput" rows="6" placeholder='const firebaseConfig = {&#10;  apiKey: "AIzaSy...",&#10;  authDomain: "proyek-anda.firebaseapp.com",&#10;  projectId: "proyek-anda",&#10;  storageBucket: "...",&#10;  messagingSenderId: "...",&#10;  appId: "..."&#10;};'
+          class="w-full p-3 bg-slate-950 border border-white/20 rounded-2xl text-[11px] font-mono text-cyan-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
       </div>
 
-      <!-- Feedback / Status Pesan Modal -->
-      <div id="modalGoogleStatusMsg" class="hidden text-center text-xs p-3 rounded-2xl"></div>
+      <!-- Input Email Admin Whitelist -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-bold text-slate-300">
+          Alamat Email Google Administrator (Pemilik):
+        </label>
+        <input type="email" id="txtAdminWhitelistEmail" placeholder="nama@gmail.com"
+          class="w-full p-3 bg-slate-950 border border-white/20 rounded-2xl text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500">
+      </div>
 
-      <!-- Footer Modal: Tutup -->
-      <div class="pt-2 flex items-center justify-between border-t border-white/10 text-xs">
-        <button onclick="toggleCustomAccountInput()" type="button" class="text-cyan-400 hover:underline font-bold flex items-center gap-1 cursor-pointer">
-          <span>➕</span> <span id="lblToggleCustom">Gunakan akun Google lain</span>
+      <!-- Action Buttons -->
+      <div class="pt-2 flex items-center justify-between border-t border-white/10">
+        <button onclick="closeFirebaseSetupModal()" type="button" class="text-xs text-slate-400 hover:text-white transition cursor-pointer">
+          Tutup
         </button>
-        <button onclick="closeGoogleAccountPickerModal()" type="button" class="text-slate-400 hover:text-white transition cursor-pointer font-bold">
-          ✕ Batal
+        <button onclick="handleSaveFirebaseConfigFromModal()" type="button"
+          class="px-5 py-2.5 rounded-2xl gold-gradient text-slate-950 font-black text-xs shadow-lg hover:brightness-105 active:scale-95 transition cursor-pointer">
+          💾 Simpan & Aktifkan Firebase
         </button>
       </div>
 
@@ -408,17 +420,18 @@
     // ==========================================
     // INITIALIZATION & SESSION RESTORE
     // ==========================================
-    // INITIALIZATION & SESSION RESTORE
-    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       populateSchoolFilterDropdown();
 
-      // Bind click handler tombol login admin secara langsung
+      // Bind click handler tombol login admin
       const btnLogin = document.getElementById('btnGoogleOwnerLogin');
       if (btnLogin) {
-        btnLogin.addEventListener('click', openGoogleAccountPickerModal);
-        btnLogin.onclick = openGoogleAccountPickerModal;
+        btnLogin.addEventListener('click', handleAdminLoginClick);
+        btnLogin.onclick = handleAdminLoginClick;
       }
+
+      // Inisialisasi Firebase jika config sudah ada
+      initFirebase();
 
       const restored = restoreAdminSession();
       if (restored) {
@@ -430,168 +443,212 @@
     });
 
     // ==========================================
-    // GOOGLE ACCOUNT PICKER MODAL LOGIC
+    // FIREBASE GOOGLE AUTHENTICATION LOGIC
     // ==========================================
-    function getSavedGoogleAccounts() {
+    let firebaseAuth = null;
+    let googleAuthProvider = null;
+
+    function getActiveFirebaseConfig() {
+      // 1. Cek dari window.APP_CONFIG di config.js
+      const appCfg = (window.APP_CONFIG && window.APP_CONFIG.FIREBASE_CONFIG) ? window.APP_CONFIG.FIREBASE_CONFIG : null;
+      if (appCfg && appCfg.apiKey && appCfg.apiKey.trim().length > 5 && appCfg.projectId) {
+        return appCfg;
+      }
+      // 2. Cek dari localStorage (jika user pernah tempel di pop-up modal)
       try {
-        const raw = localStorage.getItem('siguru_registered_google_accounts');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        const localCfg = localStorage.getItem('siguru_firebase_config');
+        if (localCfg) {
+          const parsed = JSON.parse(localCfg);
+          if (parsed && parsed.apiKey && parsed.projectId) return parsed;
         }
       } catch (e) {}
-      const single = localStorage.getItem('siguru_saved_owner_email');
-      return single ? [single] : [];
+      return null;
     }
 
-    function saveGoogleAccount(email) {
-      if (!email || !email.includes('@')) return;
-      const cleanEmail = email.trim().toLowerCase();
-      let accounts = getSavedGoogleAccounts();
-      if (!accounts.includes(cleanEmail)) {
-        accounts.push(cleanEmail);
-        localStorage.setItem('siguru_registered_google_accounts', JSON.stringify(accounts));
+    function isFirebaseConfigured() {
+      return getActiveFirebaseConfig() !== null;
+    }
+
+    function initFirebase() {
+      if (typeof firebase === 'undefined') return false;
+      const cfg = getActiveFirebaseConfig();
+      if (!cfg) return false;
+      try {
+        if (!firebase.apps || !firebase.apps.length) {
+          firebase.initializeApp(cfg);
+        }
+        firebaseAuth = firebase.auth();
+        googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+        googleAuthProvider.setCustomParameters({ prompt: 'select_account' });
+        return true;
+      } catch (err) {
+        console.error('Inisialisasi Firebase gagal:', err);
+        return false;
       }
-      localStorage.setItem('siguru_saved_owner_email', cleanEmail);
     }
 
-    function openGoogleAccountPickerModal(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      const modal = document.getElementById('modalGoogleAccountPicker');
+    function openFirebaseSetupModal() {
+      const modal = document.getElementById('modalFirebaseSetup');
       if (!modal) return;
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       modal.style.display = 'flex';
       modal.style.zIndex = '99999';
-      hideModalStatus();
-      renderGoogleAccountsList();
+
+      const existingCfg = localStorage.getItem('siguru_firebase_config');
+      if (existingCfg) {
+        const inp = document.getElementById('txtFirebaseConfigInput');
+        if (inp && !inp.value) inp.value = existingCfg;
+      }
     }
 
-    function closeGoogleAccountPickerModal() {
-      const modal = document.getElementById('modalGoogleAccountPicker');
+    function closeFirebaseSetupModal() {
+      const modal = document.getElementById('modalFirebaseSetup');
       if (!modal) return;
       modal.classList.add('hidden');
       modal.classList.remove('flex');
       modal.style.display = 'none';
     }
 
-    function renderGoogleAccountsList() {
-      const list = document.getElementById('googleAccountsList');
-      if (!list) return;
+    function handleSaveFirebaseConfigFromModal() {
+      const rawText = document.getElementById('txtFirebaseConfigInput').value.trim();
+      const whitelistEmail = document.getElementById('txtAdminWhitelistEmail').value.trim().toLowerCase();
 
-      const accounts = getSavedGoogleAccounts();
-      let html = '';
-
-      // OPSI 1: Akun Google Aktif di Browser (Auto-Detect Sesi)
-      html += `
-        <div onclick="selectGoogleAccount('ACTIVE_SESSION')"
-          class="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-cyan-500/30 hover:border-cyan-400 transition cursor-pointer flex items-center justify-between gap-3 group">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
-              👤
-            </div>
-            <div class="text-left">
-              <div class="font-bold text-white text-xs">Akun Google Utama (Sesi Aktif di Browser)</div>
-              <div class="text-[11px] text-cyan-300 font-mono">Deteksi Akun Google di Perangkat Ini</div>
-            </div>
-          </div>
-          <span class="text-xs font-bold text-cyan-400 group-hover:translate-x-1 transition">Pilih ➔</span>
-        </div>
-      `;
-
-      // OPSI 2..n: Akun Google yang tersimpan / terdaftar di perangkat
-      accounts.forEach(acc => {
-        html += `
-          <div onclick="selectGoogleAccount('${acc}')"
-            class="p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-amber-500/30 hover:border-amber-400 transition cursor-pointer flex items-center justify-between gap-3 group">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-base group-hover:scale-105 transition">
-                👑
-              </div>
-              <div class="text-left">
-                <div class="font-bold text-white text-xs">${acc}</div>
-                <div class="text-[11px] text-amber-300/80 font-mono">Akun Terdaftar di Perangkat Ini</div>
-              </div>
-            </div>
-            <span class="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition">Pilih ➔</span>
-          </div>
-        `;
-      });
-
-      list.innerHTML = html;
-    }
-
-    function toggleCustomAccountInput() {
-      const box = document.getElementById('boxCustomGoogleAccount');
-      const lbl = document.getElementById('lblToggleCustom');
-      if (!box) return;
-      if (box.classList.contains('hidden')) {
-        box.classList.remove('hidden');
-        if (lbl) lbl.textContent = 'Sembunyikan isian';
-        const inp = document.getElementById('inpModalCustomEmail');
-        if (inp) inp.focus();
-      } else {
-        box.classList.add('hidden');
-        if (lbl) lbl.textContent = 'Gunakan akun Google lain';
-      }
-    }
-
-    function showModalStatus(msg, isSuccess = false) {
-      const box = document.getElementById('modalGoogleStatusMsg');
-      if (!box) return;
-      box.classList.remove('hidden');
-      box.className = isSuccess 
-        ? 'text-center text-xs p-3 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-bold'
-        : 'text-center text-xs p-3 rounded-2xl bg-rose-950/60 border border-rose-500/40 text-rose-300 font-bold';
-      box.innerHTML = msg;
-    }
-
-    function hideModalStatus() {
-      const box = document.getElementById('modalGoogleStatusMsg');
-      if (box) box.classList.add('hidden');
-    }
-
-    async function selectGoogleAccount(accountIdentifier) {
-      const isSession = (accountIdentifier === 'ACTIVE_SESSION');
-      const emailPayload = isSession ? '' : accountIdentifier;
-
-      showModalStatus('⏳ Memverifikasi hak akses dengan Google Spreadsheet...', true);
-      showAdminToast('Memverifikasi akun Google dengan database...', 'info');
-
-      try {
-        const res = await callAdminApi('loginGoogleOwnerAdmin', { email: emailPayload });
-        if (res && res.success) {
-          const verifiedEmail = res.adminEmail || emailPayload || 'Akun Google Pemilik';
-          if (emailPayload) {
-            saveGoogleAccount(emailPayload);
-          } else if (res.adminEmail) {
-            saveGoogleAccount(res.adminEmail);
-          }
-          showModalStatus('✅ Akun Google Terverifikasi! Mengalihkan ke Dashboard...', true);
-          showAdminToast('Login Berhasil! Selamat datang Admin Pemilik.', 'success');
-          setTimeout(() => {
-            closeGoogleAccountPickerModal();
-            handleSuccessfulGoogleLogin(res);
-          }, 600);
-        } else {
-          const errMsg = (res && res.message) ? res.message : 'Akun Google ini tidak terdaftar sebagai pemilik spreadsheet SiGuru SD.';
-          showModalStatus(`⛔ Akses Ditolak: ${errMsg}`, false);
-          showAdminToast('Akses Ditolak: Akun bukan pemilik terdaftar.', 'error');
-        }
-      } catch (err) {
-        showModalStatus('⛔ Gagal menghubungi backend: ' + err.message, false);
-        showAdminToast('Error: ' + err.message, 'error');
-      }
-    }
-
-    async function handleVerifyModalCustomEmail() {
-      const inp = document.getElementById('inpModalCustomEmail');
-      const email = inp ? inp.value.trim().toLowerCase() : '';
-      if (!email || !email.includes('@')) {
-        showModalStatus('Mohon ketikkan alamat email Google yang valid.', false);
+      if (!rawText) {
+        alert('Mohon tempelkan objek firebaseConfig Anda terlebih dahulu.');
         return;
       }
-      selectGoogleAccount(email);
+
+      let parsedConfig = null;
+      try {
+        parsedConfig = JSON.parse(rawText);
+      } catch (e) {
+        try {
+          const extractField = (key) => {
+            const regex = new RegExp(`${key}\\s*:\\s*["']([^"']+)["']`);
+            const match = rawText.match(regex);
+            return match ? match[1] : '';
+          };
+          parsedConfig = {
+            apiKey: extractField('apiKey'),
+            authDomain: extractField('authDomain'),
+            projectId: extractField('projectId'),
+            storageBucket: extractField('storageBucket'),
+            messagingSenderId: extractField('messagingSenderId'),
+            appId: extractField('appId')
+          };
+        } catch (err2) {}
+      }
+
+      if (!parsedConfig || !parsedConfig.apiKey || !parsedConfig.projectId) {
+        alert('Format firebaseConfig tidak valid. Pastikan terdapat properti apiKey dan projectId.');
+        return;
+      }
+
+      localStorage.setItem('siguru_firebase_config', JSON.stringify(parsedConfig));
+
+      if (whitelistEmail && whitelistEmail.includes('@')) {
+        let emails = [];
+        try {
+          emails = JSON.parse(localStorage.getItem('siguru_admin_whitelist_emails') || '[]');
+        } catch (e) {}
+        if (!emails.includes(whitelistEmail)) emails.push(whitelistEmail);
+        localStorage.setItem('siguru_admin_whitelist_emails', JSON.stringify(emails));
+      }
+
+      showAdminToast('Konfigurasi Firebase berhasil disimpan!', 'success');
+      closeFirebaseSetupModal();
+
+      setTimeout(() => {
+        handleAdminLoginClick();
+      }, 400);
+    }
+
+    async function handleAdminLoginClick(e) {
+      if (e && e.preventDefault) e.preventDefault();
+
+      if (!isFirebaseConfigured()) {
+        openFirebaseSetupModal();
+        return;
+      }
+
+      await loginWithFirebaseGoogle();
+    }
+
+    async function loginWithFirebaseGoogle() {
+      const initialized = initFirebase();
+      if (!initialized || !firebaseAuth || !googleAuthProvider) {
+        openFirebaseSetupModal();
+        return;
+      }
+
+      const btn = document.getElementById('btnGoogleOwnerLogin');
+      const btnText = document.getElementById('txtGoogleBtn');
+      const originalText = btnText ? btnText.textContent : 'Masuk dengan Akun Google Administrator';
+
+      if (btnText) btnText.textContent = 'Membuka Jendela Akun Google...';
+      if (btn) btn.disabled = true;
+
+      try {
+        const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
+        const user = result.user;
+        const userEmail = (user.email || '').trim().toLowerCase();
+
+        if (btnText) btnText.textContent = 'Memverifikasi Hak Administrator...';
+
+        // 1. Verifikasi whitelist lokal config & localStorage
+        let allowedEmails = (window.APP_CONFIG && window.APP_CONFIG.AUTHORIZED_ADMIN_EMAILS)
+          ? window.APP_CONFIG.AUTHORIZED_ADMIN_EMAILS.map(x => String(x).trim().toLowerCase())
+          : [];
+        try {
+          const localWh = JSON.parse(localStorage.getItem('siguru_admin_whitelist_emails') || '[]');
+          if (Array.isArray(localWh)) allowedEmails = allowedEmails.concat(localWh);
+        } catch (e) {}
+
+        let isAuthorized = (allowedEmails.length > 0 && allowedEmails.includes(userEmail));
+
+        // 2. Verifikasi ke Google Apps Script backend jika belum lolos whitelist lokal
+        if (!isAuthorized) {
+          try {
+            const gasCheck = await callAdminApi('loginGoogleOwnerAdmin', { email: userEmail });
+            if (gasCheck && gasCheck.success) {
+              isAuthorized = true;
+            }
+          } catch (gasErr) {
+            console.warn('Verifikasi backend GAS:', gasErr);
+          }
+        }
+
+        // 3. Fallback: Jika whitelist belum diisi sama sekali, izinkan akun pertama dan simpan sebagai whitelist
+        if (!isAuthorized && allowedEmails.length === 0) {
+          isAuthorized = true;
+          localStorage.setItem('siguru_admin_whitelist_emails', JSON.stringify([userEmail]));
+        }
+
+        if (isAuthorized) {
+          showAdminToast(`Login Berhasil! Selamat datang, ${user.displayName || userEmail}`, 'success');
+          handleSuccessfulGoogleLogin({
+            adminEmail: userEmail,
+            adminName: user.displayName || 'Administrator Pemilik',
+            photoURL: user.photoURL || ''
+          });
+        } else {
+          await firebaseAuth.signOut();
+          showAdminToast(`Akses Ditolak: Akun (${userEmail}) bukan Administrator terdaftar.`, 'error');
+          alert(`⛔ AKSES DITOLAK!\n\nAkun Google "${userEmail}" terverifikasi asli oleh Google, namun akun ini TIDAK TERDAFTAR sebagai Administrator/Pemilik aplikasi SiGuru SD.\n\nSilakan login kembali dan pilih Akun Google yang terdaftar.`);
+        }
+      } catch (error) {
+        if (error.code === 'auth/popup-closed-by-user') {
+          showAdminToast('Login dibatalkan (jendela ditutup).', 'info');
+        } else if (error.code === 'auth/unauthorized-domain') {
+          alert(`Domain belum diizinkan di Firebase!\n\nBuka Firebase Console -> Authentication -> Settings -> Authorized domains, lalu tambahkan domain ini:\n${window.location.hostname}`);
+        } else {
+          showAdminToast('Error autentikasi: ' + error.message, 'error');
+        }
+      } finally {
+        if (btnText) btnText.textContent = originalText;
+        if (btn) btn.disabled = false;
+      }
     }
 
     async function handleSuccessfulGoogleLogin(authData) {

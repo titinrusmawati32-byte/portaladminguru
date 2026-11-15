@@ -10,6 +10,23 @@ const APP_CONFIG = {
   // 1. Google Apps Script Web App (JSON REST API Backend)
   GAS_API_URL: 'https://script.google.com/macros/s/AKfycbwsVr0J9qSchXl5ltrLdOcZF3aSWEoRiRH5_4lwXSmut92i3AKF7FrpTzjTmARoWAUfCg/exec',
 
+  // 1b. Konfigurasi Firebase Authentication (Google SSO Resmi)
+  // Dapatkan dari Firebase Console -> Project Settings -> General -> Your apps -> Web App
+  FIREBASE_CONFIG: {
+    apiKey: "AIzaSyB2gGUkOn-alsZY5U8XJ468nPySsF5yn7A",
+    authDomain: "portaladmguru-e0689.firebaseapp.com",
+    projectId: "portaladmguru-e0689",
+    storageBucket: "portaladmguru-e0689.firebasestorage.app",
+    messagingSenderId: "1078067835703",
+    appId: "1:1078067835703:web:29e21b31d7e0088bc620b2"
+  },
+
+  // 1c. Daftar Email Google Pemilik/Admin Resmi yang Diberikan Hak Akses
+  // Masukkan alamat Gmail Anda yang memiliki hak akses sebagai administrator
+  AUTHORIZED_ADMIN_EMAILS: [
+    // Contoh: 'adminambulu@gmail.com'
+  ],
+
   // 2. Identitas Platform & Wilayah Operasional
   PLATFORM_NAME: 'SiGuru SD - Kecamatan Ambulu',
   VERSION: '3.2.0-STRICT-AUTH',
