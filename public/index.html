@@ -635,7 +635,7 @@
           </div>
           <div>
             <h3 class="text-xs sm:text-sm font-black text-brand-dark leading-tight">Scanner QR Presensi Siswa</h3>
-            <p class="text-[10px] text-brand-muted">Arahkan kartu ke dalam kotak bidik kamera</p>
+            <p class="text-[10px] text-brand-muted" id="qrScannerActiveDateLabel">Presensi Tanggal: Hari Ini</p>
           </div>
         </div>
         <button onclick="stopQrScanner()" title="Tutup Kamera" class="w-8 h-8 rounded-full bg-[#F0EEF9] hover:bg-rose-100 text-brand-muted hover:text-rose-600 flex items-center justify-center font-bold text-xs transition cursor-pointer">
@@ -1148,6 +1148,7 @@
 
       renderPortal();
       syncBackendData();
+      startAutoSync(); // Aktifkan deteksi sinkronisasi lintas perangkat secara background
 
       showToast(`Berhasil masuk ke ${school.nama}!`, 'success');
 
@@ -1372,7 +1373,7 @@
     }
 
     // ==========================================
-    // AUTO-SYNC STATUS
+    // AUTO-SYNC STATUS & REALTIME CROSS-DEVICE POLLING
     // ==========================================
     let activeModuleKey = null;
     const syncState = {
@@ -1409,10 +1410,11 @@
       }
     }
 
-    async function syncBackendData() {
+    async function syncBackendData(isBackgroundSilent = false) {
       if (!IS_CONNECTED || !currentUser) return false;
       if (syncState.isSyncing) return false;
       syncState.isSyncing = true;
+      if (!isBackgroundSilent) setSyncStatus('syncing', 'Menyinkronkan...');
 
       try {
         const res = await apiGet('getTeacherData', {
@@ -1435,7 +1437,21 @@
 
           syncState.lastSyncTime = new Date();
           setSyncStatus('synced', 'Tersinkronisasi');
-          // PERINGATAN: refreshActiveModuleContent() dinonaktifkan di sini agar form/layar tidak ter-reset sendiri.
+
+          // JIKA BACKGROUND SILENT SYNC: Perbarui tampilan presensi/rekapitulasi jika sedang dibuka
+          if (isBackgroundSilent && activeModuleKey === 'guru-presensi') {
+            const subArea = document.getElementById('presensiSubTabContentArea');
+            if (subArea) {
+              const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+              const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+              if (activePresensiSubTab === 'daily') {
+                renderPresensiHarianSubTab(subArea, actKls, myStudents, selectedPresensiDate);
+              } else if (activePresensiSubTab === 'rekap') {
+                renderPresensiRekapSubTab(subArea, actKls, myStudents);
+              }
+            }
+          }
+
           return true;
         }
       } catch (e) {
@@ -1445,13 +1461,27 @@
       return false;
     }
 
-    // DINONAKTIFKAN TOTAL SESUAI INSTRUKSI:
-    // "jangan buat aplikasi merefresh dengan sendirinya kalau tidak di refresh oleh user."
+    // REALTIME CROSS-DEVICE BACKGROUND CHECK (RINGAN & NON-INTRUSIVE)
+    // Memeriksa nomor versi perubahan di server setiap 8 detik jika tab aktif
+    async function checkRealtimeCrossDeviceUpdates() {
+      if (!IS_CONNECTED || !currentUser || !syncState.isTabActive || syncState.isSyncing) return;
+      try {
+        const res = await apiGet('checkSyncStatus', { clientVersion: syncState.clientVersion });
+        if (res && res.success) {
+          if (res.serverVersion && res.serverVersion > syncState.clientVersion) {
+            syncState.serverVersion = res.serverVersion;
+            syncState.clientVersion = res.serverVersion;
+            // Ada pembaruan dari device lain (misal guru scan di HP, laptop otomatis update)
+            await syncBackendData(true);
+          }
+        }
+      } catch (e) {}
+    }
+
     function startAutoSync() {
-      if (syncState.pollTimer) {
-        clearInterval(syncState.pollTimer);
-        syncState.pollTimer = null;
-      }
+      if (syncState.pollTimer) clearInterval(syncState.pollTimer);
+      // Polling ringan setiap 8 detik untuk deteksi lintas perangkat
+      syncState.pollTimer = setInterval(checkRealtimeCrossDeviceUpdates, 8000);
     }
 
     function stopAutoSync() {
@@ -1460,6 +1490,14 @@
         syncState.pollTimer = null;
       }
     }
+
+    // Deteksi apakah tab sedang aktif / terlihat untuk menghemat kuota
+    document.addEventListener('visibilitychange', () => {
+      syncState.isTabActive = !document.hidden;
+      if (syncState.isTabActive) {
+        checkRealtimeCrossDeviceUpdates();
+      }
+    });
 
     async function manualTriggerSync() {
       showToast('Menyinkronkan data dengan database...', 'info');
@@ -3861,9 +3899,12 @@
     }
 
     // ==========================================
-    // 2. REKAP ABSENSI SISWA (SESUAI TEMPLATE RESMI)
+    // 2. MODUL PRESENSI SISWA (BERDASARKAN TANGGAL & RANGE REKAP)
     // ==========================================
     let activePresensiSubTab = 'daily'; // 'daily' atau 'rekap'
+    let selectedPresensiDate = new Date().toISOString().slice(0, 10);
+    let rekapFilterStartDate = '';
+    let rekapFilterEndDate = '';
 
     function switchPresensiSubTab(tab) {
       activePresensiSubTab = tab;
@@ -3873,8 +3914,50 @@
       }
     }
 
-    function compileRekapAbsensi(actKls, students) {
-      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+    function setPresensiSelectedDate(dateStr) {
+      selectedPresensiDate = dateStr;
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (subArea && activePresensiSubTab === 'daily') {
+        const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+        const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+        renderPresensiHarianSubTab(subArea, actKls, myStudents, selectedPresensiDate);
+      }
+      const labelModal = document.getElementById('qrScannerActiveDateLabel');
+      if (labelModal) {
+        labelModal.textContent = `Presensi Tanggal: ${formatIndonesianDateFull(selectedPresensiDate)}`;
+      }
+    }
+
+    function setPresensiDateOffset(dayOffset) {
+      const cur = new Date(selectedPresensiDate);
+      cur.setDate(cur.getDate() + dayOffset);
+      const newStr = cur.toISOString().slice(0, 10);
+      setPresensiSelectedDate(newStr);
+    }
+
+    function formatIndonesianDateFull(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr + 'T00:00:00');
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function compileRekapAbsensi(actKls, students, startDate = '', endDate = '') {
+      let filteredPresensi = dbData.presensi.filter(p => p.idKelas === activeGuruClassId);
+      if (startDate) {
+        filteredPresensi = filteredPresensi.filter(p => p.tanggal >= startDate);
+      }
+      if (endDate) {
+        filteredPresensi = filteredPresensi.filter(p => p.tanggal <= endDate);
+      }
+
+      // Hitung total hari pertemuan yang tercatat dalam rentang
+      const uniqueRecordedDays = Array.from(new Set(filteredPresensi.map(p => p.tanggal))).sort();
+      let totalPertemuan = uniqueRecordedDays.length;
+      if (totalPertemuan === 0) {
+        totalPertemuan = (!startDate && !endDate) ? (schoolMetaConfig.totalPertemuanAbsensi || 32) : 1;
+      }
 
       let totalSakit = 0;
       let totalIzin = 0;
@@ -3882,13 +3965,13 @@
       let totalHadir = 0;
 
       const rows = students.map((s, idx) => {
-        const sPresensi = dbData.presensi.filter(p => p.idSiswa === s.id && p.idKelas === activeGuruClassId);
+        const sPresensi = filteredPresensi.filter(p => p.idSiswa === s.id);
         let sakit = sPresensi.filter(p => p.statusHadir === 'Sakit').length;
         let izin = sPresensi.filter(p => p.statusHadir === 'Izin').length;
         let alpa = sPresensi.filter(p => p.statusHadir === 'Alfa' || p.statusHadir === 'Alpa').length;
         let hadir = sPresensi.filter(p => p.statusHadir === 'Hadir').length;
 
-        if (sPresensi.length < totalPertemuan) {
+        if ((!startDate && !endDate) && sPresensi.length < totalPertemuan) {
           hadir = Math.max(0, totalPertemuan - (sakit + izin + alpa));
         }
 
@@ -3927,6 +4010,8 @@
 
       return {
         rows: rows,
+        totalPertemuan: totalPertemuan,
+        uniqueRecordedDays: uniqueRecordedDays,
         totals: {
           sakit: totalSakit,
           izin: totalIzin,
@@ -3941,7 +4026,6 @@
     function renderModuleGuruPresensi(c) {
       const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
-      const today = new Date().toISOString().slice(0, 10);
 
       if (myStudents.length === 0) {
         c.innerHTML = `
@@ -3953,7 +4037,7 @@
         return;
       }
 
-      // SUB-NAV TAB SWITCHER: HARIAN vs REKAP SEMESTER
+      // SUB-NAV TAB SWITCHER: HARIAN vs REKAP SEMESTER / RANGE
       c.innerHTML = `
         <div class="space-y-4">
           
@@ -3964,7 +4048,7 @@
             </button>
             <button onclick="switchPresensiSubTab('rekap')"
               class="flex-1 py-2 px-3 rounded-xl font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5 ${activePresensiSubTab === 'rekap' ? 'bg-brand-600 text-white shadow-xs' : 'text-brand-muted hover:text-brand-dark hover:bg-slate-50'}">
-              <span>📊</span> <span>Rekap Absensi Siswa (Template Resmi)</span>
+              <span>📊</span> <span>Rekap Absensi (Per Tanggal / Range)</span>
             </button>
           </div>
 
@@ -3975,45 +4059,138 @@
 
       const subArea = document.getElementById('presensiSubTabContentArea');
       if (activePresensiSubTab === 'daily') {
-        renderPresensiHarianSubTab(subArea, actKls, myStudents, today);
+        renderPresensiHarianSubTab(subArea, actKls, myStudents, selectedPresensiDate);
       } else {
         renderPresensiRekapSubTab(subArea, actKls, myStudents);
       }
     }
 
-    function renderPresensiHarianSubTab(container, actKls, myStudents, today) {
+    function renderPresensiHarianSubTab(container, actKls, myStudents, dateStr) {
+      const todayISO = new Date().toISOString().slice(0, 10);
+      const isToday = dateStr === todayISO;
+      const formattedDateFull = formatIndonesianDateFull(dateStr);
+
+      // Hitung statistik hari terpilih
+      const presentList = myStudents.filter(s => {
+        const pr = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === dateStr);
+        return pr && pr.statusHadir === 'Hadir';
+      });
+      const sickList = myStudents.filter(s => {
+        const pr = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === dateStr);
+        return pr && pr.statusHadir === 'Sakit';
+      });
+      const permitList = myStudents.filter(s => {
+        const pr = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === dateStr);
+        return pr && pr.statusHadir === 'Izin';
+      });
+      const alpaList = myStudents.filter(s => {
+        const pr = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === dateStr);
+        return pr && (pr.statusHadir === 'Alfa' || pr.statusHadir === 'Alpa');
+      });
+
       container.innerHTML = `
-        <div class="space-y-3">
-          <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-violet-100/70 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
-            <div>
-              <span class="font-extrabold text-brand-dark block">Presensi Tanggal: ${today}</span>
-              <span class="text-[10px] text-brand-muted">${actKls ? actKls.namaRombel : '-'} • Kurikulum Merdeka</span>
+        <div class="space-y-3.5">
+          
+          <!-- BILAH NAVIGASI TANGGAL MODERN & INTERAKTIF -->
+          <div class="bg-white p-3.5 sm:p-4 rounded-[26px] border border-violet-100/80 shadow-xs space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2.5">
+              
+              <div class="flex items-center gap-2">
+                <button onclick="setPresensiDateOffset(-1)" title="Hari Sebelumnya"
+                  class="w-9 h-9 rounded-xl bg-violet-50 hover:bg-violet-100 text-brand-700 font-bold flex items-center justify-center transition active:scale-95 cursor-pointer">
+                  ‹
+                </button>
+
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-gradient-to-r from-violet-50/80 to-indigo-50/80 border border-violet-100">
+                  <span class="text-base">📅</span>
+                  <div>
+                    <label for="inputSelectedPresensiDate" class="text-[9px] font-extrabold uppercase tracking-wider text-brand-muted block cursor-pointer">
+                      PILIH TANGGAL PRESENSI
+                    </label>
+                    <input type="date" id="inputSelectedPresensiDate" value="${dateStr}" onchange="setPresensiSelectedDate(this.value)"
+                      class="bg-transparent font-black text-brand-dark text-xs sm:text-sm focus:outline-none cursor-pointer">
+                  </div>
+                </div>
+
+                <button onclick="setPresensiDateOffset(1)" title="Hari Berikutnya"
+                  class="w-9 h-9 rounded-xl bg-violet-50 hover:bg-violet-100 text-brand-700 font-bold flex items-center justify-center transition active:scale-95 cursor-pointer">
+                  ›
+                </button>
+
+                ${!isToday ? `
+                  <button onclick="setPresensiSelectedDate('${todayISO}')"
+                    class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-[11px] transition cursor-pointer">
+                    Hari Ini
+                  </button>
+                ` : ''}
+              </div>
+
+              <!-- Action Toolbar -->
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="confirmOpenQrScannerModal()"
+                  class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-700 hover:to-indigo-700 text-white font-black cursor-pointer shadow-md shadow-brand-500/25 flex items-center gap-2 transition active:scale-95 text-xs">
+                  <span class="text-base leading-none">📷</span> 
+                  <span>Scan QR Presensi</span>
+                </button>
+
+                <button onclick="printKartuQRSiswaA4()"
+                  class="px-3.5 py-2.5 rounded-2xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold cursor-pointer border border-violet-200 shadow-2xs flex items-center gap-1.5 transition text-xs">
+                  <span>🖨️</span> <span>Cetak Kartu QR (A4)</span>
+                </button>
+
+                <button onclick="markAllHadirToday()" 
+                  class="px-3.5 py-2.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold cursor-pointer shadow-2xs transition text-xs flex items-center gap-1">
+                  <span>✓</span> <span>Hadirkan Semua</span>
+                </button>
+              </div>
+
             </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <button onclick="confirmOpenQrScannerModal()"
-                class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-black cursor-pointer shadow-md shadow-brand-500/25 flex items-center gap-1.5 transition active:scale-95">
-                <span>📷</span> <span>Scan QR Presensi</span>
-              </button>
-              <button onclick="printKartuQRSiswaA4()"
-                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold cursor-pointer border border-violet-200 shadow-2xs flex items-center gap-1.5 transition">
-                <span>🖨️</span> <span>Cetak Kartu QR (A4)</span>
-              </button>
-              <button onclick="markAllHadirToday()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold cursor-pointer shadow-2xs transition">
-                ✓ Hadir Semua
-              </button>
+
+            <!-- Detail Tanggal & Indikator Status Kehadiran Hari Terpilih -->
+            <div class="pt-2 border-t border-violet-50 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+              <div class="flex items-center gap-2 font-bold text-brand-dark">
+                <span class="w-2 h-2 rounded-full ${isToday ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}"></span>
+                <span>${formattedDateFull}</span>
+                <span class="text-brand-muted font-normal">• ${actKls ? actKls.namaRombel : '-'}</span>
+              </div>
+
+              <!-- Quick Badges Counter -->
+              <div class="flex items-center gap-2 font-bold">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-100 text-[10px]">
+                  Hadir: <strong>${presentList.length}</strong>
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-100 text-[10px]">
+                  Sakit: <strong>${sickList.length}</strong>
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-100 text-[10px]">
+                  Izin: <strong>${permitList.length}</strong>
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-100 text-[10px]">
+                  Alpa: <strong>${alpaList.length}</strong>
+                </span>
+                <span class="text-brand-muted text-[10px]">
+                  (Total ${myStudents.length} Siswa)
+                </span>
+              </div>
             </div>
+
           </div>
 
+          <!-- DAFTAR SISWA & STATUS KEHADIRAN PER TANGGAL TERPILIH -->
           <div class="space-y-2">
-            ${myStudents.map(s => {
-              const pr = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === today);
+            ${myStudents.map((s, idx) => {
+              const pr = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === dateStr);
               const currentStatus = pr ? pr.statusHadir : 'Belum';
               return `
-                <div class="bg-white p-3 sm:p-3.5 rounded-2xl border border-violet-100/70 flex items-center justify-between text-xs shadow-xs">
-                  <div>
-                    <span class="font-black text-brand-dark block">${s.nama}</span>
-                    <span class="text-[10px] text-brand-muted font-mono">NIS: ${s.nis || '-'} • ${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</span>
+                <div class="bg-white p-3 sm:p-3.5 rounded-2xl border border-violet-100/70 flex items-center justify-between text-xs shadow-xs hover:border-violet-200 transition">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 text-center font-bold text-brand-muted text-[11px]">${idx + 1}</span>
+                    <div>
+                      <span class="font-black text-brand-dark block text-xs sm:text-sm">${s.nama}</span>
+                      <span class="text-[10px] text-brand-muted font-mono">NIS: ${s.nis || '-'} • NISN: ${s.nisn || '-'} • ${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</span>
+                    </div>
                   </div>
+                  
                   <div class="flex items-center gap-1">
                     ${['Hadir', 'Sakit', 'Izin', 'Alfa'].map(st => `
                       <button onclick="recordPresensiGuru('${s.id}', '${s.nama}', '${st}')"
@@ -4022,7 +4199,7 @@
                       </button>
                     `).join('')}
                     <button onclick="printSingleKartuQR('${s.id}')" title="Cetak Kartu QR Siswa"
-                      class="ml-1 w-7 h-7 rounded-full bg-violet-50 hover:bg-violet-100 text-brand-700 flex items-center justify-center font-bold text-xs transition cursor-pointer" title="Cetak Kartu Siswa">
+                      class="ml-1 w-7 h-7 rounded-full bg-violet-50 hover:bg-violet-100 text-brand-700 flex items-center justify-center font-bold text-xs transition cursor-pointer">
                       🪪
                     </button>
                   </div>
@@ -4030,23 +4207,69 @@
               `;
             }).join('')}
           </div>
+
         </div>
       `;
     }
 
     function renderPresensiRekapSubTab(container, actKls, myStudents) {
       const sch = currentSchool || { nama: 'SD Negeri Ambulu', desa: 'Ambulu' };
-      const rekap = compileRekapAbsensi(actKls, myStudents);
-      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+      const rekap = compileRekapAbsensi(actKls, myStudents, rekapFilterStartDate, rekapFilterEndDate);
+      const isFiltered = !!(rekapFilterStartDate || rekapFilterEndDate);
 
       container.innerHTML = `
-        <div class="bg-white rounded-[26px] p-5 border border-violet-100/70 shadow-xs space-y-4">
+        <div class="bg-white rounded-[26px] p-4 sm:p-5 border border-violet-100/70 shadow-xs space-y-4">
           
+          <!-- FILTER RENTANG TANGGAL REKAPITULASI (PER TANGGAL ATAU RANGE) -->
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#F8F7FD] to-[#F1EFFB] border border-violet-100 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="font-extrabold text-xs text-brand-dark flex items-center gap-1.5">
+                <span>🗓️</span> <span>Filter Rentang Waktu Rekapitulasi:</span>
+              </span>
+              ${isFiltered ? `
+                <button onclick="resetRekapDateFilter()" class="text-[11px] text-rose-600 font-bold hover:underline cursor-pointer">
+                  ✕ Reset ke Rekap Semester Penuh
+                </button>
+              ` : ''}
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 text-xs">
+              <div class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-violet-100 shadow-2xs">
+                <span class="text-brand-muted text-[10px] font-bold">Mulai:</span>
+                <input type="date" id="rekapStartDateInput" value="${rekapFilterStartDate}" onchange="applyRekapDateFilter()"
+                  class="text-xs font-bold text-brand-dark focus:outline-none bg-transparent cursor-pointer">
+              </div>
+
+              <div class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-violet-100 shadow-2xs">
+                <span class="text-brand-muted text-[10px] font-bold">Sampai:</span>
+                <input type="date" id="rekapEndDateInput" value="${rekapFilterEndDate}" onchange="applyRekapDateFilter()"
+                  class="text-xs font-bold text-brand-dark focus:outline-none bg-transparent cursor-pointer">
+              </div>
+
+              <button onclick="setRekapQuickFilter('today')"
+                class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-violet-50 text-brand-700 font-bold border border-violet-100 shadow-2xs text-[11px] transition cursor-pointer">
+                Hari Ini Saja
+              </button>
+              <button onclick="setRekapQuickFilter('thisWeek')"
+                class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-violet-50 text-brand-700 font-bold border border-violet-100 shadow-2xs text-[11px] transition cursor-pointer">
+                Minggu Ini
+              </button>
+              <button onclick="setRekapQuickFilter('thisMonth')"
+                class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-violet-50 text-brand-700 font-bold border border-violet-100 shadow-2xs text-[11px] transition cursor-pointer">
+                Bulan Ini
+              </button>
+            </div>
+          </div>
+
           <!-- Toolbar Header Sesuai Template -->
           <div class="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-violet-50 pb-3">
             <div>
-              <h4 class="font-black text-brand-dark text-sm">Rekapitulasi Kehadiran Siswa</h4>
-              <p class="text-[11px] text-brand-muted">Target Semester: <strong>${totalPertemuan} Pertemuan</strong></p>
+              <h4 class="font-black text-brand-dark text-sm">
+                Rekapitulasi Kehadiran Siswa ${isFiltered ? `(${rekapFilterStartDate || 'Awal'} s.d. ${rekapFilterEndDate || 'Sekarang'})` : 'Semester'}
+              </h4>
+              <p class="text-[11px] text-brand-muted">
+                Jumlah Hari Pertemuan Terdata: <strong>${rekap.totalPertemuan} Pertemuan</strong> • Kelas: ${actKls ? actKls.namaRombel : '-'}
+              </p>
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
@@ -4116,18 +4339,71 @@
       `;
     }
 
+    function applyRekapDateFilter() {
+      const startEl = document.getElementById('rekapStartDateInput');
+      const endEl = document.getElementById('rekapEndDateInput');
+      rekapFilterStartDate = startEl ? startEl.value : '';
+      rekapFilterEndDate = endEl ? endEl.value : '';
+
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (subArea && activePresensiSubTab === 'rekap') {
+        const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+        const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+        renderPresensiRekapSubTab(subArea, actKls, myStudents);
+      }
+    }
+
+    function resetRekapDateFilter() {
+      rekapFilterStartDate = '';
+      rekapFilterEndDate = '';
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (subArea && activePresensiSubTab === 'rekap') {
+        const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+        const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+        renderPresensiRekapSubTab(subArea, actKls, myStudents);
+      }
+    }
+
+    function setRekapQuickFilter(mode) {
+      const today = new Date();
+      if (mode === 'today') {
+        const iso = today.toISOString().slice(0, 10);
+        rekapFilterStartDate = iso;
+        rekapFilterEndDate = iso;
+      } else if (mode === 'thisWeek') {
+        const first = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+        const last = new Date(first);
+        last.setDate(last.getDate() + 5);
+        rekapFilterStartDate = first.toISOString().slice(0, 10);
+        rekapFilterEndDate = last.toISOString().slice(0, 10);
+      } else if (mode === 'thisMonth') {
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        rekapFilterStartDate = `${y}-${m}-01`;
+        const lastDay = new Date(y, today.getMonth() + 1, 0).getDate();
+        rekapFilterEndDate = `${y}-${m}-${lastDay}`;
+      }
+      const subArea = document.getElementById('presensiSubTabContentArea');
+      if (subArea && activePresensiSubTab === 'rekap') {
+        const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+        const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+        renderPresensiRekapSubTab(subArea, actKls, myStudents);
+      }
+    }
+
     function exportAbsensiToExcel() {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD Negeri Ambulu', npsn: '-' };
       const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
-      const rekap = compileRekapAbsensi(actKls, students);
-      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+      const rekap = compileRekapAbsensi(actKls, students, rekapFilterStartDate, rekapFilterEndDate);
+      const isFiltered = !!(rekapFilterStartDate || rekapFilterEndDate);
+      const periodeLabel = isFiltered ? `Periode ${rekapFilterStartDate || 'Awal'} s.d. ${rekapFilterEndDate || 'Sekarang'}` : 'Semester Ganjil';
 
       let csv = '\uFEFF';
       csv += 'REKAP ABSENSI SISWA,,,,,,,,,\r\n';
       csv += `"${sch.nama}",,,,,,,,,\r\n`;
-      csv += `Mata Pelajaran,:,Tematik,,Total Pertemuan,,${totalPertemuan},,,\r\n`;
-      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,,,,,,\r\n`;
+      csv += `Mata Pelajaran,:,Tematik / Guru Kelas,,Rentang Waktu,:,${periodeLabel},,,\r\n`;
+      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,Total Pertemuan,:,${rekap.totalPertemuan} Pertemuan,,,\r\n`;
       csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,,\r\n`;
       csv += ',,,,,,,,,\r\n';
       csv += 'No,NIS,Nama Siswa,L/P,Sakit,Izin,Alpa,Hadir,% Hadir,Keterangan\r\n';
@@ -4151,7 +4427,8 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}.csv`);
+      const fileNameSuffix = isFiltered ? `${rekapFilterStartDate || 'Awal'}_sd_${rekapFilterEndDate || 'Sekarang'}` : 'Semester';
+      link.setAttribute('download', `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}_${fileNameSuffix}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -4162,18 +4439,19 @@
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
       const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
-      const rekap = compileRekapAbsensi(actKls, students);
-      const totalPertemuan = schoolMetaConfig.totalPertemuanAbsensi || 32;
+      const rekap = compileRekapAbsensi(actKls, students, rekapFilterStartDate, rekapFilterEndDate);
+      const isFiltered = !!(rekapFilterStartDate || rekapFilterEndDate);
+      const periodeStr = isFiltered ? `Periode ${rekapFilterStartDate || 'Awal'} s.d. ${rekapFilterEndDate || 'Sekarang'}` : 'Semester Ganjil';
       const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
       return `
         <div style="font-family: Arial, Helvetica, sans-serif; color: #000; padding: 0; max-width: 100%; margin: 0 auto; line-height: 1.3;">
           
           <div style="text-align: right; font-size: 8pt; color: #666; margin-bottom: 4px;">
-            Dicetak dari Aplikasi Administrasi Guru · DATA RESMI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Halaman 2
+            Dicetak dari Aplikasi Administrasi Guru · DATA RESMI PRESENSI
           </div>
 
-          <!-- KOP SURAT SEKOLAH (PERSIS TEMPLATE PDF) -->
+          <!-- KOP SURAT SEKOLAH -->
           <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 10px;">
             <h2 style="margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${sch.nama}</h2>
             <p style="margin: 3px 0 0; font-size: 8.5pt;">Alamat Sekolah · NPSN: ${sch.npsn || '-'} · Kecamatan Ambulu, Kabupaten Jember</p>
@@ -4182,6 +4460,7 @@
           <!-- JUDUL LAPORAN -->
           <div style="text-align: center; margin-bottom: 10px;">
             <h3 style="margin: 0; font-size: 12pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">REKAP ABSENSI SISWA</h3>
+            <p style="margin: 2px 0 0; font-size: 9pt; color: #333; font-weight: bold;">${periodeStr}</p>
           </div>
 
           <!-- IDENTITAS -->
@@ -4192,7 +4471,7 @@
               <td style="width: 35%; border: none; padding: 2px 0;">Tematik / Guru Kelas</td>
               <td style="width: 18%; font-weight: bold; border: none; padding: 2px 0;">Total Pertemuan</td>
               <td style="width: 2%; border: none; padding: 2px 0;">:</td>
-              <td style="width: 25%; font-weight: bold; border: none; padding: 2px 0;">${totalPertemuan} pertemuan</td>
+              <td style="width: 25%; font-weight: bold; border: none; padding: 2px 0;">${rekap.totalPertemuan} pertemuan</td>
             </tr>
             <tr>
               <td style="font-weight: bold; border: none; padding: 2px 0;">Guru Pengampu</td>
@@ -4212,7 +4491,7 @@
             </tr>
           </table>
 
-          <!-- TABEL ABSENSI SESUAI TEMPLATE SCREENSHOT 2 -->
+          <!-- TABEL ABSENSI -->
           <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 12px;">
             <thead>
               <tr style="background-color: #1B365D; color: #FFFFFF; text-align: center;">
@@ -4286,13 +4565,13 @@
       executePrintDocument(html, `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`, 'landscape');
     }
 
-    async function recordPresensiGuru(sId, sNama, status) {
-      const today = new Date().toISOString().slice(0, 10);
+    async function recordPresensiGuru(sId, sNama, status, customDate = null) {
+      const targetDate = customDate || selectedPresensiDate || new Date().toISOString().slice(0, 10);
       const actKls = dbData.kelas.find(c => c.id === activeGuruClassId);
       const kNama = actKls ? actKls.namaRombel : 'Kelas IV-A';
-      const pId = 'PRS-' + sId + '-' + today;
+      const pId = 'PRS-' + sId + '-' + targetDate;
 
-      let existing = dbData.presensi.find(p => p.idSiswa === sId && p.tanggal === today);
+      let existing = dbData.presensi.find(p => p.idSiswa === sId && p.tanggal === targetDate);
       if (existing) {
         existing.statusHadir = status;
         existing.namaSiswa = sNama;
@@ -4300,7 +4579,7 @@
       } else {
         dbData.presensi.push({
           id: pId,
-          tanggal: today,
+          tanggal: targetDate,
           idKelas: activeGuruClassId,
           namaKelas: kNama,
           idSiswa: sId,
@@ -4313,23 +4592,26 @@
       const subArea = document.getElementById('presensiSubTabContentArea');
       if (subArea && activePresensiSubTab === 'daily') {
         const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
-        renderPresensiHarianSubTab(subArea, actKls, myStudents, today);
+        renderPresensiHarianSubTab(subArea, actKls, myStudents, targetDate);
+      } else if (subArea && activePresensiSubTab === 'rekap') {
+        const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+        renderPresensiRekapSubTab(subArea, actKls, myStudents);
       }
 
       // Kirim data ke backend Google Apps Script / Google Sheets
       await executeDbWrite('updatePresensi', {
         id: existing ? existing.id : pId,
-        tanggal: today,
+        tanggal: targetDate,
         idKelas: activeGuruClassId,
         namaKelas: kNama,
         idSiswa: sId,
         namaSiswa: sNama,
         statusHadir: status
-      }, `Presensi ${sNama}: ${status}.`);
+      }, `Presensi ${sNama} (${targetDate}): ${status}.`);
     }
 
     async function markAllHadirToday() {
-      const today = new Date().toISOString().slice(0, 10);
+      const targetDate = selectedPresensiDate || new Date().toISOString().slice(0, 10);
       const actKls = dbData.kelas.find(c => c.id === activeGuruClassId);
       const kNama = actKls ? actKls.namaRombel : 'Kelas IV-A';
       const siswaList = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
@@ -4340,14 +4622,14 @@
       }
 
       const records = siswaList.map(s => {
-        const pId = 'PRS-' + s.id + '-' + today;
-        let existing = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === today);
+        const pId = 'PRS-' + s.id + '-' + targetDate;
+        let existing = dbData.presensi.find(p => p.idSiswa === s.id && p.tanggal === targetDate);
         if (existing) {
           existing.statusHadir = 'Hadir';
         } else {
           dbData.presensi.push({
             id: pId,
-            tanggal: today,
+            tanggal: targetDate,
             idKelas: activeGuruClassId,
             namaKelas: kNama,
             idSiswa: s.id,
@@ -4357,7 +4639,7 @@
         }
         return {
           id: pId,
-          tanggal: today,
+          tanggal: targetDate,
           idKelas: activeGuruClassId,
           namaKelas: kNama,
           idSiswa: s.id,
@@ -4368,12 +4650,14 @@
 
       const subArea = document.getElementById('presensiSubTabContentArea');
       if (subArea && activePresensiSubTab === 'daily') {
-        renderPresensiHarianSubTab(subArea, actKls, siswaList, today);
+        renderPresensiHarianSubTab(subArea, actKls, siswaList, targetDate);
+      } else if (subArea && activePresensiSubTab === 'rekap') {
+        renderPresensiRekapSubTab(subArea, actKls, siswaList);
       }
 
       await executeDbWrite('batchUpdatePresensi', { 
         records: records, 
-        tanggal: today,
+        tanggal: targetDate,
         idKelas: activeGuruClassId,
         namaKelas: kNama
       }, `Presensi ${siswaList.length} siswa berhasil disimpan: Hadir.`);
@@ -4388,7 +4672,33 @@
     let lastScannedData = null;
     let lastScannedTimestamp = 0;
 
-    // 1. Audio Beep Web Audio API (Zero Latency & 100% Offline)
+    // 1. Audio Beep & Speech Synthesis Suara Jernih "[Nama Siswa] Hadir"
+    function speakAttendanceSuccess(namaSiswa) {
+      try {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel(); // Batalkan audio yang sedang antre agar tidak tumpang tindih
+
+        // Ambil nama panggilan / nama depan agar ucapan padat dan jelas (contoh: "Herman Hadir")
+        const cleanName = (namaSiswa || 'Siswa').trim().split(/\s+/)[0];
+        const speechText = `${cleanName} hadir`;
+
+        const utter = new SpeechSynthesisUtterance(speechText);
+        utter.lang = 'id-ID';
+        utter.rate = 1.05; // Sedikit lebih cepat agar tanggap
+        utter.pitch = 1.1; // Nada bersahabat dan jelas
+        utter.volume = 1.0;
+
+        // Pilih voice bahasa Indonesia jika tersedia di sistem HP / OS laptop
+        const voices = window.speechSynthesis.getVoices();
+        const idVoice = voices.find(v => v.lang === 'id-ID' || v.lang.startsWith('id'));
+        if (idVoice) utter.voice = idVoice;
+
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        console.warn('Speech synthesis audio error:', e);
+      }
+    }
+
     function playBeepSound(type = 'success') {
       try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -4606,6 +4916,7 @@
       if (student) {
         // SUKSES TERDETEKSI SECARA RESPONSIF!
         playBeepSound('success');
+        speakAttendanceSuccess(student.nama); // Bunyikan suara jernih: "[Nama Siswa] Hadir"
 
         const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         updateQrScanBanner(`
@@ -4624,7 +4935,7 @@
         `, 'success');
 
         // Rekam kehadiran ke database secara langsung (non-blocking ke Google Sheets)
-        recordPresensiGuru(student.id, student.nama, 'Hadir');
+        recordPresensiGuru(student.id, student.nama, 'Hadir', selectedPresensiDate);
       } else {
         // Cek apakah siswa terdaftar di sekolah tetapi kelas lain
         const otherStudent = dbData.siswa.find(s => s.id === rawText || (s.nis && rawText.includes(s.nis)) || (s.nisn && rawText.includes(s.nisn)));
@@ -5584,6 +5895,8 @@
       if (!restored) {
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('mainApp').style.display = 'none';
+      } else {
+        startAutoSync(); // Aktifkan sinkronisasi lintas perangkat jika sesi guru aktif
       }
 
       window.addEventListener('online', () => {

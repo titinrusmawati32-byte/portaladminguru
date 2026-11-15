@@ -17,7 +17,7 @@ echo.
 
 echo [3/4] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Update presensi QR Code responsif, izin kamera, dan cetak kartu siswa CR80
+if "%commit_msg%"=="" set commit_msg=Fitur presensi tanggal fleksibel, audio hadir jernih, filter rekap range, dan sinkronisasi realtime multi-device
 
 git commit -m "%commit_msg%"
 echo.
