@@ -17,7 +17,7 @@ echo.
 
 echo [3/5] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Pembaruan SiGuru SD Digital
+if "%commit_msg%"=="" set commit_msg=Fix: Anti-Bentrok Popup Firebase dan Auto-Redirect Fallback Login Google Admin
 
 git commit -m "%commit_msg%"
 echo.

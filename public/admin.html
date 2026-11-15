@@ -423,15 +423,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       populateSchoolFilterDropdown();
 
-      // Bind click handler tombol login admin
-      const btnLogin = document.getElementById('btnGoogleOwnerLogin');
-      if (btnLogin) {
-        btnLogin.addEventListener('click', handleAdminLoginClick);
-        btnLogin.onclick = handleAdminLoginClick;
-      }
-
-      // Inisialisasi Firebase jika config sudah ada
-      initFirebase();
+      // Cek apakah halaman kembali dari alur redirect login Google
+      checkRedirectLoginResult();
 
       const restored = restoreAdminSession();
       if (restored) {
@@ -447,6 +440,7 @@
     // ==========================================
     let firebaseAuth = null;
     let googleAuthProvider = null;
+    let isAuthInProgress = false;
 
     function getActiveFirebaseConfig() {
       // 1. Cek dari window.APP_CONFIG di config.js
@@ -484,6 +478,20 @@
       } catch (err) {
         console.error('Inisialisasi Firebase gagal:', err);
         return false;
+      }
+    }
+
+    async function checkRedirectLoginResult() {
+      if (!isFirebaseConfigured()) return;
+      if (!initFirebase()) return;
+
+      try {
+        const result = await firebaseAuth.getRedirectResult();
+        if (result && result.user) {
+          await processAuthorizedUser(result.user);
+        }
+      } catch (err) {
+        console.warn('Redirect result check:', err);
       }
     }
 
@@ -565,14 +573,25 @@
     }
 
     async function handleAdminLoginClick(e) {
-      if (e && e.preventDefault) e.preventDefault();
-
-      if (!isFirebaseConfigured()) {
-        openFirebaseSetupModal();
-        return;
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
       }
+      if (isAuthInProgress) return;
+      isAuthInProgress = true;
 
-      await loginWithFirebaseGoogle();
+      try {
+        if (!isFirebaseConfigured()) {
+          openFirebaseSetupModal();
+          return;
+        }
+
+        await loginWithFirebaseGoogle();
+      } finally {
+        setTimeout(() => {
+          isAuthInProgress = false;
+        }, 1200);
+      }
     }
 
     async function loginWithFirebaseGoogle() {
@@ -584,62 +603,32 @@
 
       const btn = document.getElementById('btnGoogleOwnerLogin');
       const btnText = document.getElementById('txtGoogleBtn');
-      const originalText = btnText ? btnText.textContent : 'Masuk dengan Akun Google Administrator';
+      const originalText = 'Masuk dengan Akun Google Administrator';
 
       if (btnText) btnText.textContent = 'Membuka Jendela Akun Google...';
       if (btn) btn.disabled = true;
 
       try {
         const result = await firebaseAuth.signInWithPopup(googleAuthProvider);
-        const user = result.user;
-        const userEmail = (user.email || '').trim().toLowerCase();
-
-        if (btnText) btnText.textContent = 'Memverifikasi Hak Administrator...';
-
-        // 1. Verifikasi whitelist lokal config & localStorage
-        let allowedEmails = (window.APP_CONFIG && window.APP_CONFIG.AUTHORIZED_ADMIN_EMAILS)
-          ? window.APP_CONFIG.AUTHORIZED_ADMIN_EMAILS.map(x => String(x).trim().toLowerCase())
-          : [];
-        try {
-          const localWh = JSON.parse(localStorage.getItem('siguru_admin_whitelist_emails') || '[]');
-          if (Array.isArray(localWh)) allowedEmails = allowedEmails.concat(localWh);
-        } catch (e) {}
-
-        let isAuthorized = (allowedEmails.length > 0 && allowedEmails.includes(userEmail));
-
-        // 2. Verifikasi ke Google Apps Script backend jika belum lolos whitelist lokal
-        if (!isAuthorized) {
-          try {
-            const gasCheck = await callAdminApi('loginGoogleOwnerAdmin', { email: userEmail });
-            if (gasCheck && gasCheck.success) {
-              isAuthorized = true;
-            }
-          } catch (gasErr) {
-            console.warn('Verifikasi backend GAS:', gasErr);
-          }
-        }
-
-        // 3. Fallback: Jika whitelist belum diisi sama sekali, izinkan akun pertama dan simpan sebagai whitelist
-        if (!isAuthorized && allowedEmails.length === 0) {
-          isAuthorized = true;
-          localStorage.setItem('siguru_admin_whitelist_emails', JSON.stringify([userEmail]));
-        }
-
-        if (isAuthorized) {
-          showAdminToast(`Login Berhasil! Selamat datang, ${user.displayName || userEmail}`, 'success');
-          handleSuccessfulGoogleLogin({
-            adminEmail: userEmail,
-            adminName: user.displayName || 'Administrator Pemilik',
-            photoURL: user.photoURL || ''
-          });
-        } else {
-          await firebaseAuth.signOut();
-          showAdminToast(`Akses Ditolak: Akun (${userEmail}) bukan Administrator terdaftar.`, 'error');
-          alert(`⛔ AKSES DITOLAK!\n\nAkun Google "${userEmail}" terverifikasi asli oleh Google, namun akun ini TIDAK TERDAFTAR sebagai Administrator/Pemilik aplikasi SiGuru SD.\n\nSilakan login kembali dan pilih Akun Google yang terdaftar.`);
+        if (result && result.user) {
+          await processAuthorizedUser(result.user);
         }
       } catch (error) {
-        if (error.code === 'auth/popup-closed-by-user') {
-          showAdminToast('Login dibatalkan (jendela ditutup).', 'info');
+        console.warn('Firebase popup error:', error);
+
+        // Jika browser memblokir pop-up atau jendela bentrok, fallback otomatis ke Google Redirect
+        if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+          showAdminToast('Pop-up terhalang browser, mengalihkan otomatis ke login Google...', 'info');
+          if (btnText) btnText.textContent = 'Mengalihkan ke Login Google...';
+          try {
+            await firebaseAuth.signInWithRedirect(googleAuthProvider);
+            return;
+          } catch (redirErr) {
+            console.error('Redirect login error:', redirErr);
+            showAdminToast('Gagal mengalihkan: ' + redirErr.message, 'error');
+          }
+        } else if (error.code === 'auth/popup-closed-by-user') {
+          showAdminToast('Login dibatalkan (jendela Google ditutup).', 'info');
         } else if (error.code === 'auth/unauthorized-domain') {
           alert(`Domain belum diizinkan di Firebase!\n\nBuka Firebase Console -> Authentication -> Settings -> Authorized domains, lalu tambahkan domain ini:\n${window.location.hostname}`);
         } else {
@@ -648,6 +637,55 @@
       } finally {
         if (btnText) btnText.textContent = originalText;
         if (btn) btn.disabled = false;
+      }
+    }
+
+    async function processAuthorizedUser(user) {
+      const userEmail = (user.email || '').trim().toLowerCase();
+
+      const btnText = document.getElementById('txtGoogleBtn');
+      if (btnText) btnText.textContent = 'Memverifikasi Hak Administrator...';
+
+      // 1. Verifikasi whitelist lokal config & localStorage
+      let allowedEmails = (window.APP_CONFIG && window.APP_CONFIG.AUTHORIZED_ADMIN_EMAILS)
+        ? window.APP_CONFIG.AUTHORIZED_ADMIN_EMAILS.map(x => String(x).trim().toLowerCase())
+        : [];
+      try {
+        const localWh = JSON.parse(localStorage.getItem('siguru_admin_whitelist_emails') || '[]');
+        if (Array.isArray(localWh)) allowedEmails = allowedEmails.concat(localWh);
+      } catch (e) {}
+
+      let isAuthorized = (allowedEmails.length > 0 && allowedEmails.includes(userEmail));
+
+      // 2. Verifikasi ke Google Apps Script backend jika belum lolos whitelist lokal
+      if (!isAuthorized) {
+        try {
+          const gasCheck = await callAdminApi('loginGoogleOwnerAdmin', { email: userEmail });
+          if (gasCheck && gasCheck.success) {
+            isAuthorized = true;
+          }
+        } catch (gasErr) {
+          console.warn('Verifikasi backend GAS:', gasErr);
+        }
+      }
+
+      // 3. Fallback: Jika whitelist belum diisi sama sekali, izinkan akun pertama dan simpan sebagai whitelist
+      if (!isAuthorized && allowedEmails.length === 0) {
+        isAuthorized = true;
+        localStorage.setItem('siguru_admin_whitelist_emails', JSON.stringify([userEmail]));
+      }
+
+      if (isAuthorized) {
+        showAdminToast(`Login Berhasil! Selamat datang, ${user.displayName || userEmail}`, 'success');
+        handleSuccessfulGoogleLogin({
+          adminEmail: userEmail,
+          adminName: user.displayName || 'Administrator Pemilik',
+          photoURL: user.photoURL || ''
+        });
+      } else {
+        await firebaseAuth.signOut();
+        showAdminToast(`Akses Ditolak: Akun (${userEmail}) bukan Administrator terdaftar.`, 'error');
+        alert(`⛔ AKSES DITOLAK!\n\nAkun Google "${userEmail}" terverifikasi asli oleh Google, namun akun ini TIDAK TERDAFTAR sebagai Administrator/Pemilik aplikasi SiGuru SD.\n\nSilakan login kembali dan pilih Akun Google yang terdaftar.`);
       }
     }
 
