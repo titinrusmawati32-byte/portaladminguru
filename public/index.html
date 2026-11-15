@@ -212,19 +212,15 @@
         </p>
       </div>
 
-      <!-- TAB SELECTION: MASUK GURU vs DAFTAR GURU BARU vs VERIFIKASI ADMIN -->
+      <!-- TAB SELECTION: MASUK GURU vs DAFTAR GURU BARU -->
       <div class="w-full max-w-sm bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 flex gap-1 mb-4">
         <button type="button" id="tabBtnLogin" onclick="switchLoginTab('login')"
-          class="flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-brandpurple-900 shadow-md">
+          class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md">
           🔑 Masuk Guru
         </button>
         <button type="button" id="tabBtnRegister" onclick="switchLoginTab('register')"
-          class="flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer text-white hover:bg-white/10">
-          📝 Guru Baru
-        </button>
-        <button type="button" id="tabBtnAdmin" onclick="switchLoginTab('admin')"
-          class="flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer text-yellow-300 hover:bg-white/10">
-          👑 Admin Sekolah
+          class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10">
+          📝 Guru Baru (Daftar)
         </button>
       </div>
 
@@ -346,50 +342,19 @@
           </button>
         </form>
 
-        <!-- 3. TAB PORTAL ADMIN SEKOLAH (VERIFIKASI GURU) -->
-        <form id="formAdminLogin" onsubmit="handleLoginAdmin(event)" class="space-y-3 hidden">
-          <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-[11px] leading-relaxed">
-            👑 <strong>Akses Admin Sekolah:</strong> Digunakan oleh Kepala Sekolah atau Operator untuk memverifikasi pendaftaran guru dan mengelola database lembaga.
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">NPSN Sekolah *</label>
-            <input type="text" id="adminNpsn" required placeholder="Contoh: 20524058" oninput="handleAdminCheckSchoolDebounce()"
-              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold font-mono text-sm focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Kode Unik Sekolah *</label>
-            <input type="text" id="adminKodeUnik" required placeholder="Contoh: SMB04-3918" oninput="handleAdminCheckSchoolDebounce()"
-              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold font-mono text-sm uppercase focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
-          </div>
-
-          <div id="adminSchoolVerifiedBadge" class="hidden p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
-            <span id="adminVerifiedSchoolName">SD Negeri</span>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">PIN Admin Sekolah *</label>
-            <input type="password" id="adminPin" required placeholder="PIN Admin (default: admin123)"
-              class="w-full p-2.5 bg-slate-100 rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-brandpurple-600">
-            <p class="text-[10px] text-slate-400 mt-0.5">PIN default sekolah baru: <code class="text-brandpurple-700 font-bold">admin123</code></p>
-          </div>
-
-          <button type="submit" id="btnAdminSubmit"
-            class="w-full py-3 rounded-2xl bg-gradient-to-r from-brandpurple-900 to-indigo-900 hover:from-purple-950 hover:to-indigo-950 text-yellow-300 font-extrabold text-xs shadow-lg transition active:scale-98 cursor-pointer flex items-center justify-center gap-2">
-            <span>Buka Panel Verifikasi Pendaftaran Guru</span>
-            <span>➔</span>
-          </button>
-        </form>
-
       </div>
 
-      <!-- Quick Helper: Daftar NPSN & Kode Unik Modal Trigger -->
-      <div class="mt-4 flex flex-col items-center gap-1.5 text-center">
+      <!-- Quick Helper: Daftar NPSN & Link ke Portal Admin -->
+      <div class="mt-4 flex flex-col items-center gap-2 text-center">
         <button type="button" onclick="openMasterSchoolDirectoryModal()"
           class="text-xs text-purple-200/90 font-bold hover:text-white hover:underline flex items-center gap-1 cursor-pointer">
           <span>📋</span> <span>Lihat Daftar NPSN & Kode Akses 14 SD Ambulu</span>
         </button>
+        
+        <a href="/admin" class="text-xs text-amber-300 font-extrabold hover:text-amber-200 hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xs cursor-pointer">
+          <span>👑</span> <span>Portal Administrator Platform (/admin) ➔</span>
+        </a>
+
         <span class="text-[10px] text-purple-300/60">Akses murni NPSN & PIN • Terisolasi aman per lembaga</span>
       </div>
 
@@ -584,33 +549,24 @@
     const IS_CONNECTED = !!(window.APP_CONFIG && window.APP_CONFIG.isConnected && window.APP_CONFIG.isConnected());
 
     // ==========================================
-    // TAB LOGIN SWITCHER (MASUK vs DAFTAR vs ADMIN)
+    // TAB LOGIN SWITCHER (MASUK vs DAFTAR)
     // ==========================================
     function switchLoginTab(tab) {
       const btnLogin = document.getElementById('tabBtnLogin');
       const btnReg = document.getElementById('tabBtnRegister');
-      const btnAdmin = document.getElementById('tabBtnAdmin');
       const formLogin = document.getElementById('formTeacherLogin');
       const formReg = document.getElementById('formTeacherRegister');
-      const formAdmin = document.getElementById('formAdminLogin');
-
-      // Reset style tombol
-      [btnLogin, btnReg, btnAdmin].forEach(b => {
-        if (b) b.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer text-white hover:bg-white/10';
-      });
-      [formLogin, formReg, formAdmin].forEach(f => {
-        if (f) f.classList.add('hidden');
-      });
 
       if (tab === 'login') {
-        btnLogin.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
+        btnLogin.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-brandpurple-900 shadow-md';
+        btnReg.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10';
         formLogin.classList.remove('hidden');
-      } else if (tab === 'register') {
-        btnReg.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-emerald-800 shadow-md';
+        formReg.classList.add('hidden');
+      } else {
+        btnReg.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer bg-white text-emerald-800 shadow-md';
+        btnLogin.className = 'flex-1 py-2 px-3 rounded-xl font-extrabold text-xs transition cursor-pointer text-white hover:bg-white/10';
         formReg.classList.remove('hidden');
-      } else if (tab === 'admin') {
-        btnAdmin.className = 'flex-1 py-2 px-2 rounded-xl font-extrabold text-[11px] transition cursor-pointer bg-white text-indigo-950 shadow-md';
-        formAdmin.classList.remove('hidden');
+        formLogin.classList.add('hidden');
       }
     }
 

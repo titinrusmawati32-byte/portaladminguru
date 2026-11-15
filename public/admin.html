@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👑 Admin Portal - SiGuru SD Kecamatan Ambulu</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            adm: {
+              950: '#0B0F19',
+              900: '#111827',
+              800: '#1F2937',
+              700: '#374151',
+              gold: '#F59E0B',
+              goldlight: '#FDE68A',
+              purple: '#6D28D9',
+              purpledark: '#4C1D95'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+    .glass-box {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .gold-gradient {
+      background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+    }
+  </style>
+
+  <!-- Konfigurasi Master -->
+  <script src="/config.js"></script>
+</head>
+<body class="font-sans antialiased flex flex-col justify-between">
+
+  <!-- ============================================================
+       1. SCREEN LOGIN ADMINISTRATOR (/admin)
+       ============================================================ -->
+  <div id="adminLoginScreen" class="flex-1 flex flex-col items-center justify-center p-4 min-h-screen">
+    
+    <div class="w-full max-w-md flex flex-col items-center space-y-6">
+      
+      <!-- Logo & Badge -->
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-400 to-amber-600 flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(245,158,11,0.4)] text-3xl">
+          👑
+        </div>
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-amber-400/20 text-amber-300 border border-amber-400/30">
+            PORTAL ADMINISTRATOR PUSAT
+          </span>
+          <h1 class="text-2xl font-black text-white mt-1">SiGuru SD Digital</h1>
+          <p class="text-xs text-slate-400">Koorwil Pendidikan Kecamatan Ambulu • Jember</p>
+        </div>
+      </div>
+
+      <!-- Card Form Login Admin -->
+      <div class="w-full glass-box rounded-3xl p-6 shadow-2xl space-y-4">
+        <div class="border-b border-white/10 pb-3">
+          <h2 class="text-sm font-extrabold text-white">Login Pengelola Aplikasi</h2>
+          <p class="text-xs text-slate-400">Kelola 14 Satuan Pendidikan, Verifikasi Guru, dan Database</p>
+        </div>
+
+        <form onsubmit="handleAdminLoginSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Username Admin *</label>
+            <div class="relative">
+              <input type="text" id="inpAdminUser" required value="admin" placeholder="admin"
+                class="w-full p-3 bg-slate-900/80 border border-white/15 rounded-2xl text-white font-bold font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <span class="absolute right-3.5 top-3.5 text-slate-400">👤</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Password Admin *</label>
+            <div class="relative">
+              <input type="password" id="inpAdminPass" required value="admin 123" placeholder="admin 123"
+                class="w-full p-3 bg-slate-900/80 border border-white/15 rounded-2xl text-white font-bold font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <span class="absolute right-3.5 top-3.5 text-slate-400">🔒</span>
+            </div>
+          </div>
+
+          <!-- Petunjuk Login Awal -->
+          <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-[11px] text-amber-200 leading-relaxed">
+            💡 <strong>Login Awal:</strong> Username: <code class="bg-amber-400/20 px-1 py-0.5 rounded font-mono font-bold text-amber-300">admin</code> &nbsp;•&nbsp; Password: <code class="bg-amber-400/20 px-1 py-0.5 rounded font-mono font-bold text-amber-300">admin 123</code>
+          </div>
+
+          <button type="submit" id="btnAdminLoginSubmit"
+            class="w-full py-3.5 rounded-2xl gold-gradient text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25 hover:brightness-105 active:scale-98 transition cursor-pointer flex items-center justify-center gap-2">
+            <span>Masuk ke Panel Kontrol Admin</span>
+            <span>➔</span>
+          </button>
+        </form>
+
+        <div class="pt-2 text-center">
+          <a href="/" class="text-[11px] text-slate-400 hover:text-white underline">
+            ← Kembali ke Portal Guru
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       2. DASHBOARD ADMINISTRATOR UTAMA (/admin)
+       ============================================================ -->
+  <div id="adminDashboardScreen" class="hidden flex-1 flex-col w-full min-h-screen">
+    
+    <!-- Top Header -->
+    <header class="w-full glass-box border-b border-white/10 sticky top-0 z-40 px-4 sm:px-8 py-3.5">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+        
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center text-xl font-bold shadow-md">
+            👑
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-sm sm:text-base font-black text-white leading-tight">Panel Administrator SiGuru SD</h2>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                Kecamatan Ambulu
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400">Pengelola 14 Lembaga & Verifikasi Administrasi Guru</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2.5 text-xs">
+          <button onclick="handleTriggerInitSheets()" title="Buat & Verifikasi Semua Sheet Lembaga"
+            class="px-3.5 py-2 rounded-xl bg-indigo-600/40 hover:bg-indigo-600/60 border border-indigo-400/30 text-indigo-200 font-bold transition flex items-center gap-1.5 cursor-pointer">
+            <span>⚡</span> <span class="hidden sm:inline">Periksa 14 Sheet Lembaga</span>
+          </button>
+
+          <a href="/" target="_blank"
+            class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold transition flex items-center gap-1.5 cursor-pointer">
+            <span>🌐</span> <span class="hidden sm:inline">Buka Portal Guru</span>
+          </a>
+
+          <button onclick="handleAdminLogout()"
+            class="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 font-bold transition cursor-pointer">
+            Keluar ✕
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6 flex-1">
+      
+      <!-- 4 Stat Metric Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="glass-box p-4 rounded-3xl border border-white/10 space-y-1">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-bold">
+            <span>Total Satuan Pendidikan</span>
+            <span>🏫</span>
+          </div>
+          <div class="text-2xl font-black text-white" id="statTotalSchools">14</div>
+          <div class="text-[11px] text-slate-400">SD Negeri Resmi Ambulu</div>
+        </div>
+
+        <div class="glass-box p-4 rounded-3xl border border-amber-500/30 bg-amber-500/5 space-y-1">
+          <div class="flex items-center justify-between text-amber-300 text-xs font-bold">
+            <span>Menunggu Verifikasi</span>
+            <span>⏳</span>
+          </div>
+          <div class="text-2xl font-black text-amber-400" id="statTotalPending">0</div>
+          <div class="text-[11px] text-amber-200/80">Permohonan Guru Baru</div>
+        </div>
+
+        <div class="glass-box p-4 rounded-3xl border border-emerald-500/30 bg-emerald-500/5 space-y-1">
+          <div class="flex items-center justify-between text-emerald-300 text-xs font-bold">
+            <span>Guru Terverifikasi (Aktif)</span>
+            <span>👥</span>
+          </div>
+          <div class="text-2xl font-black text-emerald-400" id="statTotalVerified">0</div>
+          <div class="text-[11px] text-emerald-200/80">Siap Mengelola Kelas</div>
+        </div>
+
+        <div class="glass-box p-4 rounded-3xl border border-blue-500/30 bg-blue-500/5 space-y-1">
+          <div class="flex items-center justify-between text-blue-300 text-xs font-bold">
+            <span>Database Multi-Tenant</span>
+            <span>🗄️</span>
+          </div>
+          <div class="text-base font-extrabold text-blue-300 mt-1">Google Sheets Terpusat</div>
+          <div class="text-[11px] text-blue-200/80">Sheet Khusus Per Lembaga</div>
+        </div>
+
+      </div>
+
+      <!-- Filter Sekolah & Tab Navigasi -->
+      <div class="glass-box rounded-3xl p-4 border border-white/10 space-y-4">
+        
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          
+          <!-- Filter Dropdown Sekolah -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-300">Filter Sekolah:</span>
+            <select id="filterSchoolSelect" onchange="renderActiveAdminTabContent()"
+              class="px-3.5 py-2 rounded-2xl bg-slate-900 border border-white/20 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="ALL">Semua 14 SD Negeri (Kecamatan Ambulu)</option>
+            </select>
+          </div>
+
+          <!-- Refresh Data Button -->
+          <button onclick="fetchAllAdminData(true)"
+            class="px-3.5 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition flex items-center gap-1.5 cursor-pointer">
+            <span>🔄</span> <span>Muat Ulang Data</span>
+          </button>
+
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex flex-wrap gap-2 border-t border-white/10 pt-3">
+          <button onclick="switchAdminTab('pending')" id="tabBtnPending"
+            class="px-4 py-2 rounded-2xl font-black text-xs transition cursor-pointer bg-amber-400 text-slate-950 shadow-md">
+            ⏳ Menunggu Verifikasi (<span id="badgePendingCount">0</span>)
+          </button>
+          
+          <button onclick="switchAdminTab('verified')" id="tabBtnVerified"
+            class="px-4 py-2 rounded-2xl font-bold text-xs transition cursor-pointer text-slate-300 hover:bg-white/10">
+            ✅ Guru Terverifikasi (<span id="badgeVerifiedCount">0</span>)
+          </button>
+
+          <button onclick="switchAdminTab('rejected')" id="tabBtnRejected"
+            class="px-4 py-2 rounded-2xl font-bold text-xs transition cursor-pointer text-slate-300 hover:bg-white/10">
+            ✕ Ditolak (<span id="badgeRejectedCount">0</span>)
+          </button>
+
+          <button onclick="switchAdminTab('schools')" id="tabBtnSchools"
+            class="px-4 py-2 rounded-2xl font-bold text-xs transition cursor-pointer text-slate-300 hover:bg-white/10">
+            📁 Direktori 14 Lembaga & Sheet DB
+          </button>
+
+          <button onclick="switchAdminTab('security')" id="tabBtnSecurity"
+            class="px-4 py-2 rounded-2xl font-bold text-xs transition cursor-pointer text-slate-300 hover:bg-white/10">
+            ⚙️ Keamanan Admin
+          </button>
+        </div>
+
+      </div>
+
+      <!-- KONTEN TAB -->
+      <div id="adminTabContentArea" class="space-y-4">
+        <!-- Rendered by JavaScript -->
+      </div>
+
+    </main>
+
+    <!-- Bottom Footer -->
+    <footer class="w-full text-center text-xs text-slate-500 py-6 border-t border-white/5">
+      SiGuru SD • Koorwil Pendidikan Kecamatan Ambulu, Kabupaten Jember • Versi 3.3.0 Strict Admin Gate
+    </footer>
+
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="adminToastContainer" class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Universal Admin Modal -->
+  <div id="adminUniversalModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="glass-box bg-slate-900/95 rounded-3xl max-w-lg w-full p-6 border border-white/20 space-y-4">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="font-extrabold text-sm text-white" id="adminModalTitle">Detail</h3>
+        <button onclick="closeAdminModal()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer">✕</button>
+      </div>
+      <div id="adminModalBody" class="text-xs text-slate-300 space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LOGIC JAVASCRIPT ADMINISTRATOR
+       ============================================================ -->
+  <script>
+    const GAS_URL = (window.APP_CONFIG && window.APP_CONFIG.GAS_API_URL) ? window.APP_CONFIG.GAS_API_URL : '';
+    let currentAdminTab = 'pending';
+    
+    let adminState = {
+      isLoggedIn: false,
+      schools: window.APP_CONFIG ? (window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || []) : [],
+      pendingTeachers: [],
+      verifiedTeachers: [],
+      rejectedTeachers: []
+    };
+
+    // ==========================================
+    // INITIALIZATION & SESSION RESTORE
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      populateSchoolFilterDropdown();
+      const restored = restoreAdminSession();
+      if (restored) {
+        showDashboard();
+        fetchAllAdminData();
+      } else {
+        showLoginScreen();
+      }
+    });
+
+    function showLoginScreen() {
+      document.getElementById('adminLoginScreen').classList.remove('hidden');
+      document.getElementById('adminDashboardScreen').classList.add('hidden');
+      document.getElementById('adminDashboardScreen').classList.remove('flex');
+    }
+
+    function showDashboard() {
+      document.getElementById('adminLoginScreen').classList.add('hidden');
+      document.getElementById('adminDashboardScreen').classList.remove('hidden');
+      document.getElementById('adminDashboardScreen').classList.add('flex');
+    }
+
+    function populateSchoolFilterDropdown() {
+      const sel = document.getElementById('filterSchoolSelect');
+      if (!sel) return;
+      sel.innerHTML = '<option value="ALL">Semua 14 SD Negeri (Kecamatan Ambulu)</option>';
+      adminState.schools.forEach(s => {
+        sel.innerHTML += `<option value="${s.npsn}">${s.nama} (${s.desa}) - ${s.npsn}</option>`;
+      });
+    }
+
+    // ==========================================
+    // ACTION: LOGIN SUBMIT
+    // ==========================================
+    async function handleAdminLoginSubmit(e) {
+      e.preventDefault();
+      const user = document.getElementById('inpAdminUser').value.trim();
+      const pass = document.getElementById('inpAdminPass').value.trim();
+
+      if (!user || !pass) {
+        showAdminToast('Masukkan username dan password admin.', 'warning');
+        return;
+      }
+
+      showAdminToast('Memverifikasi akun Administrator...', 'info');
+
+      try {
+        const res = await callAdminApi('loginSuperAdmin', { username: user, password: pass });
+        if (res && res.success) {
+          adminState.isLoggedIn = true;
+          if (res.schools && res.schools.length > 0) adminState.schools = res.schools;
+          adminState.pendingTeachers = res.pendingTeachers || [];
+          adminState.verifiedTeachers = res.verifiedTeachers || [];
+          adminState.rejectedTeachers = res.rejectedTeachers || [];
+
+          sessionStorage.setItem('siguru_admin_session', JSON.stringify({
+            username: user,
+            role: 'SuperAdmin',
+            time: Date.now()
+          }));
+
+          showAdminToast('Login berhasil! Selamat datang Admin.', 'success');
+          showDashboard();
+          updateMetricsUI();
+          renderActiveAdminTabContent();
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Username atau Password salah.', 'error');
+        }
+      } catch (err) {
+        // Fallback jika API sedang offline: verifikasi lokal untuk kemudahan setup
+        if (user.toLowerCase() === 'admin' && (pass.replace(/\s+/g,'') === 'admin123' || pass === 'admin 123')) {
+          adminState.isLoggedIn = true;
+          sessionStorage.setItem('siguru_admin_session', JSON.stringify({ username: user, role: 'SuperAdmin', time: Date.now() }));
+          showAdminToast('Masuk sebagai Admin.', 'success');
+          showDashboard();
+          fetchAllAdminData();
+        } else {
+          showAdminToast('Gagal menghubungi backend: ' + err.message, 'error');
+        }
+      }
+    }
+
+    function restoreAdminSession() {
+      try {
+        const raw = sessionStorage.getItem('siguru_admin_session');
+        if (!raw) return false;
+        const s = JSON.parse(raw);
+        if (s && s.username === 'admin') {
+          adminState.isLoggedIn = true;
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function handleAdminLogout() {
+      sessionStorage.removeItem('siguru_admin_session');
+      adminState.isLoggedIn = false;
+      showLoginScreen();
+      showAdminToast('Anda telah keluar.', 'info');
+    }
+
+    // ==========================================
+    // API CALLS
+    // ==========================================
+    async function callAdminApi(action, payload = {}) {
+      const res = await fetch('/api/gas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gasUrl: GAS_URL, action: action, payload: payload })
+      });
+      const data = await res.json();
+      return data;
+    }
+
+    async function fetchAllAdminData(isManual = false) {
+      if (isManual) showAdminToast('Memuat ulang data terbaru dari database...', 'info');
+      try {
+        const res = await callAdminApi('getAllTeachersAdmin', {});
+        if (res && res.success) {
+          adminState.pendingTeachers = res.pendingTeachers || [];
+          adminState.verifiedTeachers = res.verifiedTeachers || [];
+          adminState.rejectedTeachers = res.rejectedTeachers || [];
+          if (res.schools && res.schools.length > 0) adminState.schools = res.schools;
+          updateMetricsUI();
+          renderActiveAdminTabContent();
+          if (isManual) showAdminToast('Data terbaru berhasil disinkronkan.', 'success');
+        }
+      } catch (err) {
+        if (isManual) showAdminToast('Gagal memuat data: ' + err.message, 'error');
+      }
+    }
+
+    // ==========================================
+    // UI TAB SWITCHER & RENDERING
+    // ==========================================
+    function switchAdminTab(tab) {
+      currentAdminTab = tab;
+      const tabs = ['pending', 'verified', 'rejected', 'schools', 'security'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (!btn) return;
+        if (t === tab) {
+          btn.className = 'px-4 py-2 rounded-2xl font-black text-xs transition cursor-pointer bg-amber-400 text-slate-950 shadow-md';
+        } else {
+          btn.className = 'px-4 py-2 rounded-2xl font-bold text-xs transition cursor-pointer text-slate-300 hover:bg-white/10';
+        }
+      });
+      renderActiveAdminTabContent();
+    }
+
+    function updateMetricsUI() {
+      document.getElementById('statTotalSchools').textContent = adminState.schools.length || 14;
+      document.getElementById('statTotalPending').textContent = adminState.pendingTeachers.length;
+      document.getElementById('statTotalVerified').textContent = adminState.verifiedTeachers.length;
+      document.getElementById('badgePendingCount').textContent = adminState.pendingTeachers.length;
+      document.getElementById('badgeVerifiedCount').textContent = adminState.verifiedTeachers.length;
+      document.getElementById('badgeRejectedCount').textContent = adminState.rejectedTeachers.length;
+    }
+
+    function getFilteredList(list) {
+      const filterNpsn = document.getElementById('filterSchoolSelect') ? document.getElementById('filterSchoolSelect').value : 'ALL';
+      if (!filterNpsn || filterNpsn === 'ALL') return list;
+      return list.filter(item => String(item.npsn).trim() === filterNpsn);
+    }
+
+    function renderActiveAdminTabContent() {
+      const container = document.getElementById('adminTabContentArea');
+      if (!container) return;
+
+      if (currentAdminTab === 'pending') {
+        const list = getFilteredList(adminState.pendingTeachers);
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="glass-box p-12 rounded-3xl text-center space-y-3 border border-white/10">
+              <div class="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-3xl">✓</div>
+              <h4 class="text-base font-extrabold text-white">Tidak Ada Permohonan Tertunda</h4>
+              <p class="text-xs text-slate-400">Seluruh pendaftaran guru telah diverifikasi.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+              <span>Menampilkan ${list.length} guru menunggu persetujuan</span>
+            </div>
+            ${list.map(t => `
+              <div class="glass-box p-5 rounded-3xl border border-amber-500/30 bg-amber-500/5 flex flex-wrap items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base font-black text-white">${t.nama}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950">Menunggu Verifikasi</span>
+                  </div>
+                  <div class="text-xs text-slate-300 font-medium">
+                    🏫 <strong class="text-white">${t.namaSekolah || 'SD Negeri'}</strong> (NPSN: ${t.npsn})
+                  </div>
+                  <div class="text-xs text-slate-400 font-mono">
+                    NIP: ${t.nip || '-'} • WA: <a href="https://wa.me/62${(t.noHp || '').replace(/^0/,'')}" target="_blank" class="text-emerald-400 font-bold hover:underline">${t.noHp}</a>
+                    • Jabatan: <strong class="text-slate-200">${t.jabatan}</strong>
+                  </div>
+                  <div class="text-[10px] text-slate-500">Mendaftar pada: ${t.tanggalDaftar || '-'}</div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button onclick="handleApproveTeacher('${t.id}', '${t.npsn}', '${t.nama}')"
+                    class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition cursor-pointer flex items-center gap-1.5">
+                    <span>✓</span> <span>Setujui (Verifikasi)</span>
+                  </button>
+                  <button onclick="handleRejectTeacher('${t.id}', '${t.npsn}', '${t.nama}')"
+                    class="px-4 py-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 font-bold text-xs active:scale-95 transition cursor-pointer">
+                    ✕ Tolak
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (currentAdminTab === 'verified') {
+        const list = getFilteredList(adminState.verifiedTeachers);
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div class="glass-box p-12 rounded-3xl text-center space-y-2 border border-white/10">
+              <h4 class="text-base font-extrabold text-white">Belum Ada Guru Terverifikasi</h4>
+              <p class="text-xs text-slate-400">Pilih sekolah lain atau setujui guru dari tab Menunggu Verifikasi.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="glass-box rounded-3xl border border-white/10 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-white/10 bg-white/5 text-slate-400 font-bold">
+                    <th class="p-4">No</th>
+                    <th class="p-4">Nama Lengkap & NIP</th>
+                    <th class="p-4">Satuan Pendidikan</th>
+                    <th class="p-4">Jabatan</th>
+                    <th class="p-4">Kontak WhatsApp</th>
+                    <th class="p-4 text-right">Tindakan Admin</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  ${list.map((t, idx) => `
+                    <tr class="hover:bg-white/5 transition">
+                      <td class="p-4 text-slate-500 font-mono">${idx + 1}</td>
+                      <td class="p-4">
+                        <div class="font-extrabold text-white text-sm">${t.nama}</div>
+                        <div class="font-mono text-[11px] text-slate-400">${t.nip || 'Non-NIP'}</div>
+                      </td>
+                      <td class="p-4">
+                        <div class="font-bold text-slate-200">${t.namaSekolah}</div>
+                        <div class="font-mono text-[10px] text-slate-400">NPSN: ${t.npsn}</div>
+                      </td>
+                      <td class="p-4 font-semibold text-slate-300">${t.jabatan}</td>
+                      <td class="p-4 font-mono">
+                        <a href="https://wa.me/62${(t.noHp || '').replace(/^0/,'')}" target="_blank" class="text-emerald-400 hover:underline font-bold">
+                          ${t.noHp}
+                        </a>
+                      </td>
+                      <td class="p-4 text-right space-x-2">
+                        <button onclick="handleAdminResetPinPrompt('${t.id}', '${t.npsn}', '${t.nama}')"
+                          class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] cursor-pointer">
+                          🔑 Reset PIN
+                        </button>
+                        <button onclick="handleRejectTeacher('${t.id}', '${t.npsn}', '${t.nama}', 'Nonaktifkan')"
+                          class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-bold text-[11px] cursor-pointer">
+                          Nonaktifkan
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      } else if (currentAdminTab === 'rejected') {
+        const list = getFilteredList(adminState.rejectedTeachers);
+        container.innerHTML = `
+          <div class="space-y-3">
+            ${list.length === 0 ? `
+              <div class="glass-box p-12 rounded-3xl text-center space-y-2 border border-white/10">
+                <p class="text-xs text-slate-400">Tidak ada data pendaftaran yang ditolak.</p>
+              </div>
+            ` : list.map(t => `
+              <div class="glass-box p-4 rounded-3xl border border-rose-500/20 flex items-center justify-between gap-4">
+                <div>
+                  <div class="font-extrabold text-white">${t.nama}</div>
+                  <div class="text-xs text-slate-400">${t.namaSekolah} (NPSN: ${t.npsn}) • ${t.noHp}</div>
+                </div>
+                <button onclick="handleApproveTeacher('${t.id}', '${t.npsn}', '${t.nama}')"
+                  class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs cursor-pointer">
+                  Pulihkan & Setujui ➔
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (currentAdminTab === 'schools') {
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${adminState.schools.map((s, idx) => {
+              const cleanName = (s.nama || '').replace(/[^a-zA-Z0-9]/g, '_');
+              const sheetName = `DB_${s.npsn}_${cleanName}`;
+              const teacherCount = adminState.verifiedTeachers.filter(x => x.npsn === s.npsn).length;
+              const pendingCount = adminState.pendingTeachers.filter(x => x.npsn === s.npsn).length;
+
+              return `
+                <div class="glass-box p-5 rounded-3xl border border-white/10 space-y-3">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">SATUAN PENDIDIKAN #${idx + 1}</span>
+                      <h4 class="font-black text-white text-base leading-tight">${s.nama}</h4>
+                      <p class="text-xs text-slate-400 font-mono">NPSN: <strong class="text-amber-400">${s.npsn}</strong> • Desa ${s.desa}</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-xl bg-amber-400/20 text-amber-300 font-mono font-black text-xs border border-amber-400/30">
+                      ${s.kodeUnik || s.kode}
+                    </span>
+                  </div>
+
+                  <div class="p-3 bg-slate-900/80 rounded-2xl border border-white/5 space-y-1 text-[11px] font-mono">
+                    <div class="text-slate-400">Sheet Tab Database di Google Sheets:</div>
+                    <div class="text-emerald-400 font-bold break-all">${sheetName}</div>
+                  </div>
+
+                  <div class="flex items-center justify-between text-xs pt-1">
+                    <span class="text-slate-300">👥 ${teacherCount} Guru Aktif</span>
+                    ${pendingCount > 0 ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300">⏳ ${pendingCount} Baru</span>` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else if (currentAdminTab === 'security') {
+        container.innerHTML = `
+          <div class="max-w-md mx-auto glass-box rounded-3xl p-6 border border-white/10 space-y-4">
+            <div>
+              <h3 class="font-extrabold text-sm text-white">Ubah Password Administrator</h3>
+              <p class="text-xs text-slate-400">Ganti password default (admin 123) untuk keamanan maksimal.</p>
+            </div>
+
+            <form onsubmit="handleChangePasswordSubmit(event)" class="space-y-3.5 text-xs">
+              <div>
+                <label class="block font-bold text-slate-300 mb-1">Password Baru *</label>
+                <input type="password" id="inpNewAdminPass" required minlength="5" placeholder="Masukkan password baru"
+                  class="w-full p-3 bg-slate-900 border border-white/20 rounded-2xl text-white font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
+              </div>
+
+              <div>
+                <label class="block font-bold text-slate-300 mb-1">Konfirmasi Password Baru *</label>
+                <input type="password" id="inpConfirmAdminPass" required minlength="5" placeholder="Ulangi password baru"
+                  class="w-full p-3 bg-slate-900 border border-white/20 rounded-2xl text-white font-mono focus:outline-none focus:ring-2 focus:ring-amber-500">
+              </div>
+
+              <button type="submit"
+                class="w-full py-3 rounded-2xl gold-gradient text-slate-950 font-black text-xs shadow-md transition cursor-pointer">
+                Simpan Password Baru ➔
+              </button>
+            </form>
+          </div>
+        `;
+      }
+    }
+
+    // ==========================================
+    // ACTIONS: VERIFY / REJECT / RESET PIN
+    // ==========================================
+    async function handleApproveTeacher(teacherId, npsn, teacherName) {
+      if (!confirm(`Setujui pendaftaran guru atas nama "${teacherName}"? Guru langsung dapat login ke aplikasi.`)) return;
+      showAdminToast(`Menyetujui ${teacherName}...`, 'info');
+
+      try {
+        const res = await callAdminApi('verifyTeacherRegistration', {
+          teacherId: teacherId,
+          npsn: npsn,
+          status: 'Terverifikasi',
+          adminName: 'Super Administrator'
+        });
+
+        if (res && res.success) {
+          showAdminToast(`Guru "${teacherName}" telah BERHASIL diverifikasi!`, 'success');
+          fetchAllAdminData();
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Gagal verifikasi.', 'error');
+        }
+      } catch (e) {
+        showAdminToast('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function handleRejectTeacher(teacherId, npsn, teacherName, actionLabel = 'Tolak') {
+      if (!confirm(`${actionLabel} pendaftaran guru "${teacherName}"?`)) return;
+      showAdminToast(`Memproses ${teacherName}...`, 'info');
+
+      try {
+        const res = await callAdminApi('verifyTeacherRegistration', {
+          teacherId: teacherId,
+          npsn: npsn,
+          status: 'Ditolak',
+          adminName: 'Super Administrator'
+        });
+
+        if (res && res.success) {
+          showAdminToast(`Status guru "${teacherName}" diubah menjadi Ditolak.`, 'info');
+          fetchAllAdminData();
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Gagal memproses.', 'error');
+        }
+      } catch (e) {
+        showAdminToast('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function handleAdminResetPinPrompt(teacherId, npsn, teacherName) {
+      const newPin = prompt(`Masukkan PIN baru untuk ${teacherName} (4 - 6 digit):`, '123456');
+      if (!newPin || newPin.trim().length < 4) {
+        if (newPin !== null) showAdminToast('PIN minimal 4 angka.', 'warning');
+        return;
+      }
+
+      showAdminToast('Memperbarui PIN...', 'info');
+      try {
+        const res = await callAdminApi('resetTeacherPinByAdmin', {
+          teacherId: teacherId,
+          npsn: npsn,
+          newPin: newPin.trim()
+        });
+
+        if (res && res.success) {
+          showAdminToast(`PIN ${teacherName} berhasil direset menjadi: ${newPin.trim()}`, 'success');
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Gagal reset PIN.', 'error');
+        }
+      } catch (e) {
+        showAdminToast('Error: ' + e.message, 'error');
+      }
+    }
+
+    async function handleTriggerInitSheets() {
+      if (!confirm('Periksa dan buat otomatis ke-14 Sheet Lembaga di Google Spreadsheet Anda?')) return;
+      showAdminToast('Membuat sheet lembaga di Google Sheets...', 'info');
+      try {
+        const res = await callAdminApi('initAllSheets', {});
+        if (res && res.success) {
+          showAdminToast('14 Sheet Lembaga siap di Google Sheets!', 'success');
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Proses selesai.', 'info');
+        }
+      } catch (e) {
+        showAdminToast('Gagal: ' + e.message, 'error');
+      }
+    }
+
+    async function handleChangePasswordSubmit(e) {
+      e.preventDefault();
+      const p1 = document.getElementById('inpNewAdminPass').value.trim();
+      const p2 = document.getElementById('inpConfirmAdminPass').value.trim();
+
+      if (p1 !== p2) {
+        showAdminToast('Konfirmasi password tidak cocok!', 'error');
+        return;
+      }
+
+      showAdminToast('Menyimpan password baru...', 'info');
+      try {
+        const res = await callAdminApi('changeAdminPassword', { newPassword: p1 });
+        if (res && res.success) {
+          showAdminToast('Password admin berhasil diubah!', 'success');
+          document.getElementById('inpNewAdminPass').value = '';
+          document.getElementById('inpConfirmAdminPass').value = '';
+          switchAdminTab('pending');
+        } else {
+          showAdminToast((res && res.message) ? res.message : 'Gagal mengubah password.', 'error');
+        }
+      } catch (err) {
+        showAdminToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // ==========================================
+    // TOAST NOTIFICATION UTILITY
+    // ==========================================
+    function showAdminToast(msg, type = 'info') {
+      const c = document.getElementById('adminToastContainer');
+      const t = document.createElement('div');
+      const bg = type === 'error' ? 'bg-rose-600' : (type === 'success' ? 'bg-emerald-600' : 'bg-slate-800 border border-white/20');
+      t.className = `${bg} text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 pointer-events-auto transition-all duration-300`;
+      t.innerHTML = `<span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => {
+        t.style.opacity = '0';
+        setTimeout(() => t.remove(), 250);
+      }, 3500);
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminUniversalModal').classList.add('hidden');
+      document.getElementById('adminUniversalModal').classList.remove('flex');
+    }
+  </script>
+</body>
+</html>

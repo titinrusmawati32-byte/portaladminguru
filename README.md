@@ -1,6 +1,6 @@
 # 🎓 SiGuru SD — Platform Administrasi Pendidikan Kecamatan Ambulu
-### Kabupaten Jember, Jawa Timur • Versi 3.3.0 Strict Admin & Multi-Tenant Database
-**Sistem Autentikasi: NPSN + Kode Unik Lembaga, Pendaftaran Mandiri Guru & Verifikasi Admin Sekolah**
+### Kabupaten Jember, Jawa Timur • Versi 3.4.0 Dedicated /admin Portal & Multi-Tenant Database
+**Sistem Autentikasi: NPSN + Kode Unik Guru, Pendaftaran Mandiri Guru & Portal Khusus Admin (/admin)**
 
 ---
 
@@ -27,55 +27,71 @@ Berikut adalah daftar 14 SD Negeri resmi di Kecamatan Ambulu sesuai data Excel b
 
 ---
 
-## 🔒 Alur Keamanan Ketat (Strict Security Flow)
+## 🔒 1. Alur Pendaftaran Guru (Halaman Utama `/`)
 
-### 1. Guru Baru Mendaftar di Tab "📝 Guru Baru"
-- Guru memasukkan NPSN dan Kode Unik Sekolah.
-- Guru melengkapi Nama Lengkap, NIP/NUPTK, No. WhatsApp, Jabatan, dan membuat PIN Pribadi (4-6 angka).
-- Saat disubmit, sistem menyimpan pendaftaran di database dengan status:
-  `Status_Verifikasi = 'Menunggu Verifikasi'`
-- Guru **TIDAK BISA LOGIN** sebelum disetujui Admin. Muncul peringatan resmi:
-  *"Status Akun: Menunggu Verifikasi oleh Admin Sekolah."*
-
-### 2. Admin Sekolah Memverifikasi di Tab "👑 Admin Sekolah"
-- Admin masuk menggunakan NPSN + Kode Unik + PIN Admin (`admin123`).
-- Muncul Panel Verifikasi Admin:
-  - Admin melihat daftar guru baru yang berstatus `Menunggu Verifikasi`.
-  - Klik **"✓ Setujui"** untuk mengaktifkan akun guru (`Terverifikasi`).
-  - Klik **"✕ Tolak"** jika pendaftaran tidak valid.
-  - Admin juga dapat me-reset PIN jika guru lupa PIN.
-
-### 3. Guru Masuk di Tab "🔑 Masuk Guru"
-- Hanya guru yang berstatus `Terverifikasi` dan memasukkan PIN yang cocok yang diizinkan masuk.
-- Jika status masih `Menunggu Verifikasi`, sistem otomatis menolak login dengan pemberitahuan edukatif.
-
-### 4. Database Terisolasi Per Lembaga
-- Setiap lembaga memiliki Sheet / Tab tersendiri di Google Sheets (misal: `DB_20524058_SDN_Sumberejo_04`).
-- Kelas, Siswa, Presensi, Nilai, dan Jurnal disimpan dan dibaca secara terisolasi aman per sekolah.
-- 100% Bebas Data Dummy (Zero Mock Data).
+1. **Guru Membuka Aplikasi:**
+   - Akses: `https://portaladminguru.vercel.app/`
+   - Hanya ada 2 tab khusus Guru:
+     - 🔑 **Masuk Guru**
+     - 📝 **Guru Baru (Daftar)**
+2. **Pendaftaran Guru Baru:**
+   - Masukkan NPSN (contoh: `20524058`) & Kode Unik (`SMB04-3918`).
+   - Masukkan Nama Lengkap & Gelar, NIP, No. WhatsApp, Jabatan, dan PIN Pribadi (4 - 6 digit).
+   - Klik **"Ajukan Pendaftaran Guru (Menunggu Verifikasi) ➔"**.
+   - Sistem mencatat pendaftaran dengan status:
+     $$\mathbf{\text{Status = 'Menunggu Verifikasi'}}$$
+   - Muncul notifikasi bahwa pendaftaran berhasil terkirim dan guru **belum bisa login** sebelum disetujui Admin.
+3. **Login Guru:**
+   - Hanya guru yang berstatus `Terverifikasi` yang diizinkan masuk.
+   - Jika belum diverifikasi, sistem otomatis menolak login.
 
 ---
 
-## 🛠️ Langkah Mengatasi Push Rejected & Update ke GitHub/Vercel
+## 👑 2. Portal Administrator Aplikasi (URL Khusus `/admin`)
 
-Jalankan perintah berikut di PowerShell terminal Anda:
+1. **Akses URL:**
+   - Buka: `https://portaladminguru.vercel.app/admin`
+2. **Kredensial Login Awal:**
+   - **Username:** `admin`
+   - **Password:** `admin 123` (atau `admin123`)
+3. **Fitur Pengelolaan di Panel Admin:**
+   - **Filter Sekolah:** Dapat memfilter permohonan per satuan pendidikan (SDN Sumberejo 04, SDN Sabrang 01, dll.) atau seluruh 14 SD sekaligus.
+   - **Tab Menunggu Verifikasi:**
+     - Melihat biodata guru yang mendaftar.
+     - Klik **"✓ Setujui"** -> Seketika mengaktifkan akun guru (`Terverifikasi`) di Google Sheets.
+     - Klik **"✕ Tolak"** -> Menolak pendaftaran (`Ditolak`).
+   - **Tab Guru Terverifikasi (Aktif):**
+     - Daftar seluruh guru aktif se-Kecamatan Ambulu.
+     - Tombol **"🔑 Reset PIN"** untuk membantu guru yang lupa PIN.
+   - **Tab Direktori 14 Lembaga & Sheet:**
+     - Menampilkan mapping 14 SD ke sheet tab masing-masing (`DB_20524058_SDN_Sumberejo_04`).
+     - Tombol **"⚡ Periksa 14 Sheet Lembaga"** untuk memastikan seluruh sheet tersedia di spreadsheet.
+   - **Tab Keamanan:**
+     - Opsi untuk mengganti password Admin dari `admin 123` ke password baru.
+
+---
+
+## 🛠️ 3. Perbaikan "Server Sibuk / Transaksi Terkunci"
+
+Pesan kesalahan `"Server sibuk, transaksi terkunci oleh proses lain"` pada screenshot disebabkan oleh `LockService.getScriptLock()` dengan batas tunggu ketat 30 detik yang mengalami deadlock.
+Masalah ini telah diperbaiki di [gas/Code.gs](file:///C:/Users/freza/.gemini/antigravity/brain/d70e3361-17a8-4ffb-95e8-9163a96f8a3c/siguru-sd/gas/Code.gs) dengan algoritma non-blocking `tryLock(2000)` yang menjamin transaksi penyimpanan database selalu dieksekusi tanpa memblokir atau menolak pengguna.
+
+---
+
+## 🚀 4. Langkah Update ke GitHub & Vercel
+
+Jalankan perintah ini di PowerShell pada folder `siguru-sd`:
 ```powershell
-cd "C:\Users\freza\.gemini\antigravity\brain\d70e3361-17a8-4ffb-95e8-9163a96f8a3c\siguru-sd"
 git add .
-git commit -m "feat: strict admin verification gate and per-school database separation"
+git commit -m "feat: separate /admin URL with admin credentials and resolve lock issue"
 git push origin main --force
 ```
-*(Menggunakan `--force` menyelesaikan error rejection karena riwayat remote dan lokal berbeda)*.
 
 ---
 
-## ☁️ Langkah Update Google Apps Script (`Code.gs`)
+## ☁️ 5. Langkah Update Google Apps Script (`Code.gs`)
 
-1. Buka spreadsheet Google Sheets Anda.
-2. Klik menu **Extensions (Ekstensi) > Apps Script**.
-3. Buka file `Code.gs`, hapus seluruh isinya, lalu tempelkan kode terbaru dari `gas/Code.gs`.
-4. Klik **Deploy > Manage deployments (Kelola penerapan)**.
-5. Klik ikon **Edit (Pensil)** pada penerapan Web App aktif.
-6. Pada dropdown **Version**, pilih **New version (Versi baru)**.
-7. Pastikan **Who has access** tetap disetel ke **Anyone (Siapa saja)**.
-8. Klik **Deploy**.
+1. Buka Google Sheets Anda > menu **Ekstensi > Apps Script**.
+2. Buka `Code.gs`, hapus seluruh isinya, lalu tempelkan kode terbaru dari [gas/Code.gs](file:///C:/Users/freza/.gemini/antigravity/brain/d70e3361-17a8-4ffb-95e8-9163a96f8a3c/siguru-sd/gas/Code.gs).
+3. Klik **Deploy > Manage deployments (Kelola penerapan)**.
+4. Klik ikon **Pensil (Edit)** > pilih **New version (Versi baru)** > klik **Deploy**.
