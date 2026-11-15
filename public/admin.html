@@ -481,8 +481,13 @@
       document.getElementById('badgePendingCount').textContent = adminState.pendingTeachers.length;
       document.getElementById('badgeVerifiedCount').textContent = adminState.verifiedTeachers.length;
       document.getElementById('badgeRejectedCount').textContent = adminState.rejectedTeachers.length;
+      const validPerangkat = (adminState.perangkatList || []).filter(d => {
+        const url = String(d.linkBerkas || d.urlDrive || '').trim();
+        const id = String(d.id || '').trim();
+        return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) && url.indexOf('sample_modul') === -1 && id.indexOf('DOK-00') !== 0;
+      });
       const bPerangkat = document.getElementById('badgePerangkatCount');
-      if (bPerangkat) bPerangkat.textContent = (adminState.perangkatList || []).length;
+      if (bPerangkat) bPerangkat.textContent = validPerangkat.length;
     }
 
     function getFilteredList(list) {
@@ -628,7 +633,11 @@
           </div>
         `;
       } else if (currentAdminTab === 'perangkat') {
-        const pkgs = adminState.perangkatList || [];
+        const pkgs = (adminState.perangkatList || []).filter(d => {
+          const url = String(d.linkBerkas || d.urlDrive || '').trim();
+          const id = String(d.id || '').trim();
+          return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) && url.indexOf('sample_modul') === -1 && id.indexOf('DOK-00') !== 0;
+        });
         container.innerHTML = `
           <div class="space-y-6">
             
@@ -1000,12 +1009,11 @@
         const res = await callAdminApi('savePerangkatAdmin', payload);
         if (res && res.success) {
           showAdminToast(res.message || 'Perangkat ajar berhasil dipublikasikan!', 'success');
-          if (res.perangkat) {
-            adminState.perangkatList.unshift(res.perangkat);
-          }
-          updateMetricsUI();
-          renderActiveAdminTabContent();
-          fetchAllAdminData();
+          // Kosongkan formulir setelah tersimpan
+          document.getElementById('inpPerangkatJudul').value = '';
+          document.getElementById('inpPerangkatUrlDrive').value = '';
+          document.getElementById('inpPerangkatDeskripsi').value = '';
+          await fetchAllAdminData();
         } else {
           showAdminToast('Gagal mempublikasikan: ' + (res.message || 'Terjadi kesalahan.'), 'error');
         }

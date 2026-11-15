@@ -1059,7 +1059,7 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
               else if (rTipe === 'PRESENSI') myPresensi.push(payload);
               else if (rTipe === 'NILAI') myNilai.push(payload);
               else if (rTipe === 'JURNAL') myJurnal.push(payload);
-              else if (rTipe === 'PERANGKAT') myPerangkat.push(payload);
+              else if (rTipe === 'PERANGKAT' && payload.linkBerkas && payload.linkBerkas.indexOf('http') === 0 && (!payload.id || payload.id.indexOf('DOK-00') !== 0)) myPerangkat.push(payload);
             } catch (errPayload) {}
           }
         }
@@ -1551,28 +1551,96 @@ function deletePerangkatBackend(p) {
 // ============================================================
 function getOrCreatePerangkatAjarSheet(ss) {
   var sheet = ss.getSheetByName('Perangkat_Ajar');
+  var expectedHeaders = [
+    'ID_Perangkat',
+    'Judul',
+    'Kategori_Kelas',
+    'Mata_Pelajaran',
+    'Semester',
+    'Jenis_Dokumen',
+    'URL_Google_Drive',
+    'Deskripsi',
+    'Uploader',
+    'Status_Publikasi',
+    'Waktu_Upload'
+  ];
+
   if (!sheet) {
     sheet = ss.insertSheet('Perangkat_Ajar');
-    var headers = [
-      'ID_Perangkat',
-      'Judul',
-      'Kategori_Kelas',
-      'Mata_Pelajaran',
-      'Semester',
-      'Jenis_Dokumen',
-      'URL_Google_Drive',
-      'Deskripsi',
-      'Uploader',
-      'Status_Publikasi',
-      'Waktu_Upload'
-    ];
-    sheet.appendRow(headers);
-    sheet.getRange(1, 1, 1, headers.length)
+    sheet.appendRow(expectedHeaders);
+    sheet.getRange(1, 1, 1, expectedHeaders.length)
       .setFontWeight('bold')
       .setBackground('#1E293B')
       .setFontColor('#FFFFFF');
     sheet.setFrozenRows(1);
+    return sheet;
   }
+
+  // PEMBERSIHAN OTOMATIS DATA DUMMY & STANDARISASI KOLOM
+  try {
+    var data = sheet.getDataRange().getValues();
+    if (data.length > 0) {
+      var headerFirst = String(data[0][0] || '').trim();
+      // Jika format lama 17 kolom atau header adalah 'ID_Dokumen'
+      if (headerFirst === 'ID_Dokumen' || data[0].length !== expectedHeaders.length) {
+        var validRows = [];
+        for (var i = 1; i < data.length; i++) {
+          var r = data[i];
+          var rId = String(r[0] || '').trim();
+          var foundUrl = '';
+
+          // Telusuri kolom untuk menemukan URL Google Drive yang valid (bukan dummy)
+          for (var c = 0; c < r.length; c++) {
+            var val = String(r[c] || '').trim();
+            if ((val.indexOf('http://') === 0 || val.indexOf('https://') === 0) && val.indexOf('sample_modul') === -1) {
+              foundUrl = val;
+              break;
+            }
+          }
+
+          // Simpan HANYA jika bukan record dummy (bukan DOK-001 s/d DOK-004) dan memiliki URL nyata
+          if (foundUrl && rId.indexOf('DOK-00') !== 0) {
+            validRows.push([
+              rId.indexOf('PRG-') === 0 ? rId : ('PRG-ADM-' + Date.now().toString().slice(-6)),
+              String(r[1] || 'Perangkat Ajar').trim(),
+              String(r[2] || r[3] || 'Semua Kelas').trim(),
+              String(r[3] || r[2] || 'Semua Mapel').trim(),
+              'Semester 1 & 2 (Lengkap)',
+              'Modul Ajar Kurikulum Merdeka',
+              foundUrl,
+              String(r[11] || r[7] || '').trim(),
+              'Admin Koorwil Ambulu',
+              'Aktif',
+              Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss')
+            ]);
+          }
+        }
+
+        // Format ulang sheet dengan header baru 11 kolom
+        sheet.clear();
+        sheet.appendRow(expectedHeaders);
+        sheet.getRange(1, 1, 1, expectedHeaders.length)
+          .setFontWeight('bold')
+          .setBackground('#1E293B')
+          .setFontColor('#FFFFFF');
+        sheet.setFrozenRows(1);
+
+        if (validRows.length > 0) {
+          sheet.getRange(2, 1, validRows.length, expectedHeaders.length).setValues(validRows);
+        }
+      } else {
+        // Jika sudah 11 kolom, hapus baris yang terindikasi dummy (DOK-001..004 atau URL bukan http)
+        for (var d = data.length - 1; d >= 1; d--) {
+          var rowId = String(data[d][0] || '').trim();
+          var rowUrl = String(data[d][6] || '').trim();
+          if (rowId.indexOf('DOK-00') === 0 || (rowUrl.indexOf('http://') !== 0 && rowUrl.indexOf('https://') !== 0) || rowUrl.indexOf('sample_modul') !== -1) {
+            sheet.deleteRow(d + 1);
+          }
+        }
+      }
+    }
+  } catch (cleanErr) {}
+
   return sheet;
 }
 
@@ -1585,10 +1653,16 @@ function getAllPerangkatAdminBackend() {
       var data = sheet.getDataRange().getValues();
       for (var i = 1; i < data.length; i++) {
         var r = data[i];
-        var id = String(r[0]).trim();
-        var judul = String(r[1]).trim();
+        var id = String(r[0] || '').trim();
+        var judul = String(r[1] || '').trim();
+        var urlDrive = String(r[6] || '').trim();
         var status = String(r[9] || 'Aktif').trim();
-        if (id && judul && status !== 'Dihapus') {
+
+        // VALIDASI KETAT: Hanya record nyata dengan URL valid (http/https), bukan dummy DOK-001..004
+        var isValidUrl = (urlDrive.indexOf('http://') === 0 || urlDrive.indexOf('https://') === 0) && urlDrive.indexOf('sample_modul') === -1;
+        var isNotDummy = id.indexOf('DOK-00') !== 0;
+
+        if (id && judul && status !== 'Dihapus' && isValidUrl && isNotDummy) {
           list.push({
             id: id,
             judul: judul,
@@ -1596,8 +1670,8 @@ function getAllPerangkatAdminBackend() {
             mapel: String(r[3] || 'Semua Mapel').trim(),
             semester: String(r[4] || 'Lengkap').trim(),
             jenis: String(r[5] || 'Modul Ajar Kurikulum Merdeka').trim(),
-            urlDrive: String(r[6] || '').trim(),
-            linkBerkas: String(r[6] || '').trim(), // Alias link agar guru langsung buka
+            urlDrive: urlDrive,
+            linkBerkas: urlDrive, // Tautan langsung ke Google Drive
             formatTipe: 'Google Drive',
             deskripsi: String(r[7] || '').trim(),
             uploader: String(r[8] || 'Admin Koorwil Ambulu').trim(),
@@ -1636,7 +1710,7 @@ function savePerangkatAdminBackend(p) {
       return { success: false, message: 'Judul dan URL Google Drive wajib diisi.' };
     }
 
-    // Pastikan format URL valid
+    // Pastikan format URL valid diawali http:// atau https://
     if (urlDrive.indexOf('http://') !== 0 && urlDrive.indexOf('https://') !== 0) {
       urlDrive = 'https://' + urlDrive;
     }
@@ -1670,6 +1744,7 @@ function savePerangkatAdminBackend(p) {
       sheet.appendRow(rowValues);
     }
 
+    SpreadsheetApp.flush();
     logActivity('ADMIN', uploader, 'Admin Pusat', 'PUSAT', 'Upload Perangkat Ajar', 'Judul: ' + judul + ' | URL Drive: ' + urlDrive);
 
     var createdItem = {

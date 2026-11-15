@@ -1841,16 +1841,9 @@
           break;
 
         case 'guru-perangkat':
-          titleEl.textContent = 'Bank Perangkat Ajar & Kurikulum Merdeka';
-          subEl.textContent = 'Akses dan unduh berkas resmi Google Drive yang dibagikan Admin Koorwil Pendidikan';
-          actionEl.innerHTML = `
-            <button onclick="syncBackendData().then(() => renderModuleGuruPerangkat(document.getElementById('moduleContentArea')));" class="bg-emerald-600 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer hover:bg-emerald-700 transition flex items-center gap-1.5 shadow-sm">
-              <span>🔄</span> <span>Muat Ulang Paket</span>
-            </button>
-            <button onclick="openUploadPerangkatModal()" class="bg-sky-600 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer hover:bg-sky-700 transition">
-              + Unggah Mandiri
-            </button>
-          `;
+          titleEl.textContent = 'Perangkat Pembelajaran';
+          subEl.textContent = 'Akses dan unduh berkas resmi Google Drive yang dibagikan Admin';
+          actionEl.innerHTML = '';
           renderModuleGuruPerangkat(contentEl);
           break;
 
@@ -2760,7 +2753,13 @@
     let filterPerangkatKelas = 'ALL';
 
     function renderModuleGuruPerangkat(c) {
-      const allPkgs = dbData.perangkat || [];
+      const allPkgs = (dbData.perangkat || []).filter(d => {
+        // Hanya tampilkan yang memiliki URL Google Drive valid (bukan dummy)
+        const url = String(d.linkBerkas || d.urlDrive || '').trim();
+        const id = String(d.id || '').trim();
+        return (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) && url.indexOf('sample_modul') === -1 && id.indexOf('DOK-00') !== 0;
+      });
+
       const filtered = allPkgs.filter(d => {
         const matchKls = (filterPerangkatKelas === 'ALL') || (d.kategoriKelas === filterPerangkatKelas) || (d.kategoriKelas === 'Semua Kelas');
         const matchText = !filterPerangkatKeyword || 
@@ -2772,21 +2771,12 @@
 
       if (allPkgs.length === 0) {
         c.innerHTML = `
-          <div class="bg-white rounded-3xl p-8 border border-slate-100 text-center space-y-3 soft-card-shadow">
+          <div class="bg-white rounded-3xl p-12 border border-slate-100 text-center space-y-3 soft-card-shadow">
             <div class="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-3xl">📁</div>
-            <h4 class="text-base font-extrabold text-slate-900">Belum Ada Paket Perangkat Ajar</h4>
+            <h4 class="text-base font-extrabold text-slate-900">Belum Ada Perangkat Ajar</h4>
             <p class="text-xs text-slate-500 max-w-md mx-auto">
-              Admin Koorwil Pendidikan Kecamatan Ambulu belum mengunggah paket perangkat pembelajaran, atau silakan klik tombol di bawah untuk memeriksa pembaruan database.
+              Admin Koorwil Pendidikan Kecamatan Ambulu belum mengunggah paket perangkat pembelajaran.
             </p>
-            <div class="pt-2 flex justify-center gap-3">
-              <button onclick="syncBackendData().then(() => renderModuleGuruPerangkat(document.getElementById('moduleContentArea')));"
-                class="px-5 py-2.5 rounded-full bg-emerald-600 text-white font-extrabold text-xs shadow-md hover:bg-emerald-700 cursor-pointer flex items-center gap-1.5">
-                <span>🔄</span> <span>Periksa Pembaruan Database</span>
-              </button>
-              <button onclick="openUploadPerangkatModal()" class="px-5 py-2.5 rounded-full bg-sky-600 text-white font-extrabold text-xs shadow-md hover:bg-sky-700 cursor-pointer">
-                + Unggah Mandiri
-              </button>
-            </div>
           </div>
         `;
         return;
@@ -2795,24 +2785,6 @@
       c.innerHTML = `
         <div class="space-y-4">
           
-          <!-- Banner Pengantar -->
-          <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-200/60 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="text-base">📁</span>
-                <h4 class="text-xs sm:text-sm font-extrabold text-emerald-950">Bank Perangkat Ajar Resmi Koorwil Ambulu</h4>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-600 text-white">Google Drive</span>
-              </div>
-              <p class="text-[11px] text-emerald-800/80 leading-relaxed">
-                Modul Ajar, Prota, Prosem, ATP, CP, dan LKPD Kurikulum Merdeka yang dibagikan Admin Pusat. Cukup klik tombol untuk membuka & mengunduh paket berkas lengkap.
-              </p>
-            </div>
-            <button onclick="syncBackendData().then(() => renderModuleGuruPerangkat(document.getElementById('moduleContentArea')));"
-              class="shrink-0 px-3 py-1.5 rounded-full bg-white border border-emerald-300 text-emerald-800 text-[11px] font-bold hover:bg-emerald-100 transition flex items-center gap-1 cursor-pointer shadow-xs">
-              <span>🔄</span> <span>Sinkronkan</span>
-            </button>
-          </div>
-
           <!-- Filter & Search Bar -->
           <div class="bg-white rounded-2xl p-3 border border-slate-100 soft-card-shadow flex flex-wrap items-center justify-between gap-3 text-xs">
             <div class="flex items-center gap-2 flex-1 min-w-[200px]">
@@ -2919,96 +2891,6 @@
           `).join('')}
         </div>
       `;
-    }
-
-    // ==========================================
-    // UPLOAD PERANGKAT AJAR
-    // ==========================================
-    let selectedUploadFile = null;
-    let selectedUploadBase64 = '';
-    let selectedFormatDoc = 'Word';
-
-    function openUploadPerangkatModal() {
-      const content = `
-        <form onsubmit="handleUploadPerangkatAction(event)" class="space-y-4 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Judul Perangkat Ajar *</label>
-            <input type="text" id="fDocJudul" required placeholder="Contoh: Modul Ajar Matematika Pecahan Kelas IV" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
-              <input type="text" id="fDocMapel" required value="Matematika" class="w-full p-2.5 bg-slate-100 rounded-xl font-bold">
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Durasi / Jam Pembelajaran</label>
-              <input type="text" id="fDocDurasi" value="4 JP" class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-            </div>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Pilih Dokumen (Word / PDF / Excel)</label>
-            <input type="file" id="fDocFile" onchange="handleFilePicked(this)" class="w-full p-2 bg-slate-100 rounded-xl text-xs font-medium">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Tautan Alternatif Google Drive (Opsional)</label>
-            <input type="url" id="fDocLink" placeholder="https://drive.google.com/..." class="w-full p-2.5 bg-slate-100 rounded-xl font-medium">
-          </div>
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
-            <button type="submit" id="btnSubmitUpload" class="px-5 py-2 bg-sky-600 text-white rounded-full font-bold cursor-pointer hover:bg-sky-700">
-              Unggah Dokumen
-            </button>
-          </div>
-        </form>
-      `;
-      openUniversalModal('Unggah Perangkat Pembelajaran', content);
-    }
-
-    function handleFilePicked(input) {
-      if (!input.files || input.files.length === 0) return;
-      selectedUploadFile = input.files[0];
-      const name = selectedUploadFile.name;
-      if (name.endsWith('.docx') || name.endsWith('.doc')) selectedFormatDoc = 'Word';
-      else if (name.endsWith('.pdf')) selectedFormatDoc = 'PDF';
-      else if (name.endsWith('.xlsx') || name.endsWith('.xls')) selectedFormatDoc = 'Excel';
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        selectedUploadBase64 = (e.target.result || '').split(',')[1] || '';
-      };
-      reader.readAsDataURL(selectedUploadFile);
-    }
-
-    async function handleUploadPerangkatAction(e) {
-      e.preventDefault();
-      const judul = document.getElementById('fDocJudul').value.trim();
-      const mapel = document.getElementById('fDocMapel').value.trim();
-      const durasi = document.getElementById('fDocDurasi').value.trim();
-      const link = document.getElementById('fDocLink').value.trim();
-
-      const fileName = selectedUploadFile ? selectedUploadFile.name : `dokumen_${Date.now()}.${selectedFormatDoc.toLowerCase()}`;
-      const fileSize = selectedUploadFile ? (selectedUploadFile.size > 1048576 ? (selectedUploadFile.size / 1048576).toFixed(1) + ' MB' : (selectedUploadFile.size / 1024).toFixed(0) + ' KB') : '0.5 MB';
-
-      const dObj = {
-        id: 'DOK-' + Date.now().toString().slice(-4),
-        judul: judul,
-        mapel: mapel,
-        kategoriKelas: 'Semua Kelas',
-        jenis: 'Modul Ajar',
-        formatTipe: selectedFormatDoc,
-        namaFile: fileName,
-        fileBase64: selectedUploadBase64,
-        ukuranFile: fileSize,
-        durasiJP: durasi || '4 JP',
-        linkBerkas: link || 'https://drive.google.com/',
-        uploader: currentUser ? currentUser.nama : 'Guru SD',
-        statusPublikasi: 'Aktif'
-      };
-
-      dbData.perangkat.unshift(dObj);
-      closeUniversalModal();
-      openModule('guru-perangkat');
-      await executeDbWrite('uploadPerangkat', dObj, 'Dokumen berhasil diunggah!');
     }
 
     // ==========================================
