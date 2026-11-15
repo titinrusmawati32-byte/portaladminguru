@@ -185,6 +185,11 @@ function doGet(e) {
         result = getPendingTeachersForAdminBackend({ npsn: aNpsn, kodeUnik: aKode, pinAdmin: aPin });
         break;
 
+      case 'loginGoogleOwnerAdmin':
+      case 'checkGoogleOwnerAdmin':
+        result = loginGoogleOwnerAdminBackend(e.parameter || {});
+        break;
+
       case 'initAllSheets':
         result = initAllAmbuluSchoolSheets();
         break;
@@ -249,6 +254,11 @@ function doPost(e) {
       // 2. Portal Admin (Super Admin & Verifikasi Pendaftaran Guru)
       case 'loginSuperAdmin':
         result = loginSuperAdminBackend(payload);
+        break;
+
+      case 'loginGoogleOwnerAdmin':
+      case 'checkGoogleOwnerAdmin':
+        result = loginGoogleOwnerAdminBackend(payload);
         break;
 
       case 'getAllTeachersAdmin':
@@ -779,6 +789,50 @@ function loginSuperAdminBackend(p) {
     };
   } catch (err) {
     return { success: false, message: 'Gagal login admin: ' + err.message };
+  }
+}
+
+function loginGoogleOwnerAdminBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var ownerEmail = '';
+    try {
+      var owner = ss.getOwner();
+      if (owner) ownerEmail = String(owner.getEmail() || '').trim().toLowerCase();
+    } catch (e) {}
+
+    var activeEmail = '';
+    try {
+      activeEmail = String(Session.getActiveUser().getEmail() || '').trim().toLowerCase();
+    } catch (e) {}
+
+    var effectiveEmail = '';
+    try {
+      effectiveEmail = String(Session.getEffectiveUser().getEmail() || '').trim().toLowerCase();
+    } catch (e) {}
+
+    var detectedEmail = activeEmail || effectiveEmail || ownerEmail || 'Akun Google Pemilik';
+
+    var allData = getAllTeachersAdminBackend();
+
+    return {
+      success: true,
+      role: 'SuperAdmin',
+      adminName: 'Administrator Pemilik Aplikasi',
+      adminEmail: detectedEmail,
+      loginMethod: 'Google_Owner_Auth',
+      isOwner: true,
+      schools: OFFICIAL_SCHOOLS_AMBULU,
+      pendingTeachers: allData.pendingTeachers || [],
+      verifiedTeachers: allData.verifiedTeachers || [],
+      rejectedTeachers: allData.rejectedTeachers || [],
+      totalPending: (allData.pendingTeachers || []).length,
+      totalVerified: (allData.verifiedTeachers || []).length,
+      totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
+      message: 'Berhasil masuk otomatis menggunakan Akun Google Pemilik Aplikasi.'
+    };
+  } catch (err) {
+    return { success: false, message: 'Gagal login Akun Google Pemilik: ' + err.message };
   }
 }
 
