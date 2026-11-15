@@ -17,7 +17,7 @@ echo.
 
 echo [3/4] Membuat commit perubahan...
 set /p commit_msg="Masukkan pesan commit (tekan Enter untuk default): "
-if "%commit_msg%"=="" set commit_msg=Fix Admin: Hapus Pop-up Google Drive Error, Gunakan Verifikasi API Langsung dan Pilihan Email Google Multi-Akun
+if "%commit_msg%"=="" set commit_msg=Update Admin: Hapus Kolom Input Manual, Terapkan Dialog Pop-up Pemilih Akun Google Resmi
 
 git commit -m "%commit_msg%"
 echo.
