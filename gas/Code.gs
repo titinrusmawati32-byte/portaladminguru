@@ -135,6 +135,11 @@ function doGet(e) {
   try {
     var action = (e && e.parameter && e.parameter.action) ? e.parameter.action : '';
 
+    // Khusus Jendela Pop-up Pemilih Akun Google (Google Account Chooser)
+    if (action === 'authGoogleOwnerWindow') {
+      return renderGoogleOwnerAuthWindow(e);
+    }
+
     switch (action) {
       case 'ping':
         result = {
@@ -792,6 +797,77 @@ function loginSuperAdminBackend(p) {
   }
 }
 
+function renderGoogleOwnerAuthWindow(e) {
+  var ss = getActiveDb();
+  var ownerEmail = '';
+  try {
+    var owner = ss.getOwner();
+    if (owner) ownerEmail = String(owner.getEmail() || '').trim().toLowerCase();
+  } catch (err) {}
+
+  var activeEmail = '';
+  try {
+    activeEmail = String(Session.getActiveUser().getEmail() || '').trim().toLowerCase();
+  } catch (err) {}
+
+  var effectiveEmail = '';
+  try {
+    effectiveEmail = String(Session.getEffectiveUser().getEmail() || '').trim().toLowerCase();
+  } catch (err) {}
+
+  var targetEmail = (activeEmail || effectiveEmail || '').trim().toLowerCase();
+  // Validasi ketat: jika activeEmail terdeteksi dan berbeda dengan ownerEmail, tolak!
+  var isOwner = (ownerEmail && targetEmail && ownerEmail === targetEmail) || (!activeEmail && effectiveEmail === ownerEmail) || (!ownerEmail);
+
+  var html = '';
+  if (isOwner) {
+    html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Autentikasi Google Berhasil</title>' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+      '<style>body{background:#0b0f19;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;padding:16px;box-sizing:border-box;}' +
+      '.box{background:rgba(30,41,59,0.85);padding:32px 24px;border-radius:24px;border:1px solid rgba(16,185,129,0.4);max-width:380px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.6);}' +
+      'h3{color:#34d399;margin-bottom:8px;font-size:18px;}p{color:#94a3b8;font-size:13px;line-height:1.5;}</style></head>' +
+      '<body><div class="box">' +
+      '<div style="font-size:48px;margin-bottom:12px;">✅</div>' +
+      '<h3>Akun Google Terverifikasi!</h3>' +
+      '<p>Akun: <strong style="color:#fff;">' + (targetEmail || 'Pemilik Aplikasi') + '</strong></p>' +
+      '<p style="color:#64748b;font-size:11px;margin-top:8px;">Membuka Dashboard Administrator...</p>' +
+      '</div>' +
+      '<script>' +
+      'var authData = { success: true, email: "' + (targetEmail || ownerEmail) + '", role: "SuperAdmin", isOwner: true };' +
+      'if (window.opener) {' +
+      '  window.opener.postMessage({ type: "SIGURU_GOOGLE_AUTH_SUCCESS", data: authData }, "*");' +
+      '  setTimeout(function(){ window.close(); }, 900);' +
+      '} else {' +
+      '  window.location.href = "/admin";' +
+      '}' +
+      '<\/script></body></html>';
+  } else {
+    html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Akses Ditolak</title>' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+      '<style>body{background:#0b0f19;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;padding:16px;box-sizing:border-box;}' +
+      '.box{background:rgba(30,41,59,0.85);padding:32px 24px;border-radius:24px;border:1px solid rgba(244,63,94,0.4);max-width:380px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,0.6);}' +
+      'h3{color:#fb7185;margin-bottom:8px;font-size:18px;}p{color:#cbd5e1;font-size:13px;line-height:1.5;}' +
+      'button{margin-top:16px;background:#e11d48;color:#fff;border:none;padding:10px 24px;border-radius:12px;font-weight:bold;cursor:pointer;font-size:13px;}' +
+      '</style></head>' +
+      '<body><div class="box">' +
+      '<div style="font-size:48px;margin-bottom:12px;">⛔</div>' +
+      '<h3>Akses Administrator Ditolak</h3>' +
+      '<p>Akun Google (<strong style="color:#f43f5e;">' + targetEmail + '</strong>) tidak terdaftar sebagai pemilik spreadsheet SiGuru SD.</p>' +
+      '<p style="font-size:11px;color:#94a3b8;margin-top:6px;">Hanya akun pemilik yang sah yang diizinkan mengakses panel admin.</p>' +
+      '<button onclick="window.close()">Tutup Jendela</button>' +
+      '</div>' +
+      '<script>' +
+      'if (window.opener) {' +
+      '  window.opener.postMessage({ type: "SIGURU_GOOGLE_AUTH_FAILED", email: "' + targetEmail + '", message: "Akun Google ini tidak terdaftar sebagai Admin." }, "*");' +
+      '  setTimeout(function(){ window.close(); }, 4000);' +
+      '}' +
+      '<\/script></body></html>';
+  }
+
+  return HtmlService.createHtmlOutput(html)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
 function loginGoogleOwnerAdminBackend(p) {
   try {
     var ss = getActiveDb();
@@ -811,7 +887,24 @@ function loginGoogleOwnerAdminBackend(p) {
       effectiveEmail = String(Session.getEffectiveUser().getEmail() || '').trim().toLowerCase();
     } catch (e) {}
 
-    var detectedEmail = activeEmail || effectiveEmail || ownerEmail || 'Akun Google Pemilik';
+    var clientEmail = (p && p.email) ? String(p.email).trim().toLowerCase() : '';
+    var detectedEmail = clientEmail || activeEmail || effectiveEmail || ownerEmail || 'Akun Google Pemilik';
+
+    // Verifikasi ketat: jika email berbeda dengan owner, tolak akses
+    if (ownerEmail && clientEmail && clientEmail !== ownerEmail) {
+      return {
+        success: false,
+        isDenied: true,
+        message: 'Akses Ditolak: Akun Google (' + clientEmail + ') tidak terdaftar sebagai pemilik spreadsheet SiGuru SD.'
+      };
+    }
+    if (ownerEmail && activeEmail && activeEmail !== ownerEmail) {
+      return {
+        success: false,
+        isDenied: true,
+        message: 'Akses Ditolak: Akun Google (' + activeEmail + ') tidak terdaftar sebagai pemilik spreadsheet SiGuru SD.'
+      };
+    }
 
     var allData = getAllTeachersAdminBackend();
 
@@ -829,7 +922,7 @@ function loginGoogleOwnerAdminBackend(p) {
       totalPending: (allData.pendingTeachers || []).length,
       totalVerified: (allData.verifiedTeachers || []).length,
       totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
-      message: 'Berhasil masuk otomatis menggunakan Akun Google Pemilik Aplikasi.'
+      message: 'Berhasil masuk menggunakan Akun Google Pemilik Aplikasi.'
     };
   } catch (err) {
     return { success: false, message: 'Gagal login Akun Google Pemilik: ' + err.message };
