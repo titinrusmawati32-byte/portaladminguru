@@ -2438,46 +2438,8 @@
       const contentEl = document.getElementById('moduleContentArea');
       actionEl.innerHTML = '';
 
-      // Rounded Mini Bar Chart Card (Sesuai Referensi Gambar Screen 2)
-      chartEl.innerHTML = `
-        <div class="bg-white rounded-[26px] p-4 sm:p-5 shadow-xs border border-violet-100/70 space-y-3 animate-fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-xs sm:text-sm font-black text-brand-dark tracking-tight">Statistik Pembelajaran Rombel</h3>
-              <p class="text-[11px] text-brand-muted">Keaktifan peserta didik per tingkatan kelas</p>
-            </div>
-            <span class="px-2.5 py-0.5 rounded-full bg-[#EAE7FB] text-brand-700 font-extrabold text-[11px]">
-              ${currentSchool ? currentSchool.nama : 'SDN'}
-            </span>
-          </div>
-          <div class="flex items-end justify-between gap-2 sm:gap-4 h-20 px-2 sm:px-6 pt-2">
-            <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <div class="w-6 rounded-full bg-[#C4B5FD]" style="height: 65%;"></div>
-              <span class="text-[10px] font-bold text-brand-muted">Kls 1</span>
-            </div>
-            <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <div class="w-6 rounded-full bg-[#A78BFA]" style="height: 75%;"></div>
-              <span class="text-[10px] font-bold text-brand-muted">Kls 2</span>
-            </div>
-            <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <div class="w-6 rounded-full bg-brand-600 shadow-xs" style="height: 95%;"></div>
-              <span class="text-[10px] font-black text-brand-700">Kls 3</span>
-            </div>
-            <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <div class="w-6 rounded-full bg-[#C4B5FD]" style="height: 70%;"></div>
-              <span class="text-[10px] font-bold text-brand-muted">Kls 4</span>
-            </div>
-            <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <div class="w-6 rounded-full bg-[#A78BFA]" style="height: 85%;"></div>
-              <span class="text-[10px] font-bold text-brand-muted">Kls 5</span>
-            </div>
-            <div class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-              <div class="w-6 rounded-full bg-brand-600 shadow-xs" style="height: 90%;"></div>
-              <span class="text-[10px] font-bold text-brand-muted">Kls 6</span>
-            </div>
-          </div>
-        </div>
-      `;
+      // Bersihkan chart container agar tampilan bersih & clean (Opsi D)
+      chartEl.innerHTML = '';
 
       switch (moduleKey) {
         case 'guru-dashboard':
