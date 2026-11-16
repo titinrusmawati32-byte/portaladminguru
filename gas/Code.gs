@@ -471,6 +471,12 @@ function doPost(e) {
         });
         break;
 
+      case 'deleteJadwalTeacher':
+        result = withScriptLock('deleteJadwalTeacher', function () {
+          return deleteJadwalTeacherBackend(payload);
+        });
+        break;
+
       case 'batchRestoreFullData':
         result = withScriptLock('batchRestoreFullData', function () {
           return batchRestoreFullDataBackend(payload);
@@ -853,6 +859,7 @@ function loginTeacherWithPinBackend(p) {
       attendance: teacherData.presensi || [],
       grades: teacherData.nilai || [],
       journals: teacherData.jurnal || [],
+      jadwal: teacherData.jadwal || [],
       perangkat: teacherData.perangkat || [],
       message: 'Selamat datang kembali, ' + matchedTeacher.nama
     };
@@ -1305,8 +1312,8 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
           var rGuru = String(r[2]).trim();
           var jsonStr = String(r[9] || '{}');
 
-          // Filter data milik guru ini (atau seluruh kelas di lembaga jika tanpa filter ketat)
-          if (!uid || rGuru === uid) {
+          // Filter data milik guru ini (atau seluruh kelas/jadwal di lembaga jika tanpa filter ketat)
+          if (!uid || rGuru === uid || !rGuru || rTipe === 'JADWAL') {
             try {
               var payload = JSON.parse(jsonStr);
               if (rTipe === 'KELAS') myKelas.push(payload);
@@ -1395,6 +1402,7 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
       presensi: myPresensi,
       nilai: myNilai,
       jurnal: myJurnal,
+      jadwal: myJadwal,
       perangkat: myPerangkat
     };
   } catch (err) {
@@ -1833,6 +1841,204 @@ function deletePerangkatBackend(p) {
     return { success: true, message: 'Dokumen berhasil dihapus.' };
   } catch (err) {
     return { success: false, message: 'Gagal hapus dokumen: ' + err.message };
+  }
+}
+
+// --- CRUD JADWAL PELAJARAN ---
+function saveJadwalTeacherBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var item = p.jadwal || p;
+    var jId = item.id || ('JDW-' + Date.now().toString().slice(-6));
+    item.id = jId;
+
+    // Jika berstatus dihapus, langsung hapus baris fisik dari sheet
+    if (item.status === 'Dihapus' || item.mapel === 'Dihapus') {
+      if (npsn) {
+        deleteFromSchoolDbSheet(ss, npsn, namaSekolah, jId);
+      }
+      return { success: true, id: jId, message: 'Jadwal berhasil dihapus.' };
+    }
+
+    var ownerUid = (p.ownerUid || p.teacherUid || item.teacherUid || '').trim();
+    var ownerName = (p.ownerName || p.teacherName || item.teacherName || 'Guru').trim();
+    var idKelas = (p.idKelas || item.idKelas || '').trim();
+    var namaKelas = (p.namaKelas || item.namaKelas || '').trim();
+
+    if (npsn) {
+      saveToSchoolDbSheet(
+        ss, npsn, namaSekolah,
+        jId, 'JADWAL',
+        ownerUid, ownerName,
+        idKelas, namaKelas,
+        item.hari || 'Senin',
+        item.mapel || 'Mata Pelajaran',
+        (item.jamMulai || '') + '-' + (item.jamSelesai || ''),
+        item
+      );
+    }
+
+    return { success: true, id: jId, item: item, message: 'Jadwal pelajaran berhasil disimpan.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal simpan jadwal: ' + err.message };
+  }
+}
+
+function deleteJadwalTeacherBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var jId = (p.jadwalId || p.id || (p.jadwal && p.jadwal.id) || '').trim();
+
+    if (!jId) {
+      return { success: false, message: 'ID Jadwal tidak ditemukan.' };
+    }
+
+    if (npsn) {
+      deleteFromSchoolDbSheet(ss, npsn, namaSekolah, jId);
+    }
+
+    return { success: true, message: 'Jadwal pelajaran berhasil dihapus dari database.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal menghapus jadwal: ' + err.message };
+  }
+}
+
+// --- PEMULIHAN CADANGAN DATA PENUH (RESTORE) ---
+function batchRestoreFullDataBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var ownerUid = (p.ownerUid || p.teacherUid || '').trim();
+    var ownerName = (p.ownerName || p.teacherName || 'Guru').trim();
+
+    if (!npsn) {
+      return { success: false, message: 'NPSN sekolah wajib disertakan.' };
+    }
+
+    var restoredCounts = { kelas: 0, siswa: 0, presensi: 0, nilai: 0, jurnal: 0, jadwal: 0 };
+
+    // 1. Pulihkan Kelas
+    if (p.kelas && p.kelas.length > 0) {
+      p.kelas.forEach(function (k) {
+        var kId = k.id || ('KLS-' + Date.now().toString().slice(-6));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          kId, 'KELAS',
+          ownerUid, ownerName,
+          kId, k.namaRombel || 'Kelas',
+          (k.tahunAjaran || '2026/2027') + ' - ' + (k.semester || 'Ganjil'),
+          k.namaRombel || 'Kelas',
+          k.statusKelas || 'Aktif',
+          k
+        );
+        restoredCounts.kelas++;
+      });
+    }
+
+    // 2. Pulihkan Siswa
+    if (p.siswa && p.siswa.length > 0) {
+      p.siswa.forEach(function (s) {
+        var sId = s.id || ('SIS-' + Date.now().toString().slice(-6));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          sId, 'SISWA',
+          ownerUid, ownerName,
+          s.idKelas || '', s.namaKelas || '',
+          '-',
+          s.nama || 'Siswa',
+          s.statusAktif || 'Aktif',
+          s
+        );
+        restoredCounts.siswa++;
+      });
+    }
+
+    // 3. Pulihkan Presensi
+    if (p.presensi && p.presensi.length > 0) {
+      p.presensi.forEach(function (pr) {
+        var pId = pr.id || ('PRS-' + Date.now().toString().slice(-6));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          pId, 'PRESENSI',
+          ownerUid, ownerName,
+          pr.idKelas || '', pr.namaKelas || '',
+          pr.tanggal || '',
+          (pr.namaSiswa || '') + ' (' + (pr.nisn || '') + ')',
+          pr.status || 'Hadir',
+          pr
+        );
+        restoredCounts.presensi++;
+      });
+    }
+
+    // 4. Pulihkan Nilai
+    if (p.nilai && p.nilai.length > 0) {
+      p.nilai.forEach(function (n) {
+        var nId = n.id || ('NIL-' + Date.now().toString().slice(-6));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          nId, 'NILAI',
+          ownerUid, ownerName,
+          n.idKelas || '', n.namaKelas || '',
+          n.semester || 'Ganjil',
+          (n.mapel || '') + ' - ' + (n.namaPenilaian || n.jenisPenilaian || 'Nilai') + ' - ' + (n.namaSiswa || ''),
+          String(n.nilaiAngka !== undefined ? n.nilaiAngka : (n.nilaiAkhir || 0)),
+          n
+        );
+        restoredCounts.nilai++;
+      });
+    }
+
+    // 5. Pulihkan Jurnal
+    if (p.jurnal && p.jurnal.length > 0) {
+      p.jurnal.forEach(function (j) {
+        var jId = j.id || ('JRN-' + Date.now().toString().slice(-6));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          jId, 'JURNAL',
+          ownerUid, ownerName,
+          j.idKelas || '', j.namaKelas || '',
+          j.tanggal || '',
+          j.topikMateri || '',
+          j.mapel || '',
+          j
+        );
+        restoredCounts.jurnal++;
+      });
+    }
+
+    // 6. Pulihkan Jadwal
+    if (p.jadwal && p.jadwal.length > 0) {
+      p.jadwal.forEach(function (jdw) {
+        var jdwId = jdw.id || ('JDW-' + Date.now().toString().slice(-6));
+        saveToSchoolDbSheet(
+          ss, npsn, namaSekolah,
+          jdwId, 'JADWAL',
+          ownerUid, ownerName,
+          jdw.idKelas || '', jdw.namaKelas || '',
+          jdw.hari || 'Senin',
+          jdw.mapel || 'Mata Pelajaran',
+          (jdw.jamMulai || '') + '-' + (jdw.jamSelesai || ''),
+          jdw
+        );
+        restoredCounts.jadwal++;
+      });
+    }
+
+    logActivity(ownerUid, ownerName, 'Guru', 'SCH-' + npsn, 'Pemulihan Cadangan Data', 'Berhasil memulihkan data lengkap dari file cadangan.');
+
+    return {
+      success: true,
+      restoredCounts: restoredCounts,
+      message: 'Seluruh data cadangan berhasil dipulihkan dan disinkronkan ke database sekolah.'
+    };
+  } catch (err) {
+    return { success: false, message: 'Gagal memulihkan cadangan: ' + err.message };
   }
 }
 

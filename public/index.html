@@ -1040,23 +1040,29 @@
       nilai: [],
       jurnal: [],
       perangkat: [],
-      jadwal: [
-        { id: 'JDW-01', hari: 'Senin', jamMulai: '07:00', jamSelesai: '08:10', jamKe: '1 - 2', mapel: 'Pendidikan Pancasila', ruang: 'Kelas', warna: 'amber' },
-        { id: 'JDW-02', hari: 'Senin', jamMulai: '08:10', jamSelesai: '09:20', jamKe: '3 - 4', mapel: 'Bahasa Indonesia', ruang: 'Kelas', warna: 'blue' },
-        { id: 'JDW-03', hari: 'Senin', jamMulai: '09:50', jamSelesai: '11:00', jamKe: '5 - 6', mapel: 'Matematika', ruang: 'Kelas', warna: 'purple' },
-        { id: 'JDW-04', hari: 'Selasa', jamMulai: '07:00', jamSelesai: '08:45', jamKe: '1 - 3', mapel: 'IPAS', ruang: 'Kelas', warna: 'emerald' },
-        { id: 'JDW-05', hari: 'Selasa', jamMulai: '09:15', jamSelesai: '10:25', jamKe: '4 - 5', mapel: 'Seni Rupa', ruang: 'Kelas', warna: 'rose' },
-        { id: 'JDW-06', hari: 'Rabu', jamMulai: '07:00', jamSelesai: '08:45', jamKe: '1 - 3', mapel: 'Matematika', ruang: 'Kelas', warna: 'purple' },
-        { id: 'JDW-07', hari: 'Rabu', jamMulai: '09:15', jamSelesai: '11:00', jamKe: '4 - 6', mapel: 'Bahasa Indonesia', ruang: 'Kelas', warna: 'blue' },
-        { id: 'JDW-08', hari: 'Kamis', jamMulai: '07:00', jamSelesai: '08:45', jamKe: '1 - 3', mapel: 'PJOK', ruang: 'Lapangan', warna: 'emerald' },
-        { id: 'JDW-09', hari: 'Kamis', jamMulai: '09:15', jamSelesai: '10:25', jamKe: '4 - 5', mapel: 'Bahasa Inggris', ruang: 'Kelas', warna: 'blue' },
-        { id: 'JDW-10', hari: 'Jumat', jamMulai: '07:00', jamSelesai: '08:10', jamKe: '1 - 2', mapel: 'Pendidikan Agama', ruang: 'Kelas', warna: 'emerald' },
-        { id: 'JDW-11', hari: 'Sabtu', jamMulai: '07:00', jamSelesai: '09:00', jamKe: '1 - 3', mapel: 'Kokurikuler P5 / Ekstrakurikuler', ruang: 'Aula / Kelas', warna: 'amber' }
-      ],
-      pengumuman: [
-        { id: 'PGM-01', tanggal: '2026-11-15', judul: 'Edaran Kurikulum Merdeka Semester Ganjil', isi: 'Bapak/Ibu Guru diharapkan memastikan data rombel dan capaian pembelajaran terisi lengkap.', pengirim: 'Koorwil Pendidikan Ambulu' }
-      ]
+      jadwal: [],
+      pengumuman: []
     };
+
+    function initLocalJadwalData() {
+      try {
+        const raw = localStorage.getItem('siguru_jadwal_data');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            // Bersihkan jika masih terdapat cache dummy bawaan lama
+            const hasDummy = parsed.some(item => item.id && item.id.indexOf('JDW-0') === 0);
+            if (hasDummy) {
+              localStorage.removeItem('siguru_jadwal_data');
+              dbData.jadwal = [];
+            } else {
+              dbData.jadwal = parsed;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+    initLocalJadwalData();
 
     const GAS_URL = (window.APP_CONFIG && window.APP_CONFIG.GAS_API_URL) ? window.APP_CONFIG.GAS_API_URL : '';
     const IS_CONNECTED = !!(window.APP_CONFIG && window.APP_CONFIG.isConnected && window.APP_CONFIG.isConnected());
@@ -1476,6 +1482,8 @@
         if (backendData.attendance) dbData.presensi = backendData.attendance;
         if (backendData.grades) dbData.nilai = backendData.grades;
         if (backendData.journals) dbData.jurnal = backendData.journals;
+        if (backendData.jadwal) dbData.jadwal = backendData.jadwal;
+        if (backendData.perangkat) dbData.perangkat = backendData.perangkat;
       }
 
       if (dbData.kelas.length > 0) {
@@ -1765,6 +1773,7 @@
           if (res.presensi) dbData.presensi = res.presensi;
           if (res.nilai) dbData.nilai = res.nilai;
           if (res.jurnal) dbData.jurnal = res.jurnal;
+          if (res.jadwal) dbData.jadwal = res.jadwal;
           if (res.perangkat) dbData.perangkat = res.perangkat;
 
           if (dbData.kelas.length > 0 && (!activeGuruClassId || !dbData.kelas.find(k => k.id === activeGuruClassId))) {
@@ -1774,8 +1783,11 @@
           syncState.lastSyncTime = new Date();
           setSyncStatus('synced', 'Tersinkronisasi');
 
-          // JIKA BACKGROUND SILENT SYNC: Perbarui tampilan presensi/rekapitulasi jika sedang dibuka
-          if (isBackgroundSilent && activeModuleKey === 'guru-presensi') {
+          // JIKA BACKGROUND SILENT SYNC: Perbarui tampilan modul jika sedang dibuka
+          if (isBackgroundSilent && activeModuleKey === 'guru-jadwal') {
+            const c = document.getElementById('moduleContentArea');
+            if (c) renderModuleGuruJadwal(c);
+          } else if (isBackgroundSilent && activeModuleKey === 'guru-presensi') {
             const subArea = document.getElementById('presensiSubTabContentArea');
             if (subArea) {
               const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
@@ -6645,6 +6657,7 @@
 
       if (!dbData.jadwal) dbData.jadwal = [];
 
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const newItem = {
         id: 'JDW-' + Date.now().toString().slice(-6),
         hari: hari,
@@ -6653,7 +6666,11 @@
         jamSelesai: jamSelesai,
         mapel: mapel,
         ruang: ruang,
-        warna: warna
+        warna: warna,
+        idKelas: activeGuruClassId || '',
+        namaKelas: actKls ? actKls.namaRombel : '',
+        teacherUid: currentUser ? (currentUser.id || currentUser.uid) : '',
+        teacherName: currentUser ? currentUser.nama : ''
       };
 
       dbData.jadwal.push(newItem);
@@ -6671,6 +6688,7 @@
         npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
         namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : ''),
         idKelas: activeGuruClassId || '',
+        namaKelas: actKls ? actKls.namaRombel : '',
         teacherUid: currentUser ? (currentUser.id || currentUser.uid) : '',
         teacherName: currentUser ? currentUser.nama : ''
       }, `Jadwal ${mapel} (${hari}) tersimpan ke database.`);
@@ -6684,9 +6702,10 @@
       } catch (err) {}
       renderModuleGuruJadwal(document.getElementById('moduleContentArea'));
 
-      // Hapus / timpa status di database sekolah
-      await executeDbWrite('saveJadwalTeacher', {
-        jadwal: { id: jId, mapel: 'Dihapus', status: 'Dihapus' },
+      // Hapus permanen dari database Google Sheets
+      await executeDbWrite('deleteJadwalTeacher', {
+        id: jId,
+        jadwalId: jId,
         npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
         namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : '')
       }, 'Jadwal berhasil dihapus dari database.');
@@ -6979,7 +6998,8 @@
             siswa: dbData.siswa,
             presensi: dbData.presensi,
             nilai: dbData.nilai,
-            jurnal: dbData.jurnal
+            jurnal: dbData.jurnal,
+            jadwal: dbData.jadwal
           }, 'Data cadangan berhasil dipulihkan secara penuh!');
         } catch (e) {}
       }
