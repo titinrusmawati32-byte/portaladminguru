@@ -6633,7 +6633,7 @@
       openUniversalModal('🕒 Tambah Jadwal Pelajaran', content);
     }
 
-    function handleSaveJadwalItem(e) {
+    async function handleSaveJadwalItem(e) {
       e.preventDefault();
       const hari = document.getElementById('fjHari').value;
       const jamKe = document.getElementById('fjJamKe').value.trim();
@@ -6662,19 +6662,34 @@
       } catch (err) {}
 
       closeUniversalModal();
-      showToast(`Jadwal ${mapel} (${hari}) berhasil disimpan.`, 'success');
       activeJadwalHari = hari;
       renderModuleGuruJadwal(document.getElementById('moduleContentArea'));
+
+      // Simpan langsung ke database Google Sheets (Sheet DB_[NPSN]_[NamaSekolah])
+      await executeDbWrite('saveJadwalTeacher', {
+        jadwal: newItem,
+        npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
+        namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : ''),
+        idKelas: activeGuruClassId || '',
+        teacherUid: currentUser ? (currentUser.id || currentUser.uid) : '',
+        teacherName: currentUser ? currentUser.nama : ''
+      }, `Jadwal ${mapel} (${hari}) tersimpan ke database.`);
     }
 
-    function handleDeleteJadwalItem(jId) {
+    async function handleDeleteJadwalItem(jId) {
       if (!confirm('Hapus jadwal pelajaran ini?')) return;
       dbData.jadwal = (dbData.jadwal || []).filter(j => j.id !== jId);
       try {
         localStorage.setItem('siguru_jadwal_data', JSON.stringify(dbData.jadwal));
       } catch (err) {}
-      showToast('Jadwal berhasil dihapus.', 'info');
       renderModuleGuruJadwal(document.getElementById('moduleContentArea'));
+
+      // Hapus / timpa status di database sekolah
+      await executeDbWrite('saveJadwalTeacher', {
+        jadwal: { id: jId, mapel: 'Dihapus', status: 'Dihapus' },
+        npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
+        namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : '')
+      }, 'Jadwal berhasil dihapus dari database.');
     }
 
     function handleJadwalShortcutAction(action, mapelName) {
