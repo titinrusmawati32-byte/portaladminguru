@@ -873,13 +873,30 @@
         <span class="text-[10px] font-bold">Kelas</span>
       </button>
 
-      <!-- Center: Elevated Tilted Diamond FAB (Aksi Cepat) -->
-      <div class="-mt-8">
-        <button onclick="openQuickActionModal()" title="Aksi Cepat Guru"
-          class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#6C5CE7] to-[#8C7AE6] rotate-45 flex items-center justify-center text-white shadow-lg shadow-indigo-400/40 hover:scale-105 active:scale-95 transition-all cursor-pointer">
-          <div class="-rotate-45">
-            <svg viewBox="0 0 24 24" class="w-6 h-6 fill-none stroke-current" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      <!-- Center: Elevated Tilted Diamond FAB (Scan QR Presensi Cepat) -->
+      <div class="-mt-8 relative group">
+        <!-- Soft Glow Ambient Pulse Ring -->
+        <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#6C5CE7] to-[#8C7AE6] rotate-45 blur-md opacity-60 group-hover:opacity-90 transition-opacity pointer-events-none"></div>
+
+        <button onclick="openDirectQrScannerFromDock()" title="Scan QR Presensi Siswa (1-Klik)"
+          class="relative w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#5B4CDB] via-[#6C5CE7] to-[#8C7AE6] rotate-45 flex items-center justify-center text-white shadow-xl shadow-indigo-500/40 hover:scale-110 active:scale-95 transition-all cursor-pointer border border-white/30">
+          
+          <!-- Inner Icon Un-rotated 45deg: SVG QR Scanner Viewfinder Modern -->
+          <div class="-rotate-45 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" class="w-6 h-6 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Top-Left Corner Bracket -->
+              <path d="M4 8V6a2 2 0 0 1 2-2h2" />
+              <!-- Top-Right Corner Bracket -->
+              <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+              <!-- Bottom-Left Corner Bracket -->
+              <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+              <!-- Bottom-Right Corner Bracket -->
+              <path d="M16 20h2a2 2 0 0 0 2-2v-2" />
+              <!-- QR Modules / Inner Code Pattern -->
+              <rect x="8" y="8" width="3" height="3" class="fill-current" stroke="none" rx="0.5" />
+              <rect x="13" y="8" width="3" height="3" class="fill-current" stroke="none" rx="0.5" />
+              <rect x="8" y="13" width="3" height="3" class="fill-current" stroke="none" rx="0.5" />
+              <rect x="13" y="13" width="3" height="3" class="fill-current" stroke="none" rx="0.5" />
             </svg>
           </div>
         </button>
@@ -5287,6 +5304,15 @@
           osc.stop(ctx.currentTime + 0.22);
         }
       } catch (e) {}
+    }
+
+    // Buka Scanner QR Langsung Secara Cepat (Direct 1-Click dari Dock)
+    function openDirectQrScannerFromDock() {
+      // Pastikan kelas aktif terpasang
+      if (!activeGuruClassId && dbData.kelas.length > 0) {
+        activeGuruClassId = dbData.kelas[0].id;
+      }
+      handlePermissionAcceptedAndStartCamera();
     }
 
     // 2. Dialog Izin Eksplisit Kamera (Allow or Disallow)
