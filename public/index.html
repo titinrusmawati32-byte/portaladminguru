@@ -2249,49 +2249,58 @@
 
           <div class="space-y-2 pt-1">
             <!-- Record 1: Presensi -->
-            <div onclick="openModule('guru-presensi')" class="p-3 rounded-2xl bg-[#F8F7FD] hover:bg-[#F2EFFC] border border-violet-100/50 flex items-center justify-between transition cursor-pointer">
+            <div onclick="openModule('guru-presensi')" class="p-3 rounded-2xl bg-[#F8F7FD] hover:bg-[#F2EFFC] dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border border-violet-100/50 dark:border-violet-800/30 flex items-center justify-between transition cursor-pointer group">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
-                  📅
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 border border-emerald-200/60 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-sm shadow-xs backdrop-blur-xs group-hover:scale-105 transition-transform">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="3.5" class="fill-emerald-500/10 stroke-current"/>
+                    <path d="M3 9h18M8 2v4M16 2v4"/>
+                  </svg>
                 </div>
                 <div>
-                  <h4 class="font-black text-brand-dark text-xs">Presensi Harian Siswa</h4>
-                  <p class="text-[10px] text-brand-muted">${todayPresensi.length > 0 ? `${todayPresensi.filter(p => p.statusHadir === 'Hadir').length} Hadir dari ${todayPresensi.length} Siswa` : 'Belum diabsen hari ini'}</p>
+                  <h4 class="font-black text-brand-dark dark:text-white text-xs">Presensi Harian Siswa</h4>
+                  <p class="text-[10px] text-brand-muted dark:text-slate-400">${todayPresensi.length > 0 ? `${todayPresensi.filter(p => p.statusHadir === 'Hadir').length} Hadir dari ${todayPresensi.length} Siswa` : 'Belum diabsen hari ini'}</p>
                 </div>
               </div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold ${todayPresensi.length > 0 ? 'text-emerald-700 bg-emerald-50' : 'text-slate-500 bg-slate-100'} px-2.5 py-1 rounded-full">
+              <span class="text-[10px] sm:text-[11px] font-extrabold ${todayPresensi.length > 0 ? 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/60' : 'text-slate-500 bg-slate-100 dark:bg-slate-800 dark:text-slate-400'} px-2.5 py-1 rounded-full shadow-2xs">
                 ${todayPresensi.length > 0 ? '✓ Terekam' : 'Input Sekarang'}
               </span>
             </div>
 
             <!-- Record 2: Penilaian -->
-            <div onclick="openModule('guru-nilai')" class="p-3 rounded-2xl bg-[#F8F7FD] hover:bg-[#F2EFFC] border border-violet-100/50 flex items-center justify-between transition cursor-pointer">
+            <div onclick="openModule('guru-nilai')" class="p-3 rounded-2xl bg-[#F8F7FD] hover:bg-[#F2EFFC] dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border border-violet-100/50 dark:border-violet-800/30 flex items-center justify-between transition cursor-pointer group">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
-                  📝
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500/15 to-amber-500/5 border border-amber-200/60 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm shadow-xs backdrop-blur-xs group-hover:scale-105 transition-transform">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    <rect x="8" y="2" width="8" height="4" rx="1" class="fill-amber-500/20 stroke-current"/>
+                  </svg>
                 </div>
                 <div>
-                  <h4 class="font-black text-brand-dark text-xs">Penilaian Pembelajaran</h4>
-                  <p class="text-[10px] text-brand-muted">${latestNilai ? `${latestNilai.mapel} • ${latestNilai.namaPenilaian || latestNilai.kategori}` : 'Lembar input penilaian massal siswa'}</p>
+                  <h4 class="font-black text-brand-dark dark:text-white text-xs">Penilaian Pembelajaran</h4>
+                  <p class="text-[10px] text-brand-muted dark:text-slate-400">${latestNilai ? `${latestNilai.mapel} • ${latestNilai.namaPenilaian || latestNilai.kategori}` : 'Lembar input penilaian massal siswa'}</p>
                 </div>
               </div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full">
+              <span class="text-[10px] sm:text-[11px] font-extrabold text-amber-700 bg-amber-50 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-200/60 px-2.5 py-1 rounded-full shadow-2xs">
                 ${latestNilai ? `Nilai: ${latestNilai.nilaiAngka !== undefined ? latestNilai.nilaiAngka : latestNilai.nilaiAkhir}` : 'Buka Lembar'}
               </span>
             </div>
 
             <!-- Record 3: Jurnal Mengajar -->
-            <div onclick="openModule('guru-jurnal')" class="p-3 rounded-2xl bg-[#F8F7FD] hover:bg-[#F2EFFC] border border-violet-100/50 flex items-center justify-between transition cursor-pointer">
+            <div onclick="openModule('guru-jurnal')" class="p-3 rounded-2xl bg-[#F8F7FD] hover:bg-[#F2EFFC] dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border border-violet-100/50 dark:border-violet-800/30 flex items-center justify-between transition cursor-pointer group">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-sm">
-                  📖
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500/15 to-indigo-500/5 border border-indigo-200/60 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm shadow-xs backdrop-blur-xs group-hover:scale-105 transition-transform">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" class="fill-indigo-500/10 stroke-current"/>
+                  </svg>
                 </div>
                 <div>
-                  <h4 class="font-black text-brand-dark text-xs">Jurnal Mengajar</h4>
-                  <p class="text-[10px] text-brand-muted">${latestJurnal ? `${latestJurnal.mapel}: ${latestJurnal.topikMateri}` : 'Catat kegiatan belajar dan refleksi'}</p>
+                  <h4 class="font-black text-brand-dark dark:text-white text-xs">Jurnal Mengajar</h4>
+                  <p class="text-[10px] text-brand-muted dark:text-slate-400">${latestJurnal ? `${latestJurnal.mapel}: ${latestJurnal.topikMateri}` : 'Catat kegiatan belajar dan refleksi'}</p>
                 </div>
               </div>
-              <span class="text-[10px] sm:text-[11px] font-extrabold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full">
+              <span class="text-[10px] sm:text-[11px] font-extrabold text-sky-700 bg-sky-50 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200/60 px-2.5 py-1 rounded-full shadow-2xs">
                 ${latestJurnal ? '✓ Tercatat' : 'Tulis Jurnal'}
               </span>
             </div>
@@ -2533,22 +2542,191 @@
       }, 1000);
     }
 
+    // ==========================================
+    // GAYA 3: GLASSMORPHISM & NEON GLOW ICON THEMES
+    // ==========================================
+    const MODULE_GLASS_THEMES = {
+      'guru-presensi': {
+        glowClass: 'neon-glow-emerald',
+        ambientBlob: 'bg-emerald-400/25 dark:bg-emerald-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-emerald-50/70 to-emerald-100/50 dark:from-emerald-950/60 dark:to-emerald-900/30',
+        glassBorder: 'border-emerald-200/80 dark:border-emerald-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(16,185,129,0.25)] group-hover:shadow-[0_6px_22px_rgba(16,185,129,0.45)]',
+        badgeBg: 'bg-emerald-50/90 dark:bg-emerald-950/70',
+        badgeText: 'text-emerald-700 dark:text-emerald-300',
+        badgeBorder: 'border-emerald-200/70 dark:border-emerald-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600 dark:text-emerald-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="3.5" class="fill-emerald-500/10 dark:fill-emerald-400/10 stroke-current" />
+            <path d="M3 9h18" stroke-linecap="round" />
+            <path d="M8 2v4M16 2v4" stroke-linecap="round" stroke-width="2" />
+            <path d="M7 13h2.5v2.5H7zM14.5 13H17v2.5h-2.5zM7 17h2.5v2.5H7z" class="fill-current" stroke="none" />
+            <path d="M12.5 13v2m0 2.5v1.5m2-1.5h2.5" stroke-linecap="round" stroke-width="1.6" />
+          </svg>
+        `
+      },
+      'guru-siswa': {
+        glowClass: 'neon-glow-cyan',
+        ambientBlob: 'bg-sky-400/25 dark:bg-sky-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-sky-50/70 to-sky-100/50 dark:from-sky-950/60 dark:to-sky-900/30',
+        glassBorder: 'border-sky-200/80 dark:border-sky-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(14,165,233,0.25)] group-hover:shadow-[0_6px_22px_rgba(14,165,233,0.45)]',
+        badgeBg: 'bg-sky-50/90 dark:bg-sky-950/70',
+        badgeText: 'text-sky-700 dark:text-sky-300',
+        badgeBorder: 'border-sky-200/70 dark:border-sky-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-sky-600 dark:text-sky-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="9" cy="7" r="4" class="fill-sky-500/15 dark:fill-sky-400/15 stroke-current" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        `
+      },
+      'guru-nilai': {
+        glowClass: 'neon-glow-amber',
+        ambientBlob: 'bg-amber-400/25 dark:bg-amber-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-amber-50/70 to-amber-100/50 dark:from-amber-950/60 dark:to-amber-900/30',
+        glassBorder: 'border-amber-200/80 dark:border-amber-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(245,158,11,0.25)] group-hover:shadow-[0_6px_22px_rgba(245,158,11,0.45)]',
+        badgeBg: 'bg-amber-50/90 dark:bg-amber-950/70',
+        badgeText: 'text-amber-700 dark:text-amber-300',
+        badgeBorder: 'border-amber-200/70 dark:border-amber-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 dark:text-amber-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke-linecap="round" />
+            <rect x="8" y="2" width="8" height="4" rx="1" class="fill-amber-500/20 dark:fill-amber-400/20 stroke-current" />
+            <path d="M12 11l1 2 2.2.3-1.6 1.5.4 2.2-2-1-2 1 .4-2.2-1.6-1.5 2.2-.3 1-2z" class="fill-amber-500/35 dark:fill-amber-400/35 stroke-current" stroke-linejoin="round" />
+            <path d="M8 18h8" stroke-linecap="round" />
+          </svg>
+        `
+      },
+      'guru-jurnal': {
+        glowClass: 'neon-glow-purple',
+        ambientBlob: 'bg-indigo-400/25 dark:bg-indigo-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-indigo-50/70 to-indigo-100/50 dark:from-indigo-950/60 dark:to-indigo-900/30',
+        glassBorder: 'border-indigo-200/80 dark:border-indigo-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(99,102,241,0.25)] group-hover:shadow-[0_6px_22px_rgba(99,102,241,0.45)]',
+        badgeBg: 'bg-indigo-50/90 dark:bg-indigo-950/70',
+        badgeText: 'text-indigo-700 dark:text-indigo-300',
+        badgeBorder: 'border-indigo-200/70 dark:border-indigo-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600 dark:text-indigo-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" class="fill-indigo-500/10 dark:fill-indigo-400/10 stroke-current" stroke-linejoin="round" />
+            <path d="M8 7h8M8 11h6" stroke-linecap="round" />
+            <path d="M12 2v6l-2-1.5L8 8V2" class="fill-indigo-500/30 stroke-current" stroke-linejoin="round" />
+          </svg>
+        `
+      },
+      'guru-jadwal': {
+        glowClass: 'neon-glow-amber',
+        ambientBlob: 'bg-orange-400/25 dark:bg-orange-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-orange-50/70 to-orange-100/50 dark:from-orange-950/60 dark:to-orange-900/30',
+        glassBorder: 'border-orange-200/80 dark:border-orange-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(249,115,22,0.25)] group-hover:shadow-[0_6px_22px_rgba(249,115,22,0.45)]',
+        badgeBg: 'bg-orange-50/90 dark:bg-orange-950/70',
+        badgeText: 'text-orange-700 dark:text-orange-300',
+        badgeBorder: 'border-orange-200/70 dark:border-orange-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="13" r="8" class="fill-orange-500/10 dark:fill-orange-400/10 stroke-current" />
+            <path d="M12 9v4l2.5 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+            <path d="M5 3L2 6M19 3l3 3" stroke-linecap="round" stroke-width="2" />
+            <path d="M12 2v2" stroke-linecap="round" />
+          </svg>
+        `
+      },
+      'guru-kelas': {
+        glowClass: 'neon-glow-purple',
+        ambientBlob: 'bg-purple-400/25 dark:bg-purple-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-purple-50/70 to-purple-100/50 dark:from-purple-950/60 dark:to-purple-900/30',
+        glassBorder: 'border-purple-200/80 dark:border-purple-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(168,85,247,0.25)] group-hover:shadow-[0_6px_22px_rgba(168,85,247,0.45)]',
+        badgeBg: 'bg-purple-50/90 dark:bg-purple-950/70',
+        badgeText: 'text-purple-700 dark:text-purple-300',
+        badgeBorder: 'border-purple-200/70 dark:border-purple-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 21h18" stroke-linecap="round" />
+            <path d="M5 21V10l7-5 7 5v11" class="fill-purple-500/10 dark:fill-purple-400/10 stroke-current" stroke-linejoin="round" />
+            <path d="M10 21v-4a2 2 0 0 1 4 0v4" stroke-linejoin="round" />
+            <circle cx="12" cy="10" r="1.5" class="fill-current" stroke="none" />
+            <path d="M12 5V2l2.5 1.5L12 5" class="fill-purple-500/30 stroke-current" stroke-linejoin="round" />
+          </svg>
+        `
+      },
+      'guru-perangkat': {
+        glowClass: 'neon-glow-rose',
+        ambientBlob: 'bg-rose-400/25 dark:bg-rose-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-rose-50/70 to-rose-100/50 dark:from-rose-950/60 dark:to-rose-900/30',
+        glassBorder: 'border-rose-200/80 dark:border-rose-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(244,63,94,0.25)] group-hover:shadow-[0_6px_22px_rgba(244,63,94,0.45)]',
+        badgeBg: 'bg-rose-50/90 dark:bg-rose-950/70',
+        badgeText: 'text-rose-700 dark:text-rose-300',
+        badgeBorder: 'border-rose-200/70 dark:border-rose-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-rose-600 dark:text-rose-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" class="fill-rose-500/10 dark:fill-rose-400/10 stroke-current" stroke-linejoin="round" />
+            <path d="M12 11v6m0 0l-2.5-2.5m2.5 2.5l2.5-2.5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+          </svg>
+        `
+      },
+      'guru-backup': {
+        glowClass: 'neon-glow-purple',
+        ambientBlob: 'bg-fuchsia-400/25 dark:bg-fuchsia-400/20',
+        glassBg: 'bg-gradient-to-br from-white/95 via-fuchsia-50/70 to-fuchsia-100/50 dark:from-fuchsia-950/60 dark:to-fuchsia-900/30',
+        glassBorder: 'border-fuchsia-200/80 dark:border-fuchsia-500/40',
+        neonShadow: 'shadow-[0_4px_16px_rgba(217,70,239,0.25)] group-hover:shadow-[0_6px_22px_rgba(217,70,239,0.45)]',
+        badgeBg: 'bg-fuchsia-50/90 dark:bg-fuchsia-950/70',
+        badgeText: 'text-fuchsia-700 dark:text-fuchsia-300',
+        badgeBorder: 'border-fuchsia-200/70 dark:border-fuchsia-800/50',
+        svg: `
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-fuchsia-600 dark:text-fuchsia-400 transform group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" class="fill-fuchsia-500/10 dark:fill-fuchsia-400/10 stroke-current" stroke-linejoin="round" />
+            <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+          </svg>
+        `
+      }
+    };
+
     function createPastelPortalCard(moduleKey, title, desc, iconBgHex, iconTextHex, iconSymbol, badge = '', glowClass = 'neon-glow-purple') {
+      const theme = MODULE_GLASS_THEMES[moduleKey] || {
+        glowClass: glowClass,
+        ambientBlob: 'bg-purple-400/20',
+        glassBg: 'bg-white/80 dark:bg-slate-900/70',
+        glassBorder: 'border-violet-100/70 dark:border-violet-800/40',
+        neonShadow: 'shadow-2xs',
+        badgeBg: 'bg-violet-50',
+        badgeText: 'text-brand-700 dark:text-violet-300',
+        badgeBorder: 'border-violet-100/60',
+        svg: `<span class="text-xl">${iconSymbol}</span>`
+      };
+
+      const finalGlow = theme.glowClass || glowClass;
+
       return `
         <div onclick="openModule('${moduleKey}')"
-             class="bg-white rounded-[22px] sm:rounded-[26px] p-3 sm:p-4 shadow-xs border border-violet-100/70 portal-card-glow flex flex-col justify-between card-hover-effect cursor-pointer group transition-all relative overflow-hidden select-none min-h-[112px] sm:min-h-[126px]">
-          <!-- Top Row: Icon + Badge / Arrow -->
-          <div class="flex items-start justify-between w-full">
-            <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-108 transition-transform text-base sm:text-xl shadow-2xs"
-                 style="background-color: ${iconBgHex}; color: ${iconTextHex};">
-              ${iconSymbol}
+             class="bg-white/95 dark:bg-slate-900/85 rounded-[22px] sm:rounded-[26px] p-3 sm:p-4 shadow-xs border border-violet-100/80 dark:border-violet-800/40 portal-card-glow flex flex-col justify-between card-hover-effect cursor-pointer group transition-all duration-300 relative overflow-hidden select-none min-h-[114px] sm:min-h-[128px] hover:border-brand-400/60 dark:hover:border-violet-400/60">
+          
+          <!-- Neon Corner Light Ambient Blob -->
+          <div class="absolute -top-7 -right-7 w-20 h-20 ${theme.ambientBlob} rounded-full blur-xl pointer-events-none opacity-40 group-hover:opacity-85 transition-opacity duration-300"></div>
+
+          <!-- Top Row: Glassmorphism Icon + Badge / Arrow -->
+          <div class="flex items-start justify-between w-full relative z-10">
+            <!-- Glass Container -->
+            <div class="relative w-10 h-10 sm:w-11 sm:h-11 rounded-[16px] sm:rounded-2xl backdrop-blur-md ${theme.glassBg} ${theme.glassBorder} border flex items-center justify-center shrink-0 group-hover:scale-110 transition-all duration-300 ${theme.neonShadow}">
+              <!-- Glass Specular Highlight -->
+              <div class="absolute inset-0 rounded-[16px] sm:rounded-2xl bg-gradient-to-br from-white/70 via-transparent to-transparent pointer-events-none"></div>
+              ${theme.svg}
             </div>
+
             ${badge ? `
-              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-violet-50 text-brand-700 dark:bg-violet-950/60 dark:text-violet-300 border border-violet-100/60 dark:border-violet-800/40 tracking-tight font-outfit">
+              <span class="text-[9px] font-extrabold px-2.5 py-0.5 rounded-full ${theme.badgeBg} ${theme.badgeText} border ${theme.badgeBorder} tracking-tight font-outfit shadow-2xs backdrop-blur-xs">
                 ${badge}
               </span>
             ` : `
-              <div class="w-6 h-6 rounded-full bg-[#F4F2FC] group-hover:bg-brand-600 text-brand-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
+              <div class="w-6 h-6 rounded-full bg-[#F4F2FC] dark:bg-slate-800 group-hover:bg-brand-600 text-brand-600 dark:text-violet-300 group-hover:text-white flex items-center justify-center shrink-0 transition-colors shadow-2xs">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                 </svg>
@@ -2557,9 +2735,9 @@
           </div>
 
           <!-- Bottom: Title & Short Desc -->
-          <div class="mt-2 min-w-0">
-            <h4 class="font-outfit font-extrabold text-brand-dark text-xs sm:text-sm group-hover:text-brand-600 transition-colors truncate ${glowClass}">${title}</h4>
-            <p class="text-[10px] sm:text-[11px] text-brand-muted font-medium truncate mt-0.5">${desc}</p>
+          <div class="mt-2.5 min-w-0 relative z-10">
+            <h4 class="font-outfit font-extrabold text-brand-dark dark:text-white text-xs sm:text-sm group-hover:text-brand-600 dark:group-hover:text-violet-300 transition-colors truncate ${finalGlow}">${title}</h4>
+            <p class="text-[10px] sm:text-[11px] text-brand-muted dark:text-slate-400 font-medium truncate mt-0.5">${desc}</p>
           </div>
         </div>
       `;
