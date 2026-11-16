@@ -979,7 +979,7 @@
     </header>
 
     <!-- AREA VIEW 1: PORTAL DASHBOARD UTAMA GURU -->
-    <main id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-2 space-y-4 animate-fade-in pb-6">
+    <main id="portalDashboardView" class="flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-2 space-y-4 animate-fade-in pb-32 sm:pb-24">
       
       <!-- 1. SEARCH PILL BAR -->
       <div class="w-full bg-white rounded-full px-4 py-2.5 shadow-xs border border-violet-100/70 flex items-center justify-between text-xs">
@@ -1015,7 +1015,7 @@
     </main>
 
     <!-- AREA VIEW 2: HALAMAN MODUL TERSENDIRI -->
-    <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-3 space-y-4 animate-fade-in pb-6">
+    <div id="moduleView" class="hidden flex-1 flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-3 space-y-4 animate-fade-in pb-32 sm:pb-24">
       
       <!-- Header Modul Aktif -->
       <div class="bg-white rounded-[26px] p-4 sm:p-5 shadow-xs border border-violet-100/70 flex flex-wrap items-center justify-between gap-3 no-print">
@@ -1030,8 +1030,8 @@
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <div id="moduleHeaderActions" class="flex items-center gap-2"></div>
+        <div class="w-full sm:w-auto flex items-center gap-2 mt-1 sm:mt-0">
+          <div id="moduleHeaderActions" class="w-full sm:w-auto flex items-center gap-2"></div>
         </div>
       </div>
 
@@ -3160,18 +3160,20 @@
           titleEl.textContent = 'Buku Induk Data Siswa';
           subEl.textContent = 'Kelola siswa kelas aktif: input manual atau impor Excel/CSV';
           actionEl.innerHTML = `
-            <button onclick="downloadStudentExcelTemplate()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5 active:scale-95">
-              <span>📥</span> <span>Unduh Template (.xlsx)</span>
-            </button>
-            <button onclick="openImportExcelModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5 active:scale-95">
-              <span>📤</span> <span>Upload Excel</span>
-            </button>
-            <button onclick="printKartuQRSiswaA4()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5 active:scale-95">
-              <span>🪪</span> <span>Cetak Kartu QR (A4)</span>
-            </button>
-            <button onclick="openFormSiswaModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition active:scale-95">
-              + Tambah Manual
-            </button>
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center gap-2 w-full">
+              <button onclick="downloadStudentExcelTemplate()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-2.5 sm:px-3.5 py-2.5 rounded-xl sm:rounded-full cursor-pointer shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95">
+                <span>📥</span> <span class="truncate">Unduh Template</span>
+              </button>
+              <button onclick="openImportExcelModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-2.5 sm:px-3.5 py-2.5 rounded-xl sm:rounded-full cursor-pointer shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95">
+                <span>📤</span> <span class="truncate">Upload Excel</span>
+              </button>
+              <button onclick="printKartuQRSiswaA4()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-2.5 sm:px-3.5 py-2.5 rounded-xl sm:rounded-full cursor-pointer shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95">
+                <span>🪪</span> <span class="truncate">Cetak Kartu QR</span>
+              </button>
+              <button onclick="openFormSiswaModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs px-2.5 sm:px-3.5 py-2.5 rounded-xl sm:rounded-full cursor-pointer shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95">
+                <span>➕</span> <span class="truncate">Tambah Manual</span>
+              </button>
+            </div>
           `;
           renderModuleGuruSiswa(contentEl);
           break;
@@ -3459,15 +3461,15 @@
             <p class="text-xs text-brand-muted max-w-sm mx-auto">
               Daftar siswa masih kosong. Anda dapat menambahkan siswa satu per satu secara manual atau mengimpor langsung dari file Excel/CSV.
             </p>
-            <div class="pt-2 flex flex-wrap justify-center gap-2.5">
-              <button onclick="downloadStudentExcelTemplate()" class="px-5 py-2.5 rounded-full bg-emerald-600 text-white font-extrabold text-xs shadow-xs hover:bg-emerald-700 cursor-pointer flex items-center gap-1.5 active:scale-95">
+            <div class="pt-2 grid grid-cols-1 sm:flex sm:flex-wrap sm:justify-center gap-2 max-w-md mx-auto w-full">
+              <button onclick="downloadStudentExcelTemplate()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl sm:rounded-full bg-emerald-600 text-white font-extrabold text-xs shadow-xs hover:bg-emerald-700 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95">
                 <span>📥</span> <span>Unduh Template (.xlsx)</span>
               </button>
-              <button onclick="openImportExcelModal()" class="px-5 py-2.5 rounded-full bg-blue-600 text-white font-extrabold text-xs shadow-xs hover:bg-blue-700 cursor-pointer flex items-center gap-1.5 active:scale-95">
+              <button onclick="openImportExcelModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl sm:rounded-full bg-blue-600 text-white font-extrabold text-xs shadow-xs hover:bg-blue-700 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95">
                 <span>📤</span> <span>Upload Excel Siswa</span>
               </button>
-              <button onclick="openFormSiswaModal()" class="px-5 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs shadow-xs hover:bg-brand-700 cursor-pointer active:scale-95">
-                + Tambah Manual
+              <button onclick="openFormSiswaModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl sm:rounded-full bg-brand-600 text-white font-extrabold text-xs shadow-xs hover:bg-brand-700 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95">
+                <span>➕</span> <span>Tambah Manual</span>
               </button>
             </div>
           </div>
