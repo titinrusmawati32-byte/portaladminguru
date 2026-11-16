@@ -24,6 +24,9 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+  <!-- Library Parser & Generator Excel (.xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -2877,14 +2880,17 @@
           titleEl.textContent = 'Buku Induk Data Siswa';
           subEl.textContent = 'Kelola siswa kelas aktif: input manual atau impor Excel/CSV';
           actionEl.innerHTML = `
-            <button onclick="printKartuQRSiswaA4()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5">
+            <button onclick="downloadStudentExcelTemplate()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5 active:scale-95">
+              <span>📥</span> <span>Unduh Template (.xlsx)</span>
+            </button>
+            <button onclick="openImportExcelModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5 active:scale-95">
+              <span>📤</span> <span>Upload Excel</span>
+            </button>
+            <button onclick="printKartuQRSiswaA4()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5 active:scale-95">
               <span>🪪</span> <span>Cetak Kartu QR (A4)</span>
             </button>
-            <button onclick="openImportExcelModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5">
-              <span>📥</span> <span>Impor Excel</span>
-            </button>
-            <button onclick="openFormSiswaModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition">
-              + Tambah
+            <button onclick="openFormSiswaModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition active:scale-95">
+              + Tambah Manual
             </button>
           `;
           renderModuleGuruSiswa(contentEl);
@@ -3173,12 +3179,15 @@
             <p class="text-xs text-brand-muted max-w-sm mx-auto">
               Daftar siswa masih kosong. Anda dapat menambahkan siswa satu per satu secara manual atau mengimpor langsung dari file Excel/CSV.
             </p>
-            <div class="pt-2 flex justify-center gap-2.5">
-              <button onclick="openImportExcelModal()" class="px-5 py-2.5 rounded-full bg-blue-600 text-white font-extrabold text-xs shadow-xs hover:bg-blue-700 cursor-pointer flex items-center gap-1.5">
-                <span>📥</span> <span>Impor dari Excel</span>
+            <div class="pt-2 flex flex-wrap justify-center gap-2.5">
+              <button onclick="downloadStudentExcelTemplate()" class="px-5 py-2.5 rounded-full bg-emerald-600 text-white font-extrabold text-xs shadow-xs hover:bg-emerald-700 cursor-pointer flex items-center gap-1.5 active:scale-95">
+                <span>📥</span> <span>Unduh Template (.xlsx)</span>
               </button>
-              <button onclick="openFormSiswaModal()" class="px-5 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs shadow-xs hover:bg-brand-700 cursor-pointer">
-                + Tambah Siswa
+              <button onclick="openImportExcelModal()" class="px-5 py-2.5 rounded-full bg-blue-600 text-white font-extrabold text-xs shadow-xs hover:bg-blue-700 cursor-pointer flex items-center gap-1.5 active:scale-95">
+                <span>📤</span> <span>Upload Excel Siswa</span>
+              </button>
+              <button onclick="openFormSiswaModal()" class="px-5 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs shadow-xs hover:bg-brand-700 cursor-pointer active:scale-95">
+                + Tambah Manual
               </button>
             </div>
           </div>
@@ -3358,51 +3367,155 @@
       await executeDbWrite('deleteStudentTeacher', { id: siswaId, siswaId: siswaId }, `Data siswa ${nama} dihapus.`);
     }
 
-    // --- MODAL IMPOR EXCEL / CSV ---
+    // --- UNDUH TEMPLATE & IMPOR EXCEL SISWA ---
+    function downloadStudentExcelTemplate() {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const kName = actKls ? actKls.namaRombel.replace(/[^a-zA-Z0-9_-]/g, '_') : 'Kelas';
+      const filename = `Template_Data_Siswa_${kName}.xlsx`;
+
+      const header = ["No", "Nama Lengkap", "NISN", "NIS", "Jenis Kelamin"];
+      const sampleData = [
+        [1, "Ahmad Rizky Pratama", "0081234567", "2401", "L"],
+        [2, "Siti Aisyah Putri", "0081234568", "2402", "P"],
+        [3, "Budi Santoso", "0081234569", "2403", "L"],
+        [4, "Dewi Lestari", "0081234570", "2404", "P"]
+      ];
+
+      const fullRows = [header, ...sampleData];
+
+      if (window.XLSX && window.XLSX.utils) {
+        try {
+          const ws = XLSX.utils.aoa_to_sheet(fullRows);
+          ws['!cols'] = [
+            { wch: 6 },
+            { wch: 32 },
+            { wch: 16 },
+            { wch: 14 },
+            { wch: 16 }
+          ];
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
+          XLSX.writeFile(wb, filename);
+          showToast(`Template ${filename} berhasil diunduh. Silakan isi data siswa dan upload kembali.`, 'success');
+          return;
+        } catch (err) {
+          console.warn('XLSX.writeFile fallback to CSV:', err);
+        }
+      }
+
+      // Fallback CSV (UTF-8 BOM untuk Microsoft Excel)
+      const csvContent = "\uFEFF" + fullRows.map(row => 
+        row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(",")
+      ).join("\r\n");
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Template_Data_Siswa_${kName}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('Template Data Siswa (.csv) berhasil diunduh.', 'success');
+    }
+
+    // Modal Impor Excel / CSV Siswa dengan Drag & Drop File Picker
     function openImportExcelModal() {
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      parsedImportStudents = [];
+
       const content = `
         <div class="space-y-4 text-xs">
-          <div class="p-3 bg-violet-50 rounded-2xl border border-violet-100 text-brand-dark leading-relaxed">
-            <strong>Petunjuk Impor Massal Siswa:</strong><br>
-            Salin (Copy) tabel dari Excel / Google Sheets lalu Tempel (Paste) ke kotak di bawah ini.<br>
-            <span class="text-[11px] font-mono font-bold text-brand-700">Urutan Kolom: NIS | NISN | Nama Siswa | JK (L/P) | Nama Wali | No HP Wali</span>
+          <!-- Banner Petunjuk Format Template Excel Resmi -->
+          <div class="p-3.5 bg-gradient-to-r from-violet-50 to-indigo-50/60 rounded-2xl border border-violet-100 text-brand-dark space-y-2 shadow-2xs">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-xs text-brand-700 flex items-center gap-1.5">
+                <span>📋</span> <span>Struktur Format Template Excel:</span>
+              </span>
+              <button type="button" onclick="downloadStudentExcelTemplate()" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 bg-white px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs hover:bg-emerald-50 transition cursor-pointer flex items-center gap-1">
+                <span>📥</span> <span>Unduh Template</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5 text-center font-mono font-bold text-[10px]">
+              <div class="bg-white/80 p-1.5 rounded-lg border border-violet-100">Kolom A<br><span class="text-brand-dark">No</span></div>
+              <div class="bg-white/80 p-1.5 rounded-lg border border-violet-100">Kolom B<br><span class="text-brand-dark">Nama Lengkap</span></div>
+              <div class="bg-white/80 p-1.5 rounded-lg border border-violet-100">Kolom C<br><span class="text-brand-dark">NISN</span></div>
+              <div class="bg-white/80 p-1.5 rounded-lg border border-violet-100">Kolom D<br><span class="text-brand-dark">NIS</span></div>
+              <div class="bg-white/80 p-1.5 rounded-lg border border-violet-100">Kolom E<br><span class="text-brand-dark">Jenis Kelamin</span></div>
+            </div>
+            <p class="text-[10px] text-brand-muted">
+              * Kolom Jenis Kelamin diisi dengan <strong>L</strong> (Laki-laki) atau <strong>P</strong> (Perempuan).
+            </p>
           </div>
 
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Target Rombel:</label>
-            <input type="text" disabled value="${actKls ? actKls.namaRombel : 'Pilih Kelas Terlebih Dahulu'}" class="w-full p-2.5 bg-slate-200 text-slate-700 rounded-xl font-bold">
+          <!-- Target Rombel Belajar -->
+          <div class="flex items-center justify-between bg-[#F8F7FD] p-2.5 rounded-xl border border-violet-100">
+            <span class="font-bold text-slate-600">Target Rombel Belajar:</span>
+            <span class="font-black text-brand-700 px-3 py-1 bg-white rounded-lg border border-violet-100 shadow-2xs">${actKls ? actKls.namaRombel : 'Pilih Rombel Terlebih Dahulu'}</span>
           </div>
 
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Tempelkan Data Excel di sini:</label>
-            <textarea id="importRawData" rows="6" oninput="previewParsedExcelData(this.value)" placeholder="Contoh:&#10;2401	0081234567	Ahmad Rizky Pratama	L	Hendra Pratama	081234567890&#10;2402	0081234568	Siti Aisyah Putri	P	Ratna Dewi	082345678901"
-              class="w-full p-3 font-mono text-xs bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl focus:outline-none"></textarea>
+          <!-- Upload Dropzone (Drag & Drop + File Picker) -->
+          <div id="excelDropZone"
+               ondragover="handleDragOverExcel(event)"
+               ondragleave="handleDragLeaveExcel(event)"
+               ondrop="handleDropExcel(event)"
+               onclick="document.getElementById('excelFileInput').click()"
+               class="border-2 border-dashed border-violet-200 hover:border-brand-500 rounded-2xl p-5 bg-[#F8F7FD] hover:bg-violet-50/50 transition-all text-center cursor-pointer space-y-2 select-none group">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-violet-100 text-brand-600 flex items-center justify-center mx-auto text-2xl group-hover:scale-110 shadow-xs transition-transform">
+              📊
+            </div>
+            <div>
+              <div class="font-extrabold text-brand-dark text-xs sm:text-sm">Tarik & Lepas File Excel (.xlsx / .xls / .csv) ke Sini</div>
+              <div class="text-[11px] text-brand-muted mt-0.5">atau <span class="text-brand-600 font-bold underline">klik untuk memilih file</span> dari komputer/HP</div>
+            </div>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" onchange="handleExcelFileInput(event)" class="hidden">
+            <div id="selectedFileInfo" class="hidden text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 py-1.5 px-3 rounded-xl inline-flex items-center gap-1.5"></div>
           </div>
 
+          <!-- Accordion Toggle: Opsi Paste Spreadsheet Manual -->
+          <div class="text-right">
+            <button type="button" onclick="togglePasteArea()" class="text-[11px] text-brand-600 font-bold hover:underline cursor-pointer inline-flex items-center gap-1">
+              <span>📋</span> <span id="togglePasteText">Atau Tempel (Copy-Paste) Teks Spreadsheet ▾</span>
+            </button>
+          </div>
+
+          <div id="pasteAreaContainer" class="hidden space-y-1.5">
+            <textarea id="importRawData" rows="4" oninput="previewParsedExcelText(this.value)" placeholder="Tempelkan baris data dari Excel / Google Sheets di sini...&#10;Contoh: 1	Ahmad Rizky Pratama	0081234567	2401	L"
+              class="w-full p-2.5 font-mono text-xs bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl focus:outline-none focus:border-brand-500"></textarea>
+          </div>
+
+          <!-- Area Pratinjau Siswa Terdeteksi -->
           <div id="importPreviewArea" class="hidden space-y-2">
-            <span class="font-extrabold text-brand-dark block" id="importPreviewCount">Pratinjau Data (0 Siswa Terdeteksi):</span>
-            <div class="max-h-40 overflow-y-auto border border-violet-100 rounded-xl p-2 bg-[#FBFBFE]">
+            <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-emerald-800">
+              <span class="font-black text-xs" id="importPreviewCount">✓ 0 Siswa Terdeteksi Siap Diimpor</span>
+              <span class="text-[10px] font-bold text-emerald-600">Periksa data sebelum disimpan</span>
+            </div>
+
+            <div class="max-h-48 overflow-y-auto border border-violet-100 rounded-xl p-2 bg-[#FBFBFE]">
               <table class="w-full text-left text-[11px]" id="tableImportPreview">
                 <thead>
-                  <tr class="border-b font-bold text-brand-muted">
-                    <th>NIS</th>
-                    <th>NISN</th>
-                    <th>Nama</th>
-                    <th>JK</th>
-                    <th>Wali</th>
+                  <tr class="border-b border-violet-100 font-bold text-brand-muted text-[10px]">
+                    <th class="py-1">No</th>
+                    <th class="py-1">Nama Lengkap</th>
+                    <th class="py-1">NISN</th>
+                    <th class="py-1">NIS</th>
+                    <th class="py-1 text-center">JK</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-violet-50"></tbody>
+                <tbody class="divide-y divide-violet-50 font-medium"></tbody>
               </table>
             </div>
           </div>
 
-          <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
+          <!-- Tombol Aksi Modal -->
+          <div class="pt-2 flex items-center justify-between gap-2 border-t border-violet-50">
+            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-full cursor-pointer transition">
+              Batal
+            </button>
             <button type="button" id="btnSubmitImport" onclick="submitImportExcel()" disabled
-              class="px-5 py-2 bg-brand-600 disabled:opacity-50 text-white rounded-full font-bold cursor-pointer hover:bg-brand-700 shadow-xs">
-              Impor Sekarang ke Kelas
+              class="px-5 py-2.5 bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-brand-700 text-white rounded-full font-extrabold text-xs cursor-pointer shadow-md shadow-brand-500/20 active:scale-95 transition flex items-center gap-1.5">
+              <span>Terapkan & Simpan ke Kelas Ini ➔</span>
             </button>
           </div>
         </div>
@@ -3410,86 +3523,231 @@
       openUniversalModal('📥 Impor Data Siswa dari Excel / CSV', content);
     }
 
+    function handleDragOverExcel(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const el = document.getElementById('excelDropZone');
+      if (el) el.classList.add('border-brand-600', 'bg-violet-100/50');
+    }
+
+    function handleDragLeaveExcel(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const el = document.getElementById('excelDropZone');
+      if (el) el.classList.remove('border-brand-600', 'bg-violet-100/50');
+    }
+
+    function handleDropExcel(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const el = document.getElementById('excelDropZone');
+      if (el) el.classList.remove('border-brand-600', 'bg-violet-100/50');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processExcelFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function handleExcelFileInput(e) {
+      if (e.target.files && e.target.files.length > 0) {
+        processExcelFile(e.target.files[0]);
+      }
+    }
+
+    function togglePasteArea() {
+      const container = document.getElementById('pasteAreaContainer');
+      const text = document.getElementById('togglePasteText');
+      if (!container) return;
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        if (text) text.textContent = 'Sembunyikan Kotak Tempel ▴';
+      } else {
+        container.classList.add('hidden');
+        if (text) text.textContent = 'Atau Tempel (Copy-Paste) Teks Spreadsheet ▾';
+      }
+    }
+
+    function processExcelFile(file) {
+      const infoEl = document.getElementById('selectedFileInfo');
+      if (infoEl) {
+        infoEl.innerHTML = `<span>✓</span> <span>${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>`;
+        infoEl.classList.remove('hidden');
+      }
+
+      const isXlsx = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+
+      if (isXlsx && window.XLSX) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+            parseImportedRows(rows);
+          } catch (err) {
+            showToast('Gagal membaca file Excel: ' + err.message, 'error');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        // Plain CSV / Text
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const text = e.target.result;
+            previewParsedExcelText(text);
+          } catch (err) {
+            showToast('Gagal membaca file CSV: ' + err.message, 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
+    }
+
     let parsedImportStudents = [];
 
-    function previewParsedExcelData(raw) {
-      const lines = raw.trim().split('\n');
-      parsedImportStudents = [];
-      const tbody = document.querySelector('#tableImportPreview tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      lines.forEach(line => {
-        const clean = line.trim();
-        if (!clean) return;
-        let cols = clean.split('\t');
-        if (cols.length === 1) cols = clean.split(',');
-        if (cols.length === 1) cols = clean.split(';');
-
-        if (cols.length >= 2) {
-          const nis = (cols[0] || '').trim();
-          const nisn = (cols[1] || '').trim();
-          const nama = (cols[2] || cols[0] || '').trim();
-          const jk = ((cols[3] || 'L').toUpperCase().startsWith('P')) ? 'P' : 'L';
-          const wali = (cols[4] || '-').trim();
-          const hp = (cols[5] || '').trim();
-
-          if (nama && nama !== 'Nama Siswa' && nama !== 'Nama') {
-            parsedImportStudents.push({
-              nis: nis,
-              nisn: nisn,
-              nama: nama,
-              jenisKelamin: jk,
-              namaWali: wali,
-              noHpWali: hp,
-              idKelas: activeGuruClassId,
-              statusAktif: 'Aktif'
-            });
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td class="py-1 font-mono">${nis}</td>
-              <td class="py-1 font-mono">${nisn}</td>
-              <td class="py-1 font-bold text-brand-dark">${nama}</td>
-              <td class="py-1">${jk}</td>
-              <td class="py-1">${wali}</td>
-            `;
-            tbody.appendChild(tr);
-          }
-        }
+    function previewParsedExcelText(raw) {
+      const lines = raw.trim().split(/\r?\n/);
+      const rows = lines.map(line => {
+        let cols = line.split('\t');
+        if (cols.length === 1) cols = line.split(',');
+        if (cols.length === 1) cols = line.split(';');
+        return cols;
       });
+      parseImportedRows(rows);
+    }
 
+    function parseImportedRows(rawRows) {
+      parsedImportStudents = [];
+      if (!rawRows || rawRows.length === 0) return;
+
+      // Cek apakah baris 0 adalah Header
+      let startIdx = 0;
+      let colIdxNo = -1;
+      let colIdxNama = -1;
+      let colIdxNisn = -1;
+      let colIdxNis = -1;
+      let colIdxJk = -1;
+
+      const firstRow = (rawRows[0] || []).map(c => String(c).trim().toLowerCase());
+      const hasHeader = firstRow.some(c => /nama|nisn|nis|kelamin|jk|rombel|no/i.test(c));
+
+      if (hasHeader) {
+        startIdx = 1;
+        firstRow.forEach((h, idx) => {
+          if (/^(no|nomor)$/i.test(h)) colIdxNo = idx;
+          else if (/nama/i.test(h)) colIdxNama = idx;
+          else if (/nisn/i.test(h)) colIdxNisn = idx;
+          else if (/^nis$/i.test(h)) colIdxNis = idx;
+          else if (/kelamin|jk|gender|l\/p/i.test(h)) colIdxJk = idx;
+        });
+      }
+
+      // Default fallback sesuai template resmi jika tidak terdeteksi via nama kolom:
+      // Template resmi: [No, Nama Lengkap, NISN, NIS, Jenis Kelamin]
+      if (colIdxNama === -1) colIdxNama = 1;
+      if (colIdxNisn === -1) colIdxNisn = 2;
+      if (colIdxNis === -1) colIdxNis = 3;
+      if (colIdxJk === -1) colIdxJk = 4;
+
+      for (let i = startIdx; i < rawRows.length; i++) {
+        const row = rawRows[i];
+        if (!row || row.length === 0) continue;
+
+        let nama = String(row[colIdxNama] !== undefined ? row[colIdxNama] : '').trim();
+        let nisn = String(row[colIdxNisn] !== undefined ? row[colIdxNisn] : '').trim();
+        let nis = String(row[colIdxNis] !== undefined ? row[colIdxNis] : '').trim();
+        let jkRaw = String(row[colIdxJk] !== undefined ? row[colIdxJk] : '').trim().toUpperCase();
+
+        // Bersihkan formatting angka ilmiah dari Excel jika ada (misal 8.12E+09)
+        if (nisn.includes('E+') || nisn.includes('e+')) {
+          const num = Number(nisn);
+          if (!isNaN(num)) nisn = Math.round(num).toString();
+        }
+        if (nis.includes('E+') || nis.includes('e+')) {
+          const num = Number(nis);
+          if (!isNaN(num)) nis = Math.round(num).toString();
+        }
+
+        // Tentukan JK: default L, P jika diawali 'P'
+        const jk = jkRaw.startsWith('P') ? 'P' : 'L';
+
+        // Validasi: nama harus ada dan bukan teks header yang tertinggal
+        if (nama && !/^(nama lengkap|nama siswa|nama|header)$/i.test(nama)) {
+          parsedImportStudents.push({
+            nama: nama,
+            nisn: nisn,
+            nis: nis,
+            jenisKelamin: jk,
+            idKelas: activeGuruClassId,
+            statusAktif: 'Aktif'
+          });
+        }
+      }
+
+      renderImportPreviewTable();
+    }
+
+    function renderImportPreviewTable() {
       const pArea = document.getElementById('importPreviewArea');
       const pCount = document.getElementById('importPreviewCount');
       const btn = document.getElementById('btnSubmitImport');
+      const tbody = document.querySelector('#tableImportPreview tbody');
+
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      parsedImportStudents.forEach((s, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-violet-50/40';
+        tr.innerHTML = `
+          <td class="py-1.5 text-brand-muted font-bold">${idx + 1}</td>
+          <td class="py-1.5 font-bold text-brand-dark">${s.nama}</td>
+          <td class="py-1.5 font-mono text-slate-600">${s.nisn || '-'}</td>
+          <td class="py-1.5 font-mono text-slate-600">${s.nis || '-'}</td>
+          <td class="py-1.5 text-center">
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold ${s.jenisKelamin === 'P' ? 'bg-pink-50 text-pink-700' : 'bg-blue-50 text-blue-700'}">
+              ${s.jenisKelamin}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
 
       if (parsedImportStudents.length > 0) {
-        pArea.classList.remove('hidden');
-        pCount.textContent = `Pratinjau Data (${parsedImportStudents.length} Siswa Terdeteksi):`;
-        btn.disabled = false;
+        if (pArea) pArea.classList.remove('hidden');
+        if (pCount) pCount.textContent = `✓ ${parsedImportStudents.length} Siswa Terdeteksi Siap Diimpor`;
+        if (btn) btn.disabled = false;
       } else {
-        pArea.classList.add('hidden');
-        btn.disabled = true;
+        if (pArea) pArea.classList.add('hidden');
+        if (btn) btn.disabled = true;
       }
     }
 
     async function submitImportExcel() {
       if (!parsedImportStudents || parsedImportStudents.length === 0) return;
       const count = parsedImportStudents.length;
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const kNama = actKls ? actKls.namaRombel : 'Kelas Aktif';
 
       parsedImportStudents.forEach((s, i) => {
         s.id = 'SIS-' + (Date.now() + i).toString().slice(-6);
+        s.idKelas = activeGuruClassId;
+        s.namaKelas = kNama;
+        s.statusAktif = 'Aktif';
         dbData.siswa.push(s);
       });
 
       closeUniversalModal();
       openModule('guru-siswa');
-      showToast(`Mengimpor ${count} siswa ke database...`, 'info');
+      showToast(`Mengimpor ${count} peserta didik ke ${kNama}...`, 'info');
 
       await executeDbWrite('batchImportStudents', {
         students: parsedImportStudents,
-        classId: activeGuruClassId
-      }, `Berhasil mengimpor ${count} siswa.`);
+        classId: activeGuruClassId,
+        namaKelas: kNama
+      }, `Berhasil mengimpor ${count} siswa ke ${kNama}.`);
     }
 
     // --- INPUT NILAI GURU ---
@@ -5799,25 +6057,25 @@
     }
 
     // ==========================================
-    // SISTEM CETAK KARTU IDENTITAS PRESENSI SISWA (A4 GRID)
-    // PERSIS SESUAI DESAIN MOCKUP REFERENSI (UKURAN RESMI CR80: 3.39" x 2.13" / 86 x 54 mm)
+    // SISTEM CETAK KARTU IDENTITAS PRESENSI QR SISWA (A4 GRID 8 KARTU)
+    // DESAIN JUMBO QR CODE, TANPA FOTO & TANPA TANDA TANGAN KEPALA SEKOLAH
+    // UKURAN ID CARD RESMI CR80 VERTIKAL (54 mm x 86 mm)
     // ==========================================
     function getQrCodeImageUrl(payloadText) {
       return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=4&data=${encodeURIComponent(payloadText)}`;
     }
 
     function generateSingleStudentCardHTML(s, sch, actKls, qrUrl) {
-      const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' });
-      const kNama = actKls ? actKls.namaRombel : 'Kelas IV-A';
+      const kNama = actKls ? actKls.namaRombel : 'Kelas Siswa';
       const ta = actKls ? actKls.tahunAjaran : '2026/2027';
 
       return `
         <div class="id-card-wrapper" style="
-          width: 86mm;
-          height: 54mm;
+          width: 54mm;
+          height: 86mm;
           background: #FFFFFF;
-          border: 1.5px solid #162447;
-          border-radius: 8px;
+          border: 1.5px solid #0F172A;
+          border-radius: 9px;
           position: relative;
           box-sizing: border-box;
           overflow: hidden;
@@ -5826,156 +6084,146 @@
           flex-direction: column;
           justify-content: space-between;
           page-break-inside: avoid;
-          margin: 0;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+          margin: 0 auto;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         ">
-          <!-- Card Header Angled Banner (Persis Mockup Referensi) -->
-          <div style="
-            background: linear-gradient(135deg, #162447 0%, #1F4068 70%, #1B1A47 100%);
-            color: #FFFFFF;
-            padding: 4px 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 2.5px solid #E43F5A;
-            position: relative;
-          ">
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <div style="
-                width: 20px;
-                height: 20px;
-                border-radius: 4px;
-                background: #E43F5A;
-                color: #FFFFFF;
-                font-weight: 900;
-                font-size: 8pt;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-              ">🎓</div>
-              <div>
-                <div style="font-size: 7.5pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.1;">
-                  ${sch.nama || 'SD NEGERI AMBULU'}
-                </div>
-                <div style="font-size: 5.5pt; opacity: 0.9; line-height: 1; letter-spacing: 0.1px;">
-                  NPSN: ${sch.npsn || '-'} • Kec. Ambulu, Kab. Jember
-                </div>
-              </div>
-            </div>
-            <span style="
-              font-size: 5pt;
-              font-weight: 900;
-              background: rgba(255,255,255,0.18);
-              padding: 2px 5px;
-              border-radius: 3px;
-              text-transform: uppercase;
-              color: #FEE715;
-              letter-spacing: 0.3px;
-            ">KURIKULUM MERDEKA</span>
-          </div>
-
-          <!-- Card Body: Dua Kolom (Kiri: QR Code Besar, Kanan: Identitas Siswa) -->
-          <div style="
-            display: flex;
-            padding: 4px 7px 2px 7px;
-            gap: 6px;
-            align-items: center;
-            flex: 1;
-          ">
-            <!-- Kolom Kiri: QR Code Besar & Kontras Tinggi untuk Pemindaian Instan -->
+          <!-- 1. Slot Lubang Gantungan Tali Lanyard (Top Punch Slot Visual) -->
+          <div style="padding: 2.2mm 0 1mm 0; display: flex; justify-content: center; background: #FFFFFF;">
             <div style="
-              width: 32mm;
+              width: 16mm;
+              height: 2.8mm;
+              border-radius: 3px;
+              border: 1px dashed #94A3B8;
+              background: #F1F5F9;
               display: flex;
-              flex-direction: column;
               align-items: center;
               justify-content: center;
-              text-align: center;
-              border: 1.2px solid #CBD5E1;
-              border-radius: 6px;
-              padding: 2px;
-              background: #F8FAFC;
+              font-size: 4pt;
+              font-weight: bold;
+              color: #94A3B8;
+              letter-spacing: 0.5px;
             ">
-              <img src="${qrUrl}" alt="QR" style="
-                width: 28mm;
-                height: 28mm;
+              · LUBANG TALI ·
+            </div>
+          </div>
+
+          <!-- 2. Header Satuan Pendidikan Resmi -->
+          <div style="
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: #FFFFFF;
+            padding: 3.5px 4px;
+            text-align: center;
+            border-bottom: 2px solid #10B981;
+            position: relative;
+          ">
+            <div style="font-size: 7.2pt; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2px; line-height: 1.15; color: #FFFFFF;">
+              ${sch.nama || 'SD NEGERI AMBULU'}
+            </div>
+            <div style="font-size: 5pt; color: #94A3B8; line-height: 1.1; margin-top: 1px;">
+              NPSN: ${sch.npsn || '-'} • Kec. Ambulu
+            </div>
+          </div>
+
+          <!-- 3. Identitas Siswa: Nama Lengkap Besar & Badges Identitas -->
+          <div style="padding: 2.5mm 2.5mm 1mm 2.5mm; text-align: center;">
+            <div style="
+              font-size: 8.8pt;
+              font-weight: 900;
+              color: #0F172A;
+              text-transform: uppercase;
+              line-height: 1.15;
+              letter-spacing: 0.2px;
+              max-height: 2.3em;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+            " title="${s.nama}">
+              ${s.nama}
+            </div>
+
+            <!-- Badges Baris: NISN, NIS, Gender, Kelas -->
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2.5px; margin-top: 3px;">
+              <span style="font-family: monospace; font-size: 5.2pt; font-weight: 800; background: #F1F5F9; color: #334155; padding: 1px 3.5px; border-radius: 3px; border: 0.8px solid #CBD5E1;">
+                NISN: ${s.nisn || '-'}
+              </span>
+              <span style="font-family: monospace; font-size: 5.2pt; font-weight: 800; background: #F1F5F9; color: #334155; padding: 1px 3.5px; border-radius: 3px; border: 0.8px solid #CBD5E1;">
+                NIS: ${s.nis || '-'}
+              </span>
+              <span style="font-size: 5.2pt; font-weight: 900; background: ${s.jenisKelamin === 'P' ? '#FCE7F3' : '#E0E7FF'}; color: ${s.jenisKelamin === 'P' ? '#BE185D' : '#3730A3'}; padding: 1px 4px; border-radius: 3px;">
+                ${s.jenisKelamin === 'P' ? 'P' : 'L'}
+              </span>
+              <span style="font-size: 5.2pt; font-weight: 800; background: #ECFDF5; color: #047857; padding: 1px 4px; border-radius: 3px;">
+                ${kNama}
+              </span>
+            </div>
+          </div>
+
+          <!-- 4. Area QR Code JUMBO (Mengisi ~55% Area Kartu dengan Reticle Laser Hijau) -->
+          <div style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1mm 2mm;
+            flex: 1;
+          ">
+            <div style="
+              width: 37mm;
+              height: 37mm;
+              position: relative;
+              background: #FFFFFF;
+              border: 1px solid #E2E8F0;
+              border-radius: 7px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 1mm;
+              box-sizing: border-box;
+              box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            ">
+              <!-- Reticle 4 Sudut Laser Scan Hijau Emerald -->
+              <div style="position: absolute; top: 1.5px; left: 1.5px; width: 6px; height: 6px; border-top: 2px solid #10B981; border-left: 2px solid #10B981; border-top-left-radius: 2px;"></div>
+              <div style="position: absolute; top: 1.5px; right: 1.5px; width: 6px; height: 6px; border-top: 2px solid #10B981; border-right: 2px solid #10B981; border-top-right-radius: 2px;"></div>
+              <div style="position: absolute; bottom: 1.5px; left: 1.5px; width: 6px; height: 6px; border-bottom: 2px solid #10B981; border-left: 2px solid #10B981; border-bottom-left-radius: 2px;"></div>
+              <div style="position: absolute; bottom: 1.5px; right: 1.5px; width: 6px; height: 6px; border-bottom: 2px solid #10B981; border-right: 2px solid #10B981; border-bottom-right-radius: 2px;"></div>
+
+              <img src="${qrUrl}" alt="QR Presensi" style="
+                width: 33mm;
+                height: 33mm;
                 display: block;
                 image-rendering: pixelated;
               ">
-              <span style="
-                font-size: 5pt;
-                font-weight: 900;
-                color: #162447;
-                margin-top: 1px;
-                letter-spacing: 0.3px;
-              ">SCAN PRESENSI</span>
             </div>
 
-            <!-- Kolom Kanan: Rincian Data Siswa -->
-            <div style="flex: 1; font-size: 7pt; color: #1E293B; line-height: 1.25;">
-              <div style="
-                font-size: 8.5pt;
-                font-weight: 900;
-                color: #162447;
-                text-transform: uppercase;
-                line-height: 1.15;
-                margin-bottom: 3px;
-                border-bottom: 1.5px solid #E2E8F0;
-                padding-bottom: 2px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 44mm;
-              " title="${s.nama}">
-                ${s.nama}
-              </div>
-
-              <table style="width: 100%; border-collapse: collapse; font-size: 6.5pt; border: none; margin-bottom: 2px;">
-                <tr>
-                  <td style="width: 28%; font-weight: bold; color: #64748B; padding: 1px 0; border: none;">NIS</td>
-                  <td style="width: 5%; border: none; padding: 1px 0;">:</td>
-                  <td style="width: 67%; font-family: monospace; font-weight: bold; color: #0F172A; border: none; padding: 1px 0;">${s.nis || '-'}</td>
-                </tr>
-                <tr>
-                  <td style="font-weight: bold; color: #64748B; padding: 1px 0; border: none;">NISN</td>
-                  <td style="border: none; padding: 1px 0;">:</td>
-                  <td style="font-family: monospace; font-weight: bold; color: #0F172A; border: none; padding: 1px 0;">${s.nisn || '-'}</td>
-                </tr>
-                <tr>
-                  <td style="font-weight: bold; color: #64748B; padding: 1px 0; border: none;">Kelas</td>
-                  <td style="border: none; padding: 1px 0;">:</td>
-                  <td style="font-weight: bold; color: #1E40AF; border: none; padding: 1px 0;">${kNama} (${ta})</td>
-                </tr>
-                <tr>
-                  <td style="font-weight: bold; color: #64748B; padding: 1px 0; border: none;">L / P</td>
-                  <td style="border: none; padding: 1px 0;">:</td>
-                  <td style="border: none; padding: 1px 0;">${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</td>
-                </tr>
-              </table>
-
-              <!-- Kolom Tanda Tangan Kepala Sekolah -->
-              <div style="margin-top: 1px; text-align: right; font-size: 5.5pt; color: #334155; line-height: 1.1;">
-                Ambulu, ${todayStr}<br>
-                Kepala Sekolah,
-                <div style="font-weight: 800; text-decoration: underline; margin-top: 8px; color: #0F172A;">
-                  ${schoolMetaConfig.kepalaSekolah}
-                </div>
-              </div>
+            <!-- Teks Instruksi Bawah QR -->
+            <div style="
+              font-size: 5.5pt;
+              font-weight: 900;
+              color: #047857;
+              text-transform: uppercase;
+              letter-spacing: 0.4px;
+              margin-top: 1.8mm;
+              text-align: center;
+            ">
+              PINDAI UNTUK PRESENSI HARIAN
             </div>
           </div>
 
-          <!-- Bottom Footer Strip -->
+          <!-- 5. Bottom Footer Strip -->
           <div style="
-            background: #162447;
+            background: #0F172A;
             color: #94A3B8;
-            font-size: 5pt;
-            padding: 2.5px 8px;
+            font-size: 4.8pt;
+            padding: 2.2px 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-top: 1px solid #1E293B;
           ">
-            <span>KARTU IDENTITAS PRESENSI SISWA</span>
-            <span style="color: #60A5FA; font-weight: 800;">SiGuru SD Digital</span>
+            <span>KARTU PRESENSI QR SISWA</span>
+            <span style="color: #38BDF8; font-weight: 800;">SiGuru SD Digital</span>
           </div>
         </div>
       `;
@@ -5984,14 +6232,48 @@
     function generateAllStudentCardsHTML(students) {
       const sch = currentSchool || { nama: 'SD NEGERI AMBULU', npsn: '-', desa: 'Ambulu' };
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const kNama = actKls ? actKls.namaRombel : 'Kelas Siswa';
 
-      const cardsHtml = students.map(s => {
-        const payload = `SIGURU:${s.id}:${s.nis || ''}`;
-        const qrUrl = getQrCodeImageUrl(payload);
+      // Pecah per 8 kartu untuk setiap halaman cetak A4 Landscape (4 kolom x 2 baris)
+      const cardsPerPage = 8;
+      const pages = [];
+      for (let i = 0; i < students.length; i += cardsPerPage) {
+        pages.push(students.slice(i, i + cardsPerPage));
+      }
+
+      const pagesHtml = pages.map((pageStudents, pageIdx) => {
+        const cardsHtml = pageStudents.map(s => {
+          const payload = `SIGURU:${s.id}:${s.nis || ''}`;
+          const qrUrl = getQrCodeImageUrl(payload);
+          return `
+            <div style="box-sizing: border-box; display: inline-block; padding: 0.5mm;">
+              <div style="border: 1px dashed #94A3B8; padding: 1mm; border-radius: 10px; background: #FFFFFF; position: relative;">
+                <span class="no-print" style="position: absolute; top: -7px; left: 8px; font-size: 8px; color: #64748B; background: #FFFFFF; padding: 0 4px; font-weight: bold;">✂️ potong</span>
+                ${generateSingleStudentCardHTML(s, sch, actKls, qrUrl)}
+              </div>
+            </div>
+          `;
+        }).join('');
+
         return `
-          <div style="padding: 2mm; box-sizing: border-box; display: inline-block; page-break-inside: avoid;">
-            <div style="border: 1px dashed #CBD5E1; padding: 1.5mm; border-radius: 10px; background: #F8FAFC;">
-              ${generateSingleStudentCardHTML(s, sch, actKls, qrUrl)}
+          <div class="print-page-a4" style="
+            width: 280mm;
+            margin: 0 auto;
+            page-break-after: ${pageIdx < pages.length - 1 ? 'always' : 'auto'};
+            page-break-inside: avoid;
+            box-sizing: border-box;
+            padding-top: 2mm;
+          ">
+            <div style="
+              display: grid;
+              grid-template-columns: repeat(4, 57mm);
+              grid-template-rows: repeat(2, 90mm);
+              gap: 3mm 4mm;
+              justify-content: center;
+              align-content: center;
+              margin: 0 auto;
+            ">
+              ${cardsHtml}
             </div>
           </div>
         `;
@@ -5999,23 +6281,12 @@
 
       return `
         <div style="font-family: Arial, Helvetica, sans-serif; background: #ffffff; padding: 0; margin: 0 auto;">
-          <div class="no-print" style="text-align: center; margin-bottom: 12px; font-size: 8.5pt; color: #475569; border: 1px solid #E2E8F0; padding: 8px 12px; border-radius: 8px; background: #F8FAFC;">
-            <strong style="color: #1E293B; font-size: 9.5pt;">LEMBAR CETAK KARTU IDENTITAS PRESENSI QR SISWA (A4 GRID)</strong><br>
-            Format Standar ID Card (3.39" x 2.13" / 86 x 54 mm). Cetak di kertas tebal / kertas foto A4, potong mengikuti garis putus-putus abu-abu, lalu masukkan ke plastik mika gantungan tali kartu siswa (<em>lanyard</em>).
+          <div class="no-print" style="text-align: center; margin-bottom: 12px; font-size: 8.5pt; color: #475569; border: 1px solid #E2E8F0; padding: 8px 14px; border-radius: 12px; background: #F8FAFC; max-width: 900px; margin-left: auto; margin-right: auto;">
+            <strong style="color: #1E293B; font-size: 10pt;">LEMBAR CETAK KARTU PRESENSI QR SISWA (A4 LANDSCAPE - 8 KARTU PER LEMBAR)</strong><br>
+            <span style="color: #059669; font-weight: bold;">✓ Ukuran Standar ID Card (54 x 86 mm) • QR Code Jumbo Cepat Scan Kamera • Tanpa Foto & Tanpa Tanda Tangan</span><br>
+            <span style="font-size: 8pt; color: #64748B;">Petunjuk: Cetak di kertas tebal (Art Paper 230/260 gsm atau Photo Paper A4), potong mengikuti garis putus-putus abu-abu ✂️, lalu masukkan ke dalam plastik mika tali lanyard siswa.</span>
           </div>
-
-          <div style="
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 2mm 3mm;
-            justify-items: center;
-            align-items: center;
-            width: 100%;
-            max-width: 190mm;
-            margin: 0 auto;
-          ">
-            ${cardsHtml}
-          </div>
+          ${pagesHtml}
         </div>
       `;
     }
@@ -6025,13 +6296,13 @@
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
 
       if (myStudents.length === 0) {
-        showToast('Belum ada siswa di kelas ini untuk dicetak kartunya.', 'warning');
+        showToast('Belum ada data siswa di kelas ini untuk dicetak kartunya.', 'warning');
         return;
       }
 
-      showToast(`Menyiapkan lembar cetak kartu QR ${myStudents.length} siswa...`, 'info');
+      showToast(`Menyiapkan lembar cetak kartu QR ${myStudents.length} siswa (A4 Landscape 8 kartu/lembar)...`, 'info');
       const html = generateAllStudentCardsHTML(myStudents);
-      openPrintInNewTab(html, `Kartu_QR_Siswa_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`, 'portrait');
+      openPrintInNewTab(html, `Kartu_QR_Siswa_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}`, 'landscape');
     }
 
     function printSingleKartuQR(studentId) {
@@ -6039,7 +6310,7 @@
       if (!student) return;
 
       const html = generateAllStudentCardsHTML([student]);
-      openPrintInNewTab(html, `Kartu_QR_${student.nama.replace(/\s+/g, '_')}`, 'portrait');
+      openPrintInNewTab(html, `Kartu_QR_${student.nama.replace(/\s+/g, '_')}`, 'landscape');
     }
 
     // ==========================================
