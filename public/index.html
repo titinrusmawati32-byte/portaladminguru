@@ -380,11 +380,38 @@
       scrollbar-width: none;
     }
 
-    /* Mencegah tabel horizontal menelan atau mengunci gesture swipe vertikal */
-    .overflow-x-auto {
+    /* ============================================================
+       MOBILE & TABLET HIGH-PERFORMANCE 60-120 FPS TOUCH SCROLL
+       ============================================================ */
+    html {
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y;
+      overscroll-behavior-y: none;
+      scroll-behavior: auto; /* Mencegah lag perebutan thread gesture bawaan OS */
+    }
+
+    body {
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      overscroll-behavior-y: none;
+      /* Membantu GPU menahan compositing layer tanpa repaint */
+      transform: translate3d(0, 0, 0);
+      -webkit-transform: translate3d(0, 0, 0);
+    }
+
+    /* Hilangkan delay 300ms sentuhan tombol di semua browser HP */
+    button, a, input, select, textarea, [onclick] {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Mencegah tabel horizontal menelan atau mengunci gesture swipe vertikal */
+    .overflow-x-auto,
+    .overflow-y-auto {
+      -webkit-overflow-scrolling: touch !important;
       touch-action: pan-x pan-y;
-      overscroll-behavior-x: contain;
+      overscroll-behavior: contain;
     }
 
     /* Soft Pastel Glassmorphism */
@@ -404,12 +431,82 @@
       box-shadow: 0 4px 15px -2px rgba(124, 110, 230, 0.12);
     }
 
+    /* Mencegah efek hover tersangkut dan membuat macet saat jari menggeser kartu di touchscreen */
     .card-hover-effect {
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+      will-change: auto;
+      transform: translateZ(0);
     }
-    .card-hover-effect:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px -4px rgba(124, 110, 230, 0.12);
+    @media (hover: hover) and (pointer: fine) {
+      .card-hover-effect:hover {
+        transform: translateY(-3px) translateZ(0);
+        box-shadow: 0 12px 30px -4px rgba(124, 110, 230, 0.12);
+      }
+    }
+
+    /* Isolasi Render Layer pada Kontainer Utama agar Scroll Tidak Membebani CPU */
+    #portalDashboardView,
+    #moduleView,
+    #portalHeroContainer,
+    #portalCardsContainer {
+      transform: translateZ(0);
+      contain: layout style;
+    }
+
+    /* content-visibility: auto untuk perenderan instan bagian bawah layar */
+    #portalRecordsContainer,
+    #portalWelcomeBarContainer,
+    #tableGuruSiswa,
+    #tableGuruNilai,
+    #tableGuruPresensi {
+      content-visibility: auto;
+      contain-intrinsic-size: 0 400px;
+    }
+
+    /* Optimasi khusus Layar Smartphone & Tablet Kecil (max-width: 768px) */
+    @media (max-width: 768px) {
+      /* Matikan kalkulasi berat backdrop-filter blur di HP agar GPU 60-120fps konstan */
+      .backdrop-blur-md,
+      .backdrop-blur-xl,
+      .backdrop-blur-xs,
+      .glass-card-pastel {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      /* Sembunyikan ambient neon blobs yang blur di belakang kartu HP agar tidak overdraw */
+      .portal-card-glow .absolute.rounded-full.blur-xl {
+        display: none !important;
+      }
+
+      /* Nonaktifkan filter SVG berat di grafik mobile */
+      #neonWaveGlow {
+        display: none !important;
+      }
+      path[filter="url(#neonWaveGlow)"] {
+        filter: none !important;
+      }
+
+      /* Momentum scrolling licin untuk semua tabel & daftar */
+      .overflow-x-auto,
+      .overflow-y-auto {
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-x pan-y !important;
+        overscroll-behavior: contain !important;
+      }
+    }
+
+    /* Optimasi Layar Tablet (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .backdrop-blur-md,
+      .backdrop-blur-xl {
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+      }
+      .overflow-x-auto,
+      .overflow-y-auto {
+        -webkit-overflow-scrolling: touch !important;
+      }
     }
 
     @keyframes fadeIn {
