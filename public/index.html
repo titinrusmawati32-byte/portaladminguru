@@ -420,6 +420,17 @@
       animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
+    @keyframes pulseGlow {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 20px rgba(124, 110, 230, 0.5));
+      }
+      50% {
+        transform: scale(1.06);
+        filter: drop-shadow(0 0 35px rgba(56, 189, 248, 0.8));
+      }
+    }
+
     /* Aksesibilitas: Hormati prefers-reduced-motion */
     @media (prefers-reduced-motion: reduce) {
       html {
@@ -502,6 +513,109 @@
 
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed top-4 right-4 z-[110] flex flex-col gap-2 max-w-sm w-full pointer-events-none no-print"></div>
+
+  <!-- ============================================================
+       CINEMATIC FULLSCREEN SPLASH SCREEN OVERLAY (OPSI 2 LOGIN TRANSISI)
+       ============================================================ -->
+  <div id="cinematicSplashOverlay"
+       class="fixed inset-0 z-[9999] flex flex-col items-center justify-between p-6 sm:p-8 text-white no-print pointer-events-none opacity-0 transition-all duration-500 overflow-hidden select-none"
+       style="display: none; background: radial-gradient(circle at 50% 38%, #1e1b4b 0%, #0f172a 60%, #020617 100%);">
+    
+    <!-- Ambient Orbital Background Glowing Blobs -->
+    <div class="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-violet-600/25 blur-[120px] pointer-events-none animate-pulse"></div>
+    <div class="absolute -bottom-32 -right-32 w-[480px] h-[480px] rounded-full bg-cyan-500/20 blur-[120px] pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full bg-brand-600/15 blur-[150px] pointer-events-none"></div>
+
+    <!-- Top Status Header Pill -->
+    <div class="relative z-10 w-full max-w-md flex items-center justify-between pt-2">
+      <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs shadow-lg">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="font-extrabold uppercase tracking-wider text-cyan-300 font-outfit text-[10px]">SiGuru SD Digital</span>
+      </div>
+      <span class="text-[11px] font-mono text-slate-400">Kecamatan Ambulu</span>
+    </div>
+
+    <!-- Center Cinematic Content: 3D Emblem + Greetings + Circular Progress Loader -->
+    <div class="relative z-10 flex flex-col items-center justify-center text-center my-auto max-w-md w-full px-4 space-y-5">
+      
+      <!-- Animated 3D Floating Education Emblem with Dual Orbital Neon Rings -->
+      <div class="relative w-28 h-28 flex items-center justify-center">
+        <!-- Outer Orbit Ring (Violet) -->
+        <div class="absolute inset-0 rounded-full border border-violet-400/40 border-dashed animate-spin" style="animation-duration: 12s;"></div>
+        <!-- Inner Orbit Ring (Cyan) -->
+        <div class="absolute inset-2 rounded-full border-2 border-transparent border-t-cyan-400 border-r-cyan-400/60 animate-spin" style="animation-duration: 5s; animation-direction: reverse;"></div>
+        
+        <!-- Glowing 3D Glass Emblem -->
+        <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-brand-700 via-violet-600 to-indigo-500 border border-white/40 shadow-[0_0_35px_rgba(124,110,230,0.6)] flex items-center justify-center text-4xl select-none"
+             style="animation: pulseGlow 3s ease-in-out infinite;">
+          🎓
+        </div>
+      </div>
+
+      <!-- Greeting & School Identifier -->
+      <div class="space-y-1.5">
+        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md">
+          Selamat Datang, Bapak/Ibu Guru
+        </h2>
+        <div id="splashTeacherName" class="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-200 to-amber-200 truncate max-w-xs sm:max-w-sm mx-auto">
+          Guru SD
+        </div>
+        <p id="splashSchoolName" class="text-xs sm:text-sm font-semibold text-slate-300 flex items-center justify-center gap-1.5 pt-0.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span id="splashSchoolNameText">SD Negeri Ambulu</span>
+        </p>
+      </div>
+
+      <!-- Circular Glowing Neon Progress Loader -->
+      <div class="relative w-28 h-28 flex items-center justify-center my-1">
+        <!-- SVG Circular Ring -->
+        <svg class="w-28 h-28 -rotate-90 transform" viewBox="0 0 100 100">
+          <!-- Background Track -->
+          <circle cx="50" cy="50" r="40" stroke="rgba(255, 255, 255, 0.12)" stroke-width="6" fill="none" />
+          <!-- Dynamic Neon Ring -->
+          <circle id="splashProgressCircle" cx="50" cy="50" r="40"
+                  stroke="url(#splashNeonGradient)" stroke-width="6" stroke-linecap="round" fill="none"
+                  stroke-dasharray="251.2" stroke-dashoffset="251.2"
+                  style="transition: stroke-dashoffset 0.35s ease-out; filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.8));" />
+          <defs>
+            <linearGradient id="splashNeonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38BDF8" />
+              <stop offset="50%" stop-color="#A78BFA" />
+              <stop offset="100%" stop-color="#34D399" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <!-- Center Percentage Text -->
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span id="splashProgressPct" class="text-2xl font-black font-outfit text-white tracking-tight drop-shadow">0%</span>
+        </div>
+      </div>
+
+      <!-- Sequential Step Status Label -->
+      <div class="w-full">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-cyan-200 text-xs font-bold shadow-lg shadow-black/20">
+          <svg class="w-3.5 h-3.5 animate-spin text-cyan-400 shrink-0" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span id="splashStatusText">Memverifikasi identitas & PIN akun guru...</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Technology & Security Identifier -->
+    <div class="relative z-10 w-full max-w-md text-center space-y-1 pb-2">
+      <div class="text-[10px] text-slate-400 font-medium">
+        Sinkronisasi Database Mandiri SD Negeri se-Kecamatan Ambulu
+      </div>
+      <div class="text-[9px] text-slate-500 font-mono tracking-wider">
+        Koorwil Pendidikan Kab. Jember • SiGuru SD Digital
+      </div>
+    </div>
+
+  </div>
 
   <!-- ============================================================
        1. HALAMAN LOGIN: NPSN + KODE UNIK + PIN GURU (OPSI C)
@@ -1280,6 +1394,59 @@
     }
 
     // ==========================================
+    // ACTION: FULLSCREEN CINEMATIC SPLASH SCREEN (OPSI 2 ANIMASI LOADING LOGIN)
+    // ==========================================
+    function showCinematicSplashScreen(teacherName, schoolName) {
+      const overlay = document.getElementById('cinematicSplashOverlay');
+      if (!overlay) return;
+
+      const tEl = document.getElementById('splashTeacherName');
+      const sEl = document.getElementById('splashSchoolNameText');
+      if (tEl) tEl.textContent = teacherName || 'Guru SD';
+      if (sEl) sEl.textContent = schoolName || 'SD Negeri Ambulu';
+
+      updateCinematicSplashProgress(15, 'Memverifikasi identitas & PIN akun guru...');
+
+      overlay.style.display = 'flex';
+      overlay.style.transform = 'scale(1)';
+      void overlay.offsetWidth; // Force DOM reflow
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      overlay.classList.add('opacity-100', 'pointer-events-auto');
+    }
+
+    function updateCinematicSplashProgress(pct, statusText) {
+      const circle = document.getElementById('splashProgressCircle');
+      const textPct = document.getElementById('splashProgressPct');
+      const statusEl = document.getElementById('splashStatusText');
+
+      const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+      const circumference = 251.2;
+      const offset = circumference - (circumference * clamped / 100);
+
+      if (circle) circle.style.strokeDashoffset = offset;
+      if (textPct) textPct.textContent = `${clamped}%`;
+      if (statusEl && statusText) statusEl.textContent = statusText;
+    }
+
+    function hideCinematicSplashScreen(callback) {
+      const overlay = document.getElementById('cinematicSplashOverlay');
+      if (!overlay) {
+        if (callback) callback();
+        return;
+      }
+
+      overlay.classList.remove('opacity-100', 'pointer-events-auto');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      overlay.style.transform = 'scale(1.04)';
+
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        overlay.style.transform = 'scale(1)';
+        if (callback) callback();
+      }, 500);
+    }
+
+    // ==========================================
     // ACTION: LOGIN GURU (HANYA TERVERIFIKASI)
     // ==========================================
     async function handleLoginTeacherWithPin(e) {
@@ -1292,6 +1459,13 @@
       const inputEl = document.getElementById('loginTeacherNameInput');
       const teacherIdOrName = selectEl ? selectEl.value : (inputEl ? inputEl.value.trim() : '');
 
+      let displayTeacherName = 'Guru SD';
+      if (selectEl && selectEl.selectedIndex >= 0 && selectEl.options[selectEl.selectedIndex]) {
+        displayTeacherName = selectEl.options[selectEl.selectedIndex].text.replace(/\s*\(.*\)/, '').trim();
+      } else if (inputEl && inputEl.value.trim()) {
+        displayTeacherName = inputEl.value.trim();
+      }
+
       if (!npsn || !kodeUnik || !teacherIdOrName || !pin) {
         showToast('Lengkapi seluruh kolom login.', 'warning');
         return;
@@ -1303,7 +1477,17 @@
         return;
       }
 
-      showToast('Memverifikasi akun guru...', 'info');
+      // TAMPILKAN CINEMATIC FULLSCREEN SPLASH SCREEN (OPSI 2)
+      showCinematicSplashScreen(displayTeacherName, school.nama);
+
+      // Simulasikan urutan tahapan loading secara dinamis selama request berlangsung
+      const t1 = setTimeout(() => {
+        updateCinematicSplashProgress(45, `Menghubungkan ke database mandiri ${school.nama}...`);
+      }, 350);
+
+      const t2 = setTimeout(() => {
+        updateCinematicSplashProgress(75, 'Memuat rombongan belajar & buku induk siswa...');
+      }, 750);
 
       try {
         const res = await apiPost('loginTeacherWithPin', {
@@ -1313,77 +1497,100 @@
           pin: pin
         });
 
+        clearTimeout(t1);
+        clearTimeout(t2);
+
         if (res && res.success) {
-          completeLoginTeacher(res.teacher, school, res);
-        } else if (res && res.isPending) {
-          openUniversalModal(
-            'Akses Ditolak: Menunggu Verifikasi',
-            `
-            <div class="text-center space-y-4 py-3">
-              <div class="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-3xl shadow-xs">
-                ⏳
-              </div>
-              <div class="space-y-1">
-                <h4 class="text-base font-extrabold text-brand-dark">Akun Anda Menunggu Verifikasi</h4>
-                <p class="text-xs text-slate-600 max-w-sm mx-auto">
-                  ${res.message || 'Pendaftaran Anda di ' + school.nama + ' saat ini masih berstatus "Menunggu Verifikasi" oleh Admin Sekolah.'}
-                </p>
-              </div>
-              <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[11px] text-amber-900 text-left leading-relaxed">
-                📢 <strong>Keamanan Lembaga:</strong> Guru hanya dapat masuk setelah disetujui (diverifikasi) oleh Admin / Kepala Sekolah ${school.nama}. Silakan hubungi Admin Sekolah Anda untuk menyetujui akun Anda.
-              </div>
-              <div class="pt-2">
-                <button onclick="closeUniversalModal()" class="px-6 py-2.5 rounded-full bg-slate-800 text-white font-extrabold text-xs cursor-pointer">
-                  Saya Mengerti
-                </button>
-              </div>
-            </div>
-            `
-          );
-        } else if (res && res.isRejected) {
-          openUniversalModal(
-            'Pendaftaran Ditolak',
-            `
-            <div class="text-center space-y-4 py-3">
-              <div class="w-16 h-16 rounded-3xl bg-rose-100 text-rose-700 flex items-center justify-center mx-auto text-3xl">
-                ✕
-              </div>
-              <h4 class="text-base font-extrabold text-brand-dark">Pendaftaran Anda Ditolak</h4>
-              <p class="text-xs text-slate-600 max-w-sm mx-auto">
-                ${res.message || 'Pendaftaran akun Anda telah ditolak oleh Admin Sekolah.'}
-              </p>
-              <div class="pt-2">
-                <button onclick="closeUniversalModal()" class="px-6 py-2.5 rounded-full bg-rose-600 text-white font-extrabold text-xs cursor-pointer">
-                  Tutup
-                </button>
-              </div>
-            </div>
-            `
-          );
-        } else if (res && res.notRegistered) {
-          openUniversalModal(
-            'Akun Belum Terdaftar',
-            `
-            <div class="text-center space-y-4 py-3">
-              <div class="w-16 h-16 rounded-3xl bg-blue-100 text-blue-700 flex items-center justify-center mx-auto text-3xl">
-                📝
-              </div>
-              <h4 class="text-base font-extrabold text-brand-dark">Belum Terdaftar di ${school.nama}</h4>
-              <p class="text-xs text-slate-600 max-w-sm mx-auto">
-                Data guru belum ditemukan untuk sekolah ini. Silakan mendaftar terlebih dahulu pada tab "Guru Baru".
-              </p>
-              <div class="pt-2">
-                <button onclick="closeUniversalModal(); switchLoginTab('register');" class="px-6 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs cursor-pointer">
-                  Daftar Sekarang ➔
-                </button>
-              </div>
-            </div>
-            `
-          );
+          if (res.teacher && res.teacher.nama) {
+            displayTeacherName = res.teacher.nama;
+            const tEl = document.getElementById('splashTeacherName');
+            if (tEl) tEl.textContent = displayTeacherName;
+          }
+
+          updateCinematicSplashProgress(100, '✓ Data berhasil disinkronkan! Menyiapkan portal...');
+
+          // Jeda sejenak (450ms) agar transisi 100% dan status sukses terlihat megah
+          setTimeout(() => {
+            completeLoginTeacher(res.teacher, school, res);
+            hideCinematicSplashScreen();
+          }, 450);
+
         } else {
-          showToast((res && res.message) ? res.message : 'Kombinasi NPSN, Akun, atau PIN tidak cocok.', 'error');
+          hideCinematicSplashScreen();
+
+          if (res && res.isPending) {
+            openUniversalModal(
+              'Akses Ditolak: Menunggu Verifikasi',
+              `
+              <div class="text-center space-y-4 py-3">
+                <div class="w-16 h-16 rounded-3xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto text-3xl shadow-xs">
+                  ⏳
+                </div>
+                <div class="space-y-1">
+                  <h4 class="text-base font-extrabold text-brand-dark">Akun Anda Menunggu Verifikasi</h4>
+                  <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                    ${res.message || 'Pendaftaran Anda di ' + school.nama + ' saat ini masih berstatus "Menunggu Verifikasi" oleh Admin Sekolah.'}
+                  </p>
+                </div>
+                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-[11px] text-amber-900 text-left leading-relaxed">
+                  📢 <strong>Keamanan Lembaga:</strong> Guru hanya dapat masuk setelah disetujui (diverifikasi) oleh Admin / Kepala Sekolah ${school.nama}. Silakan hubungi Admin Sekolah Anda untuk menyetujui akun Anda.
+                </div>
+                <div class="pt-2">
+                  <button onclick="closeUniversalModal()" class="px-6 py-2.5 rounded-full bg-slate-800 text-white font-extrabold text-xs cursor-pointer">
+                    Saya Mengerti
+                  </button>
+                </div>
+              </div>
+              `
+            );
+          } else if (res && res.isRejected) {
+            openUniversalModal(
+              'Pendaftaran Ditolak',
+              `
+              <div class="text-center space-y-4 py-3">
+                <div class="w-16 h-16 rounded-3xl bg-rose-100 text-rose-700 flex items-center justify-center mx-auto text-3xl">
+                  ✕
+                </div>
+                <h4 class="text-base font-extrabold text-brand-dark">Pendaftaran Anda Ditolak</h4>
+                <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                  ${res.message || 'Pendaftaran akun Anda telah ditolak oleh Admin Sekolah.'}
+                </p>
+                <div class="pt-2">
+                  <button onclick="closeUniversalModal()" class="px-6 py-2.5 rounded-full bg-rose-600 text-white font-extrabold text-xs cursor-pointer">
+                    Tutup
+                  </button>
+                </div>
+              </div>
+              `
+            );
+          } else if (res && res.notRegistered) {
+            openUniversalModal(
+              'Akun Belum Terdaftar',
+              `
+              <div class="text-center space-y-4 py-3">
+                <div class="w-16 h-16 rounded-3xl bg-blue-100 text-blue-700 flex items-center justify-center mx-auto text-3xl">
+                  📝
+                </div>
+                <h4 class="text-base font-extrabold text-brand-dark">Belum Terdaftar di ${school.nama}</h4>
+                <p class="text-xs text-slate-600 max-w-sm mx-auto">
+                  Data guru belum ditemukan untuk sekolah ini. Silakan mendaftar terlebih dahulu pada tab "Guru Baru".
+                </p>
+                <div class="pt-2">
+                  <button onclick="closeUniversalModal(); switchLoginTab('register');" class="px-6 py-2.5 rounded-full bg-brand-600 text-white font-extrabold text-xs cursor-pointer">
+                    Daftar Sekarang ➔
+                  </button>
+                </div>
+              </div>
+              `
+            );
+          } else {
+            showToast((res && res.message) ? res.message : 'Kombinasi NPSN, Akun, atau PIN tidak cocok.', 'error');
+          }
         }
       } catch (err) {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        hideCinematicSplashScreen();
         showToast('Gagal menghubungi server database: ' + err.message, 'error');
       }
     }
