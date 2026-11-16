@@ -381,32 +381,26 @@
     }
 
     /* ============================================================
-       MOBILE & TABLET HIGH-PERFORMANCE 60-120 FPS TOUCH SCROLL
+       MOBILE & TABLET HIGH-PERFORMANCE TOUCH ENGINE (ZERO DELAY)
        ============================================================ */
     html {
       -webkit-text-size-adjust: 100%;
       -webkit-tap-highlight-color: transparent;
-      touch-action: pan-y;
-      overscroll-behavior-y: none;
-      scroll-behavior: auto; /* Mencegah lag perebutan thread gesture bawaan OS */
     }
 
     body {
       -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      overscroll-behavior-y: none;
-      /* Membantu GPU menahan compositing layer tanpa repaint */
-      transform: translate3d(0, 0, 0);
-      -webkit-transform: translate3d(0, 0, 0);
+      /* PENTING: DILARANG menggunakan transform pada body karena akan merusak */
+      /* dan menurunkan posisi elemen fixed (seperti bottom nav dock) ke bawah */
     }
 
-    /* Hilangkan delay 300ms sentuhan tombol di semua browser HP */
+    /* Hilangkan delay sentuhan 300ms tombol di seluruh browser HP */
     button, a, input, select, textarea, [onclick] {
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Mencegah tabel horizontal menelan atau mengunci gesture swipe vertikal */
+    /* Mencegah tabel horizontal mengunci scroll vertikal di HP */
     .overflow-x-auto,
     .overflow-y-auto {
       -webkit-overflow-scrolling: touch !important;
@@ -435,37 +429,17 @@
     .card-hover-effect {
       transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
       will-change: auto;
-      transform: translateZ(0);
     }
     @media (hover: hover) and (pointer: fine) {
       .card-hover-effect:hover {
-        transform: translateY(-3px) translateZ(0);
+        transform: translateY(-3px);
         box-shadow: 0 12px 30px -4px rgba(124, 110, 230, 0.12);
       }
     }
 
-    /* Isolasi Render Layer pada Kontainer Utama agar Scroll Tidak Membebani CPU */
-    #portalDashboardView,
-    #moduleView,
-    #portalHeroContainer,
-    #portalCardsContainer {
-      transform: translateZ(0);
-      contain: layout style;
-    }
-
-    /* content-visibility: auto untuk perenderan instan bagian bawah layar */
-    #portalRecordsContainer,
-    #portalWelcomeBarContainer,
-    #tableGuruSiswa,
-    #tableGuruNilai,
-    #tableGuruPresensi {
-      content-visibility: auto;
-      contain-intrinsic-size: 0 400px;
-    }
-
-    /* Optimasi khusus Layar Smartphone & Tablet Kecil (max-width: 768px) */
+    /* Optimasi performa grafis khusus Layar Smartphone & Tablet (max-width: 768px) */
     @media (max-width: 768px) {
-      /* Matikan kalkulasi berat backdrop-filter blur di HP agar GPU 60-120fps konstan */
+      /* Ringankan beban GPU overdraw di HP */
       .backdrop-blur-md,
       .backdrop-blur-xl,
       .backdrop-blur-xs,
@@ -542,10 +516,12 @@
 
     /* Floating bottom nav dengan perlindungan Safe Area Inset & isolasi layer GPU */
     nav.fixed {
+      position: fixed !important;
       left: 50% !important;
-      bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+      bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px)) !important;
       transform: translate3d(-50%, 0, 0) !important;
       -webkit-transform: translate3d(-50%, 0, 0) !important;
+      z-index: 50 !important;
       will-change: transform;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
