@@ -4006,19 +4006,15 @@
               </select>
             </div>
 
-            <!-- Tombol Ekspor Excel, Cetak PDF Rapi, & Buka Tab PDF Sesuai Template Resmi -->
+            <!-- Tombol Ekspor Excel & Pratinjau PDF Terpisah -->
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportNilaiToExcel('${currentSelectedMapel}')"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
               </button>
-              <button onclick="printRekapNilaiPDF('${currentSelectedMapel}')"
-                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>🖨️</span> <span>Cetak / PDF Rapi</span>
-              </button>
               <button onclick="openPrintInNewTab(generateRekapNilaiHTML('${currentSelectedMapel}'), 'Rekap_Nilai_${currentSelectedMapel}', 'landscape')"
-                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition border border-violet-200">
-                <span>📄</span> <span>Buka Tab PDF</span>
+                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>🖨️</span> <span>Pratinjau & Cetak PDF</span>
               </button>
             </div>
           </div>
@@ -4171,95 +4167,8 @@
     // MENGGUNAKAN ISOLATED HIDDEN IFRAME (A4 LANDSCAPE DEFAULT)
     // ==========================================
     function executePrintDocument(htmlContent, docTitle = 'Dokumen_Administrasi_Guru', orientation = 'landscape') {
-      // 1. Simpan salinan ke container cadangan halaman utama tanpa timer penghapusan
-      let printContainer = document.getElementById('printAreaContainer');
-      if (!printContainer) {
-        printContainer = document.createElement('div');
-        printContainer.id = 'printAreaContainer';
-        document.body.appendChild(printContainer);
-      }
-      printContainer.innerHTML = htmlContent;
-      printContainer.classList.remove('hidden');
-      printContainer.style.display = 'block';
-      printContainer.style.visibility = 'visible';
-
-      // 2. Buat / perbarui Hidden Iframe Terisolasi (bebas total dari Tailwind CSS, flexbox body, & overflow scroll)
-      let iframe = document.getElementById('printDedicatedIframe');
-      if (iframe) {
-        try { iframe.remove(); } catch (e) {}
-      }
-
-      iframe = document.createElement('iframe');
-      iframe.id = 'printDedicatedIframe';
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0px';
-      iframe.style.height = '0px';
-      iframe.style.border = '0';
-      iframe.style.visibility = 'hidden';
-      iframe.style.zIndex = '-9999';
-      document.body.appendChild(iframe);
-
-      const doc = iframe.contentWindow.document;
-      doc.open();
-      doc.write(`
-        <!DOCTYPE html>
-        <html lang="id">
-        <head>
-          <meta charset="UTF-8">
-          <title>${docTitle}</title>
-          <style>
-            @page {
-              size: A4 ${orientation};
-              margin: 8mm 10mm;
-            }
-            * {
-              box-sizing: border-box;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-              color-adjust: exact !important;
-            }
-            html, body {
-              margin: 0;
-              padding: 0;
-              background: #ffffff !important;
-              color: #000000 !important;
-              font-family: Arial, Helvetica, sans-serif;
-              font-size: 8.5pt;
-              width: 100%;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              page-break-inside: auto;
-            }
-            tr {
-              page-break-inside: avoid;
-              page-break-after: auto;
-            }
-            th, td {
-              border: 1px solid #000;
-            }
-          </style>
-        </head>
-        <body>
-          ${htmlContent}
-        </body>
-        </html>
-      `);
-      doc.close();
-
-      // Tunggu 350ms agar dokumen terisolasi selesai dirender, lalu fokus dan cetak
-      setTimeout(() => {
-        try {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
-        } catch (err) {
-          console.warn('Iframe print error, beralih ke openPrintInNewTab:', err);
-          openPrintInNewTab(htmlContent, docTitle, orientation);
-        }
-      }, 350);
+      // Selalu buka pratinjau & cetak di tab baru yang bersih terpisah, jangan pernah merusak / menimpa layar aplikasi utama
+      openPrintInNewTab(htmlContent, docTitle, orientation);
     }
 
     function openPrintInNewTab(htmlContent, docTitle = 'Dokumen_Administrasi_Guru', orientation = 'landscape') {
@@ -4924,13 +4833,9 @@
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
               </button>
-              <button onclick="printAbsensiPDF()"
-                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>🖨️</span> <span>Cetak / PDF Rapi</span>
-              </button>
               <button onclick="openPrintInNewTab(generateRekapAbsensiHTML(), 'Rekap_Absensi', 'landscape')"
-                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition border border-violet-200">
-                <span>📄</span> <span>Buka Tab PDF</span>
+                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>🖨️</span> <span>Pratinjau & Cetak PDF</span>
               </button>
             </div>
           </div>
@@ -6063,13 +5968,9 @@
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
                 <span>📊</span> <span>Ekspor Excel (.csv)</span>
               </button>
-              <button onclick="printJurnalPDF()"
-                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>🖨️</span> <span>Cetak / PDF Rapi</span>
-              </button>
               <button onclick="openPrintInNewTab(generateRekapJurnalHTML(), 'Rekap_Jurnal_Mengajar', 'landscape')"
-                class="px-3.5 py-2 rounded-xl bg-[#EAE7FB] hover:bg-violet-200 text-brand-800 font-extrabold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition border border-violet-200">
-                <span>📄</span> <span>Buka Tab PDF</span>
+                class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
+                <span>🖨️</span> <span>Pratinjau & Cetak PDF</span>
               </button>
             </div>
           </div>
