@@ -5,6 +5,9 @@
   "functions": {
     "api/gas.js": {
       "maxDuration": 60
+    },
+    "api/firebase-config.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [

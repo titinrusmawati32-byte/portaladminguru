@@ -10,10 +10,10 @@ const APP_CONFIG = {
   // 1. Google Apps Script Web App (JSON REST API Backend)
   GAS_API_URL: 'https://script.google.com/macros/s/AKfycbwsVr0J9qSchXl5ltrLdOcZF3aSWEoRiRH5_4lwXSmut92i3AKF7FrpTzjTmARoWAUfCg/exec',
 
-  // 1b. Konfigurasi Firebase Authentication (Google SSO Resmi)
-  // Dapatkan dari Firebase Console -> Project Settings -> General -> Your apps -> Web App
+  // 1b. Konfigurasi Firebase Authentication (Google SSO Resmi Admin)
+  // API Key aman dikelola melalui Vercel Environment Variables (/api/firebase-config)
   FIREBASE_CONFIG: {
-    apiKey: "AIzaSyB2gGUkOn-alsZY5U8XJ468nPySsF5yn7A",
+    apiKey: "", // Diambil otomatis & aman melalui serverless endpoint /api/firebase-config
     authDomain: "portaladmguru-e0689.firebaseapp.com",
     projectId: "portaladmguru-e0689",
     storageBucket: "portaladmguru-e0689.firebasestorage.app",

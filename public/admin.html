@@ -420,8 +420,11 @@
     // ==========================================
     // INITIALIZATION & SESSION RESTORE
     // ==========================================
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       populateSchoolFilterDropdown();
+
+      // Muat config Firebase secara aman dari serverless API Vercel
+      await loadFirebaseConfigFromApi();
 
       // Cek apakah halaman kembali dari alur redirect login Google
       checkRedirectLoginResult();
@@ -442,8 +445,26 @@
     let googleAuthProvider = null;
     let isAuthInProgress = false;
 
+    async function loadFirebaseConfigFromApi() {
+      if (window.APP_CONFIG && (!window.APP_CONFIG.FIREBASE_CONFIG || !window.APP_CONFIG.FIREBASE_CONFIG.apiKey)) {
+        try {
+          const res = await fetch('/api/firebase-config');
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.apiKey) {
+              window.APP_CONFIG.FIREBASE_CONFIG = data;
+              return data;
+            }
+          }
+        } catch (e) {
+          console.warn('Gagal memuat firebase config dari /api/firebase-config:', e);
+        }
+      }
+      return null;
+    }
+
     function getActiveFirebaseConfig() {
-      // 1. Cek dari window.APP_CONFIG di config.js
+      // 1. Cek dari window.APP_CONFIG di config.js (atau yang dimuat dari /api/firebase-config)
       const appCfg = (window.APP_CONFIG && window.APP_CONFIG.FIREBASE_CONFIG) ? window.APP_CONFIG.FIREBASE_CONFIG : null;
       if (appCfg && appCfg.apiKey && appCfg.apiKey.trim().length > 5 && appCfg.projectId) {
         return appCfg;
@@ -581,6 +602,10 @@
       isAuthInProgress = true;
 
       try {
+        if (!isFirebaseConfigured()) {
+          await loadFirebaseConfigFromApi();
+        }
+
         if (!isFirebaseConfigured()) {
           openFirebaseSetupModal();
           return;
