@@ -1040,6 +1040,19 @@
       nilai: [],
       jurnal: [],
       perangkat: [],
+      jadwal: [
+        { id: 'JDW-01', hari: 'Senin', jamMulai: '07:00', jamSelesai: '08:10', jamKe: '1 - 2', mapel: 'Pendidikan Pancasila', ruang: 'Kelas', warna: 'amber' },
+        { id: 'JDW-02', hari: 'Senin', jamMulai: '08:10', jamSelesai: '09:20', jamKe: '3 - 4', mapel: 'Bahasa Indonesia', ruang: 'Kelas', warna: 'blue' },
+        { id: 'JDW-03', hari: 'Senin', jamMulai: '09:50', jamSelesai: '11:00', jamKe: '5 - 6', mapel: 'Matematika', ruang: 'Kelas', warna: 'purple' },
+        { id: 'JDW-04', hari: 'Selasa', jamMulai: '07:00', jamSelesai: '08:45', jamKe: '1 - 3', mapel: 'IPAS', ruang: 'Kelas', warna: 'emerald' },
+        { id: 'JDW-05', hari: 'Selasa', jamMulai: '09:15', jamSelesai: '10:25', jamKe: '4 - 5', mapel: 'Seni Rupa', ruang: 'Kelas', warna: 'rose' },
+        { id: 'JDW-06', hari: 'Rabu', jamMulai: '07:00', jamSelesai: '08:45', jamKe: '1 - 3', mapel: 'Matematika', ruang: 'Kelas', warna: 'purple' },
+        { id: 'JDW-07', hari: 'Rabu', jamMulai: '09:15', jamSelesai: '11:00', jamKe: '4 - 6', mapel: 'Bahasa Indonesia', ruang: 'Kelas', warna: 'blue' },
+        { id: 'JDW-08', hari: 'Kamis', jamMulai: '07:00', jamSelesai: '08:45', jamKe: '1 - 3', mapel: 'PJOK', ruang: 'Lapangan', warna: 'emerald' },
+        { id: 'JDW-09', hari: 'Kamis', jamMulai: '09:15', jamSelesai: '10:25', jamKe: '4 - 5', mapel: 'Bahasa Inggris', ruang: 'Kelas', warna: 'blue' },
+        { id: 'JDW-10', hari: 'Jumat', jamMulai: '07:00', jamSelesai: '08:10', jamKe: '1 - 2', mapel: 'Pendidikan Agama', ruang: 'Kelas', warna: 'emerald' },
+        { id: 'JDW-11', hari: 'Sabtu', jamMulai: '07:00', jamSelesai: '09:00', jamKe: '1 - 3', mapel: 'Kokurikuler P5 / Ekstrakurikuler', ruang: 'Aula / Kelas', warna: 'amber' }
+      ],
       pengumuman: [
         { id: 'PGM-01', tanggal: '2026-11-15', judul: 'Edaran Kurikulum Merdeka Semester Ganjil', isi: 'Bapak/Ibu Guru diharapkan memastikan data rombel dan capaian pembelajaran terisi lengkap.', pengirim: 'Koorwil Pendidikan Ambulu' }
       ]
@@ -2170,10 +2183,10 @@
             ${createPastelPortalCard('guru-siswa', 'Data Siswa', 'Buku induk & Excel', '#E0F2FE', '#0284C7', '👥', 'Induk', 'neon-glow-cyan')}
             ${createPastelPortalCard('guru-nilai', 'Input Nilai', 'Formatif, SAS & PTS', '#FEF3C7', '#D97706', '📝', 'Rapor', 'neon-glow-amber')}
             ${createPastelPortalCard('guru-jurnal', 'Jurnal Guru', 'Agenda pembelajaran', '#EDE9FE', '#7C6EE6', '📖', 'Agenda', 'neon-glow-purple')}
+            ${createPastelPortalCard('guru-jadwal', 'Jadwal Pelajaran', 'Agenda & jam mengajar', '#FFF7ED', '#EA580C', '🕒', 'Jadwal', 'neon-glow-amber')}
             ${createPastelPortalCard('guru-kelas', 'Kelas Saya', 'Kelola rombel belajar', '#EEF2FF', '#4F46E5', '🏫', 'Rombel', 'neon-glow-purple')}
             ${createPastelPortalCard('guru-perangkat', 'Perangkat Ajar', 'Drive resmi Koorwil', '#FFE4E6', '#E11D48', '📁', 'Drive', 'neon-glow-rose')}
-            ${createPastelPortalCard('guru-dashboard', 'Statistik', 'Analisis capaian', '#F3E8FF', '#9333EA', '📊', 'Grafik', 'neon-glow-purple')}
-            ${createPastelPortalCard('guru-pengumuman', 'Pengumuman', 'Edaran resmi Ambulu', '#F1F5F9', '#475569', '📢', 'Koorwil', 'neon-glow-cyan')}
+            ${createPastelPortalCard('guru-backup', 'Cadangkan Data', 'Backup & pulihkan aman', '#F5F3FF', '#7C3AED', '🛡️', 'Cadangan', 'neon-glow-purple')}
           </div>
         </div>
       `;
@@ -2637,10 +2650,26 @@
       chartEl.innerHTML = '';
 
       switch (moduleKey) {
-        case 'guru-dashboard':
-          titleEl.textContent = 'Statistik & Capaian Guru';
-          subEl.textContent = 'Ringkasan kelas aktif dan rekap tugas mengajar Anda';
-          renderModuleGuruDashboard(contentEl);
+        case 'guru-jadwal':
+          titleEl.textContent = 'Jadwal Pelajaran Kelas';
+          subEl.textContent = 'Agenda waktu dan sebaran mata pelajaran mingguan rombel';
+          actionEl.innerHTML = `
+            <button onclick="openFormJadwalModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs px-4 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5">
+              <span>+</span> <span>Tambah Jadwal</span>
+            </button>
+          `;
+          renderModuleGuruJadwal(contentEl);
+          break;
+
+        case 'guru-backup':
+          titleEl.textContent = 'Cadangkan & Pulihkan Aplikasi';
+          subEl.textContent = 'Amankan data mandiri guru: ekspor & impor file cadangan offline';
+          actionEl.innerHTML = `
+            <button onclick="handleDownloadFullBackupJSON()" class="bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs px-4 py-2 rounded-full cursor-pointer shadow-xs transition flex items-center gap-1.5">
+              <span>📥</span> <span>Cadangkan Sekarang</span>
+            </button>
+          `;
+          renderModuleGuruBackup(contentEl);
           break;
 
         case 'guru-kelas':
@@ -6399,21 +6428,550 @@
       `;
     }
 
-    function renderModuleGuruPengumuman(c) {
+    // ==========================================
+    // MODUL: JADWAL PELAJARAN INTERAKTIF
+    // ==========================================
+    let activeJadwalHari = 'Senin';
+
+    function getTodayHariIndonesia() {
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const d = days[new Date().getDay()];
+      return (d === 'Minggu') ? 'Senin' : d;
+    }
+
+    function switchJadwalHari(hari) {
+      activeJadwalHari = hari;
+      const c = document.getElementById('moduleContentArea');
+      if (c && activeModuleKey === 'guru-jadwal') {
+        renderModuleGuruJadwal(c);
+      }
+    }
+
+    function renderModuleGuruJadwal(c) {
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const listHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const todayName = getTodayHariIndonesia();
+
+      if (!activeJadwalHari) activeJadwalHari = todayName;
+
+      // Ambil jadwal hari terpilih
+      const jadwalList = (dbData.jadwal || []).filter(j => j.hari === activeJadwalHari);
+
       c.innerHTML = `
-        <div class="space-y-3">
-          ${dbData.pengumuman.map(p => `
-            <div class="bg-white p-5 rounded-[26px] border border-violet-100/70 space-y-2 text-xs shadow-xs">
-              <div class="flex justify-between text-brand-muted font-bold">
-                <span>${p.tanggal}</span>
-                <span class="text-brand-700 font-extrabold">${p.pengirim}</span>
-              </div>
-              <h4 class="font-black text-brand-dark text-sm">${p.judul}</h4>
-              <p class="text-slate-600 leading-relaxed">${p.isi}</p>
+        <div class="space-y-4">
+          
+          <!-- Tab Pil Hari Interaktif (Senin - Sabtu) -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            ${listHari.map(h => {
+              const isActive = h === activeJadwalHari;
+              const isToday = h === todayName;
+              return `
+                <button type="button" onclick="switchJadwalHari('${h}')"
+                  class="px-4 py-2 rounded-2xl font-black text-xs transition cursor-pointer shrink-0 flex items-center gap-1.5 ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25' 
+                      : 'bg-white hover:bg-violet-50 text-brand-muted hover:text-brand-dark border border-violet-100/80 shadow-2xs'
+                  }">
+                  <span>${h}</span>
+                  ${isToday ? `<span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-emerald-500'} animate-pulse"></span>` : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- Banner Keterangan Hari Terpilih -->
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-[24px] p-4 border border-amber-200/70 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-800">Jadwal Hari ${activeJadwalHari}</span>
+              <h4 class="text-sm font-black text-brand-dark">${actKls ? actKls.namaRombel : 'Semua Rombel'} • Semester ${actKls ? actKls.semester : 'Ganjil'}</h4>
+              <p class="text-[11px] text-amber-900/80 mt-0.5">Tersedia ${jadwalList.length} sesi pembelajaran terjadwal.</p>
             </div>
-          `).join('')}
+            <button onclick="openFormJadwalModal('${activeJadwalHari}')"
+              class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs shadow-xs cursor-pointer flex items-center gap-1 transition active:scale-95">
+              <span>+</span> <span>Tambah Sesi</span>
+            </button>
+          </div>
+
+          <!-- Timeline Daftar Mata Pelajaran -->
+          <div class="space-y-3">
+            ${jadwalList.length === 0 ? `
+              <div class="bg-white rounded-[26px] p-8 border border-violet-100/70 text-center space-y-3 shadow-xs">
+                <div class="w-14 h-14 rounded-3xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto text-2xl">
+                  🕒
+                </div>
+                <h4 class="text-sm font-extrabold text-brand-dark">Belum Ada Jadwal untuk Hari ${activeJadwalHari}</h4>
+                <p class="text-xs text-brand-muted max-w-xs mx-auto">
+                  Tambahkan jam belajar dan mata pelajaran untuk memudahkan agenda mengajar Anda.
+                </p>
+                <div class="pt-1">
+                  <button onclick="openFormJadwalModal('${activeJadwalHari}')"
+                    class="px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs cursor-pointer">
+                    + Tambah Jadwal Hari Ini
+                  </button>
+                </div>
+              </div>
+            ` : jadwalList.map((j, idx) => {
+              // Palet warna kartu pastel
+              const colorMaps = {
+                amber: { bg: 'bg-amber-50/70', border: 'border-amber-200/80', badge: 'bg-amber-100 text-amber-800', icon: '📐' },
+                blue: { bg: 'bg-blue-50/70', border: 'border-blue-200/80', badge: 'bg-blue-100 text-blue-800', icon: '📖' },
+                purple: { bg: 'bg-purple-50/70', border: 'border-purple-200/80', badge: 'bg-purple-100 text-purple-800', icon: '🔬' },
+                emerald: { bg: 'bg-emerald-50/70', border: 'border-emerald-200/80', badge: 'bg-emerald-100 text-emerald-800', icon: '🌱' },
+                rose: { bg: 'bg-rose-50/70', border: 'border-rose-200/80', badge: 'bg-rose-100 text-rose-800', icon: '🎨' }
+              };
+              const cTheme = colorMaps[j.warna] || colorMaps.purple;
+
+              return `
+                <div class="bg-white rounded-[24px] p-4 border border-violet-100/80 shadow-2xs hover:border-violet-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="flex items-start gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-2xl ${cTheme.bg} ${cTheme.border} border flex items-center justify-center text-xl shrink-0">
+                      ${cTheme.icon}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${cTheme.badge}">
+                          Jam Ke: ${j.jamKe || (idx + 1)}
+                        </span>
+                        <span class="text-[11px] font-mono font-bold text-brand-dark">
+                          ⏰ ${j.jamMulai} - ${j.jamSelesai}
+                        </span>
+                        <span class="text-[10px] text-brand-muted">
+                          • ${j.ruang || 'Kelas'}
+                        </span>
+                      </div>
+                      <h4 class="font-black text-brand-dark text-sm sm:text-base mt-1 truncate">${j.mapel}</h4>
+                    </div>
+                  </div>
+
+                  <!-- Aksi Cepat Mengajar -->
+                  <div class="flex items-center gap-1.5 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-violet-50">
+                    <button onclick="handleJadwalShortcutAction('jurnal', '${j.mapel.replace(/'/g, "\\'")}')"
+                      class="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-extrabold text-[11px] transition cursor-pointer border border-sky-100 flex items-center gap-1">
+                      <span>📖</span> <span>+ Jurnal</span>
+                    </button>
+                    <button onclick="handleJadwalShortcutAction('nilai', '${j.mapel.replace(/'/g, "\\'")}')"
+                      class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-extrabold text-[11px] transition cursor-pointer border border-amber-100 flex items-center gap-1">
+                      <span>📝</span> <span>+ Nilai</span>
+                    </button>
+                    <button onclick="handleDeleteJadwalItem('${j.id}')" title="Hapus Jadwal"
+                      class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs transition cursor-pointer">
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
         </div>
       `;
+    }
+
+    function openFormJadwalModal(defaultHari = 'Senin') {
+      const mapels = getTeacherMapelList();
+      const listHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
+      const content = `
+        <form onsubmit="handleSaveJadwalItem(event)" class="space-y-3.5 text-xs">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Hari Pelajaran *</label>
+              <select id="fjHari" required class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+                ${listHari.map(h => `<option value="${h}" ${h === defaultHari ? 'selected' : ''}>${h}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Jam Ke- *</label>
+              <input type="text" id="fjJamKe" required value="1 - 2" placeholder="Contoh: 1-2 atau 3" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Jam Mulai *</label>
+              <input type="time" id="fjJamMulai" required value="07:00" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold font-mono">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Jam Selesai *</label>
+              <input type="time" id="fjJamSelesai" required value="08:10" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold font-mono">
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
+            <input type="text" id="fjMapel" list="mapelJadwalList" required placeholder="Ketik atau pilih mata pelajaran" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+            <datalist id="mapelJadwalList">
+              ${mapels.map(m => `<option value="${m}">`).join('')}
+            </datalist>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Ruang / Lokasi</label>
+              <input type="text" id="fjRuang" value="Kelas" placeholder="Contoh: Kelas IV-A / Lapangan" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Aksen Warna Kartu</label>
+              <select id="fjWarna" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+                <option value="amber">Amber / Oranye</option>
+                <option value="blue">Biru Langit</option>
+                <option value="purple">Ungu Lavender</option>
+                <option value="emerald">Hijau Zamrud</option>
+                <option value="rose">Merah Muda</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end gap-2">
+            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold cursor-pointer">Batal</button>
+            <button type="submit" class="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-extrabold rounded-full shadow-xs cursor-pointer">
+              Simpan Jadwal
+            </button>
+          </div>
+        </form>
+      `;
+      openUniversalModal('🕒 Tambah Jadwal Pelajaran', content);
+    }
+
+    function handleSaveJadwalItem(e) {
+      e.preventDefault();
+      const hari = document.getElementById('fjHari').value;
+      const jamKe = document.getElementById('fjJamKe').value.trim();
+      const jamMulai = document.getElementById('fjJamMulai').value;
+      const jamSelesai = document.getElementById('fjJamSelesai').value;
+      const mapel = document.getElementById('fjMapel').value.trim();
+      const ruang = document.getElementById('fjRuang').value.trim() || 'Kelas';
+      const warna = document.getElementById('fjWarna').value;
+
+      if (!dbData.jadwal) dbData.jadwal = [];
+
+      const newItem = {
+        id: 'JDW-' + Date.now().toString().slice(-6),
+        hari: hari,
+        jamKe: jamKe,
+        jamMulai: jamMulai,
+        jamSelesai: jamSelesai,
+        mapel: mapel,
+        ruang: ruang,
+        warna: warna
+      };
+
+      dbData.jadwal.push(newItem);
+      try {
+        localStorage.setItem('siguru_jadwal_data', JSON.stringify(dbData.jadwal));
+      } catch (err) {}
+
+      closeUniversalModal();
+      showToast(`Jadwal ${mapel} (${hari}) berhasil disimpan.`, 'success');
+      activeJadwalHari = hari;
+      renderModuleGuruJadwal(document.getElementById('moduleContentArea'));
+    }
+
+    function handleDeleteJadwalItem(jId) {
+      if (!confirm('Hapus jadwal pelajaran ini?')) return;
+      dbData.jadwal = (dbData.jadwal || []).filter(j => j.id !== jId);
+      try {
+        localStorage.setItem('siguru_jadwal_data', JSON.stringify(dbData.jadwal));
+      } catch (err) {}
+      showToast('Jadwal berhasil dihapus.', 'info');
+      renderModuleGuruJadwal(document.getElementById('moduleContentArea'));
+    }
+
+    function handleJadwalShortcutAction(action, mapelName) {
+      if (action === 'jurnal') {
+        openModule('guru-jurnal');
+        openFormJurnalModal();
+        setTimeout(() => {
+          const mInp = document.getElementById('fjMateri');
+          if (mInp) mInp.placeholder = `Materi pokok ${mapelName}...`;
+        }, 150);
+      } else if (action === 'nilai') {
+        openModule('guru-nilai');
+        switchNilaiSubTab('input');
+        setTimeout(() => {
+          const mapelSelect = document.getElementById('inpNilaiMapel');
+          if (mapelSelect) {
+            for (let opt of mapelSelect.options) {
+              if (opt.value.toLowerCase().includes(mapelName.toLowerCase())) {
+                mapelSelect.value = opt.value;
+                autoFillNamaPenilaian();
+                break;
+              }
+            }
+          }
+        }, 150);
+      }
+    }
+
+    // ==========================================
+    // MODUL: CADANGKAN & PULIHKAN APLIKASI (BACKUP & RESTORE)
+    // ==========================================
+    let pendingRestoreData = null;
+
+    function renderModuleGuruBackup(c) {
+      const sch = currentSchool || { nama: 'SD Negeri Ambulu', npsn: '-' };
+      const totalSiswa = dbData.siswa.length;
+      const totalNilai = dbData.nilai.length;
+      const totalPresensi = dbData.presensi.length;
+      const totalJurnal = dbData.jurnal.length;
+
+      c.innerHTML = `
+        <div class="space-y-4">
+          
+          <!-- SEKSI 1: CADANGKAN DATA (EKSPOR KE FILE .JSON) -->
+          <div class="bg-gradient-to-br from-violet-600 via-indigo-600 to-purple-700 rounded-[28px] p-5 sm:p-6 text-white shadow-xl shadow-brand-500/20 relative overflow-hidden">
+            <!-- Decorative Blobs -->
+            <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center text-2xl border border-white/20">
+                  📥
+                </div>
+                <div>
+                  <h4 class="text-base sm:text-lg font-black leading-tight">Cadangkan Seluruh Data Saya</h4>
+                  <p class="text-xs text-violet-100">Simpan salinan data mandiri guru ke file cadangan offline yang aman.</p>
+                </div>
+              </div>
+
+              <!-- Rincian Data yang Terangkum -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+                <div class="p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15">
+                  <span class="block text-violet-200 text-[10px] font-bold">Data Siswa</span>
+                  <span class="font-black text-sm">${totalSiswa} Siswa</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15">
+                  <span class="block text-violet-200 text-[10px] font-bold">Catatan Nilai</span>
+                  <span class="font-black text-sm">${totalNilai} Nilai</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15">
+                  <span class="block text-violet-200 text-[10px] font-bold">Presensi Siswa</span>
+                  <span class="font-black text-sm">${totalPresensi} Data</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15">
+                  <span class="block text-violet-200 text-[10px] font-bold">Jurnal Guru</span>
+                  <span class="font-black text-sm">${totalJurnal} Catatan</span>
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <button onclick="handleDownloadFullBackupJSON()"
+                  class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white hover:bg-violet-50 text-brand-700 font-black text-xs shadow-lg transition active:scale-95 cursor-pointer flex items-center justify-center gap-2">
+                  <span>📥 Unduh Berkas Cadangan Lengkap (.json)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEKSI 2: PULIHKAN DATA DARI BERKAS CADANGAN -->
+          <div class="bg-white rounded-[28px] p-5 sm:p-6 border border-violet-100/80 shadow-xs space-y-4">
+            <div class="flex items-center gap-3 border-b border-violet-50 pb-3">
+              <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center text-xl">
+                📤
+              </div>
+              <div>
+                <h4 class="font-black text-brand-dark text-sm sm:text-base">Pulihkan Data dari Berkas Cadangan</h4>
+                <p class="text-xs text-brand-muted">Gunakan berkas .json yang telah Anda cadangkan sebelumnya jika berganti HP atau laptop.</p>
+              </div>
+            </div>
+
+            <!-- Area Dropzone / Upload File Picker -->
+            <div onclick="document.getElementById('fileRestoreInput').click()"
+              class="border-2 border-dashed border-violet-200 hover:border-brand-500 rounded-3xl p-6 text-center cursor-pointer transition-all bg-[#FAF9FE] hover:bg-violet-50/50 space-y-2">
+              <input type="file" id="fileRestoreInput" accept=".json" onchange="handleSelectRestoreFile(event)" class="hidden">
+              <div class="w-12 h-12 rounded-2xl bg-violet-100 text-brand-700 flex items-center justify-center mx-auto text-2xl shadow-2xs">
+                📂
+              </div>
+              <h5 class="font-extrabold text-brand-dark text-xs sm:text-sm">Klik untuk Memilih Berkas Cadangan (.json)</h5>
+              <p class="text-[11px] text-brand-muted max-w-sm mx-auto leading-relaxed">
+                Pilih file <strong>Backup_SiGuruSD_... .json</strong> dari memori perangkat Anda.
+              </p>
+            </div>
+
+            <!-- Preview Data Terbaca Setelah Upload -->
+            <div id="restorePreviewContainer" class="hidden space-y-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 animate-fade-in">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-emerald-800 text-xs flex items-center gap-1.5">
+                  <span>✓</span> <span>Berkas Cadangan Berhasil Diverifikasi!</span>
+                </span>
+                <span class="text-[10px] font-mono text-emerald-700" id="restoreFileInfo"></span>
+              </div>
+              <div class="p-3 bg-white rounded-xl border border-emerald-100 text-xs text-slate-700 space-y-1" id="restoreDetailsList">
+                <!-- Rincian diisi secara dinamis -->
+              </div>
+              <div class="pt-1 flex justify-end gap-2">
+                <button type="button" onclick="cancelRestoreProcess()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold text-xs cursor-pointer">
+                  Batal
+                </button>
+                <button type="button" onclick="executeApplyRestoreData()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-full shadow-md shadow-emerald-500/20 cursor-pointer transition active:scale-95">
+                  Pulihkan Seluruh Data Sekarang ➔
+                </button>
+              </div>
+            </div>
+
+            <!-- Panduan Keamanan Data -->
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-[11px] text-slate-600 space-y-1 leading-relaxed">
+              <strong>💡 Catatan Keamanan:</strong>
+              <p>Mencadangkan data secara berkala (misal 1 minggu sekali) sangat disarankan agar catatan penilaian, presensi siswa, dan jurnal mengajar Anda tetap terjaga 100% aman.</p>
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function handleDownloadFullBackupJSON() {
+      if (!currentUser) {
+        showToast('Sesi guru belum aktif.', 'warning');
+        return;
+      }
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const cleanGuruName = (currentUser.nama || 'Guru').replace(/[^a-zA-Z0-9]/g, '_');
+
+      const backupPackage = {
+        app: 'SiGuru SD Digital',
+        version: '2.0.0',
+        exportedAt: new Date().toISOString(),
+        guru: currentUser,
+        school: currentSchool,
+        metaConfig: schoolMetaConfig,
+        data: {
+          kelas: dbData.kelas || [],
+          siswa: dbData.siswa || [],
+          presensi: dbData.presensi || [],
+          nilai: dbData.nilai || [],
+          jurnal: dbData.jurnal || [],
+          jadwal: dbData.jadwal || [],
+          perangkat: dbData.perangkat || []
+        }
+      };
+
+      const jsonStr = JSON.stringify(backupPackage, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Backup_SiGuruSD_${cleanGuruName}_${todayStr}.json`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showToast('Berkas cadangan (.json) berhasil diunduh ke perangkat Anda.', 'success');
+    }
+
+    function handleSelectRestoreFile(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (!parsed || (!parsed.data && !parsed.siswa && !parsed.nilai)) {
+            showToast('Format berkas cadangan tidak valid.', 'error');
+            return;
+          }
+
+          pendingRestoreData = parsed;
+
+          // Ekstrak rincian
+          const d = parsed.data || parsed;
+          const klsCount = (d.kelas || []).length;
+          const siswaCount = (d.siswa || []).length;
+          const nilaiCount = (d.nilai || []).length;
+          const presensiCount = (d.presensi || []).length;
+          const jurnalCount = (d.jurnal || []).length;
+          const jadwalCount = (d.jadwal || []).length;
+
+          const previewEl = document.getElementById('restorePreviewContainer');
+          const infoEl = document.getElementById('restoreFileInfo');
+          const listEl = document.getElementById('restoreDetailsList');
+
+          if (infoEl) infoEl.textContent = file.name;
+          if (listEl) {
+            listEl.innerHTML = `
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <div>• Rombel/Kelas: <strong>${klsCount}</strong></div>
+                <div>• Data Siswa: <strong>${siswaCount}</strong></div>
+                <div>• Riwayat Nilai: <strong>${nilaiCount}</strong></div>
+                <div>• Rekap Presensi: <strong>${presensiCount}</strong></div>
+                <div>• Jurnal Mengajar: <strong>${jurnalCount}</strong></div>
+                <div>• Jadwal Belajar: <strong>${jadwalCount}</strong></div>
+              </div>
+              <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+                Pencadangan oleh: <strong>${(parsed.guru && parsed.guru.nama) || 'Guru'}</strong> • Tanggal: ${(parsed.exportedAt || '').slice(0, 10) || '-'}
+              </div>
+            `;
+          }
+
+          if (previewEl) previewEl.classList.remove('hidden');
+          showToast('Berkas berhasil dibaca. Klik "Pulihkan Data Sekarang" untuk menerapkan.', 'info');
+        } catch (err) {
+          showToast('Gagal membaca file JSON: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function cancelRestoreProcess() {
+      pendingRestoreData = null;
+      const previewEl = document.getElementById('restorePreviewContainer');
+      const fileInput = document.getElementById('fileRestoreInput');
+      if (previewEl) previewEl.classList.add('hidden');
+      if (fileInput) fileInput.value = '';
+    }
+
+    async function executeApplyRestoreData() {
+      if (!pendingRestoreData) {
+        showToast('Tidak ada data cadangan yang siap dipulihkan.', 'warning');
+        return;
+      }
+
+      if (!confirm('Apakah Anda yakin ingin memulihkan data dari berkas cadangan ini? Seluruh data rombel, siswa, nilai, dan presensi akan diperbarui.')) {
+        return;
+      }
+
+      const d = pendingRestoreData.data || pendingRestoreData;
+
+      // Pulihkan ke local state
+      if (d.kelas && Array.isArray(d.kelas)) dbData.kelas = d.kelas;
+      if (d.siswa && Array.isArray(d.siswa)) dbData.siswa = d.siswa;
+      if (d.presensi && Array.isArray(d.presensi)) dbData.presensi = d.presensi;
+      if (d.nilai && Array.isArray(d.nilai)) dbData.nilai = d.nilai;
+      if (d.jurnal && Array.isArray(d.jurnal)) dbData.jurnal = d.jurnal;
+      if (d.jadwal && Array.isArray(d.jadwal)) dbData.jadwal = d.jadwal;
+
+      if (pendingRestoreData.metaConfig) {
+        schoolMetaConfig = { ...schoolMetaConfig, ...pendingRestoreData.metaConfig };
+        try { localStorage.setItem('siguru_meta_config', JSON.stringify(schoolMetaConfig)); } catch (e) {}
+      }
+
+      // Pastikan kelas aktif terpasang
+      if (dbData.kelas.length > 0) {
+        activeGuruClassId = dbData.kelas[0].id;
+      }
+
+      saveSessionState();
+
+      // Sinkronkan ke database cloud jika online
+      if (IS_CONNECTED && currentUser) {
+        showToast('Menyimpan data hasil pemulihan ke cloud database...', 'info');
+        try {
+          await executeDbWrite('batchRestoreFullData', {
+            kelas: dbData.kelas,
+            siswa: dbData.siswa,
+            presensi: dbData.presensi,
+            nilai: dbData.nilai,
+            jurnal: dbData.jurnal
+          }, 'Data cadangan berhasil dipulihkan secara penuh!');
+        } catch (e) {}
+      }
+
+      cancelRestoreProcess();
+      showToast('🎉 Selamat! Seluruh data Anda telah berhasil dipulihkan.', 'success');
+      renderPortal();
     }
 
     // ==========================================

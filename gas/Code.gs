@@ -109,6 +109,105 @@ function getOrCreateSchoolDbSheet(ss, npsn, namaSekolah) {
 /**
  * Inisialisasi otomatis tab database untuk ke-14 SD di Ambulu
  */
+// ============================================================
+// 7. BACKEND JADWAL PELAJARAN & BATCH RESTORE FULL DATA
+// ============================================================
+function saveJadwalTeacherBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var jadwalItem = p.jadwal || p;
+
+    if (!jadwalItem.id) {
+      jadwalItem.id = 'JDW-' + new Date().getTime();
+    }
+
+    saveToSchoolDbSheet(
+      ss,
+      npsn,
+      namaSekolah,
+      jadwalItem.id,
+      'JADWAL',
+      p.teacherUid || (p.guru && p.guru.id) || '',
+      p.teacherName || (p.guru && p.guru.nama) || '',
+      p.idKelas || '',
+      p.namaKelas || '',
+      jadwalItem.hari || 'Senin',
+      jadwalItem.mapel || 'Mata Pelajaran',
+      jadwalItem.jamMulai + '-' + jadwalItem.jamSelesai,
+      jadwalItem
+    );
+
+    return { success: true, message: 'Jadwal pelajaran berhasil disimpan di database sekolah.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal menyimpan jadwal: ' + err.message };
+  }
+}
+
+function batchRestoreFullDataBackend(p) {
+  try {
+    var ss = getActiveDb();
+    var npsn = (p.npsn || '').trim();
+    var namaSekolah = (p.namaSekolah || '').trim();
+    var guruId = (p.teacherUid || (p.guru && p.guru.id) || '').trim();
+    var guruNama = (p.teacherName || (p.guru && p.guru.nama) || '').trim();
+
+    if (!npsn) {
+      return { success: false, message: 'NPSN sekolah wajib disertakan untuk pemulihan data.' };
+    }
+
+    var sheet = getOrCreateSchoolDbSheet(ss, npsn, namaSekolah);
+
+    // Pulihkan Kelas
+    if (p.kelas && Array.isArray(p.kelas)) {
+      p.kelas.forEach(function (k) {
+        saveToSchoolDbSheet(ss, npsn, namaSekolah, k.id, 'KELAS', guruId, guruNama, k.id, k.namaRombel, k.tahunAjaran || '', k.namaRombel, k.statusKelas || 'Aktif', k);
+      });
+    }
+
+    // Pulihkan Siswa
+    if (p.siswa && Array.isArray(p.siswa)) {
+      p.siswa.forEach(function (s) {
+        saveToSchoolDbSheet(ss, npsn, namaSekolah, s.id, 'SISWA', guruId, guruNama, s.idKelas, s.namaKelas || '', s.nis || '', s.nama, s.statusAktif || 'Aktif', s);
+      });
+    }
+
+    // Pulihkan Presensi
+    if (p.presensi && Array.isArray(p.presensi)) {
+      p.presensi.forEach(function (pr) {
+        saveToSchoolDbSheet(ss, npsn, namaSekolah, pr.id, 'PRESENSI', guruId, guruNama, pr.idKelas, pr.namaKelas || '', pr.tanggal, pr.namaSiswa, pr.statusHadir, pr);
+      });
+    }
+
+    // Pulihkan Nilai
+    if (p.nilai && Array.isArray(p.nilai)) {
+      p.nilai.forEach(function (nl) {
+        saveToSchoolDbSheet(ss, npsn, namaSekolah, nl.id, 'NILAI', guruId, guruNama, nl.idKelas, nl.namaKelas || '', nl.tanggal || '', nl.mapel + ' - ' + nl.namaPenilaian, String(nl.nilaiAkhir || nl.nilaiAngka), nl);
+      });
+    }
+
+    // Pulihkan Jurnal
+    if (p.jurnal && Array.isArray(p.jurnal)) {
+      p.jurnal.forEach(function (jr) {
+        saveToSchoolDbSheet(ss, npsn, namaSekolah, jr.id, 'JURNAL', guruId, guruNama, jr.idKelas, jr.namaKelas || '', jr.tanggal, jr.materiPokok || 'Jurnal', jr.jamKe || '', jr);
+      });
+    }
+
+    // Pulihkan Jadwal
+    if (p.jadwal && Array.isArray(p.jadwal)) {
+      p.jadwal.forEach(function (jd) {
+        saveToSchoolDbSheet(ss, npsn, namaSekolah, jd.id, 'JADWAL', guruId, guruNama, jd.idKelas || '', jd.namaKelas || '', jd.hari || 'Senin', jd.mapel, jd.jamMulai + '-' + jd.jamSelesai, jd);
+      });
+    }
+
+    SpreadsheetApp.flush();
+    return { success: true, message: 'Seluruh paket data cadangan berhasil dipulihkan ke database sekolah.' };
+  } catch (err) {
+    return { success: false, message: 'Gagal memulihkan cadangan: ' + err.message };
+  }
+}
+
 function initAllAmbuluSchoolSheets() {
   var ss = getActiveDb();
   setupDatabaseMultiSchool();
@@ -361,6 +460,20 @@ function doPost(e) {
       case 'saveJurnal':
         result = withScriptLock('addJurnal', function () {
           return addJurnalBackend(payload);
+        });
+        break;
+
+      // 7. Guru: Kelola Jadwal Pelajaran & Pemulihan Cadangan (Backup/Restore)
+      case 'saveJadwalTeacher':
+      case 'batchSaveJadwal':
+        result = withScriptLock('saveJadwalTeacher', function () {
+          return saveJadwalTeacherBackend(payload);
+        });
+        break;
+
+      case 'batchRestoreFullData':
+        result = withScriptLock('batchRestoreFullData', function () {
+          return batchRestoreFullDataBackend(payload);
         });
         break;
 
@@ -1169,6 +1282,7 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
     var myPresensi = [];
     var myNilai = [];
     var myJurnal = [];
+    var myJadwal = [];
     var myPerangkat = [];
 
     // Muat semua paket perangkat ajar Google Drive resmi dari Admin Pusat Koorwil Ambulu
@@ -1200,6 +1314,7 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
               else if (rTipe === 'PRESENSI') myPresensi.push(payload);
               else if (rTipe === 'NILAI') myNilai.push(payload);
               else if (rTipe === 'JURNAL') myJurnal.push(payload);
+              else if (rTipe === 'JADWAL') myJadwal.push(payload);
               else if (rTipe === 'PERANGKAT' && payload.linkBerkas && payload.linkBerkas.indexOf('http') === 0 && (!payload.id || payload.id.indexOf('DOK-00') !== 0)) myPerangkat.push(payload);
             } catch (errPayload) {}
           }
@@ -1214,6 +1329,7 @@ function getTeacherDataBackend(teacherUid, schoolId, npsn, namaSekolah) {
           presensi: myPresensi,
           nilai: myNilai,
           jurnal: myJurnal,
+          jadwal: myJadwal,
           perangkat: myPerangkat
         };
       }
