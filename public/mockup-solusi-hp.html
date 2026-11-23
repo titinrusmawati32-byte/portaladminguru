@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desain Solusi UI Input Nilai di Layar HP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F1EFFB; color: #1E1B4B; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Device Frame Styling */
+    .device-screen-portrait {
+      width: 375px;
+      height: 720px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .device-screen-landscape {
+      width: 760px;
+      height: 420px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Scrollbar halus */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #F1EFFB; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #C4B5FD; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
+
+    /* Sticky columns in landscape matrix */
+    .mob-sticky-col-no {
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      background-color: #FFFFFF;
+      box-shadow: 2px 0 6px rgba(0,0,0,0.04);
+    }
+    .mob-sticky-col-name {
+      position: sticky;
+      left: 36px;
+      z-index: 20;
+      background-color: #FFFFFF;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
+    }
+    .mob-sticky-header th {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background-color: #F8F7FD;
+    }
+    .mob-sticky-corner-no {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 35 !important;
+      background-color: #EDE9FE !important;
+    }
+    .mob-sticky-corner-name {
+      position: sticky;
+      left: 36px;
+      top: 0;
+      z-index: 35 !important;
+      background-color: #EDE9FE !important;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-6 min-h-screen flex flex-col items-center justify-start">
+
+  <!-- TOP HEADER & CONTROLLER -->
+  <div class="max-w-4xl w-full mb-5 bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-violet-200/80">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-indigo-100 text-indigo-800 uppercase tracking-wide">
+          <span>📱</span> <span>DISKUSI & EVALUASI DESAIN HP</span>
+        </div>
+        <h1 class="text-base sm:text-xl font-black text-slate-900 mt-1.5">
+          Solusi Tampilan Input Nilai yang Pas & Nyaman di HP
+        </h1>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Mari kita uji 2 opsi tampilan di bawah ini untuk melihat mana yang paling enak digunakan guru.
+        </p>
+      </div>
+
+      <!-- Mode Switcher Buttons -->
+      <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 flex-wrap">
+        <button onclick="setPreviewMode('focus_portrait')" id="btnOpt1"
+          class="px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition">
+          <span>✨</span> <span>Mode Fokus Penilaian (Rekomendasi HP)</span>
+        </button>
+        <button onclick="setPreviewMode('matrix_landscape')" id="btnOpt2"
+          class="px-3.5 py-2 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition">
+          <span>🔄</span> <span>Mode Matriks Miring (Landscape)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bedah Masalah Tampilan Sebelumnya -->
+    <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+      <div class="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100 text-rose-900">
+        <span class="font-extrabold block text-rose-700">❌ Kenapa Kemarin Tidak Enak:</span>
+        Nama siswa memakan 60% layar HP, sehingga kotak nilai lainnya terpotong di tepi kanan.
+      </div>
+      <div class="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100 text-rose-900">
+        <span class="font-extrabold block text-rose-700">❌ Statistik Memakan Ruang:</span>
+        4 kotak statistik di bawah tabel memakan setengah layar, membuat daftar anak terhimpit.
+      </div>
+      <div class="bg-emerald-50/90 p-2.5 rounded-xl border border-emerald-200 text-emerald-900">
+        <span class="font-extrabold block text-emerald-700">✅ Solusi "Mode Fokus HP":</span>
+        Nama utuh & jelas, kotak nilai besar ramah jempol, pindah jenis nilai cukup 1 tap tab di atas!
+      </div>
+    </div>
+  </div>
+
+  <!-- THE INTERACTIVE PHONE CHASSIS -->
+  <div class="relative bg-slate-900 p-3.5 sm:p-5 rounded-[46px] shadow-2xl border-4 border-slate-800 flex flex-col items-center">
+    
+    <!-- Phone Top Speaker & Camera -->
+    <div class="w-24 h-4 bg-slate-950 rounded-full mb-2.5 flex items-center justify-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-slate-800"></span>
+      <span class="w-8 h-1 bg-slate-800 rounded-full"></span>
+    </div>
+
+    <!-- SCREEN VIEWPORT -->
+    <div id="phoneViewport" class="device-screen-portrait bg-[#F5F3FF] rounded-[28px] overflow-hidden flex flex-col relative border border-slate-700/40">
+
+      <!-- ========================================================
+           VIEW A: MODE FOKUS PENILAIAN (HP PORTRAIT - ULTRA CLEAN)
+           ======================================================== -->
+      <div id="viewFocusPortrait" class="flex-1 flex flex-col min-h-0 bg-[#F8F7FD]">
+        
+        <!-- Header Ringkas HP -->
+        <div class="bg-white px-3.5 py-2.5 border-b border-violet-100 shrink-0 space-y-2">
+          
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <div class="font-black text-xs text-slate-900">Buku Nilai • Kelas 4 (28 Siswa)</div>
+              <div class="text-[10px] text-slate-500">Mata Pelajaran: <strong>Matematika</strong></div>
+            </div>
+
+            <!-- Tombol Beralih ke Matriks -->
+            <button onclick="setPreviewMode('matrix_landscape')"
+              class="px-2.5 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 text-indigo-700 font-black text-[10px] border border-violet-200 flex items-center gap-1 cursor-pointer">
+              <span>🔄</span> <span>Putar Layar</span>
+            </button>
+          </div>
+
+          <!-- PITA SELEKTOR JENIS PENILAIAN (GURU TINGGAL TAP MAU ISI NILAI APA) -->
+          <div class="space-y-1">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="font-extrabold text-slate-700">Pilih Nilai yang Sedang Diisi:</span>
+              <span class="text-indigo-600 font-extrabold text-[9px] bg-indigo-50 px-2 py-0.5 rounded-full">KKTP: 75</span>
+            </div>
+
+            <!-- Horizontal Carousel Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-xs">
+              <button onclick="selectCategory('Formatif 1 (TP 1)')" id="tab_f1"
+                class="px-3 py-1.5 rounded-full font-black text-[11px] bg-indigo-600 text-white shadow-xs shrink-0 transition flex items-center gap-1">
+                <span>Formatif 1</span>
+                <span class="text-[9px] bg-white/20 px-1 rounded-full">TP1</span>
+              </button>
+              <button onclick="selectCategory('Formatif 2 (TP 2)')" id="tab_f2"
+                class="px-3 py-1.5 rounded-full font-bold text-[11px] bg-white text-slate-700 border border-violet-100 hover:bg-violet-50 shrink-0 transition flex items-center gap-1">
+                <span>Formatif 2</span>
+              </button>
+              <button onclick="selectCategory('Tugas 1')" id="tab_t1"
+                class="px-3 py-1.5 rounded-full font-bold text-[11px] bg-white text-slate-700 border border-violet-100 hover:bg-violet-50 shrink-0 transition flex items-center gap-1">
+                <span>Tugas 1</span>
+              </button>
+              <button onclick="selectCategory('UH Bab 1')" id="tab_uh1"
+                class="px-3 py-1.5 rounded-full font-bold text-[11px] bg-white text-slate-700 border border-violet-100 hover:bg-violet-50 shrink-0 transition flex items-center gap-1">
+                <span>UH Bab 1</span>
+              </button>
+              <button onclick="selectCategory('STS Tengah')" id="tab_sts"
+                class="px-3 py-1.5 rounded-full font-bold text-[11px] bg-white text-slate-700 border border-violet-100 hover:bg-violet-50 shrink-0 transition flex items-center gap-1">
+                <span>STS</span>
+              </button>
+              <button onclick="selectCategory('SAS Akhir')" id="tab_sas"
+                class="px-3 py-1.5 rounded-full font-bold text-[11px] bg-white text-slate-700 border border-violet-100 hover:bg-violet-50 shrink-0 transition flex items-center gap-1">
+                <span>SAS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- MINI STATS STRIP (COMPACT, TIDAK MAKAN TEMPAT) -->
+          <div class="bg-indigo-50/70 rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[10px] text-indigo-900 border border-indigo-100/60 font-semibold">
+            <div>
+              Mengisi: <strong id="lblActiveCategory" class="text-indigo-700">Formatif 1 (TP 1)</strong>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>Terisi: <strong id="lblFilledCount">28/28</strong></span>
+              <span>•</span>
+              <span>Rata: <strong id="lblAvgScore">83.4</strong></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- DAFTAR SISWA HP (LEBAR, NAMA UTUH, RAMAH JEMPOL) -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-2">
+          
+          <!-- Quick Toolbar HP -->
+          <div class="flex items-center justify-between pb-1 text-[11px]">
+            <span class="text-slate-500 font-bold">Daftar Nilai Peserta Didik:</span>
+            <div class="flex items-center gap-1.5">
+              <button onclick="fillQuickAll(80)" class="text-indigo-600 font-black hover:underline cursor-pointer">
+                ⚡ Isi Cepat
+              </button>
+              <span class="text-slate-300">•</span>
+              <button onclick="clearAll()" class="text-slate-400 font-bold hover:underline cursor-pointer">
+                Kosongkan
+              </button>
+            </div>
+          </div>
+
+          <!-- Siswa 1 -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-2.5 hover:border-indigo-300 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-6 h-6 rounded-full bg-violet-100 text-indigo-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                1
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="font-black text-slate-900 text-xs truncate">Ahmad Fadhoil Hasbi</div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">NIS: 2401 • Laki-laki</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="badge_s1">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  Tuntas
+                </span>
+              </div>
+              <input type="number" inputmode="decimal" value="88" oninput="handleScoreChange(1, this.value)"
+                class="w-16 h-10 text-center font-black text-base bg-violet-50/60 border-2 border-violet-200 focus:border-indigo-600 focus:bg-white rounded-xl focus:outline-none text-slate-900 shadow-2xs">
+            </div>
+          </div>
+
+          <!-- Siswa 2 -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-2.5 hover:border-indigo-300 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-6 h-6 rounded-full bg-violet-100 text-indigo-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                2
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="font-black text-slate-900 text-xs truncate">Ahmad Habibi Ahnaf</div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">NIS: 2402 • Laki-laki</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="badge_s2">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  Tuntas
+                </span>
+              </div>
+              <input type="number" inputmode="decimal" value="85" oninput="handleScoreChange(2, this.value)"
+                class="w-16 h-10 text-center font-black text-base bg-violet-50/60 border-2 border-violet-200 focus:border-indigo-600 focus:bg-white rounded-xl focus:outline-none text-slate-900 shadow-2xs">
+            </div>
+          </div>
+
+          <!-- Siswa 3 -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-2.5 hover:border-indigo-300 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-6 h-6 rounded-full bg-violet-100 text-indigo-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                3
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="font-black text-slate-900 text-xs truncate">Ahmad Ihsan Nudin</div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">NIS: 2403 • Laki-laki</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="badge_s3">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  Tuntas
+                </span>
+              </div>
+              <input type="number" inputmode="decimal" value="92" oninput="handleScoreChange(3, this.value)"
+                class="w-16 h-10 text-center font-black text-base bg-violet-50/60 border-2 border-violet-200 focus:border-indigo-600 focus:bg-white rounded-xl focus:outline-none text-slate-900 shadow-2xs">
+            </div>
+          </div>
+
+          <!-- Siswa 4 (Remedial Example) -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-2.5 hover:border-indigo-300 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-6 h-6 rounded-full bg-violet-100 text-indigo-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                4
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="font-black text-slate-900 text-xs truncate">Akhmad Yusuf Khafid</div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">NIS: 2404 • Laki-laki</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="badge_s4">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-100 text-rose-800">
+                  Remedial
+                </span>
+              </div>
+              <input type="number" inputmode="decimal" value="68" oninput="handleScoreChange(4, this.value)"
+                class="w-16 h-10 text-center font-black text-base bg-rose-50/70 border-2 border-rose-300 focus:border-rose-600 focus:bg-white rounded-xl focus:outline-none text-rose-900 shadow-2xs">
+            </div>
+          </div>
+
+          <!-- Siswa 5 -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-2.5 hover:border-indigo-300 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-6 h-6 rounded-full bg-violet-100 text-indigo-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                5
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="font-black text-slate-900 text-xs truncate">Alexa Putri Aghata</div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">NIS: 2405 • Perempuan</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="badge_s5">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  Tuntas
+                </span>
+              </div>
+              <input type="number" inputmode="decimal" value="90" oninput="handleScoreChange(5, this.value)"
+                class="w-16 h-10 text-center font-black text-base bg-violet-50/60 border-2 border-violet-200 focus:border-indigo-600 focus:bg-white rounded-xl focus:outline-none text-slate-900 shadow-2xs">
+            </div>
+          </div>
+
+          <!-- Siswa 6 -->
+          <div class="bg-white rounded-2xl p-2.5 sm:p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-2.5 hover:border-indigo-300 transition-all">
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="w-6 h-6 rounded-full bg-violet-100 text-indigo-800 font-black text-[11px] flex items-center justify-center shrink-0">
+                6
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="font-black text-slate-900 text-xs truncate">Almira Asshabira Rahma</div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">NIS: 2406 • Perempuan</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div id="badge_s6">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">
+                  Tuntas
+                </span>
+              </div>
+              <input type="number" inputmode="decimal" value="84" oninput="handleScoreChange(6, this.value)"
+                class="w-16 h-10 text-center font-black text-base bg-violet-50/60 border-2 border-violet-200 focus:border-indigo-600 focus:bg-white rounded-xl focus:outline-none text-slate-900 shadow-2xs">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- BOTTOM ACTION BAR HP (RAMAH JEMPOL & TIDAK MENGGANGGU NAVBAR) -->
+        <div class="bg-white p-3 border-t border-violet-100 shrink-0 flex items-center justify-between gap-2 shadow-sm">
+          <div class="text-[10px] text-slate-500">
+            Nilai otomatis tersimpan sementara
+          </div>
+          <button class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs shadow-md transition flex items-center gap-1.5 active:scale-95">
+            <span>💾</span> <span>Simpan Nilai</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ========================================================
+           VIEW B: MODE MATRIKS LEBAR (LANDSCAPE MODE)
+           ======================================================== -->
+      <div id="viewMatrixLandscape" class="hidden flex-1 flex flex-col min-h-0 bg-white">
+        
+        <!-- Header Landscape -->
+        <div class="bg-white px-3.5 py-2 border-b border-violet-100 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="font-black text-xs text-slate-900">Buku Nilai Matriks Landscape • Kelas 4</span>
+            <span class="text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md font-bold">Matematika</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="setPreviewMode('focus_portrait')"
+              class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-extrabold text-[10px] border border-indigo-200 flex items-center gap-1">
+              <span>📱</span> <span>Mode HP Tegak</span>
+            </button>
+            <button class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-black text-[10px] shadow-xs">
+              💾 Simpan
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabel Matriks Landscape dengan Freeze Nama Siswa -->
+        <div class="flex-1 overflow-auto relative">
+          <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+            <thead>
+              <tr class="mob-sticky-header text-center font-black uppercase text-[9px] border-b border-violet-100 bg-[#F5F3FF]">
+                <th class="mob-sticky-corner-no py-2 px-1.5 w-9 border-r border-violet-100 text-slate-500">No</th>
+                <th class="mob-sticky-corner-name py-2 px-2.5 w-40 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
+                <th class="py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-blue-200 min-w-[65px]">Formatif 1</th>
+                <th class="py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-blue-200 min-w-[65px]">Formatif 2</th>
+                <th class="py-2 px-2 bg-emerald-100/70 text-emerald-900 border-r border-emerald-200 min-w-[65px]">Tugas 1</th>
+                <th class="py-2 px-2 bg-amber-100/70 text-amber-900 border-r border-amber-200 min-w-[65px]">UH Bab 1</th>
+                <th class="py-2 px-2 bg-purple-100/70 text-purple-900 border-r border-purple-200 min-w-[65px]">STS</th>
+                <th class="py-2 px-2.5 bg-violet-100 text-indigo-900 min-w-[60px]">Rata-Rata</th>
+                <th class="py-2 px-2.5 bg-violet-100 text-indigo-900 min-w-[65px]">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-violet-50 font-medium">
+              <tr class="hover:bg-violet-50/60">
+                <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">1</td>
+                <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                  <div class="font-extrabold text-slate-900 text-[11px] truncate w-36">Ahmad Fadhoil Hasbi</div>
+                </td>
+                <td class="py-1 px-1 text-center border-r"><input value="88" class="w-12 h-7 text-center font-bold bg-blue-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="85" class="w-12 h-7 text-center font-bold bg-blue-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="90" class="w-12 h-7 text-center font-bold bg-emerald-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="84" class="w-12 h-7 text-center font-bold bg-amber-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="85" class="w-12 h-7 text-center font-bold bg-purple-50/60 rounded border"></td>
+                <td class="py-1 px-2 text-center font-black font-mono text-emerald-700 bg-emerald-50/40">86.4</td>
+                <td class="py-1 px-2 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">Tuntas</span></td>
+              </tr>
+              <tr class="hover:bg-violet-50/60">
+                <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">2</td>
+                <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                  <div class="font-extrabold text-slate-900 text-[11px] truncate w-36">Ahmad Habibi Ahnaf</div>
+                </td>
+                <td class="py-1 px-1 text-center border-r"><input value="85" class="w-12 h-7 text-center font-bold bg-blue-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="82" class="w-12 h-7 text-center font-bold bg-blue-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="88" class="w-12 h-7 text-center font-bold bg-emerald-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="80" class="w-12 h-7 text-center font-bold bg-amber-50/60 rounded border"></td>
+                <td class="py-1 px-1 text-center border-r"><input value="82" class="w-12 h-7 text-center font-bold bg-purple-50/60 rounded border"></td>
+                <td class="py-1 px-2 text-center font-black font-mono text-emerald-700 bg-emerald-50/40">83.4</td>
+                <td class="py-1 px-2 text-center"><span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">Tuntas</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Home Bar Indicator -->
+    <div class="w-32 h-1 bg-slate-700 rounded-full mt-3"></div>
+
+  </div>
+
+  <script>
+    function setPreviewMode(mode) {
+      const screen = document.getElementById('phoneViewport');
+      const viewFocus = document.getElementById('viewFocusPortrait');
+      const viewMatrix = document.getElementById('viewMatrixLandscape');
+      const btn1 = document.getElementById('btnOpt1');
+      const btn2 = document.getElementById('btnOpt2');
+
+      if (mode === 'focus_portrait') {
+        screen.className = 'device-screen-portrait bg-[#F5F3FF] rounded-[28px] overflow-hidden flex flex-col relative border border-slate-700/40';
+        viewFocus.classList.remove('hidden');
+        viewMatrix.classList.add('hidden');
+
+        btn1.className = 'px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition';
+        btn2.className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition';
+      } else {
+        screen.className = 'device-screen-landscape bg-[#F5F3FF] rounded-[28px] overflow-hidden flex flex-col relative border border-slate-700/40';
+        viewFocus.classList.add('hidden');
+        viewMatrix.classList.remove('hidden');
+
+        btn1.className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition';
+        btn2.className = 'px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition';
+      }
+    }
+
+    function selectCategory(catName) {
+      document.getElementById('lblActiveCategory').textContent = catName;
+      const buttons = [
+        { id: 'tab_f1', name: 'Formatif 1' },
+        { id: 'tab_f2', name: 'Formatif 2' },
+        { id: 'tab_t1', name: 'Tugas 1' },
+        { id: 'tab_uh1', name: 'UH Bab 1' },
+        { id: 'tab_sts', name: 'STS' },
+        { id: 'tab_sas', name: 'SAS' }
+      ];
+
+      buttons.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (catName.includes(b.name)) {
+          el.className = 'px-3 py-1.5 rounded-full font-black text-[11px] bg-indigo-600 text-white shadow-xs shrink-0 transition flex items-center gap-1';
+        } else {
+          el.className = 'px-3 py-1.5 rounded-full font-bold text-[11px] bg-white text-slate-700 border border-violet-100 hover:bg-violet-50 shrink-0 transition flex items-center gap-1';
+        }
+      });
+    }
+
+    function handleScoreChange(id, val) {
+      const badge = document.getElementById('badge_s' + id);
+      const num = parseFloat(val);
+      if (val === '') {
+        badge.innerHTML = '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-400">Kosong</span>';
+      } else if (num >= 75) {
+        badge.innerHTML = '<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800">Tuntas</span>';
+      } else {
+        badge.innerHTML = '<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-100 text-rose-800">Remedial</span>';
+      }
+    }
+
+    function fillQuickAll(val) {
+      const inputs = document.querySelectorAll('#viewFocusPortrait input[type="number"]');
+      inputs.forEach((inp, idx) => {
+        inp.value = val;
+        handleScoreChange(idx + 1, val);
+      });
+    }
+
+    function clearAll() {
+      const inputs = document.querySelectorAll('#viewFocusPortrait input[type="number"]');
+      inputs.forEach((inp, idx) => {
+        inp.value = '';
+        handleScoreChange(idx + 1, '');
+      });
+    }
+  </script>
+</body>
+</html>
