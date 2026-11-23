@@ -1,0 +1,24 @@
+{
+  "name": "SiGuru SD Digital",
+  "short_name": "SiGuru SD",
+  "description": "Platform Administrasi Pendidikan Guru SD Kecamatan Ambulu, Kabupaten Jember",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#060911",
+  "theme_color": "#7C6EE6",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

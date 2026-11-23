@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buku Panduan Penggunaan SiGuru SD - Edisi Guru Mandiri</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-sizing: border-box;
+    }
+    .font-outfit {
+      font-family: 'Outfit', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Pengaturan Cetak A4 Resmi */
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm 15mm 15mm;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-break {
+        page-break-after: always;
+        break-after: page;
+      }
+      .avoid-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .shadow-2xl, .shadow-xl, .shadow-lg, .shadow-md, .shadow-xs {
+        box-shadow: none !important;
+      }
+    }
+
+    .lavender-gradient {
+      background: linear-gradient(135deg, #7C6EE6 0%, #6C5CE7 50%, #5846B5 100%);
+    }
+    .emerald-gradient {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+    .amber-gradient {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen py-6 sm:py-10">
+
+  <!-- ============================================================
+       TOP FLOATING ACTION BAR (HANYA MUNCUL DI LAYAR BROWSER)
+       ============================================================ -->
+  <aside aria-label="Aksi Dokumen" class="fixed top-4 right-4 z-50 flex items-center gap-2.5 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-full shadow-xl border border-violet-100 no-print">
+    <button onclick="window.print()" class="px-5 py-2 rounded-full lavender-gradient text-white font-extrabold text-xs shadow-md hover:brightness-110 active:scale-95 transition cursor-pointer flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+      </svg>
+      <span>🖨️ Cetak / Simpan sebagai PDF (A4)</span>
+    </button>
+    <a href="/" class="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center gap-1.5">
+      <span>←</span> <span>Buka Aplikasi</span>
+    </a>
+  </aside>
+
+  <!-- ============================================================
+       CONTAINER UTAMA BUKU PANDUAN (STANDAR A4 MAJALAH)
+       ============================================================ -->
+  <main class="max-w-4xl mx-auto space-y-10">
+
+    <!-- ==========================================
+         HALAMAN 1: COVER RESMI BUKU PANDUAN
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-8 sm:p-14 shadow-xl border border-slate-200 relative overflow-hidden flex flex-col justify-between min-h-[1050px] page-break">
+      
+      <!-- Latar Estetika Melengkung -->
+      <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-violet-100/60 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-indigo-100/60 blur-3xl pointer-events-none"></div>
+
+      <!-- Kop Surat Instansi -->
+      <div class="relative z-10 border-b-2 border-slate-900 pb-5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-14 h-14 rounded-2xl lavender-gradient flex items-center justify-center text-white text-2xl font-black shadow-md">
+            🎓
+          </div>
+          <div>
+            <h4 class="text-xs font-black tracking-widest uppercase text-slate-500 font-outfit">Pemerintah Kabupaten Jember</h4>
+            <h3 class="text-sm font-black text-slate-900 uppercase font-outfit">Dinas Pendidikan • Koorwil Bidang Pendidikan Kecamatan Ambulu</h3>
+            <p class="text-[11px] text-slate-600 font-medium">Platform Layanan Administrasi Guru Sekolah Dasar Berbasis Digital Mandiri</p>
+          </div>
+        </div>
+        <div class="text-right hidden sm:block">
+          <span class="px-3 py-1 rounded-full text-[10px] font-black bg-violet-50 text-brand-700 border border-violet-200">
+            Edisi v3.5 Resmi
+          </span>
+        </div>
+      </div>
+
+      <!-- Judul Utama Dokumen -->
+      <div class="relative z-10 my-auto py-10 space-y-6">
+        <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-black tracking-wider uppercase">
+          📘 Buku Panduan Pengguna (User Manual Guide)
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl font-black text-slate-900 leading-tight font-outfit">
+          PANDUAN OPERASIONAL<br>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#6C5CE7] to-[#8275E5]">
+            SIGURU SD DIGITAL
+          </span>
+        </h1>
+
+        <p class="text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed font-medium">
+          Pedoman langkah demi langkah bagi <strong>Guru Kelas & Guru Mapel SD</strong> dalam mengelola <strong>Buku Induk Siswa, Presensi QR Code Scanner, Olah Nilai Formatif & Sumatif, Jurnal Harian, serta Pencadangan Mandiri</strong> yang dirancang responsif untuk Handphone, Tablet, dan Laptop.
+        </p>
+
+        <!-- Feature Highlight Pills -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4">
+          <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-xl">🪪</span>
+            <div class="text-[11px] font-black text-slate-800 mt-1">Kartu Presensi QR</div>
+            <div class="text-[9px] text-slate-500">Cetak A4 Jumbo 8 Kartu</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-xl">📷</span>
+            <div class="text-[11px] font-black text-slate-800 mt-1">Scanner Cepat HP</div>
+            <div class="text-[9px] text-slate-500">Tombol Diamond Tengah</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-xl">📊</span>
+            <div class="text-[11px] font-black text-slate-800 mt-1">Olah Nilai Otomatis</div>
+            <div class="text-[9px] text-slate-500">Rekap Resmi Ber-Kop</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+            <span class="text-xl">📥</span>
+            <div class="text-[11px] font-black text-slate-800 mt-1">Excel & Backup</div>
+            <div class="text-[9px] text-slate-500">Impor .xlsx & JSON Aman</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Cover -->
+      <div class="relative z-10 border-t border-slate-200 pt-5 flex flex-wrap items-center justify-between text-xs text-slate-500">
+        <div>
+          <span class="font-extrabold text-slate-800">Sasaran Pengguna:</span> Seluruh Guru SD Negeri di Kecamatan Ambulu
+        </div>
+        <div>
+          Tahun Ajaran 2026/2027 • Semester Ganjil/Genap
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 2: DAFTAR ISI & STRUKTUR NAVIGASI
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200 space-y-8 page-break">
+      
+      <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-black text-slate-900 font-outfit uppercase tracking-wide">Daftar Isi Panduan</h2>
+          <p class="text-xs text-slate-500">Struktur materi tutorial aplikasi SiGuru SD Khusus Guru</p>
+        </div>
+        <span class="text-xs font-bold px-3 py-1 bg-slate-100 rounded-full text-slate-600">Halaman 2</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        
+        <!-- Bab 1 -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center gap-2 font-black text-brand-700 font-outfit text-sm">
+            <span>01</span> <span>Akses & Keamanan Akun Guru</span>
+          </div>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+            <li>Identifikasi Lembaga via NPSN & Kode Akses</li>
+            <li>Memilih Nama Guru & Masuk PIN 6-Digit</li>
+            <li>Pendaftaran Guru Baru & Verifikasi Admin</li>
+            <li>Penggunaan Mode Gelap (Dark Mode Cyber-Clean)</li>
+          </ul>
+        </div>
+
+        <!-- Bab 2 -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center gap-2 font-black text-brand-700 font-outfit text-sm">
+            <span>02</span> <span>Manajemen Rombel & Siswa</span>
+          </div>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+            <li>Pembuatan Rombongan Belajar (Rombel/Kelas)</li>
+            <li>Unduh Template & Impor Excel Siswa (.xlsx)</li>
+            <li>Tambah & Edit Siswa Manual</li>
+            <li>Cetak Kartu Siswa QR Jumbo (A4 Landscape)</li>
+          </ul>
+        </div>
+
+        <!-- Bab 3 -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center gap-2 font-black text-emerald-700 font-outfit text-sm">
+            <span>03</span> <span>Presensi Siswa & QR Scanner</span>
+          </div>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+            <li>Pencatatan Kehadiran Harian (H, S, I, A)</li>
+            <li>Tombol 1-Klik "Hadir Semua Hari Ini"</li>
+            <li>Scanner Kamera QR Code (Diamond FAB Tengah)</li>
+            <li>Pemilihan Tanggal Fleksibel & Suara Konfirmasi</li>
+          </ul>
+        </div>
+
+        <!-- Bab 4 -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center gap-2 font-black text-emerald-700 font-outfit text-sm">
+            <span>04</span> <span>Input & Olah Nilai Pembelajaran</span>
+          </div>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+            <li>Pengisian Lembar Nilai Formatif & Sumatif</li>
+            <li>Pengaturan Standar KKM/KKTP & Bobot Nilai</li>
+            <li>Rekap Otomatis Nilai Akhir & Predikat</li>
+            <li>Cetak Laporan Rekap Nilai Resmi Ber-Kop Surat</li>
+          </ul>
+        </div>
+
+        <!-- Bab 5 -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center gap-2 font-black text-indigo-700 font-outfit text-sm">
+            <span>05</span> <span>Jurnal Mengajar & Jadwal</span>
+          </div>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+            <li>Penulisan Jurnal Mengajar & Refleksi Harian</li>
+            <li>Pengaturan Roster Pelajaran Mingguan</li>
+            <li>Integrasi Jadwal Aktif ke Widget Beranda</li>
+            <li>Akses & Unduh Berkas Perangkat Ajar Resmi</li>
+          </ul>
+        </div>
+
+        <!-- Bab 6 -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="flex items-center gap-2 font-black text-indigo-700 font-outfit text-sm">
+            <span>06</span> <span>Pencadangan Data Mandiri</span>
+          </div>
+          <ul class="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+            <li>Ekspor Cadangan Data Lengkap (.JSON)</li>
+            <li>Pemulihan Data Saat Ganti HP / Komputer</li>
+            <li>Indikator Sinkronisasi Real-Time Otomatis</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Sekilas Tampilan Navigasi Bawah -->
+      <div class="p-4 rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="text-xs font-black text-brand-900 font-outfit">Floating Bottom Navigation Dock</div>
+          <p class="text-[11px] text-slate-600">Selalu melayang di bagian bawah layar HP untuk navigasi cepat 1-jempol.</p>
+        </div>
+        <div class="px-4 py-2 bg-white rounded-full shadow-sm border border-violet-100 flex items-center gap-3 text-xs font-bold text-slate-600">
+          <span>🏠 Beranda</span>
+          <span>🏫 Kelas</span>
+          <span class="p-1.5 rounded-xl lavender-gradient text-white">📷 Scan</span>
+          <span>📁 Perangkat</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 3: BAB 1 - LOGIN & KEAMANAN AKUN
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200 space-y-6 page-break">
+      
+      <div class="border-b border-slate-200 pb-3 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase text-brand-600 tracking-wider font-outfit">BAB 01 • AUTENTIKASI AMAN</span>
+          <h2 class="text-xl font-black text-slate-900 font-outfit">Panduan Akses & Keamanan Akun Guru</h2>
+        </div>
+        <span class="text-xs font-bold px-3 py-1 bg-slate-100 rounded-full text-slate-600">Halaman 3</span>
+      </div>
+
+      <!-- TAMPILAN 2 TANGKAPAN LAYAR ASLI APLIKASI (TAB MASUK & TAB DAFTAR) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Kartu 1: Tab Masuk Guru -->
+        <div class="p-3.5 bg-slate-900 text-white rounded-2xl border border-slate-800 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-black text-brand-300 font-outfit">Gambar 1A: Tab "Masuk Guru"</span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] bg-brand-500/20 text-brand-300 font-mono">Akun Aktif</span>
+          </div>
+          <div class="rounded-xl overflow-hidden border border-slate-800 shadow-inner flex justify-center bg-black/40">
+            <img src="/assets/img_login_guru.jpg" onerror="this.src='/C:/Users/freza/.gemini/antigravity/brain/d70e3361-17a8-4ffb-95e8-9163a96f8a3c/.user_uploaded/media_1794839508926_3074b8fa.jpg'" alt="Tangkapan Layar Menu Masuk Guru" class="max-h-80 object-contain rounded-lg">
+          </div>
+          <p class="text-[10px] text-slate-400 text-center">Gunakan menu ini jika akun Anda sudah didaftarkan dan diverifikasi.</p>
+        </div>
+
+        <!-- Kartu 2: Tab Guru Baru -->
+        <div class="p-3.5 bg-slate-900 text-white rounded-2xl border border-slate-800 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-black text-emerald-400 font-outfit">Gambar 1B: Tab "Guru Baru (Daftar)"</span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] bg-emerald-500/20 text-emerald-300 font-mono">Registrasi</span>
+          </div>
+          <div class="rounded-xl overflow-hidden border border-slate-800 shadow-inner flex justify-center bg-black/40">
+            <img src="/assets/img_daftar_guru.jpg" onerror="this.src='/C:/Users/freza/.gemini/antigravity/brain/d70e3361-17a8-4ffb-95e8-9163a96f8a3c/.user_uploaded/media_1794839529839_3fdff76a.jpg'" alt="Tangkapan Layar Formulir Guru Baru" class="max-h-80 object-contain rounded-lg">
+          </div>
+          <p class="text-[10px] text-slate-400 text-center">Gunakan menu ini untuk mengajukan permohonan akun guru baru.</p>
+        </div>
+
+      </div>
+
+      <!-- Tabel Bedah Fitur Tab Masuk Guru -->
+      <div class="space-y-2 text-xs">
+        <h4 class="font-extrabold text-slate-900 font-outfit uppercase">Tabel Bedah Fitur Layar Masuk Guru:</h4>
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left text-[11px]">
+            <thead class="bg-slate-50 font-bold border-b border-slate-200 text-slate-700">
+              <tr>
+                <th class="p-2 w-12 text-center">No</th>
+                <th class="p-2 w-44">Elemen / Tombol</th>
+                <th class="p-2">Penjelasan Fungsi & Panduan Penggunaan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-600">
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">①</td>
+                <td class="p-2 font-bold text-slate-800">Kartu SiGuru Access</td>
+                <td class="p-2">Kartu virtual di bagian atas menampilkan status akses lembaga resmi, Kurikulum Merdeka, dan wilayah operasional.</td>
+              </tr>
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">②</td>
+                <td class="p-2 font-bold text-slate-800">NPSN Sekolah (8 Digit)</td>
+                <td class="p-2">Ketikkan 8 digit NPSN resmi sekolah tempat Anda mengajar (contoh: <code>20524058</code>) untuk menghubungkan ke database lembaga Anda.</td>
+              </tr>
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">③</td>
+                <td class="p-2 font-bold text-slate-800">Kode Unik Sekolah</td>
+                <td class="p-2">Kunci otorisasi lembaga (contoh: <code>SMB04-3918</code>) untuk menjamin data antar sekolah terisolasi aman.</td>
+              </tr>
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">④</td>
+                <td class="p-2 font-bold text-slate-800">Nama Guru Terverifikasi</td>
+                <td class="p-2">Pilih nama Anda dari daftar dropdown guru terdaftar di sekolah tersebut tanpa perlu mengetik ulang.</td>
+              </tr>
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">⑤</td>
+                <td class="p-2 font-bold text-slate-800">PIN Pribadi (4-6 Angka)</td>
+                <td class="p-2">Sandi rahasia pribadi Anda untuk membuka portal. Karakter otomatis disamarkan (••••••) demi menjaga privasi.</td>
+              </tr>
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">⑥</td>
+                <td class="p-2 font-bold text-slate-800">Masuk ke Portal Guru →</td>
+                <td class="p-2">Klik tombol ungu utama ini untuk memproses verifikasi dan masuk ke Beranda Portal Guru.</td>
+              </tr>
+              <tr>
+                <td class="p-2 text-center font-bold text-brand-700">⑦</td>
+                <td class="p-2 font-bold text-slate-800">Lihat Daftar NPSN & Kode</td>
+                <td class="p-2">Tombol bantuan jika Anda lupa kode unik lembaga sekolah Anda, menampilkan direktori 14 SD se-Kecamatan Ambulu.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-[11px] leading-relaxed flex items-center gap-2">
+        <span class="text-base">💡</span>
+        <span><strong>Tips Mode Gelap:</strong> Klik tombol ikon matahari/bulan di pojok kanan atas layar login untuk menyesuaikan kontras tampilan sesuai kenyamanan mata Anda.</span>
+      </div>
+
+    </div>
+
+        <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-[11px] leading-relaxed flex items-center gap-2">
+          <span class="text-base">💡</span>
+          <span><strong>Tips Mode Gelap:</strong> Klik tombol ikon bulan 🌙 di kanan atas dashboard untuk mengaktifkan Dark Mode yang nyaman di mata saat menginput nilai di malam hari.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 4: BAB 2 - BUKU INDUK & KARTU QR JUMBO
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200 space-y-8 page-break">
+      
+      <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase text-brand-600 tracking-wider font-outfit">BAB 02 • BUKU INDUK DATA SISWA</span>
+          <h2 class="text-xl font-black text-slate-900 font-outfit">Kelola Siswa & Cetak Kartu Presensi QR Jumbo</h2>
+        </div>
+        <span class="text-xs font-bold px-3 py-1 bg-slate-100 rounded-full text-slate-600">Halaman 4</span>
+      </div>
+
+      <!-- Mockup Header Modul Siswa (2x2 Grid di HP) -->
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="text-xs font-black text-slate-800">Tampilan Header Modul Siswa (Tersedia 4 Tombol Cepat)</div>
+          <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-violet-100 text-brand-700">Responsive Grid 2x2</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="p-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-[11px] text-center shadow-xs flex items-center justify-center gap-1">
+            <span>📥</span> <span>Unduh Template</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-blue-600 text-white font-extrabold text-[11px] text-center shadow-xs flex items-center justify-center gap-1">
+            <span>📤</span> <span>Upload Excel</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-indigo-600 text-white font-extrabold text-[11px] text-center shadow-xs flex items-center justify-center gap-1">
+            <span>🪪</span> <span>Cetak Kartu QR</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#7C6EE6] text-white font-extrabold text-[11px] text-center shadow-xs flex items-center justify-center gap-1">
+            <span>➕</span> <span>Tambah Manual</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mockup Format Kartu Presensi QR Jumbo A4 -->
+      <div class="space-y-3">
+        <div class="text-xs font-black text-slate-800 font-outfit uppercase">Mockup Kartu Presensi Siswa Jumbo (54 x 86 mm Standar Kartu Pelajar):</div>
+        
+        <div class="p-4 rounded-3xl bg-violet-50/50 border border-violet-100 flex flex-wrap justify-center gap-4">
+          
+          <!-- Contoh 1 Kartu Siswa -->
+          <div class="w-48 bg-white rounded-2xl border-2 border-violet-300 p-3 shadow-md flex flex-col items-center justify-between space-y-2 text-center">
+            <div class="border-b border-slate-100 pb-1.5 w-full">
+              <div class="text-[8px] font-black uppercase tracking-wider text-brand-700">SDN SUMBEREJO 04</div>
+              <div class="text-[9px] font-bold text-slate-700">KARTU PRESENSI SISWA</div>
+            </div>
+            
+            <!-- QR Code Besar -->
+            <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
+              <svg class="w-20 h-20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 2h8v8H2zM4 4v4h4V4zm10-2h8v8h-8zM16 4v4h4V4zm-14 14h8v8H2zm2 2v4h4v-4zm10 0h2v2h-2zm4 0h2v2h-2zm-4 4h2v2h-2zm4 0h2v2h-2zm-2-2h2v2h-2zm4-6h2v4h-2zm-4 0h2v2h-2zm-2 2h2v2h-2zm6 2h2v2h-2z"/>
+              </svg>
+            </div>
+
+            <div>
+              <h5 class="text-xs font-black text-slate-900 leading-tight">ADITYA PRATAMA</h5>
+              <p class="text-[10px] text-slate-500 font-mono mt-0.5">NISN: 0148293019 • KELAS IV-A</p>
+            </div>
+            
+            <div class="w-full pt-1 border-t border-slate-100 text-[8px] text-slate-400 font-medium">
+              Tahun Ajaran 2026/2027
+            </div>
+          </div>
+
+          <div class="flex-1 max-w-sm flex flex-col justify-center space-y-2.5 text-xs text-slate-600">
+            <div class="p-3 bg-white rounded-2xl border border-slate-200 space-y-1">
+              <div class="font-bold text-slate-800">📋 Keunggulan Cetak A4 Jumbo:</div>
+              <p class="text-[11px] leading-relaxed">
+                Tepat <strong>8 Kartu per lembar A4 Landscape</strong> (Grid 4 kolom x 2 baris). Dilengkapi garis potong putus-putus (*cut-guide lines*) sehingga mudah digunting rapi.
+              </p>
+            </div>
+
+            <div class="p-3 bg-white rounded-2xl border border-slate-200 space-y-1">
+              <div class="font-bold text-slate-800">🖨️ Rekomendasi Kertas:</div>
+              <p class="text-[11px] leading-relaxed">
+                Gunakan kertas tebal seperti <strong>Brief Card (BC) 160 gsm</strong> atau <strong>Kertas Foto Glossy</strong>, lalu masukkan ke dalam wadah plastik ID Card (Name Tag) agar awet dikalungkan siswa.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 5: BAB 3 - SCANNER QR PRESENSI
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200 space-y-8 page-break">
+      
+      <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase text-emerald-600 tracking-wider font-outfit">BAB 03 • PRESENSI & SCANNER KAMERA</span>
+          <h2 class="text-xl font-black text-slate-900 font-outfit">Presensi Harian & Pemindai QR Cepat di HP</h2>
+        </div>
+        <span class="text-xs font-bold px-3 py-1 bg-slate-100 rounded-full text-slate-600">Halaman 5</span>
+      </div>
+
+      <!-- Mockup Kamera Scanner Viewfinder -->
+      <div class="p-6 rounded-3xl bg-slate-950 text-white space-y-4 max-w-md mx-auto shadow-md relative overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-400">📷</span>
+            <span class="text-xs font-black font-outfit">PEMINDAI QR PRESENSI SISWA</span>
+          </div>
+          <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/30">KAMERA AKTIF</span>
+        </div>
+
+        <!-- Frame Target Scanner -->
+        <div class="h-44 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center relative">
+          <div class="w-32 h-32 border-2 border-emerald-400 rounded-xl flex items-center justify-center relative shadow-[0_0_20px_rgba(52,211,153,0.3)]">
+            <div class="absolute inset-x-2 top-2 h-0.5 bg-emerald-400 shadow-[0_0_10px_#34D399]"></div>
+            <span class="text-[10px] text-slate-400 font-medium text-center px-2">Arahkan Kartu Siswa ke Sini</span>
+          </div>
+        </div>
+
+        <!-- Hasil Deteksi Instan -->
+        <div class="p-2.5 rounded-xl bg-emerald-900/40 border border-emerald-500/40 text-center">
+          <div class="text-[11px] font-extrabold text-emerald-300">✓ ADITYA PRATAMA (HADIR)</div>
+          <div class="text-[9px] text-emerald-200/80">Pukul 06:45 WIB • Suara "Hadir" Berbunyi</div>
+        </div>
+      </div>
+
+      <!-- Cara Menggunakan Scanner -->
+      <div class="space-y-4">
+        <h3 class="text-sm font-black text-slate-900 font-outfit uppercase">Cara Presensi Scanner 1-Detik Per Anak:</h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+            <div class="font-extrabold text-emerald-700">1. Klik Tombol Belah Ketupat</div>
+            <p class="text-slate-600 text-[11px]">
+              Klik tombol tengah ungu berbentuk belah ketupat (<strong>Diamond FAB</strong>) pada menu navigasi bawah.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+            <div class="font-extrabold text-emerald-700">2. Arahkan Kartu Siswa</div>
+            <p class="text-slate-600 text-[11px]">
+              Siswa cukup menunjukkan kartu QR ke depan kamera HP guru selama 1 detik.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+            <div class="font-extrabold text-emerald-700">3. Suara & Status Otomatis</div>
+            <p class="text-slate-600 text-[11px]">
+              Aplikasi berbunyi merdu <em>"Hadir"</em> dan nama siswa langsung tercatat otomatis di database rekap!
+            </p>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-blue-50 rounded-2xl border border-blue-200 text-blue-950 text-xs space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <span>⚡</span> <span>Fitur Sakti: "Hadir Semua Hari Ini"</span>
+          </div>
+          <p class="text-[11px] text-blue-800 leading-relaxed">
+            Jika seluruh siswa masuk sekolah tanpa ada yang absen, guru tidak perlu scan satu per satu. Cukup klik tombol hijau <strong>"Hadir Semua Hari Ini"</strong> di modul presensi, maka 100% siswa di kelas aktif langsung otomatis berstatus Hadir!
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 6: BAB 4 & 5 - NILAI & JURNAL
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200 space-y-8 page-break">
+      
+      <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase text-brand-600 tracking-wider font-outfit">BAB 04 & 05 • PENILAIAN & JURNAL</span>
+          <h2 class="text-xl font-black text-slate-900 font-outfit">Olah Nilai Pembelajaran & Jurnal Mengajar</h2>
+        </div>
+        <span class="text-xs font-bold px-3 py-1 bg-slate-100 rounded-full text-slate-600">Halaman 6</span>
+      </div>
+
+      <!-- Penjelasan Modul Nilai -->
+      <div class="space-y-4">
+        <h3 class="text-sm font-black text-slate-900 font-outfit uppercase">1. Pengisian & Rekap Nilai Siswa:</h3>
+        
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200">
+              <span class="font-extrabold text-brand-700">Formatif & Tugas</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">Penilaian harian proses belajar per Tujuan Pembelajaran (TP).</p>
+            </div>
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200">
+              <span class="font-extrabold text-brand-700">Sumatif / Ulangan</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">Tes lingkup materi akhir bab atau unit pembelajaran.</p>
+            </div>
+            <div class="p-2.5 bg-white rounded-xl border border-slate-200">
+              <span class="font-extrabold text-brand-700">SAS / Semester</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">Sumatif Akhir Semester untuk penentu nilai rapor.</p>
+            </div>
+          </div>
+
+          <div class="p-3 bg-white rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div>
+              <span class="font-bold text-slate-800">Cetak Laporan Rekap Nilai Resmi:</span>
+              <p class="text-[11px] text-slate-500">Lengkap dengan Kop Dinas, Nama Kepala Sekolah, KKM, dan Tanda Tangan.</p>
+            </div>
+            <button class="px-4 py-2 rounded-full lavender-gradient text-white font-extrabold text-xs shadow-xs">
+              🖨️ Cetak PDF Rekap Nilai
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Penjelasan Modul Jurnal & Jadwal -->
+      <div class="space-y-4 pt-2">
+        <h3 class="text-sm font-black text-slate-900 font-outfit uppercase">2. Jurnal Mengajar Harian & Roster Jadwal:</h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div class="font-extrabold text-indigo-700 flex items-center gap-1.5">
+              <span>📖</span> <span>Jurnal Mengajar Harian</span>
+            </div>
+            <p class="text-slate-600 text-[11px] leading-relaxed">
+              Catat mata pelajaran, materi pokok yang diajarkan, dan catatan refleksi siswa setiap hari. Semua catatan tersimpan rapi dan dapat dicetak sebagai bukti administrasi pengawasan Kepala Sekolah/Pengawas.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+            <div class="font-extrabold text-indigo-700 flex items-center gap-1.5">
+              <span>🗓️</span> <span>Jadwal Pelajaran Roster</span>
+            </div>
+            <p class="text-slate-600 text-[11px] leading-relaxed">
+              Atur jadwal jam pelajaran dari hari Senin hingga Sabtu. Jadwal aktif hari ini otomatis tampil pada kartu ribbon tanggal di beranda utama guru sebagai pengingat mandiri.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         HALAMAN 7: BAB 6 & PENUTUP (BACKUP DATA)
+         ========================================== -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-200 space-y-8 page-break">
+      
+      <div class="border-b border-slate-200 pb-4 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase text-brand-600 tracking-wider font-outfit">BAB 06 • PENCADANGAN & KEAMANAN</span>
+          <h2 class="text-xl font-black text-slate-900 font-outfit">Cadangkan Data Mandiri (Anti Hilang)</h2>
+        </div>
+        <span class="text-xs font-bold px-3 py-1 bg-slate-100 rounded-full text-slate-600">Halaman 7</span>
+      </div>
+
+      <!-- Fitur Backup JSON -->
+      <div class="p-5 rounded-2xl bg-violet-50/60 border border-violet-100 space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🛡️</span>
+          <div>
+            <h4 class="text-xs font-black text-brand-900 font-outfit">Mengapa Guru Harus Mencadangkan Data?</h4>
+            <p class="text-[11px] text-slate-600">Meskipun aplikasi otomatis tersinkronisasi ke Cloud Google Sheets, mencadangkan data mandiri menjamin data tetap aman 100% jika Anda berganti perangkat HP atau laptop.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+          <div class="p-3 bg-white rounded-xl border border-violet-100 space-y-1">
+            <div class="font-bold text-slate-800">1. Ekspor Cadangan (.JSON):</div>
+            <p class="text-[11px] text-slate-500">
+              Buka menu <strong>Cadangkan Data</strong> di Beranda, klik tombol <em>"📥 Unduh Cadangan Lengkap"</em>. Berkas JSON akan otomatis tersimpan di HP/laptop Anda.
+            </p>
+          </div>
+
+          <div class="p-3 bg-white rounded-xl border border-violet-100 space-y-1">
+            <div class="font-bold text-slate-800">2. Pulihkan Data (.JSON):</div>
+            <p class="text-[11px] text-slate-500">
+              Saat membuka aplikasi di HP baru, masuk ke menu Cadangkan Data, pilih berkas JSON Anda, dan klik <em>"Pulihkan"</em>. Seluruh siswa dan nilai langsung kembali!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Ringkas Guru -->
+      <div class="space-y-3 pt-2">
+        <h3 class="text-sm font-black text-slate-900 font-outfit uppercase">Pertanyaan Sering Diajukan (FAQ):</h3>
+        
+        <div class="space-y-2 text-xs">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-slate-800">T: Apakah aplikasi ini bisa dibuka di HP Android biasa?</span>
+            <p class="text-slate-600 text-[11px] mt-0.5">J: Sangat bisa! SiGuru SD dirancang ringan, cepat, dan telah dioptimasi untuk layar smartphone maupun tablet.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-slate-800">T: Bagaimana jika kamera HP tidak bisa membuka scanner QR?</span>
+            <p class="text-slate-600 text-[11px] mt-0.5">J: Pastikan Anda memberikan izin kamera (*Allow Camera Access*) saat pertama kali browser memintanya. Anda juga bisa beralih ke tombol presensi manual "Hadir Semua".</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="font-extrabold text-slate-800">T: Ke mana saya harus menghubungi jika lupa PIN Guru?</span>
+            <p class="text-slate-600 text-[11px] mt-0.5">J: Hubungi Admin Sekolah Anda. Admin memiliki hak akses di panel admin untuk mereset PIN Anda secara instan.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lembar Tanda Tangan Penutup -->
+      <div class="border-t border-slate-200 pt-6 mt-8 flex justify-between items-end text-xs text-slate-600">
+        <div>
+          <p class="font-bold text-slate-800">Koorwil Bidang Pendidikan Kecamatan Ambulu</p>
+          <p class="text-[11px]">Kabupaten Jember - Jawa Timur</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[11px]">Ditetapkan di: <strong>Ambulu</strong></p>
+          <p class="text-[11px] mt-1 text-slate-400">SiGuru SD Digital Official Edition</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

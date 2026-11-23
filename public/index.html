@@ -8,6 +8,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="SiGuru SD">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icon.svg">
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.warn('Peringatan: PWA Service Worker belum aktif:', err);
+        });
+      });
+    }
+  </script>
 
   <!-- Google Fonts: Plus Jakarta Sans, Outfit & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -362,9 +374,23 @@
       border-color: rgba(167, 139, 250, 0.2) !important;
     }
     html.dark #syncStatusBadge {
-      background-color: rgba(18, 24, 40, 0.9) !important;
-      border-color: rgba(52, 211, 153, 0.3) !important;
+      background-color: rgba(18, 24, 40, 0.92) !important;
+    }
+    html.dark #syncStatusBadge.badge-synced {
+      border-color: rgba(52, 211, 153, 0.35) !important;
       color: #34D399 !important;
+    }
+    html.dark #syncStatusBadge.badge-syncing {
+      border-color: rgba(96, 165, 250, 0.45) !important;
+      color: #60A5FA !important;
+    }
+    html.dark #syncStatusBadge.badge-offline {
+      border-color: rgba(251, 191, 36, 0.45) !important;
+      color: #FCD34D !important;
+    }
+    html.dark #syncStatusBadge.badge-error {
+      border-color: rgba(244, 63, 94, 0.45) !important;
+      color: #FB7185 !important;
     }
     html.dark #darkModeToggleBtn {
       background-color: rgba(18, 24, 40, 0.9) !important;
@@ -943,11 +969,11 @@
 
       <!-- Right: Real-Time Auto-Sync Badge & Logout Pill -->
       <div class="flex items-center gap-2">
-        <!-- Sync Status Pill -->
-        <div id="syncStatusBadge" onclick="manualTriggerSync()" title="Klik untuk sinkronisasi manual"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-emerald-700 border border-violet-100 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none">
+        <!-- Sync Status Pill (3 State: Online, Syncing, Offline) -->
+        <div id="syncStatusBadge" onclick="handleSyncBadgeClick()" title="Status Sinkronisasi & Penyimpanan Offline"
+          class="badge-synced flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-emerald-700 border border-emerald-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none">
           <span id="syncStatusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span id="syncStatusText" class="hidden sm:inline">Tersinkronisasi</span>
+          <span id="syncStatusText" class="hidden sm:inline">Online • Tersinkronisasi</span>
           <svg id="syncIconSpin" class="w-3.5 h-3.5 text-emerald-600 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
@@ -1447,18 +1473,37 @@
 
     async function fetchTeachersForSchoolDropdown(npsn, kodeUnik) {
       const container = document.getElementById('teacherSelectContainer');
+
+      const renderDropdown = (teachers, isOfflineNotice = false) => {
+        container.innerHTML = `
+          <select id="loginTeacherSelect" required class="w-full p-2.5 bg-[#F8F7FD] border ${isOfflineNotice ? 'border-amber-300' : 'border-[#E2DEF7]'} rounded-xl font-bold text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs">
+            <option value="">-- Pilih Akun Guru Terverifikasi ${isOfflineNotice ? '(Mode Offline)' : ''} --</option>
+            ${teachers.map(t => `<option value="${t.id || t.nama}">${t.nama} (${t.jabatan || 'Guru'})</option>`).join('')}
+          </select>
+        `;
+      };
+
       try {
         const res = await apiPost('verifySchoolByNpsn', { npsn: npsn, kodeUnik: kodeUnik });
         if (res && res.success && res.teachers && res.teachers.length > 0) {
-          container.innerHTML = `
-            <select id="loginTeacherSelect" required class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs">
-              <option value="">-- Pilih Akun Guru Terverifikasi --</option>
-              ${res.teachers.map(t => `<option value="${t.id}">${t.nama} (${t.jabatan || 'Guru'})</option>`).join('')}
-            </select>
-          `;
+          try {
+            localStorage.setItem(`siguru_cached_teachers_${npsn}`, JSON.stringify(res.teachers));
+          } catch (e) {}
+          renderDropdown(res.teachers, false);
           return;
         }
-      } catch (e) {}
+      } catch (e) {
+        try {
+          const cachedRaw = localStorage.getItem(`siguru_cached_teachers_${npsn}`);
+          if (cachedRaw) {
+            const cachedList = JSON.parse(cachedRaw);
+            if (Array.isArray(cachedList) && cachedList.length > 0) {
+              renderDropdown(cachedList, true);
+              return;
+            }
+          }
+        } catch (ce) {}
+      }
 
       container.innerHTML = `
         <input type="text" id="loginTeacherNameInput" required placeholder="Masukkan Nama Lengkap / NIP Anda"
@@ -1664,7 +1709,19 @@
         clearTimeout(t1);
         clearTimeout(t2);
         hideCinematicSplashScreen();
-        showToast('Gagal menghubungi server database: ' + err.message, 'error');
+
+        // 1. Verifikasi Offline Fallback: Cek akun guru terdaftar yang pernah login di HP ini
+        const offlineCheck = verifyOfflineTeacherAuth(npsn, teacherIdOrName, pin);
+        if (offlineCheck.success) {
+          showToast(`🟡 Mode Offline: Selamat datang kembali, ${offlineCheck.teacher.nama}!`, 'info');
+          completeLoginTeacher(offlineCheck.teacher, school, null, false, true /* isOffline */);
+          return;
+        } else if (offlineCheck.wrongPin) {
+          showToast('PIN pribadi Anda salah. Silakan periksa kembali.', 'error');
+          return;
+        }
+
+        showToast('Koneksi internet terputus & akun belum pernah login di HP ini. Silakan sambungkan internet untuk login awal.', 'warning');
       }
     }
 
@@ -1748,10 +1805,34 @@
       }
     }
 
-    function completeLoginTeacher(teacher, school, backendData = null, isNew = false) {
+    function completeLoginTeacher(teacher, school, backendData = null, isNew = false, isOffline = false) {
       currentUser = teacher;
       currentSchool = school;
       currentRole = 'Guru';
+
+      // 1. Simpan data akun ke cache autentikasi lokal HP untuk mendukung login offline selanjutnya
+      try {
+        const authKey = `siguru_auth_teachers_${school.npsn}`;
+        let authList = JSON.parse(localStorage.getItem(authKey) || '[]');
+        const idx = authList.findIndex(t => (t.id && t.id === teacher.id) || (t.nama === teacher.nama));
+        const pinInput = document.getElementById('loginPin');
+        const entry = {
+          id: teacher.id || (teacher.uid || ''),
+          nama: teacher.nama || '',
+          nip: teacher.nip || '',
+          jabatan: teacher.jabatan || 'Guru Kelas',
+          statusKepegawaian: teacher.statusKepegawaian || '',
+          pin: teacher.pin || (pinInput ? pinInput.value.trim() : ''),
+          npsn: school.npsn,
+          namaSekolah: school.nama
+        };
+        if (idx >= 0) {
+          authList[idx] = { ...authList[idx], ...entry };
+        } else {
+          authList.push(entry);
+        }
+        localStorage.setItem(authKey, JSON.stringify(authList));
+      } catch (e) {}
 
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainApp').style.display = 'flex';
@@ -1767,6 +1848,12 @@
         if (backendData.journals) dbData.jurnal = backendData.journals;
         if (backendData.jadwal) dbData.jadwal = backendData.jadwal;
         if (backendData.perangkat) dbData.perangkat = backendData.perangkat;
+
+        // Simpan langsung salinan lengkap database ke memori offline HP
+        saveLocalTeacherDatabase();
+      } else {
+        // Mode Offline: Muat data lokal yang tersimpan di HP guru
+        loadLocalTeacherDatabase(school.npsn, teacher.id || teacher.uid || teacher.nama);
       }
 
       if (dbData.kelas.length > 0) {
@@ -1774,10 +1861,17 @@
       }
 
       renderPortal();
-      syncBackendData();
-      startAutoSync(); // Aktifkan deteksi sinkronisasi lintas perangkat secara background
 
-      showToast(`Berhasil masuk ke ${school.nama}!`, 'success');
+      if (isOffline || !navigator.onLine) {
+        setSyncStatus('offline');
+      } else {
+        setSyncStatus('synced');
+        syncBackendData();
+        startAutoSync();
+        processSyncQueue();
+      }
+
+      showToast(isOffline ? `Mode Offline Aktif di ${school.nama}` : `Berhasil masuk ke ${school.nama}!`, isOffline ? 'info' : 'success');
 
       if (isNew || dbData.kelas.length === 0) {
         setTimeout(openFirstClassCreationWizard, 500);
@@ -1972,20 +2066,161 @@
       }
     }
 
-    async function executeDbWrite(action, payload, successMsg = 'Data berhasil disimpan.') {
-      setSyncStatus('syncing', 'Menyimpan...');
+    // ==========================================
+    // OFFLINE-FIRST LOCAL STORAGE & SYNC ENGINE
+    // ==========================================
+    function getTeacherStorageKey() {
+      const npsn = currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : 'default');
+      const tId = currentUser ? (currentUser.id || currentUser.uid || currentUser.nip || currentUser.nama || 'unknown') : 'guest';
+      return `siguru_offline_db_${npsn}_${tId}`;
+    }
+
+    function getSyncQueueKey() {
+      const npsn = currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : 'default');
+      const tId = currentUser ? (currentUser.id || currentUser.uid || currentUser.nip || currentUser.nama || 'unknown') : 'guest';
+      return `siguru_sync_queue_${npsn}_${tId}`;
+    }
+
+    function getSyncQueue() {
       try {
-        const enrichedPayload = {
-          ...payload,
-          npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
-          namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : ''),
-          ownerUid: currentUser ? (currentUser.id || currentUser.uid) : '',
-          schoolId: currentSchool ? currentSchool.id : (currentUser ? currentUser.schoolId : '')
+        const raw = localStorage.getItem(getSyncQueueKey());
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+      return [];
+    }
+
+    function saveSyncQueue(queue) {
+      try {
+        localStorage.setItem(getSyncQueueKey(), JSON.stringify(queue));
+      } catch (e) {}
+    }
+
+    function saveLocalTeacherDatabase() {
+      if (!currentUser) return;
+      try {
+        const key = getTeacherStorageKey();
+        const payload = {
+          version: 1,
+          savedAt: new Date().toISOString(),
+          user: currentUser,
+          school: currentSchool,
+          activeGuruClassId: activeGuruClassId,
+          kelas: dbData.kelas || [],
+          siswa: dbData.siswa || [],
+          presensi: dbData.presensi || [],
+          nilai: dbData.nilai || [],
+          jurnal: dbData.jurnal || [],
+          jadwal: dbData.jadwal || [],
+          perangkat: dbData.perangkat || [],
+          metaConfig: schoolMetaConfig
         };
+        localStorage.setItem(key, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('Gagal menyimpan database offline lokal:', e);
+      }
+    }
+
+    function loadLocalTeacherDatabase(npsnParam = null, teacherIdParam = null) {
+      try {
+        const npsn = npsnParam || (currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : 'default'));
+        const tId = teacherIdParam || (currentUser ? (currentUser.id || currentUser.uid || currentUser.nip || currentUser.nama) : 'guest');
+        const key = `siguru_offline_db_${npsn}_${tId}`;
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        if (d) {
+          if (Array.isArray(d.kelas)) dbData.kelas = d.kelas;
+          if (Array.isArray(d.siswa)) dbData.siswa = d.siswa;
+          if (Array.isArray(d.presensi)) dbData.presensi = d.presensi;
+          if (Array.isArray(d.nilai)) dbData.nilai = d.nilai;
+          if (Array.isArray(d.jurnal)) dbData.jurnal = d.jurnal;
+          if (Array.isArray(d.jadwal)) dbData.jadwal = d.jadwal;
+          if (Array.isArray(d.perangkat)) dbData.perangkat = d.perangkat;
+          if (d.metaConfig) {
+            schoolMetaConfig = { ...schoolMetaConfig, ...d.metaConfig };
+          }
+          if (d.activeGuruClassId && dbData.kelas.find(k => k.id === d.activeGuruClassId)) {
+            activeGuruClassId = d.activeGuruClassId;
+          } else if (dbData.kelas.length > 0) {
+            activeGuruClassId = dbData.kelas[0].id;
+          }
+          return d;
+        }
+      } catch (e) {
+        console.warn('Gagal memuat database offline lokal:', e);
+      }
+      return null;
+    }
+
+    function verifyOfflineTeacherAuth(npsn, teacherIdOrName, pin) {
+      try {
+        const raw = localStorage.getItem(`siguru_auth_teachers_${npsn}`);
+        if (!raw) return { success: false, reason: 'no_data' };
+        const list = JSON.parse(raw);
+        if (!Array.isArray(list) || list.length === 0) return { success: false, reason: 'no_data' };
+
+        const searchStr = String(teacherIdOrName).toLowerCase().trim();
+        const found = list.find(t => 
+          (t.id && String(t.id).toLowerCase() === searchStr) ||
+          (t.nama && t.nama.toLowerCase().trim() === searchStr) ||
+          (t.nip && String(t.nip).trim() === searchStr)
+        );
+
+        if (!found) return { success: false, reason: 'not_found' };
+
+        if (String(found.pin).trim() !== String(pin).trim()) {
+          return { success: false, wrongPin: true };
+        }
+
+        return { success: true, teacher: found };
+      } catch (e) {
+        return { success: false, reason: 'error' };
+      }
+    }
+
+    async function executeDbWrite(action, payload, successMsg = 'Data berhasil disimpan.') {
+      // 1. Selalu perbarui penyimpanan lokal HP guru seketika (Zero Data Loss)
+      saveLocalTeacherDatabase();
+
+      const enrichedPayload = {
+        ...payload,
+        npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
+        namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : ''),
+        ownerUid: currentUser ? (currentUser.id || currentUser.uid) : '',
+        schoolId: currentSchool ? currentSchool.id : (currentUser ? currentUser.schoolId : '')
+      };
+
+      // 2. Jika perangkat sedang offline: masukkan ke antrean sinkronisasi lokal
+      if (!navigator.onLine) {
+        const queue = getSyncQueue();
+        queue.push({
+          id: 'SQ_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          action: action,
+          payload: enrichedPayload,
+          timestamp: new Date().toISOString()
+        });
+        saveSyncQueue(queue);
+        setSyncStatus('offline');
+        showToast('Tersimpan di HP (Mode Offline) • Masuk antrean sinkronisasi.', 'info');
+        return { success: true, offline: true };
+      }
+
+      // 3. Jika online: coba kirim ke server cloud
+      setSyncStatus('syncing', 'Menyimpan ke Cloud...');
+      try {
         const res = await apiPost(action, enrichedPayload);
         if (res && res.success) {
           syncState.lastSyncTime = new Date();
-          setSyncStatus('synced', 'Tersinkronisasi');
+          const qCount = getSyncQueue().length;
+          if (qCount === 0) {
+            setSyncStatus('synced', 'Online • Tersinkronisasi');
+          } else {
+            setSyncStatus('syncing', `Menyinkronkan (${qCount})...`);
+            processSyncQueue();
+          }
           if (successMsg) showToast(successMsg, 'success');
           return { success: true, res };
         } else {
@@ -1994,8 +2229,18 @@
           return { success: false };
         }
       } catch (err) {
-        setSyncStatus('error', 'Gagal Menyimpan');
-        return { success: false };
+        console.warn('Network write failed, queuing offline:', err);
+        const queue = getSyncQueue();
+        queue.push({
+          id: 'SQ_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          action: action,
+          payload: enrichedPayload,
+          timestamp: new Date().toISOString()
+        });
+        saveSyncQueue(queue);
+        setSyncStatus('offline');
+        showToast('Koneksi terputus. Data aman tersimpan di HP & masuk antrean.', 'warning');
+        return { success: true, offline: true };
       }
     }
 
@@ -2019,21 +2264,138 @@
       const spin = document.getElementById('syncIconSpin');
 
       if (!badge || !dot || !text) return;
-      if (spin) spin.classList.remove('animate-spin');
+      if (spin) {
+        spin.classList.remove('animate-spin');
+        spin.style.display = 'inline-block';
+      }
+
+      const qCount = getSyncQueue().length;
+
+      badge.classList.remove('badge-synced', 'badge-syncing', 'badge-offline', 'badge-error');
 
       if (status === 'synced') {
-        badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-emerald-700 border border-violet-100 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
+        // 🟢 Hijau: Online • Tersinkronisasi
+        badge.classList.add('badge-synced');
+        badge.className = 'badge-synced flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-emerald-700 border border-emerald-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
         dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
-        text.textContent = message || 'Tersinkronisasi';
+        if (spin) spin.className = 'w-3.5 h-3.5 text-emerald-600 transition-transform';
+        text.textContent = message || 'Online • Tersinkronisasi';
       } else if (status === 'syncing') {
-        badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
+        // 🔵 Biru (Berputar): Menyinkronkan ke Cloud...
+        badge.classList.add('badge-syncing');
+        badge.className = 'badge-syncing flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
+        dot.className = 'w-2 h-2 rounded-full bg-blue-500';
+        if (spin) {
+          spin.className = 'w-3.5 h-3.5 text-blue-600 transition-transform animate-spin';
+        }
+        text.textContent = message || (qCount > 0 ? `Menyinkronkan (${qCount})...` : 'Menyinkronkan ke Cloud...');
+      } else if (status === 'offline') {
+        // 🟡 Kuning: Mode Offline • Data Tersimpan di HP (X antrean)
+        badge.classList.add('badge-offline');
+        badge.className = 'badge-offline flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
         dot.className = 'w-2 h-2 rounded-full bg-amber-500';
-        if (spin) spin.classList.add('animate-spin');
-        text.textContent = message || 'Menyinkronkan...';
+        if (spin) spin.style.display = 'none';
+        const qInfo = qCount > 0 ? ` (${qCount} antrean)` : '';
+        text.textContent = message || `Mode Offline • Data Tersimpan di HP${qInfo}`;
       } else if (status === 'error') {
-        badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
+        badge.classList.add('badge-error');
+        badge.className = 'badge-error flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
         dot.className = 'w-2 h-2 rounded-full bg-rose-600';
-        text.textContent = message || 'Offline / Error';
+        if (spin) spin.style.display = 'none';
+        text.textContent = message || 'Gagal Menghubungkan';
+      }
+    }
+
+    function handleSyncBadgeClick() {
+      const q = getSyncQueue();
+      if (!navigator.onLine) {
+        openUniversalModal(
+          '📡 Status Koneksi: Mode Offline',
+          `
+          <div class="space-y-3.5 text-xs">
+            <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🟡</span>
+                <h4 class="font-black text-sm">Mode Offline Aktif</h4>
+              </div>
+              <p class="leading-relaxed">
+                Aplikasi tetap berjalan normal tanpa koneksi internet. Seluruh perubahan data presensi, nilai, jadwal, dan modul lainnya <strong>langsung tersimpan di memori HP Anda</strong>.
+              </p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
+              <div class="flex justify-between items-center font-bold">
+                <span class="text-slate-700">Antrean Sinkronisasi Cloud:</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-black">${q.length} perubahan</span>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                Saat HP Anda terhubung kembali ke internet (WiFi atau Paket Data), sistem akan <strong>otomatis menyinkronkan seluruh antrean</strong> ini ke Google Spreadsheet tanpa perlu tindakan tambahan.
+              </p>
+            </div>
+            <div class="pt-2 flex justify-end">
+              <button onclick="closeUniversalModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-extrabold rounded-full cursor-pointer shadow-xs">
+                Tutup
+              </button>
+            </div>
+          </div>
+          `
+        );
+      } else {
+        manualTriggerSync();
+      }
+    }
+
+    let isProcessingSyncQueue = false;
+    async function processSyncQueue() {
+      if (isProcessingSyncQueue) return;
+      if (!navigator.onLine || !currentUser) {
+        if (!navigator.onLine) setSyncStatus('offline');
+        return;
+      }
+
+      const queue = getSyncQueue();
+      if (queue.length === 0) {
+        setSyncStatus('synced', 'Online • Tersinkronisasi');
+        return;
+      }
+
+      isProcessingSyncQueue = true;
+      setSyncStatus('syncing', `Menyinkronkan ke Cloud... (${queue.length})`);
+
+      let successCount = 0;
+      const remainingQueue = [];
+
+      for (let i = 0; i < queue.length; i++) {
+        const item = queue[i];
+        try {
+          setSyncStatus('syncing', `Menyinkronkan ke Cloud... (${queue.length - i} tersisa)`);
+          const res = await apiPost(item.action, item.payload);
+          if (res && res.success) {
+            successCount++;
+          } else {
+            remainingQueue.push(item);
+          }
+        } catch (err) {
+          // Koneksi terputus saat proses sinkronisasi antrean berlangsung
+          remainingQueue.push(item);
+          for (let j = i + 1; j < queue.length; j++) {
+            remainingQueue.push(queue[j]);
+          }
+          break;
+        }
+      }
+
+      saveSyncQueue(remainingQueue);
+      isProcessingSyncQueue = false;
+
+      if (remainingQueue.length === 0) {
+        setSyncStatus('synced', 'Online • Tersinkronisasi');
+        if (successCount > 0) {
+          showToast(`🎉 ${successCount} data offline berhasil disinkronkan ke cloud!`, 'success');
+        }
+        await syncBackendData(true);
+      } else {
+        setSyncStatus('offline', `Mode Offline • Data Tersimpan di HP (${remainingQueue.length} antrean)`);
+        showToast(`Koneksi terputus. ${remainingQueue.length} data aman tersimpan di HP & tetap dalam antrean.`, 'warning');
       }
     }
 
@@ -2063,8 +2425,16 @@
             activeGuruClassId = dbData.kelas[0].id;
           }
 
+          // Perbarui snapshot offline lokal
+          saveLocalTeacherDatabase();
+
           syncState.lastSyncTime = new Date();
-          setSyncStatus('synced', 'Tersinkronisasi');
+          const qCount = getSyncQueue().length;
+          if (qCount === 0) {
+            setSyncStatus('synced', 'Online • Tersinkronisasi');
+          } else {
+            setSyncStatus('offline');
+          }
 
           // JIKA BACKGROUND SILENT SYNC: Perbarui tampilan modul jika sedang dibuka
           if (isBackgroundSilent && activeModuleKey === 'guru-jadwal') {
@@ -2095,14 +2465,13 @@
     // REALTIME CROSS-DEVICE BACKGROUND CHECK (RINGAN & NON-INTRUSIVE)
     // Memeriksa nomor versi perubahan di server setiap 8 detik jika tab aktif
     async function checkRealtimeCrossDeviceUpdates() {
-      if (!IS_CONNECTED || !currentUser || !syncState.isTabActive || syncState.isSyncing) return;
+      if (!IS_CONNECTED || !currentUser || !syncState.isTabActive || syncState.isSyncing || !navigator.onLine) return;
       try {
         const res = await apiGet('checkSyncStatus', { clientVersion: syncState.clientVersion });
         if (res && res.success) {
           if (res.serverVersion && res.serverVersion > syncState.clientVersion) {
             syncState.serverVersion = res.serverVersion;
             syncState.clientVersion = res.serverVersion;
-            // Ada pembaruan dari device lain (misal guru scan di HP, laptop otomatis update)
             await syncBackendData(true);
           }
         }
@@ -2111,7 +2480,6 @@
 
     function startAutoSync() {
       if (syncState.pollTimer) clearInterval(syncState.pollTimer);
-      // Polling ringan setiap 8 detik untuk deteksi lintas perangkat
       syncState.pollTimer = setInterval(checkRealtimeCrossDeviceUpdates, 8000);
     }
 
@@ -2122,27 +2490,31 @@
       }
     }
 
-    // Deteksi apakah tab sedang aktif / terlihat untuk menghemat kuota
     document.addEventListener('visibilitychange', () => {
       syncState.isTabActive = !document.hidden;
-      if (syncState.isTabActive) {
+      if (syncState.isTabActive && navigator.onLine) {
         checkRealtimeCrossDeviceUpdates();
       }
     });
 
     async function manualTriggerSync() {
-      showToast('Menyinkronkan data dengan database...', 'info');
-      setSyncStatus('syncing', 'Menyinkronkan...');
+      if (!navigator.onLine) {
+        handleSyncBadgeClick();
+        return;
+      }
+      showToast('Menyinkronkan data dengan database cloud...', 'info');
+      setSyncStatus('syncing', 'Menyinkronkan ke Cloud...');
+      await processSyncQueue();
       const ok = await syncBackendData();
       if (ok) {
-        showToast('Data berhasil diperbarui dari database.', 'success');
+        showToast('Data berhasil diperbarui dari cloud.', 'success');
         if (activeModuleKey) {
           openModule(activeModuleKey);
         } else {
           renderPortal();
         }
       } else {
-        showToast('Data sudah versi terbaru.', 'info');
+        showToast('Data lokal sudah versi terbaru.', 'info');
       }
     }
 
@@ -2199,6 +2571,10 @@
           currentUser = s.user;
           currentSchool = s.school;
           activeGuruClassId = s.activeClassId || null;
+
+          // 1. Muat database lokal guru seketika (Offline-First)
+          loadLocalTeacherDatabase(s.school.npsn, s.user.id || s.user.uid || s.user.nama);
+
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('mainApp').style.display = 'flex';
           updateHeaderUserUI();
@@ -2207,7 +2583,14 @@
           } else {
             renderPortal();
           }
-          syncBackendData();
+
+          if (navigator.onLine) {
+            processSyncQueue();
+            syncBackendData();
+            startAutoSync();
+          } else {
+            setSyncStatus('offline');
+          }
           return true;
         }
       } catch (e) {}
@@ -2250,6 +2633,21 @@
                 <span class="text-[10px] text-brand-muted font-mono">NPSN: ${sch.npsn || '-'}</span>
               </div>
             </div>
+          </div>
+
+          <!-- SEKSI 0: BUKU PANDUAN PENGGUNAAN GURU (RESMI A4) -->
+          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-violet-500/10 via-brand-500/10 to-indigo-500/10 border border-violet-200/80 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">📘</span>
+              <div>
+                <h4 class="font-extrabold text-brand-dark text-xs">Buku Panduan Penggunaan Guru</h4>
+                <p class="text-[10px] text-brand-muted">Tutorial lengkap langkah demi langkah siap cetak PDF resmi A4</p>
+              </div>
+            </div>
+            <a href="/panduan" target="_blank"
+              class="px-3.5 py-2 rounded-xl lavender-gradient text-white font-extrabold text-xs shadow-xs hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 cursor-pointer shrink-0">
+              <span>Buka Panduan</span> <span>↗</span>
+            </a>
           </div>
 
           <!-- SEKSI 1: IDENTITAS GURU -->
@@ -7820,18 +8218,25 @@
         startAutoSync(); // Aktifkan sinkronisasi lintas perangkat jika sesi guru aktif
       }
 
-      window.addEventListener('online', () => {
+      window.addEventListener('online', async () => {
         const dot = document.getElementById('onlinePresenceDot');
         if (dot) dot.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-400';
-        setSyncStatus('syncing', 'Menghubungkan...');
-        syncBackendData();
+        showToast('🌐 Internet kembali terhubung! Menyinkronkan data ke cloud...', 'info');
+        await processSyncQueue();
       });
 
       window.addEventListener('offline', () => {
         const dot = document.getElementById('onlinePresenceDot');
-        if (dot) dot.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full bg-rose-500 border-2 border-white ring-1 ring-rose-400';
-        setSyncStatus('error', 'Offline');
+        if (dot) dot.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full bg-amber-500 border-2 border-white ring-1 ring-amber-400';
+        setSyncStatus('offline');
+        showToast('📡 Anda beralih ke Mode Offline. Data tetap aman tersimpan di HP.', 'info');
       });
+
+      if (!navigator.onLine) {
+        const dot = document.getElementById('onlinePresenceDot');
+        if (dot) dot.className = 'absolute bottom-0 right-0 w-3 h-3 rounded-full bg-amber-500 border-2 border-white ring-1 ring-amber-400';
+        setSyncStatus('offline');
+      }
 
       document.addEventListener('visibilitychange', () => {
         // Jangan merefresh aplikasi secara otomatis saat ganti tab / kembali ke tab
