@@ -620,6 +620,53 @@
         margin: 6mm 10mm;
       }
     }
+
+    /* ============================================================
+       LANDSCAPE MATRIX STICKY COLUMNS & HEADERS (HP, TABLET, DESKTOP)
+       ============================================================ */
+    .mob-sticky-col-no {
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      background-color: #FFFFFF;
+      box-shadow: 2px 0 6px rgba(0,0,0,0.04);
+    }
+    .mob-sticky-col-name {
+      position: sticky;
+      left: 36px;
+      z-index: 20;
+      background-color: #FFFFFF;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
+    }
+    .mob-sticky-header th {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background-color: #F8F7FD;
+    }
+    .mob-sticky-corner-no {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 35 !important;
+      background-color: #EDE9FE !important;
+    }
+    .mob-sticky-corner-name {
+      position: sticky;
+      left: 36px;
+      top: 0;
+      z-index: 35 !important;
+      background-color: #EDE9FE !important;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
+    }
+    .matrix-input-cell {
+      transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .matrix-input-cell:focus {
+      background-color: #FFFFFF !important;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.4);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col bg-[#F0EEF9] text-brand-dark selection:bg-brand-600 selection:text-white">
@@ -4663,237 +4710,312 @@
       }
     }
 
+// ============================================================
+    // SISTEM PENILAIAN LANDSCAPE MATRIX & CHECKBOX (SD / FASE ABC)
+    // ============================================================
+    let activeMatrixMapel = '';
+    let matrixActiveCols = {
+      ph1: true,
+      ph2: true,
+      ph3: false,
+      ph4: false,
+      tugas1: true,
+      tugas2: false,
+      uh1: true,
+      uh2: false,
+      sts: true,
+      sas: false
+    };
+
+    const MATRIX_COLUMNS = [
+      { key: 'ph1', label: 'Formatif 1', sub: 'TP 1', cat: 'Formatif 1', colorName: 'blue', bgHeader: '#EFF6FF', borderHeader: '#BFDBFE', textHeader: '#1E3A8A', bgInput: '#F0F7FF', borderInput: '#BFDBFE' },
+      { key: 'ph2', label: 'Formatif 2', sub: 'TP 2', cat: 'Formatif 2', colorName: 'blue', bgHeader: '#EFF6FF', borderHeader: '#BFDBFE', textHeader: '#1E3A8A', bgInput: '#F0F7FF', borderInput: '#BFDBFE' },
+      { key: 'ph3', label: 'Formatif 3', sub: 'TP 3', cat: 'Formatif 3', colorName: 'blue', bgHeader: '#EFF6FF', borderHeader: '#BFDBFE', textHeader: '#1E3A8A', bgInput: '#F0F7FF', borderInput: '#BFDBFE' },
+      { key: 'ph4', label: 'Formatif 4', sub: 'TP 4', cat: 'Formatif 4', colorName: 'blue', bgHeader: '#EFF6FF', borderHeader: '#BFDBFE', textHeader: '#1E3A8A', bgInput: '#F0F7FF', borderInput: '#BFDBFE' },
+      { key: 'tugas1', label: 'Tugas 1', sub: 'Mandiri/Kel', cat: 'Tugas 1', colorName: 'emerald', bgHeader: '#ECFDF5', borderHeader: '#A7F3D0', textHeader: '#064E3B', bgInput: '#F2FDF8', borderInput: '#A7F3D0' },
+      { key: 'tugas2', label: 'Tugas 2', sub: 'Proyek/PR', cat: 'Tugas 2', colorName: 'emerald', bgHeader: '#ECFDF5', borderHeader: '#A7F3D0', textHeader: '#064E3B', bgInput: '#F2FDF8', borderInput: '#A7F3D0' },
+      { key: 'uh1', label: 'Sumatif LM 1', sub: 'UH Bab 1', cat: 'Sumatif Lingkup Materi', colorName: 'amber', bgHeader: '#FFFBEB', borderHeader: '#FDE68A', textHeader: '#78350F', bgInput: '#FEFDF5', borderInput: '#FDE68A' },
+      { key: 'uh2', label: 'Sumatif LM 2', sub: 'UH Bab 2', cat: 'Sumatif Lingkup Materi 2', colorName: 'amber', bgHeader: '#FFFBEB', borderHeader: '#FDE68A', textHeader: '#78350F', bgInput: '#FEFDF5', borderInput: '#FDE68A' },
+      { key: 'sts', label: 'STS (Tengah)', sub: 'Tengah Sem', cat: 'PTS', colorName: 'purple', bgHeader: '#FAF5FF', borderHeader: '#E9D5FF', textHeader: '#581C87', bgInput: '#FCF9FF', borderInput: '#E9D5FF' },
+      { key: 'sas', label: 'SAS (Akhir)', sub: 'Akhir Sem', cat: 'PAS', colorName: 'rose', bgHeader: '#FFF1F2', borderHeader: '#FECDD3', textHeader: '#881337', bgInput: '#FFF7F8', borderInput: '#FECDD3' }
+    ];
+
+    function findExistingStudentScore(studentId, mapel, colDef) {
+      if (!dbData.nilai || dbData.nilai.length === 0) return null;
+      const targetMapel = (mapel || '').trim().toLowerCase();
+      const studentGrades = dbData.nilai.filter(n => {
+        if (n.idSiswa !== studentId) return false;
+        if (targetMapel && n.mapel && n.mapel.trim().toLowerCase() !== targetMapel) return false;
+        return true;
+      });
+
+      const patterns = {
+        ph1: ['formatif 1', 'uh 1', 'uh1', 'ulangan harian 1', 'tp1', 'tp 1'],
+        ph2: ['formatif 2', 'uh 2', 'uh2', 'ulangan harian 2', 'tp2', 'tp 2'],
+        ph3: ['formatif 3', 'uh 3', 'uh3', 'ulangan harian 3', 'tp3', 'tp 3'],
+        ph4: ['formatif 4', 'uh 4', 'uh4', 'ulangan harian 4', 'tp4', 'tp 4'],
+        tugas1: ['tugas 1', 't1', 't-1'],
+        tugas2: ['tugas 2', 't2', 't-2'],
+        uh1: ['sumatif lingkup materi 1', 'sumatif lm 1', 'uh bab 1', 'ulangan bab 1', 'sumatif lingkup materi'],
+        uh2: ['sumatif lingkup materi 2', 'sumatif lm 2', 'uh bab 2', 'ulangan bab 2'],
+        sts: ['pts', 'sts', 'tengah semester', 'sumatif tengah'],
+        sas: ['pas', 'sas', 'akhir semester', 'sumatif akhir']
+      }[colDef.key] || [colDef.cat.toLowerCase()];
+
+      for (let p of patterns) {
+        const found = studentGrades.find(n => {
+          const cat = (n.kategori || n.jenisPenilaian || '').toLowerCase();
+          const name = (n.namaPenilaian || '').toLowerCase();
+          return cat.includes(p) || name.includes(p);
+        });
+        if (found) {
+          const val = found.nilaiAngka !== undefined ? found.nilaiAngka : found.nilaiAkhir;
+          return { id: found.id, value: val, item: found };
+        }
+      }
+      return null;
+    }
+
     function renderLembarInputNilaiMassal(container, actKls, students) {
       const mapels = getTeacherMapelList();
+      if (!activeMatrixMapel || !mapels.includes(activeMatrixMapel)) {
+        activeMatrixMapel = mapels[0] || 'Matematika';
+      }
+
+      const activeCount = Object.values(matrixActiveCols).filter(Boolean).length;
+      const kktpVal = schoolMetaConfig.kkm || 75;
 
       container.innerHTML = `
         <form onsubmit="handleSaveAllNilaiBatch(event)" class="space-y-4">
-          
-          <!-- PENGATURAN ASESMEN / HEADER FILTER (FLEKSIBEL & BEBAS EDIT) -->
-          <div class="bg-white rounded-[26px] p-5 border border-violet-100/70 shadow-xs space-y-3.5 text-xs">
-            <div class="flex items-center justify-between border-b border-violet-50 pb-2.5">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span>
-                <h4 class="font-black text-brand-dark text-sm">Konfigurasi Penilaian Pembelajaran</h4>
+
+          <!-- TOP CONTROL & MAPEL SELECTOR -->
+          <div class="bg-white rounded-[26px] p-4 sm:p-5 border border-violet-100/70 shadow-xs space-y-3.5 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-violet-50 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
+                  📑
+                </div>
+                <div>
+                  <h4 class="font-black text-brand-dark text-sm sm:text-base leading-tight">Buku Nilai Landscape SD</h4>
+                  <p class="text-[11px] text-brand-muted">Kelas ${actKls ? actKls.namaRombel : '-'} • ${students.length} Siswa Terdaftar</p>
+                </div>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#EAE7FB] text-brand-700">
-                ${actKls.namaRombel} • ${actKls.tahunAjaran || '2026/2027'} (${actKls.semester || 'Ganjil'})
-              </span>
+
+              <!-- Quick action toolbar -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <button type="button" onclick="quickFillMatrixScore()"
+                  class="px-3 py-1.5 rounded-full bg-[#EAE7FB] hover:bg-brand-200 text-brand-700 font-extrabold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1">
+                  <span>⚡</span> <span>Isi Cepat</span>
+                </button>
+                <button type="button" onclick="resetMatrixScoreInputs()"
+                  class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer">
+                  Bersihkan
+                </button>
+                <button type="submit" id="btnSaveMatrixGrades"
+                  class="px-4 py-1.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-black text-[11px] shadow-xs transition cursor-pointer flex items-center gap-1.5">
+                  <span>💾</span> <span>Simpan Semua Nilai</span>
+                </button>
+              </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <!-- Mata Pelajaran Otomatis Sesuai Jabatan Guru -->
-              <div>
+            <!-- Filter Controls Bar: Mapel & KKTP -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div class="sm:col-span-2">
                 <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
-                <select id="inpNilaiMapel" onchange="autoFillNamaPenilaian()" required
-                  class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
-                  ${mapels.map(m => `<option value="${m}">${m}</option>`).join('')}
+                <select id="inpNilaiMapel" onchange="reloadMatrixForMapel(this.value)" required
+                  class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-black text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs sm:text-sm">
+                  ${mapels.map(m => `<option value="${m}" ${m === activeMatrixMapel ? 'selected' : ''}>${m}</option>`).join('')}
                 </select>
               </div>
 
-              <!-- Kategori Penilaian Sesuai Permintaan User & Template Resmi -->
-              <div>
-                <label class="block font-bold text-slate-700 mb-1">Kategori Penilaian *</label>
-                <select id="inpNilaiKategori" onchange="autoFillNamaPenilaian()" required
-                  class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
-                  <option value="Tugas 1">Tugas 1 (T1)</option>
-                  <option value="Tugas 2">Tugas 2 (T2)</option>
-                  <option value="Tugas 3">Tugas 3 (T3)</option>
-                  <option value="UH 1">Ulangan Harian 1 (UH 1 / Formatif 1)</option>
-                  <option value="UH 2">Ulangan Harian 2 (UH 2 / Formatif 2)</option>
-                  <option value="PTS">Penilaian Tengah Semester (PTS / STS)</option>
-                  <option value="PAS">Penilaian Akhir Semester (PAS / SAS)</option>
-                  <option value="Formatif">Formatif (Asesmen Harian)</option>
-                  <option value="Sumatif Lingkup Materi">Sumatif Lingkup Materi</option>
-                  <option value="Tugas">Tugas Mandiri / Kelompok</option>
-                  <option value="Keterampilan">Keterampilan / Praktik</option>
-                  <option value="Sumatif Akhir Semester">Sumatif Akhir Semester (SAS)</option>
-                </select>
-              </div>
-
-              <!-- Standar Ketuntasan (KKTP) -->
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Batas KKTP / Tuntas *</label>
                 <div class="flex items-center gap-2">
-                  <input type="number" id="inpNilaiKktp" value="75" min="50" max="100" oninput="updateStudentScoreCalculation()"
+                  <input type="number" id="inpNilaiKktp" value="${kktpVal}" min="50" max="100" oninput="recalcAllMatrixRows()"
                     class="w-24 p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
-                  <span class="text-brand-muted text-[11px] font-medium leading-tight">Nilai batas ketuntasan</span>
+                  <span class="text-brand-muted text-[11px] font-medium leading-tight">Standar ketuntasan kelas</span>
                 </div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-              <!-- Nama Penilaian (Bisa Diedit Sendiri oleh Guru) -->
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="font-bold text-slate-700">Nama / Judul Penilaian *</label>
-                  <span class="text-[10px] text-brand-600 font-bold">Bebas diedit guru</span>
-                </div>
-                <input type="text" id="inpNilaiNamaPenilaian" required value="Formatif 1: Operasi Bilangan" placeholder="Contoh: UH Bab 2 / Formatif 1 / Proyek Kolase"
-                  class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
-              </div>
-
-              <!-- Lingkup Materi / TP -->
-              <div>
-                <label class="block font-bold text-slate-700 mb-1">Lingkup Materi / Tujuan Pembelajaran (TP)</label>
-                <input type="text" id="inpNilaiMateri" value="Memahami dan menguraikan konsep dasar materi" placeholder="Contoh: Menghitung pecahan senilai"
-                  class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
               </div>
             </div>
           </div>
 
-          <!-- TABEL INPUT NILAI MASSAL (SELURUH SISWA DALAM SATU TAMPILAN) -->
-          <div class="bg-white rounded-[26px] p-5 border border-violet-100/70 shadow-xs space-y-3.5">
-            <div class="flex flex-wrap items-center justify-between gap-2.5">
+          <!-- PITA CENTANG PILIHAN PENILAIAN (HORIZONTAL SCROLL CHIPS) -->
+          <div class="bg-white rounded-[24px] p-3.5 sm:p-4 border border-violet-100/70 shadow-xs space-y-2 text-xs">
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 pb-1">
+              <div class="flex items-center gap-1.5">
+                <span>☑️</span>
+                <span>Pilih kolom penilaian yang ingin ditampilkan di tabel:</span>
+                <span id="matrixColCountBadge" class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 font-black text-[10px]">
+                  ${activeCount} Kolom Aktif
+                </span>
+              </div>
+              <button type="button" onclick="toggleAllMatrixCols()"
+                class="text-brand-600 hover:text-brand-800 font-extrabold cursor-pointer transition text-[11px] underline">
+                Toggle Semua
+              </button>
+            </div>
+
+            <!-- Chips Horizontal List -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 text-[11px] select-none" id="matrixFilterBarContainer">
+              ${MATRIX_COLUMNS.map(col => {
+                const isChk = !!matrixActiveCols[col.key];
+                return `
+                  <label id="chip_col_${col.key}"
+                    class="px-2.5 sm:px-3 py-1.5 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition-all ${isChk ? '' : 'opacity-50'}"
+                    style="background:${isChk ? col.bgHeader : '#F8FAFC'}; border-color:${isChk ? col.borderHeader : '#E2E8F0'}; color:${isChk ? col.textHeader : '#64748B'};">
+                    <input type="checkbox" id="chk_col_${col.key}" ${isChk ? 'checked' : ''} onchange="toggleMatrixCol('${col.key}', this.checked)"
+                      class="w-3.5 h-3.5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                    <span>${col.label}</span>
+                    <span class="text-[9px] opacity-75 font-normal">(${col.sub})</span>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
+              <span>💡 <strong>Tip HP:</strong> Geser tabel ke kanan untuk melihat kolom penilaian lainnya. Nama siswa tetap terkunci (freeze) di sebelah kiri.</span>
+            </div>
+          </div>
+
+          <!-- SUCCESS SAVED BANNER (JIKA BARU SAJA SIMPAN) -->
+          <div id="matrixSavedBanner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-800 flex items-center justify-between gap-2 shadow-2xs">
+            <div class="flex items-center gap-2">
+              <span class="text-base">✅</span>
               <div>
-                <h4 class="font-black text-brand-dark text-xs sm:text-sm">Lembar Input Nilai Peserta Didik</h4>
-                <p class="text-[11px] text-brand-muted">Gunakan tombol <strong>Enter</strong> atau <strong>Panah Bawah (↓)</strong> untuk berpindah ke siswa berikutnya dengan cepat.</p>
-              </div>
-
-              <!-- Tombol Cepat Toolbar -->
-              <div class="flex items-center gap-2">
-                <button type="button" onclick="fillQuickScoresBatch()"
-                  class="px-3 py-1.5 rounded-full bg-[#EAE7FB] hover:bg-brand-200 text-brand-700 font-extrabold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1">
-                  <span>⚡</span> <span>Isi Nilai Cepat</span>
-                </button>
-                <button type="button" onclick="resetStudentScoreInputs()"
-                  class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer">
-                  Bersihkan
-                </button>
+                <span class="font-black" id="matrixSavedBannerMsg">Nilai siswa berhasil disimpan ke database!</span>
+                <div class="text-[11px] text-emerald-700">Data tersinkronisasi offline & online cloud.</div>
               </div>
             </div>
+            <button type="button" onclick="switchNilaiSubTab('history')"
+              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl shadow-xs transition shrink-0 cursor-pointer">
+              Lihat Rekap Rapor 📊
+            </button>
+          </div>
 
-            <!-- TAMPILAN 1: KHUSUS LAYAR HP (RESPONSIVE MOBILE CARD VIEW - ZERO HORIZONTAL SCROLL) -->
-            <div class="block md:hidden space-y-3">
-              ${students.map((s, idx) => `
-                <div class="bg-white rounded-2xl p-3.5 border border-violet-100/90 shadow-2xs hover:border-brand-300 transition-all space-y-2.5">
-                  <div class="flex items-center justify-between gap-3">
-                    <!-- Sisi Kiri: Nomor & Identitas Siswa -->
-                    <div class="flex items-start gap-2.5 min-w-0 flex-1">
-                      <span class="w-6 h-6 rounded-full bg-[#EDE9FE] text-brand-700 font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">
-                        ${idx + 1}
-                      </span>
-                      <div class="min-w-0 flex-1">
-                        <h5 class="font-black text-brand-dark text-xs sm:text-sm leading-tight truncate">${s.nama}</h5>
-                        <p class="text-[10px] text-brand-muted mt-0.5">
-                          NIS: <span class="font-mono font-bold text-slate-700">${s.nis || '-'}</span> • ${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}
-                        </p>
-                        <!-- Badge Ketercapaian Live Mobile -->
-                        <div class="mt-1" id="mobile_status_badge_${s.id}">
-                          <span class="inline-block px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-400">
-                            Belum Diisi
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Sisi Kanan: Input Nilai Lebar Ramah Jempol (Numpad) -->
-                    <div class="shrink-0 text-right">
-                      <span class="block text-[9px] font-bold text-brand-muted mb-0.5">Nilai (0-100)</span>
-                      <input type="number" min="0" max="100" step="any"
-                        inputmode="decimal"
-                        data-idx="${idx}"
-                        id="score_${s.id}"
-                        placeholder="0"
-                        oninput="updateStudentScoreCalculation()"
-                        onkeydown="handleScoreInputNavigation(event, ${idx})"
-                        class="student-score-input w-20 h-11 px-2 text-center font-black text-base bg-[#F8F7FD] border-2 border-violet-200 focus:border-brand-600 focus:bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 text-brand-dark shadow-2xs">
-                    </div>
-                  </div>
-
-                  <!-- Baris Catatan / Refleksi Nilai Fleksibel -->
-                  <div class="pt-1 border-t border-violet-50">
-                    <input type="text"
-                      id="catatan_${s.id}"
-                      placeholder="Catatan / deskripsi capaian (opsional)"
-                      class="w-full py-1.5 px-3 bg-[#F8F7FD] border border-violet-100 rounded-xl text-[11px] text-brand-dark focus:outline-none focus:bg-white focus:border-brand-400">
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-
-            <!-- TAMPILAN 2: KHUSUS LAYAR LAPTOP / TABLET (DESKTOP COMPACT TABLE) -->
-            <div class="hidden md:block overflow-x-auto">
-              <table class="w-full text-left text-xs" id="tableMassInputNilai">
+          <!-- TABEL LANDSCAPE MATRIX TERPADU (HP, TABLET, LAPTOP) -->
+          <div class="bg-white rounded-[26px] p-3 sm:p-5 border border-violet-100/70 shadow-xs space-y-3">
+            <div class="overflow-x-auto overflow-y-auto max-h-[62vh] border border-violet-100/90 rounded-2xl relative bg-white shadow-2xs" id="matrixTableContainer">
+              <table class="w-full text-left border-collapse text-xs whitespace-nowrap" id="tableMassInputNilai">
+                
+                <!-- STICKY TABLE HEADER -->
                 <thead>
-                  <tr class="border-b border-violet-50 text-brand-muted font-bold text-[11px]">
-                    <th class="pb-2.5 text-center w-10">No</th>
-                    <th class="pb-2.5 w-28">NIS / NISN</th>
-                    <th class="pb-2.5 min-w-[180px]">Nama Lengkap Siswa</th>
-                    <th class="pb-2.5 text-center w-28">Nilai (0 - 100)</th>
-                    <th class="pb-2.5 text-center w-32">Ketercapaian</th>
-                    <th class="pb-2.5 min-w-[200px]">Catatan / Refleksi Nilai</th>
+                  <tr class="mob-sticky-header text-center font-black uppercase text-[10px] border-b border-violet-100 bg-[#F5F3FF]">
+                    
+                    <!-- Frozen Corner Columns (No & Nama) -->
+                    <th class="mob-sticky-corner-no py-2.5 px-1.5 w-10 sm:w-12 border-r border-violet-100 text-slate-600">No</th>
+                    <th class="mob-sticky-corner-name py-2.5 px-3 w-40 sm:w-52 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
+
+                    <!-- Dynamic Assessment Columns -->
+                    ${MATRIX_COLUMNS.map((col, cIdx) => `
+                      <th class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-2 px-2 text-center border-r font-extrabold text-[11px] min-w-[70px] sm:min-w-[80px]"
+                        style="background:${col.bgHeader}; color:${col.textHeader}; border-color:${col.borderHeader};">
+                        ${col.label}<br>
+                        <span class="text-[9px] font-normal opacity-85">(${col.sub})</span>
+                      </th>
+                    `).join('')}
+
+                    <!-- Summary & Final Columns -->
+                    <th class="py-2.5 px-2 text-center bg-violet-100 text-indigo-950 font-black min-w-[65px] border-l border-violet-200">
+                      Rata-Rata
+                    </th>
+                    <th class="py-2.5 px-2.5 text-center bg-violet-100 text-indigo-950 font-black min-w-[75px]">
+                      Status
+                    </th>
                   </tr>
                 </thead>
+
+                <!-- BODY SISWA -->
                 <tbody class="divide-y divide-violet-50 font-medium">
-                  ${students.map((s, idx) => `
-                    <tr class="hover:bg-[#F8F7FD] transition-colors" data-student-id="${s.id}">
-                      <td class="py-2 text-center font-bold text-brand-muted">${idx + 1}</td>
-                      <td class="py-2 font-mono text-[11px] text-slate-600">
-                        ${s.nis || '-'}<br><span class="text-[10px] text-brand-muted">${s.nisn || '-'}</span>
-                      </td>
-                      <td class="py-2">
-                        <span class="font-black text-brand-dark text-xs block">${s.nama}</span>
-                        <span class="text-[10px] text-brand-muted">${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}</span>
-                      </td>
-                      <td class="py-2 text-center">
-                        <input type="number" min="0" max="100" step="any"
-                          inputmode="decimal"
-                          data-idx="${idx}"
-                          id="desk_score_${s.id}"
-                          placeholder="0"
-                          oninput="syncDeskInputScore('${s.id}', this.value)"
-                          onkeydown="handleScoreInputNavigation(event, ${idx})"
-                          class="student-score-input-desk w-20 p-2 text-center font-black text-sm bg-white border border-[#E2DEF7] rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent shadow-2xs">
-                      </td>
-                      <td class="py-2 text-center" id="status_badge_${s.id}">
-                        <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-400">
-                          Belum Diisi
-                        </span>
-                      </td>
-                      <td class="py-2">
-                        <input type="text"
-                          id="desk_catatan_${s.id}"
-                          oninput="syncDeskInputCatatan('${s.id}', this.value)"
-                          placeholder="Deskripsi ketercapaian siswa (opsional)"
-                          class="w-full p-2 bg-[#F8F7FD] border border-violet-100 rounded-xl text-xs text-brand-dark focus:outline-none focus:bg-white focus:ring-1 focus:ring-brand-600">
-                      </td>
-                    </tr>
-                  `).join('')}
+                  ${students.map((s, idx) => {
+                    return `
+                      <tr class="hover:bg-violet-50/60 transition-colors" data-row-student-id="${s.id}">
+                        <!-- Sticky No -->
+                        <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[11px]">
+                          ${idx + 1}
+                        </td>
+
+                        <!-- Sticky Nama Siswa -->
+                        <td class="mob-sticky-col-name py-2 px-2.5 border-r border-violet-100">
+                          <div class="font-extrabold text-brand-dark text-xs truncate max-w-[140px] sm:max-w-[190px]" title="${escapeHtml(s.nama)}">
+                            ${escapeHtml(s.nama)}
+                          </div>
+                          <div class="text-[9px] text-brand-muted font-mono flex items-center gap-1 mt-0.5">
+                            <span>NIS: ${s.nis || '-'}</span>
+                            <span>•</span>
+                            <span class="${s.jenisKelamin === 'P' ? 'text-pink-600 font-bold' : 'text-blue-600 font-bold'}">${s.jenisKelamin === 'P' ? 'P' : 'L'}</span>
+                          </div>
+                        </td>
+
+                        <!-- Dynamic Matrix Inputs -->
+                        ${MATRIX_COLUMNS.map((col, cIdx) => {
+                          const existing = findExistingStudentScore(s.id, activeMatrixMapel, col);
+                          const val = existing !== null && existing.value !== null && existing.value !== undefined ? existing.value : '';
+                          return `
+                            <td class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-1 px-1 text-center border-r border-violet-50">
+                              <input type="number" inputmode="decimal" min="0" max="100" step="any"
+                                id="score_${s.id}_${col.key}"
+                                data-student-id="${s.id}"
+                                data-student-name="${escapeHtml(s.nama)}"
+                                data-col-key="${col.key}"
+                                data-row-idx="${idx}"
+                                data-col-idx="${cIdx}"
+                                value="${val}"
+                                placeholder="-"
+                                oninput="onMatrixCellInput('${s.id}')"
+                                onkeydown="handleMatrixNav(event, ${idx}, ${cIdx})"
+                                class="matrix-score-input matrix-input-cell w-14 sm:w-16 h-8 text-center font-black text-xs rounded-lg border border-slate-200 text-brand-dark"
+                                style="background:${col.bgInput}; border-color:${col.borderInput};">
+                            </td>
+                          `;
+                        }).join('')}
+
+                        <!-- Realtime Average & Status -->
+                        <td class="py-1 px-2 text-center font-black font-mono text-xs border-l border-violet-100 bg-violet-50/30 text-slate-700" id="mat_avg_${s.id}">
+                          -
+                        </td>
+                        <td class="py-1 px-2 text-center text-[10px]" id="mat_status_${s.id}">
+                          <span class="inline-block px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-400">
+                            Belum Diisi
+                          </span>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
                 </tbody>
               </table>
             </div>
 
-            <!-- Ringkasan Statistik Kelas Live -->
-            <div class="p-3.5 bg-[#F0EEF9] rounded-2xl border border-violet-100/70 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div class="flex items-center gap-4">
-                <div>
-                  <span class="text-brand-muted block text-[10px] font-bold">Rata-rata Nilai:</span>
-                  <span class="text-sm font-black text-brand-dark" id="statRataRata">0.0</span>
-                </div>
-                <div>
-                  <span class="text-brand-muted block text-[10px] font-bold">Tertinggi / Terendah:</span>
-                  <span class="text-xs font-black text-brand-dark" id="statMaxMin">- / -</span>
-                </div>
-                <div>
-                  <span class="text-brand-muted block text-[10px] font-bold">Tuntas / Remedial:</span>
-                  <span class="text-xs font-black text-emerald-700" id="statTuntasRemedial">0 / 0</span>
-                </div>
+            <!-- LIVE CLASS STATS SUMMARY -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Rata-Rata Kelas</span>
+                <span id="statRataRata" class="font-black text-brand-dark text-sm sm:text-base font-mono">0.0</span>
               </div>
-
-              <div>
-                <span class="text-brand-muted block text-[10px] font-bold">Ketuntasan Kelas:</span>
-                <span class="text-sm font-black text-brand-600" id="statKetuntasanPct">0%</span>
+              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Tertinggi / Terendah</span>
+                <span id="statMaxMin" class="font-black text-brand-dark text-sm sm:text-base font-mono">- / -</span>
+              </div>
+              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Tuntas / Remedial</span>
+                <span id="statTuntasRemedial" class="font-black text-xs sm:text-sm font-mono leading-tight">-</span>
+              </div>
+              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Ketuntasan Klasikal</span>
+                <span id="statKetuntasanPct" class="font-black text-brand-600 text-sm sm:text-base font-mono">0%</span>
               </div>
             </div>
 
-            <!-- Tombol Simpan Massal -->
-            <div class="pt-2 flex justify-end">
-              <button type="submit" id="btnSubmitAllNilai"
-                class="px-6 py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white font-black text-xs shadow-md shadow-brand-500/25 flex items-center gap-2 transition hover:scale-[1.01] active:scale-98 cursor-pointer">
-                <span>💾 Simpan Seluruh Nilai Siswa</span>
-                <span>➔</span>
-              </button>
+            <!-- Bottom Floating Save Bar for Easy Mobile Thumb Access -->
+            <div class="pt-2 flex items-center justify-between gap-3 border-t border-violet-50">
+              <div class="text-[11px] text-brand-muted hidden sm:block">
+                Gunakan tombol <strong>Enter</strong> atau <strong>Panah Bawah (↓)</strong> untuk berpindah baris.
+              </div>
+              <div class="w-full sm:w-auto flex items-center gap-2 justify-end">
+                <button type="submit"
+                  class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition cursor-pointer flex items-center justify-center gap-2">
+                  <span>💾</span> <span>Simpan Semua Nilai ke Database</span>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -4901,201 +5023,316 @@
         </form>
       `;
 
-      autoFillNamaPenilaian();
+      // Kalkulasi langsung nilai yang terisi awal
+      setTimeout(() => {
+        recalcAllMatrixRows();
+      }, 50);
     }
 
-    function autoFillNamaPenilaian() {
-      const mapelEl = document.getElementById('inpNilaiMapel');
-      const katEl = document.getElementById('inpNilaiKategori');
-      const nameEl = document.getElementById('inpNilaiNamaPenilaian');
-      if (!mapelEl || !katEl || !nameEl) return;
-
-      const mapel = mapelEl.value;
-      const kat = katEl.value;
-
-      const countExisting = dbData.nilai.filter(n => n.idKelas === activeGuruClassId && n.mapel === mapel && (n.kategori === kat || n.jenisPenilaian === kat)).length + 1;
-      nameEl.value = `${kat} ${countExisting}: ${mapel.split('(')[0].trim()}`;
+    function reloadMatrixForMapel(mapel) {
+      if (mapel) activeMatrixMapel = mapel;
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const subArea = document.getElementById('nilaiSubTabContentArea');
+      if (subArea) {
+        renderLembarInputNilaiMassal(subArea, actKls, myStudents);
+      }
     }
 
-    function handleScoreInputNavigation(e, currentIndex) {
-      if (e.key === 'Enter' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        const nextInput = document.querySelector(`.student-score-input[data-idx="${currentIndex + 1}"]`);
-        if (nextInput) {
-          nextInput.focus();
-          nextInput.select();
+    function toggleMatrixCol(colKey, isChecked) {
+      matrixActiveCols[colKey] = isChecked;
+      const elements = document.querySelectorAll('.col_' + colKey);
+      elements.forEach(el => {
+        if (isChecked) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+
+      const colDef = MATRIX_COLUMNS.find(c => c.key === colKey);
+      const chip = document.getElementById('chip_col_' + colKey);
+      if (chip && colDef) {
+        if (isChecked) {
+          chip.classList.remove('opacity-50');
+          chip.style.background = colDef.bgHeader;
+          chip.style.borderColor = colDef.borderHeader;
+          chip.style.color = colDef.textHeader;
+        } else {
+          chip.classList.add('opacity-50');
+          chip.style.background = '#F8FAFC';
+          chip.style.borderColor = '#E2E8F0';
+          chip.style.color = '#64748B';
         }
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const prevInput = document.querySelector(`.student-score-input[data-idx="${currentIndex - 1}"]`);
-        if (prevInput) {
-          prevInput.focus();
-          prevInput.select();
+      }
+
+      const activeCount = Object.values(matrixActiveCols).filter(Boolean).length;
+      const badge = document.getElementById('matrixColCountBadge');
+      if (badge) badge.textContent = activeCount + ' Kolom Aktif';
+
+      recalcAllMatrixRows();
+    }
+
+    function toggleAllMatrixCols() {
+      const allActive = Object.values(matrixActiveCols).every(Boolean);
+      const targetState = !allActive;
+
+      MATRIX_COLUMNS.forEach(col => {
+        const chk = document.getElementById('chk_col_' + col.key);
+        if (chk) {
+          chk.checked = targetState;
+          toggleMatrixCol(col.key, targetState);
         }
-      }
+      });
     }
 
-    function syncDeskInputScore(sId, val) {
-      const mobileInp = document.getElementById('score_' + sId);
-      if (mobileInp && mobileInp.value !== val) {
-        mobileInp.value = val;
-      }
-      updateStudentScoreCalculation();
+    function onMatrixCellInput(studentId) {
+      recalcSingleMatrixRow(studentId);
+      recalcMatrixClassStats();
     }
 
-    function syncDeskInputCatatan(sId, val) {
-      const mobileCat = document.getElementById('catatan_' + sId);
-      if (mobileCat && mobileCat.value !== val) {
-        mobileCat.value = val;
-      }
-    }
-
-    function updateStudentScoreCalculation() {
+    function recalcSingleMatrixRow(studentId) {
       const kktp = parseFloat(document.getElementById('inpNilaiKktp')?.value) || 75;
-      const inputs = document.querySelectorAll('.student-score-input');
       let total = 0;
       let count = 0;
-      let max = -Infinity;
-      let min = Infinity;
-      let tuntas = 0;
-      let remedial = 0;
 
-      inputs.forEach(inp => {
-        const sId = inp.id.replace('score_', '');
-        const badge = document.getElementById('status_badge_' + sId);
-        const mobileBadge = document.getElementById('mobile_status_badge_' + sId);
-        const deskInp = document.getElementById('desk_score_' + sId);
-        const val = inp.value.trim();
-
-        if (deskInp && deskInp.value !== val) {
-          deskInp.value = val;
-        }
-
-        if (val !== '') {
-          const num = parseFloat(val);
-          total += num;
-          count++;
-          if (num > max) max = num;
-          if (num < min) min = num;
-
-          const isTuntas = num >= kktp;
-          if (isTuntas) tuntas++;
-          else remedial++;
-
-          const badgeHtml = isTuntas ? `
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tuntas
-            </span>
-          ` : `
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800">
-              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Remedial
-            </span>
-          `;
-
-          if (badge) badge.innerHTML = badgeHtml;
-          if (mobileBadge) mobileBadge.innerHTML = badgeHtml;
-        } else {
-          const emptyBadgeHtml = `
-            <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-400">
-              Belum Diisi
-            </span>
-          `;
-          if (badge) badge.innerHTML = emptyBadgeHtml;
-          if (mobileBadge) mobileBadge.innerHTML = emptyBadgeHtml;
+      MATRIX_COLUMNS.forEach(col => {
+        if (!matrixActiveCols[col.key]) return;
+        const inp = document.getElementById('score_' + studentId + '_' + col.key);
+        if (inp && inp.value.trim() !== '') {
+          const val = parseFloat(inp.value.trim());
+          if (!isNaN(val)) {
+            total += val;
+            count++;
+          }
         }
       });
 
-      const avg = count > 0 ? (total / count).toFixed(1) : '0.0';
-      const pct = count > 0 ? Math.round((tuntas / count) * 100) : 0;
+      const avgEl = document.getElementById('mat_avg_' + studentId);
+      const statusEl = document.getElementById('mat_status_' + studentId);
+
+      if (count > 0) {
+        const avg = total / count;
+        const avgFormatted = avg.toFixed(1);
+        const isTuntas = avg >= kktp;
+
+        if (avgEl) {
+          avgEl.textContent = avgFormatted;
+          avgEl.className = isTuntas 
+            ? 'py-1 px-2 text-center font-black font-mono text-xs border-l border-violet-100 bg-emerald-50/50 text-emerald-800'
+            : 'py-1 px-2 text-center font-black font-mono text-xs border-l border-violet-100 bg-rose-50/50 text-rose-800';
+        }
+
+        if (statusEl) {
+          statusEl.innerHTML = isTuntas ? `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tuntas
+            </span>
+          ` : `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Remedial
+            </span>
+          `;
+        }
+      } else {
+        if (avgEl) {
+          avgEl.textContent = '-';
+          avgEl.className = 'py-1 px-2 text-center font-black font-mono text-xs border-l border-violet-100 bg-violet-50/30 text-slate-700';
+        }
+        if (statusEl) {
+          statusEl.innerHTML = `
+            <span class="inline-block px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-400 text-[10px]">
+              Belum Diisi
+            </span>
+          `;
+        }
+      }
+    }
+
+    function recalcAllMatrixRows() {
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      myStudents.forEach(s => recalcSingleMatrixRow(s.id));
+      recalcMatrixClassStats();
+    }
+
+    function recalcMatrixClassStats() {
+      const kktp = parseFloat(document.getElementById('inpNilaiKktp')?.value) || 75;
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+
+      let totalAvg = 0;
+      let filledStudentCount = 0;
+      let maxScore = -Infinity;
+      let minScore = Infinity;
+      let tuntasCount = 0;
+      let remedialCount = 0;
+
+      myStudents.forEach(s => {
+        let sTotal = 0;
+        let sCount = 0;
+        MATRIX_COLUMNS.forEach(col => {
+          if (!matrixActiveCols[col.key]) return;
+          const inp = document.getElementById('score_' + s.id + '_' + col.key);
+          if (inp && inp.value.trim() !== '') {
+            const val = parseFloat(inp.value.trim());
+            if (!isNaN(val)) {
+              sTotal += val;
+              sCount++;
+              if (val > maxScore) maxScore = val;
+              if (val < minScore) minScore = val;
+            }
+          }
+        });
+
+        if (sCount > 0) {
+          const sAvg = sTotal / sCount;
+          totalAvg += sAvg;
+          filledStudentCount++;
+          if (sAvg >= kktp) tuntasCount++;
+          else remedialCount++;
+        }
+      });
 
       const avgEl = document.getElementById('statRataRata');
       const maxMinEl = document.getElementById('statMaxMin');
       const trEl = document.getElementById('statTuntasRemedial');
       const pctEl = document.getElementById('statKetuntasanPct');
 
-      if (avgEl) avgEl.textContent = avg;
-      if (maxMinEl) maxMinEl.textContent = count > 0 ? `${max} / ${min}` : '- / -';
-      if (trEl) trEl.innerHTML = `<span class="text-emerald-700">${tuntas} Tuntas</span> / <span class="text-rose-600">${remedial} Remedial</span>`;
-      if (pctEl) pctEl.textContent = pct + '%';
+      if (avgEl) avgEl.textContent = filledStudentCount > 0 ? (totalAvg / filledStudentCount).toFixed(1) : '0.0';
+      if (maxMinEl) maxMinEl.textContent = filledStudentCount > 0 ? `${maxScore} / ${minScore}` : '- / -';
+      if (trEl) trEl.innerHTML = `<span class="text-emerald-700">${tuntasCount} Tuntas</span> / <span class="text-rose-600">${remedialCount} Remedial</span>`;
+      if (pctEl) {
+        const pct = filledStudentCount > 0 ? Math.round((tuntasCount / filledStudentCount) * 100) : 0;
+        pctEl.textContent = pct + '%';
+      }
     }
 
-    function fillQuickScoresBatch() {
-      const def = prompt('Masukkan nilai standar cepat untuk seluruh siswa yang belum diisi (contoh: 80):', '80');
-      if (def === null) return;
-      const num = parseFloat(def);
+    function handleMatrixNav(e, rowIdx, colIdx) {
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const totalRows = myStudents.length;
+
+      if (e.key === 'Enter' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextRow = rowIdx + 1;
+        if (nextRow < totalRows) {
+          const targetInp = document.querySelector(`input[data-row-idx="${nextRow}"][data-col-idx="${colIdx}"]`);
+          if (targetInp) targetInp.focus();
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevRow = rowIdx - 1;
+        if (prevRow >= 0) {
+          const targetInp = document.querySelector(`input[data-row-idx="${prevRow}"][data-col-idx="${colIdx}"]`);
+          if (targetInp) targetInp.focus();
+        }
+      }
+    }
+
+    function quickFillMatrixScore() {
+      const activeList = MATRIX_COLUMNS.filter(c => matrixActiveCols[c.key]);
+      if (activeList.length === 0) {
+        showToast('Aktifkan minimal satu kolom penilaian terlebih dahulu.', 'warning');
+        return;
+      }
+
+      const optionsStr = activeList.map((c, i) => `${i + 1}. ${c.label} (${c.sub})`).join('\n');
+      const choice = prompt('Pilih kolom yang ingin diisi nilai cepat:\n' + optionsStr + '\n\nMasukkan nomor pilihan (1-' + activeList.length + '):', '1');
+      if (choice === null) return;
+
+      const idx = parseInt(choice, 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= activeList.length) {
+        showToast('Pilihan kolom tidak valid.', 'warning');
+        return;
+      }
+
+      const targetCol = activeList[idx];
+      const valStr = prompt(`Masukkan nilai default untuk kolom "${targetCol.label}" (0-100):\n(Hanya mengisi baris yang masih kosong)`, '80');
+      if (valStr === null) return;
+
+      const num = parseFloat(valStr);
       if (isNaN(num) || num < 0 || num > 100) {
         showToast('Nilai harus berupa angka antara 0 dan 100.', 'warning');
         return;
       }
 
-      const inputs = document.querySelectorAll('.student-score-input');
       let filled = 0;
-      inputs.forEach(inp => {
-        if (!inp.value || inp.value.trim() === '') {
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      myStudents.forEach(s => {
+        const inp = document.getElementById('score_' + s.id + '_' + targetCol.key);
+        if (inp && inp.value.trim() === '') {
           inp.value = num;
           filled++;
         }
       });
 
-      updateStudentScoreCalculation();
-      showToast(`Berhasil mengisi ${filled} nilai siswa dengan angka ${num}.`, 'info');
+      recalcAllMatrixRows();
+      showToast(`Berhasil mengisi ${filled} nilai pada kolom ${targetCol.label}.`, 'info');
     }
 
-    function resetStudentScoreInputs() {
-      if (!confirm('Kosongkan seluruh isian nilai pada tabel?')) return;
-      const inputs = document.querySelectorAll('.student-score-input');
+    function resetMatrixScoreInputs() {
+      if (!confirm('Kosongkan seluruh isian nilai pada tabel penilaian?')) return;
+      const inputs = document.querySelectorAll('.matrix-score-input');
       inputs.forEach(inp => inp.value = '');
-      updateStudentScoreCalculation();
+      recalcAllMatrixRows();
+      showToast('Seluruh isian tabel telah dibersihkan.', 'info');
     }
 
     async function handleSaveAllNilaiBatch(e) {
-      e.preventDefault();
-      const mapel = document.getElementById('inpNilaiMapel').value.trim();
-      const kategori = document.getElementById('inpNilaiKategori').value;
-      const kktp = parseFloat(document.getElementById('inpNilaiKktp').value) || 75;
-      const namaPenilaian = document.getElementById('inpNilaiNamaPenilaian').value.trim();
-      const lingkupMateri = document.getElementById('inpNilaiMateri').value.trim();
+      if (e && e.preventDefault) e.preventDefault();
+
+      const mapel = activeMatrixMapel || document.getElementById('inpNilaiMapel')?.value?.trim() || 'Matematika';
+      const kktp = parseFloat(document.getElementById('inpNilaiKktp')?.value) || 75;
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
-
-      const gradesToSave = [];
       const today = new Date().toISOString().slice(0, 10);
 
+      const gradesToSave = [];
+
       myStudents.forEach(s => {
-        const inp = document.getElementById('score_' + s.id);
-        const cat = document.getElementById('catatan_' + s.id);
-        if (inp && inp.value.trim() !== '') {
-          const score = parseFloat(inp.value.trim());
-          const statusTuntas = score >= kktp ? 'Tuntas' : 'Remedial';
-          const catatanStr = cat ? cat.value.trim() : '';
+        MATRIX_COLUMNS.forEach(col => {
+          if (!matrixActiveCols[col.key]) return;
+          const inp = document.getElementById('score_' + s.id + '_' + col.key);
+          if (inp && inp.value.trim() !== '') {
+            const score = parseFloat(inp.value.trim());
+            if (isNaN(score)) return;
 
-          const gradeObj = {
-            id: 'NIL-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 3),
-            idKelas: activeGuruClassId,
-            namaKelas: actKls ? actKls.namaRombel : 'Kelas IV-A',
-            idSiswa: s.id,
-            namaSiswa: s.nama,
-            nis: s.nis || '-',
-            nisn: s.nisn || '-',
-            mapel: mapel,
-            kategori: kategori,
-            jenisPenilaian: kategori,
-            namaPenilaian: namaPenilaian,
-            lingkupMateri: lingkupMateri,
-            nilaiAngka: score,
-            nilaiAkhir: score,
-            kktp: kktp,
-            statusTuntas: statusTuntas,
-            catatan: catatanStr,
-            tanggal: today,
-            semester: actKls ? actKls.semester : 'Ganjil',
-            tahunAjaran: actKls ? actKls.tahunAjaran : '2026/2027',
-            teacherUid: currentUser ? (currentUser.id || currentUser.uid) : '',
-            teacherName: currentUser ? currentUser.nama : ''
-          };
+            const statusTuntas = score >= kktp ? 'Tuntas' : 'Remedial';
 
-          gradesToSave.push(gradeObj);
-        }
+            // Cek apakah sudah ada di local database
+            const existing = findExistingStudentScore(s.id, mapel, col);
+            let gradeId = existing ? existing.id : ('NIL-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4));
+
+            const gradeObj = {
+              id: gradeId,
+              idKelas: activeGuruClassId,
+              namaKelas: actKls ? actKls.namaRombel : 'Kelas IV-A',
+              idSiswa: s.id,
+              namaSiswa: s.nama,
+              nis: s.nis || '-',
+              nisn: s.nisn || '-',
+              mapel: mapel,
+              kategori: col.cat,
+              jenisPenilaian: col.cat,
+              namaPenilaian: col.label + ' (' + col.sub + ')',
+              lingkupMateri: col.label + ' - ' + (col.sub || 'Materi Pokok'),
+              nilaiAngka: score,
+              nilaiAkhir: score,
+              kktp: kktp,
+              statusTuntas: statusTuntas,
+              catatan: '',
+              tanggal: today,
+              semester: actKls ? actKls.semester : 'Ganjil',
+              tahunAjaran: actKls ? actKls.tahunAjaran : '2026/2027',
+              teacherUid: currentUser ? (currentUser.id || currentUser.uid) : '',
+              teacherName: currentUser ? currentUser.nama : ''
+            };
+
+            // Update in-memory local state
+            if (existing && existing.item) {
+              Object.assign(existing.item, gradeObj);
+            } else {
+              dbData.nilai.unshift(gradeObj);
+            }
+
+            gradesToSave.push(gradeObj);
+          }
+        });
       });
 
       if (gradesToSave.length === 0) {
@@ -5103,28 +5340,80 @@
         return;
       }
 
-      // Masukkan ke local state
-      gradesToSave.forEach(g => dbData.nilai.unshift(g));
+      const saveBtn = document.getElementById('btnSaveMatrixGrades');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span>⏳</span> <span>Menyimpan...</span>';
+      }
 
-      showToast(`Menyimpan nilai ${gradesToSave.length} siswa ke database...`, 'info');
+      showToast(`Menyimpan ${gradesToSave.length} nilai siswa ke database...`, 'info');
+
+      // Local snapshot save
+      if (typeof saveLocalDbSnapshot === 'function') {
+        saveLocalDbSnapshot();
+      }
 
       const payload = {
         grades: gradesToSave,
         idKelas: activeGuruClassId,
         namaKelas: actKls ? actKls.namaRombel : '',
         mapel: mapel,
-        namaPenilaian: namaPenilaian,
-        kategori: kategori,
+        namaPenilaian: 'Penilaian ' + mapel,
+        kategori: 'Matrix Penilaian',
         semester: actKls ? actKls.semester : 'Ganjil',
         npsn: currentSchool ? currentSchool.npsn : (currentUser ? currentUser.npsn : ''),
         namaSekolah: currentSchool ? currentSchool.nama : (currentUser ? currentUser.namaSekolah : '')
       };
 
-      await executeDbWrite('batchSaveNilai', payload, `Berhasil menyimpan seluruh nilai ${gradesToSave.length} siswa.`);
-      switchNilaiSubTab('history');
+      try {
+        await executeDbWrite('batchSaveNilai', payload, `Berhasil menyimpan ${gradesToSave.length} nilai peserta didik.`);
+
+        // Tampilkan success banner di atas tabel
+        const banner = document.getElementById('matrixSavedBanner');
+        const bannerMsg = document.getElementById('matrixSavedBannerMsg');
+        if (banner && bannerMsg) {
+          bannerMsg.textContent = `Berhasil menyimpan ${gradesToSave.length} data nilai ke database cloud & offline!`;
+          banner.classList.remove('hidden');
+          banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        recalcAllMatrixRows();
+      } catch (err) {
+        console.error('Gagal simpan batch nilai:', err);
+        showToast('Gagal menyimpan nilai: ' + err.message, 'error');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<span>💾</span> <span>Simpan Semua Nilai</span>';
+        }
+      }
     }
 
-    // ==========================================
+    // Backward compatibility helper functions
+    function autoFillNamaPenilaian() {
+      const mapelSelect = document.getElementById('inpNilaiMapel');
+      if (mapelSelect && mapelSelect.value) {
+        reloadMatrixForMapel(mapelSelect.value);
+      }
+    }
+
+    function handleScoreInputNavigation(e, idx) {
+      if (e.key === 'Enter' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextInp = document.querySelector(`input[data-idx="${idx + 1}"]`);
+        if (nextInp) nextInp.focus();
+      }
+    }
+
+    function updateStudentScoreCalculation() {
+      recalcAllMatrixRows();
+    }
+
+    function fillQuickScoresBatch() {
+      quickFillMatrixScore();
+    }
+
+        // ==========================================
     // 1. REKAP NILAI SISWA (SESUAI TEMPLATE RESMI)
     // ==========================================
     function compileRekapNilaiMatrix(actKls, students, mapel) {

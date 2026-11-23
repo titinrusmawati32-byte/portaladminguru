@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Mockup Input Nilai di Layar HP (Landscape & Portrait)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #E2DFEF; color: #1E1B4B; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Device Frame Styling */
+    .device-screen-landscape {
+      width: 780px;
+      height: 400px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .device-screen-portrait {
+      width: 375px;
+      height: 680px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Sticky columns in mobile horizontal matrix */
+    .mob-sticky-col-no {
+      position: sticky;
+      left: 0;
+      z-index: 25;
+      background-color: #FFFFFF;
+      box-shadow: 2px 0 6px rgba(0,0,0,0.04);
+    }
+    .mob-sticky-col-name {
+      position: sticky;
+      left: 36px;
+      z-index: 25;
+      background-color: #FFFFFF;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
+    }
+    .mob-sticky-header th {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background-color: #F8F7FD;
+    }
+    .mob-sticky-corner-no {
+      position: sticky;
+      left: 0;
+      top: 0;
+      z-index: 45 !important;
+      background-color: #EDE9FE !important;
+    }
+    .mob-sticky-corner-name {
+      position: sticky;
+      left: 36px;
+      top: 0;
+      z-index: 45 !important;
+      background-color: #EDE9FE !important;
+      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
+    }
+
+    /* Scrollbar halus */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #F1EFFB; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb { background: #C4B5FD; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
+  </style>
+</head>
+<body class="p-2 sm:p-6 min-h-screen flex flex-col items-center justify-start">
+
+  <!-- TOP BAR CONTROL SIMULATOR -->
+  <div class="max-w-4xl w-full mb-4 bg-white rounded-3xl p-4 shadow-sm border border-violet-200/80 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <span class="px-3 py-1 rounded-full text-[10px] font-black bg-indigo-100 text-indigo-800 uppercase tracking-wide">
+        📱 SIMULATOR TAMPILAN HP GURU
+      </span>
+      <h1 class="text-base sm:text-lg font-black text-slate-900 mt-1">Uji Coba Tampilan Matrix Nilai di Layar HP</h1>
+      <p class="text-xs text-slate-500">Klik tombol di kanan untuk mencoba posisi HP miring (Landscape) vs posisi HP tegak (Portrait).</p>
+    </div>
+
+    <!-- Toggle Orientation Buttons -->
+    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200">
+      <button onclick="setOrientation('landscape')" id="btnLand"
+        class="px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition">
+        <span>🔄</span> <span>HP Miring (Landscape)</span>
+      </button>
+      <button onclick="setOrientation('portrait')" id="btnPort"
+        class="px-3.5 py-2 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition">
+        <span>📱</span> <span>HP Tegak (Portrait)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- THE PHONE CHASSIS CONTAINER -->
+  <div class="relative bg-slate-900 p-3 sm:p-4 rounded-[42px] shadow-2xl border-4 border-slate-800 flex flex-col items-center">
+    
+    <!-- Phone Speaker Notch / Dynamic Island -->
+    <div class="w-24 h-4 bg-slate-950 rounded-full mb-2 flex items-center justify-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-slate-800"></span>
+      <span class="w-8 h-1 bg-slate-800 rounded-full"></span>
+    </div>
+
+    <!-- THE PHONE SCREEN (VIEWPORT) -->
+    <div id="phoneScreen" class="device-screen-landscape bg-[#F5F3FF] rounded-[28px] overflow-hidden flex flex-col relative border border-slate-700/40">
+
+      <!-- ==========================================
+           HEADER DALAM HP (COMPACT TOP BAR)
+           ========================================== -->
+      <div class="bg-white px-3 py-2 border-b border-violet-100 flex items-center justify-between shrink-0 gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-xs shrink-0">
+            📊
+          </div>
+          <div class="truncate">
+            <div class="font-black text-xs text-slate-900 truncate">Matematika • 4A (28 Siswa)</div>
+            <div class="text-[9px] text-slate-500">Buku Nilai Landscape SD</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1 shrink-0">
+          <!-- Button Toggle Centang Sheet -->
+          <button onclick="toggleFilterDrawer()"
+            class="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-black border border-indigo-200 flex items-center gap-1 cursor-pointer">
+            <span>☑️</span> <span id="labelFilterBtn">Filter Kolom (5)</span>
+          </button>
+          <button class="px-3 py-1 rounded-lg bg-indigo-600 text-white text-[10px] font-black shadow-xs active:scale-95">
+            💾 Simpan
+          </button>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           PITA CENTANG PILIHAN NILAI DI HP (HORIZONTAL CHIPS)
+           Bisa di-scroll ke samping dengan satu sentuhan jari
+           ========================================== -->
+      <div id="filterBarContainer" class="bg-white/95 px-3 py-1.5 border-b border-violet-100 shrink-0">
+        <div class="flex items-center justify-between text-[10px] pb-1 text-slate-500 font-bold">
+          <span>Geser centang jenis nilai yang ingin diisi:</span>
+          <span class="text-indigo-600 font-extrabold cursor-pointer" onclick="toggleAllCols()">Toggle Semua</span>
+        </div>
+        
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar text-[10px]">
+          <!-- Chip 1: Formatif 1 -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none" id="chip_ph1" style="background:#EFF6FF; border-color:#BFDBFE; color:#1E3A8A;">
+            <input type="checkbox" id="chk_ph1" checked onchange="handleColumnToggle('col_ph1', 'chip_ph1', this.checked)" class="w-3.5 h-3.5 text-indigo-600 rounded">
+            <span>Formatif 1</span>
+          </label>
+
+          <!-- Chip 2: Formatif 2 -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none" id="chip_ph2" style="background:#EFF6FF; border-color:#BFDBFE; color:#1E3A8A;">
+            <input type="checkbox" id="chk_ph2" checked onchange="handleColumnToggle('col_ph2', 'chip_ph2', this.checked)" class="w-3.5 h-3.5 text-indigo-600 rounded">
+            <span>Formatif 2</span>
+          </label>
+
+          <!-- Chip 3: Formatif 3 -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none opacity-60" id="chip_ph3" style="background:#F8FAFC; border-color:#E2E8F0; color:#64748B;">
+            <input type="checkbox" id="chk_ph3" onchange="handleColumnToggle('col_ph3', 'chip_ph3', this.checked)" class="w-3.5 h-3.5 text-indigo-600 rounded">
+            <span>Formatif 3</span>
+          </label>
+
+          <!-- Chip 4: Tugas -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none" id="chip_tugas" style="background:#ECFDF5; border-color:#A7F3D0; color:#064E3B;">
+            <input type="checkbox" id="chk_tugas" checked onchange="handleColumnToggle('col_tugas', 'chip_tugas', this.checked)" class="w-3.5 h-3.5 text-emerald-600 rounded">
+            <span>Tugas 1</span>
+          </label>
+
+          <!-- Chip 5: Ulangan Bab 1 -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none" id="chip_uh1" style="background:#FFFBEB; border-color:#FDE68A; color:#78350F;">
+            <input type="checkbox" id="chk_uh1" checked onchange="handleColumnToggle('col_uh1', 'chip_uh1', this.checked)" class="w-3.5 h-3.5 text-amber-600 rounded">
+            <span>UH Bab 1</span>
+          </label>
+
+          <!-- Chip 6: STS -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none" id="chip_sts" style="background:#FAF5FF; border-color:#E9D5FF; color:#581C87;">
+            <input type="checkbox" id="chk_sts" checked onchange="handleColumnToggle('col_sts', 'chip_sts', this.checked)" class="w-3.5 h-3.5 text-purple-600 rounded">
+            <span>STS (Tengah)</span>
+          </label>
+
+          <!-- Chip 7: SAS -->
+          <label class="px-2.5 py-1 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition select-none opacity-60" id="chip_sas" style="background:#F8FAFC; border-color:#E2E8F0; color:#64748B;">
+            <input type="checkbox" id="chk_sas" onchange="handleColumnToggle('col_sas', 'chip_sas', this.checked)" class="w-3.5 h-3.5 text-rose-600 rounded">
+            <span>SAS (Akhir)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TABEL NILAI DALAM LAYAR HP (WITH FREEZE NAME)
+           ========================================== -->
+      <div class="flex-1 overflow-x-auto overflow-y-auto relative bg-white" id="tableContainer">
+        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+          
+          <!-- STICKY HEADER HP -->
+          <thead>
+            <tr class="mob-sticky-header text-center font-black uppercase text-[9px] border-b border-violet-100 bg-[#F5F3FF]">
+              <!-- Frozen 1 & 2 -->
+              <th class="mob-sticky-corner-no py-2 px-1.5 w-9 border-r border-violet-100 text-slate-500">No</th>
+              <th class="mob-sticky-corner-name py-2 px-2.5 w-36 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
+              
+              <!-- Kolom Penilaian Dinamis Sesuai Centang -->
+              <th class="col_ph1 py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-blue-200 min-w-[70px]">
+                F-1 (Cacah)
+              </th>
+              <th class="col_ph2 py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-blue-200 min-w-[70px]">
+                F-2 (Pecahan)
+              </th>
+              <th class="col_ph3 hidden py-2 px-2 bg-blue-100/70 text-blue-900 border-r border-blue-200 min-w-[70px]">
+                F-3 (Geometri)
+              </th>
+              <th class="col_tugas py-2 px-2 bg-emerald-100/70 text-emerald-900 border-r border-emerald-200 min-w-[70px]">
+                Tugas 1
+              </th>
+              <th class="col_uh1 py-2 px-2 bg-amber-100/70 text-amber-900 border-r border-amber-200 min-w-[75px]">
+                UH Bab 1
+              </th>
+              <th class="col_sts py-2 px-2 bg-purple-100/70 text-purple-900 border-r border-purple-200 min-w-[70px]">
+                STS
+              </th>
+              <th class="col_sas hidden py-2 px-2 bg-rose-100/70 text-rose-900 border-r border-rose-200 min-w-[70px]">
+                SAS
+              </th>
+
+              <!-- Kolom Rapor -->
+              <th class="py-2 px-2.5 bg-violet-100 text-indigo-900 min-w-[65px]">
+                Nilai Akhir
+              </th>
+            </tr>
+          </thead>
+
+          <!-- BODY SISWA -->
+          <tbody class="divide-y divide-violet-50 font-medium">
+            
+            <!-- Siswa 1 -->
+            <tr class="hover:bg-violet-50/60">
+              <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">1</td>
+              <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                <div class="font-extrabold text-slate-900 text-[11px] truncate w-32">Ahmad Rizky Pratama</div>
+                <div class="text-[8px] text-slate-400 font-mono">NIS: 24001 • L</div>
+              </td>
+              <td class="col_ph1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="88" oninput="recalcRow(1)" id="r1_f1"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white focus:border-indigo-500 text-blue-900">
+              </td>
+              <td class="col_ph2 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="85" oninput="recalcRow(1)" id="r1_f2"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white focus:border-indigo-500 text-blue-900">
+              </td>
+              <td class="col_ph3 hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r1_f3"
+                  class="w-14 h-7 text-center font-black text-xs bg-slate-50 border border-slate-200 rounded-md">
+              </td>
+              <td class="col_tugas py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="90" oninput="recalcRow(1)" id="r1_tug"
+                  class="w-14 h-7 text-center font-black text-xs bg-emerald-50/70 border border-emerald-200 rounded-md focus:bg-white text-emerald-900">
+              </td>
+              <td class="col_uh1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="84" oninput="recalcRow(1)" id="r1_uh"
+                  class="w-14 h-7 text-center font-black text-xs bg-amber-50/70 border border-amber-200 rounded-md focus:bg-white text-amber-900">
+              </td>
+              <td class="col_sts py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="85" oninput="recalcRow(1)" id="r1_sts"
+                  class="w-14 h-7 text-center font-black text-xs bg-purple-50/70 border border-purple-200 rounded-md focus:bg-white text-purple-900">
+              </td>
+              <td class="col_sas hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r1_sas"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-200 rounded-md">
+              </td>
+              <td class="py-1 px-2 text-center font-black font-mono text-[11px] text-emerald-700 bg-emerald-50/50" id="r1_na">
+                86.4
+              </td>
+            </tr>
+
+            <!-- Siswa 2 -->
+            <tr class="hover:bg-violet-50/60">
+              <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">2</td>
+              <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                <div class="font-extrabold text-slate-900 text-[11px] truncate w-32">Budi Santoso</div>
+                <div class="text-[8px] text-slate-400 font-mono">NIS: 24002 • L</div>
+              </td>
+              <td class="col_ph1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="75" oninput="recalcRow(2)" id="r2_f1"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white text-blue-900">
+              </td>
+              <td class="col_ph2 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="78" oninput="recalcRow(2)" id="r2_f2"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white text-blue-900">
+              </td>
+              <td class="col_ph3 hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r2_f3"
+                  class="w-14 h-7 text-center font-black text-xs bg-slate-50 border border-slate-200 rounded-md">
+              </td>
+              <td class="col_tugas py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="82" oninput="recalcRow(2)" id="r2_tug"
+                  class="w-14 h-7 text-center font-black text-xs bg-emerald-50/70 border border-emerald-200 rounded-md focus:bg-white text-emerald-900">
+              </td>
+              <td class="col_uh1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="76" oninput="recalcRow(2)" id="r2_uh"
+                  class="w-14 h-7 text-center font-black text-xs bg-amber-50/70 border border-amber-200 rounded-md focus:bg-white text-amber-900">
+              </td>
+              <td class="col_sts py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="78" oninput="recalcRow(2)" id="r2_sts"
+                  class="w-14 h-7 text-center font-black text-xs bg-purple-50/70 border border-purple-200 rounded-md focus:bg-white text-purple-900">
+              </td>
+              <td class="col_sas hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r2_sas"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-200 rounded-md">
+              </td>
+              <td class="py-1 px-2 text-center font-black font-mono text-[11px] text-indigo-700 bg-violet-50/50" id="r2_na">
+                77.8
+              </td>
+            </tr>
+
+            <!-- Siswa 3 (Remedial) -->
+            <tr class="hover:bg-violet-50/60">
+              <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">3</td>
+              <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                <div class="font-extrabold text-slate-900 text-[11px] truncate w-32">Citra Kirana</div>
+                <div class="text-[8px] text-slate-400 font-mono">NIS: 24003 • P</div>
+              </td>
+              <td class="col_ph1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="65" oninput="recalcRow(3)" id="r3_f1"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-300 rounded-md focus:bg-white text-rose-700">
+              </td>
+              <td class="col_ph2 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="70" oninput="recalcRow(3)" id="r3_f2"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-300 rounded-md focus:bg-white text-rose-700">
+              </td>
+              <td class="col_ph3 hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r3_f3"
+                  class="w-14 h-7 text-center font-black text-xs bg-slate-50 border border-slate-200 rounded-md">
+              </td>
+              <td class="col_tugas py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="75" oninput="recalcRow(3)" id="r3_tug"
+                  class="w-14 h-7 text-center font-black text-xs bg-emerald-50/70 border border-emerald-200 rounded-md focus:bg-white text-emerald-900">
+              </td>
+              <td class="col_uh1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="68" oninput="recalcRow(3)" id="r3_uh"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-300 rounded-md focus:bg-white text-rose-700">
+              </td>
+              <td class="col_sts py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="70" oninput="recalcRow(3)" id="r3_sts"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-300 rounded-md focus:bg-white text-rose-700">
+              </td>
+              <td class="col_sas hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r3_sas"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-200 rounded-md">
+              </td>
+              <td class="py-1 px-2 text-center font-black font-mono text-[11px] text-rose-700 bg-rose-50" id="r3_na">
+                69.6
+              </td>
+            </tr>
+
+            <!-- Siswa 4 -->
+            <tr class="hover:bg-violet-50/60">
+              <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">4</td>
+              <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                <div class="font-extrabold text-slate-900 text-[11px] truncate w-32">Dewi Lestari</div>
+                <div class="text-[8px] text-slate-400 font-mono">NIS: 24004 • P</div>
+              </td>
+              <td class="col_ph1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="92" oninput="recalcRow(4)" id="r4_f1"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white text-blue-900">
+              </td>
+              <td class="col_ph2 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="90" oninput="recalcRow(4)" id="r4_f2"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white text-blue-900">
+              </td>
+              <td class="col_ph3 hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r4_f3"
+                  class="w-14 h-7 text-center font-black text-xs bg-slate-50 border border-slate-200 rounded-md">
+              </td>
+              <td class="col_tugas py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="95" oninput="recalcRow(4)" id="r4_tug"
+                  class="w-14 h-7 text-center font-black text-xs bg-emerald-50/70 border border-emerald-200 rounded-md focus:bg-white text-emerald-900">
+              </td>
+              <td class="col_uh1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="88" oninput="recalcRow(4)" id="r4_uh"
+                  class="w-14 h-7 text-center font-black text-xs bg-amber-50/70 border border-amber-200 rounded-md focus:bg-white text-amber-900">
+              </td>
+              <td class="col_sts py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="94" oninput="recalcRow(4)" id="r4_sts"
+                  class="w-14 h-7 text-center font-black text-xs bg-purple-50/70 border border-purple-200 rounded-md focus:bg-white text-purple-900">
+              </td>
+              <td class="col_sas hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r4_sas"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-200 rounded-md">
+              </td>
+              <td class="py-1 px-2 text-center font-black font-mono text-[11px] text-emerald-700 bg-emerald-50/50" id="r4_na">
+                91.8
+              </td>
+            </tr>
+
+            <!-- Siswa 5 -->
+            <tr class="hover:bg-violet-50/60">
+              <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[10px]">5</td>
+              <td class="mob-sticky-col-name py-2 px-2 border-r border-violet-100">
+                <div class="font-extrabold text-slate-900 text-[11px] truncate w-32">Eko Prasetyo</div>
+                <div class="text-[8px] text-slate-400 font-mono">NIS: 24005 • L</div>
+              </td>
+              <td class="col_ph1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="80" oninput="recalcRow(5)" id="r5_f1"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white text-blue-900">
+              </td>
+              <td class="col_ph2 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="82" oninput="recalcRow(5)" id="r5_f2"
+                  class="w-14 h-7 text-center font-black text-xs bg-blue-50/70 border border-blue-200 rounded-md focus:bg-white text-blue-900">
+              </td>
+              <td class="col_ph3 hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r5_f3"
+                  class="w-14 h-7 text-center font-black text-xs bg-slate-50 border border-slate-200 rounded-md">
+              </td>
+              <td class="col_tugas py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="85" oninput="recalcRow(5)" id="r5_tug"
+                  class="w-14 h-7 text-center font-black text-xs bg-emerald-50/70 border border-emerald-200 rounded-md focus:bg-white text-emerald-900">
+              </td>
+              <td class="col_uh1 py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="79" oninput="recalcRow(5)" id="r5_uh"
+                  class="w-14 h-7 text-center font-black text-xs bg-amber-50/70 border border-amber-200 rounded-md focus:bg-white text-amber-900">
+              </td>
+              <td class="col_sts py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" value="80" oninput="recalcRow(5)" id="r5_sts"
+                  class="w-14 h-7 text-center font-black text-xs bg-purple-50/70 border border-purple-200 rounded-md focus:bg-white text-purple-900">
+              </td>
+              <td class="col_sas hidden py-1 px-1 text-center border-r border-violet-50">
+                <input type="number" inputmode="decimal" placeholder="-" id="r5_sas"
+                  class="w-14 h-7 text-center font-black text-xs bg-rose-50 border border-rose-200 rounded-md">
+              </td>
+              <td class="py-1 px-2 text-center font-black font-mono text-[11px] text-indigo-700 bg-violet-50/50" id="r5_na">
+                81.2
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- BOTTOM MOBILE STATUS BAR -->
+      <div class="bg-white px-3 py-1.5 border-t border-violet-100 flex items-center justify-between text-[10px] text-slate-500 font-bold shrink-0">
+        <div class="flex items-center gap-2">
+          <span>Geser jari ke kanan untuk kolom lain ➔</span>
+        </div>
+        <div class="text-indigo-600 font-extrabold">
+          Rata-rata: 81.3
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Home Indicator Bar at the bottom of phone -->
+    <div class="w-32 h-1 bg-slate-700 rounded-full mt-3"></div>
+
+  </div>
+
+  <!-- PENJELASAN PRAKTIS UNTUK PENGGUNA -->
+  <div class="max-w-xl w-full mt-5 bg-white rounded-2xl p-4 border border-violet-100 text-xs space-y-2 text-slate-700">
+    <h4 class="font-black text-slate-900 text-sm flex items-center gap-1.5">
+      <span>✨</span> <span>Keunggulan Desain Landscape di Layar HP:</span>
+    </h4>
+    <ul class="list-disc pl-5 space-y-1 leading-relaxed text-slate-600">
+      <li><strong>Nama Siswa Tetap Terkunci (Sticky Freeze):</strong> Saat jari guru menggeser (*swipe*) tabel ke kanan untuk melihat nilai Tugas atau Ujian, nama anak tidak akan hilang atau tersembunyi.</li>
+      <li><strong>Kolom Bebas Dicentang:</strong> Guru bisa mematikan kolom yang belum dinilai sehingga di HP tampilannya sangat lega dan pas.</li>
+      <li><strong>Ukuran Input Ramah Jari (Numpad Ready):</strong> Kotak input angka pas untuk keyboard angka (*inputmode="decimal"*), tidak terlalu kecil dan tidak saling menumpuk.</li>
+      <li><strong>Bisa Mode Landscape (Miring) & Portrait (Tegak):</strong> Coba klik tombol beralih di atas untuk melihat kedua posisinya!</li>
+    </ul>
+  </div>
+
+  <script>
+    function setOrientation(mode) {
+      const screen = document.getElementById('phoneScreen');
+      const btnLand = document.getElementById('btnLand');
+      const btnPort = document.getElementById('btnPort');
+
+      if (mode === 'landscape') {
+        screen.className = 'device-screen-landscape bg-[#F5F3FF] rounded-[28px] overflow-hidden flex flex-col relative border border-slate-700/40';
+        btnLand.className = 'px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition';
+        btnPort.className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition';
+      } else {
+        screen.className = 'device-screen-portrait bg-[#F5F3FF] rounded-[28px] overflow-hidden flex flex-col relative border border-slate-700/40';
+        btnLand.className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition';
+        btnPort.className = 'px-3.5 py-2 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-md flex items-center gap-1.5 transition';
+      }
+    }
+
+    function handleColumnToggle(colClass, chipId, isChecked) {
+      const cols = document.querySelectorAll('.' + colClass);
+      cols.forEach(c => {
+        if (isChecked) c.classList.remove('hidden');
+        else c.classList.add('hidden');
+      });
+
+      const chip = document.getElementById(chipId);
+      if (chip) {
+        if (isChecked) {
+          chip.classList.remove('opacity-60');
+          chip.style.background = colClass.includes('ph') ? '#EFF6FF' : (colClass.includes('tugas') ? '#ECFDF5' : (colClass.includes('uh') ? '#FFFBEB' : '#FAF5FF'));
+        } else {
+          chip.classList.add('opacity-60');
+          chip.style.background = '#F8FAFC';
+        }
+      }
+      updateActiveCount();
+    }
+
+    function updateActiveCount() {
+      const checkedBoxes = document.querySelectorAll('#filterBarContainer input[type="checkbox"]:checked');
+      const lbl = document.getElementById('labelFilterBtn');
+      if (lbl) lbl.textContent = `Filter Kolom (${checkedBoxes.length})`;
+    }
+
+    function toggleFilterDrawer() {
+      const container = document.getElementById('filterBarContainer');
+      container.classList.toggle('hidden');
+    }
+
+    function toggleAllCols() {
+      const boxes = document.querySelectorAll('#filterBarContainer input[type="checkbox"]');
+      const allChecked = Array.from(boxes).every(b => b.checked);
+      boxes.forEach(b => {
+        b.checked = !allChecked;
+        b.dispatchEvent(new Event('change'));
+      });
+    }
+
+    function recalcRow(rowNum) {
+      const f1 = parseFloat(document.getElementById(`r${rowNum}_f1`)?.value) || 0;
+      const f2 = parseFloat(document.getElementById(`r${rowNum}_f2`)?.value) || 0;
+      const tug = parseFloat(document.getElementById(`r${rowNum}_tug`)?.value) || 0;
+      const uh = parseFloat(document.getElementById(`r${rowNum}_uh`)?.value) || 0;
+      const sts = parseFloat(document.getElementById(`r${rowNum}_sts`)?.value) || 0;
+
+      const avg = ((f1 + f2 + tug + uh + sts) / 5).toFixed(1);
+      const naEl = document.getElementById(`r${rowNum}_na`);
+      if (naEl) {
+        naEl.textContent = avg;
+        if (avg < 75) {
+          naEl.className = 'py-1 px-2 text-center font-black font-mono text-[11px] text-rose-700 bg-rose-50';
+        } else {
+          naEl.className = 'py-1 px-2 text-center font-black font-mono text-[11px] text-emerald-700 bg-emerald-50/50';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
