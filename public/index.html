@@ -93,11 +93,10 @@
       font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
     }
     html {
-      height: 100%;
+      min-height: 100%;
       overflow-x: hidden;
       /* Mencegah browser trigger pull-to-refresh reload tanpa mematikan scrolling vertikal native */
       overscroll-behavior-y: contain;
-      scroll-behavior: smooth;
       -webkit-text-size-adjust: 100%;
       background-color: #EBE8F9;
     }
@@ -116,7 +115,7 @@
     }
     body.modal-open {
       overflow: hidden !important;
-      touch-action: none !important;
+      /* Jangan gunakan touch-action: none di body karena akan membekukan gesture scroll mobile */
     }
 
     /* ============================================================
@@ -809,16 +808,16 @@
       <div class="w-full max-w-sm bg-white rounded-[28px] p-5 sm:p-6 shadow-[0_15px_40px_rgba(124,110,230,0.12)] border border-white/80 space-y-3.5 text-xs text-brand-dark">
 
         <!-- 1. TAB MASUK GURU -->
-        <form id="formTeacherLogin" onsubmit="handleLoginTeacherWithPin(event)" class="space-y-3">
+        <form id="formTeacherLogin" onsubmit="handleLoginTeacherWithPin(event)" class="space-y-3" autocomplete="off">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">NPSN Sekolah *</label>
-            <input type="text" id="loginNpsn" required placeholder="Contoh: 20524058" oninput="handleCheckSchoolDebounce()"
+            <label class="block font-bold text-slate-700 mb-1">1. NPSN Sekolah *</label>
+            <input type="text" id="loginNpsn" required placeholder="Contoh: 20524959" autocomplete="off" oninput="handleCheckSchoolDebounce()"
               class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
           </div>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Kode Unik Sekolah *</label>
-            <input type="text" id="loginKodeUnik" required placeholder="Contoh: SMB04-3918" oninput="handleCheckSchoolDebounce()"
+            <label class="block font-bold text-slate-700 mb-1">2. Kode Unik Sekolah *</label>
+            <input type="text" id="loginKodeUnik" required placeholder="Contoh: ADG03-4959" autocomplete="off" oninput="handleCheckSchoolDebounce()"
               class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold font-mono text-xs uppercase focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
           </div>
 
@@ -834,21 +833,21 @@
           <!-- Guru Selector or Name Input -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="font-bold text-slate-700">Nama Guru / Akun Terverifikasi *</label>
+              <label class="font-bold text-slate-700">3. Nama Guru / Akun Terverifikasi *</label>
               <button type="button" onclick="switchLoginTab('register')" class="text-[10px] text-brand-600 font-extrabold hover:underline">
                 + Belum Terdaftar?
               </button>
             </div>
             <div id="teacherSelectContainer">
-              <input type="text" id="loginTeacherNameInput" required placeholder="Ketik nama Anda / masukkan NPSN dulu"
-                class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
+              <input type="text" id="loginTeacherNameInput" required placeholder="Ketik nama Anda / masukkan NPSN dulu" autocomplete="off" oninput="handleTeacherNameInputDetect(this)"
+                class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs">
             </div>
           </div>
 
           <!-- PIN Pribadi -->
           <div>
-            <label class="block font-bold text-slate-700 mb-1">PIN Pribadi Guru (4 - 6 Angka) *</label>
-            <input type="password" id="loginPin" required maxlength="6" placeholder="• • • • • •"
+            <label class="block font-bold text-slate-700 mb-1">4. PIN Pribadi Guru (4 - 6 Angka) *</label>
+            <input type="password" id="loginPin" required maxlength="6" placeholder="• • • • • •" autocomplete="current-password"
               class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
           </div>
 
@@ -1144,15 +1143,15 @@
   <!-- ============================================================
        MODAL UNIVERSAL
        ============================================================ -->
-  <div id="universalModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-4 overflow-y-auto no-print overscroll-contain">
-    <div class="bg-white rounded-[28px] max-w-xl w-full max-h-[88vh] shadow-2xl border border-violet-100 animate-fade-in relative flex flex-col overflow-hidden">
-      <div class="sticky top-0 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-violet-100 flex items-center justify-between z-10 shrink-0">
+  <div id="universalModal" onclick="handleUniversalModalBackdrop(event)" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 overflow-y-auto no-print overscroll-contain">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-[28px] max-w-xl w-full max-h-[90vh] shadow-2xl border border-violet-100 animate-fade-in relative flex flex-col overflow-hidden">
+      <div class="sticky top-0 bg-white/95 backdrop-blur-md px-5 sm:px-6 py-3.5 sm:py-4 border-b border-violet-100 flex items-center justify-between z-10 shrink-0">
         <h3 class="text-sm sm:text-base font-black text-brand-dark" id="universalModalTitle">Modal Title</h3>
-        <button onclick="closeUniversalModal()" class="w-8 h-8 rounded-full bg-[#F0EEF9] hover:bg-violet-100 text-brand-muted hover:text-brand-dark flex items-center justify-center transition cursor-pointer">
+        <button type="button" onclick="closeUniversalModal()" class="w-8 h-8 rounded-full bg-[#F0EEF9] hover:bg-violet-100 text-brand-muted hover:text-brand-dark flex items-center justify-center transition cursor-pointer">
           ✕
         </button>
       </div>
-      <div class="p-5 sm:p-6 flex-1 overflow-y-auto text-xs" id="universalModalBody"></div>
+      <div class="p-4 sm:p-6 flex-1 overflow-y-auto text-xs" id="universalModalBody" style="-webkit-overflow-scrolling: touch;"></div>
     </div>
   </div>
 
@@ -1423,7 +1422,49 @@
     let checkSchoolTimer = null;
     function handleCheckSchoolDebounce() {
       if (checkSchoolTimer) clearTimeout(checkSchoolTimer);
-      checkSchoolTimer = setTimeout(checkSchoolLoginBadge, 350);
+      checkSchoolTimer = setTimeout(() => {
+        // Cerdas: Jika pengguna memasukkan kode unik ke kolom NPSN secara terbalik
+        const npsnInput = document.getElementById('loginNpsn');
+        const kodeInput = document.getElementById('loginKodeUnik');
+        if (npsnInput && window.APP_CONFIG && Array.isArray(window.APP_CONFIG.MASTER_SEKOLAH_AMBULU)) {
+          const val = npsnInput.value.trim().toUpperCase();
+          if (val.includes('-') || /[A-Z]/.test(val)) {
+            const matched = window.APP_CONFIG.MASTER_SEKOLAH_AMBULU.find(s => 
+              (s.kodeUnik && s.kodeUnik.toUpperCase() === val) || (s.kode && s.kode.toUpperCase() === val)
+            );
+            if (matched) {
+              npsnInput.value = matched.npsn;
+              if (kodeInput) kodeInput.value = matched.kodeUnik || matched.kode;
+            }
+          }
+        }
+        checkSchoolLoginBadge();
+      }, 300);
+    }
+
+    // Deteksi cerdas jika pengguna keliru memasukkan Kode Sekolah / NPSN ke kolom Nama Guru (seperti Image 2)
+    function handleTeacherNameInputDetect(inputEl) {
+      if (!inputEl) return;
+      const val = (inputEl.value || '').trim().toUpperCase();
+      if (!val || val.length < 4) return;
+
+      if (window.APP_CONFIG && Array.isArray(window.APP_CONFIG.MASTER_SEKOLAH_AMBULU)) {
+        const matched = window.APP_CONFIG.MASTER_SEKOLAH_AMBULU.find(s => {
+          const codeMatch = (s.kodeUnik && s.kodeUnik.toUpperCase() === val) || (s.kode && s.kode.toUpperCase() === val);
+          const npsnMatch = String(s.npsn).trim() === val;
+          return codeMatch || npsnMatch;
+        });
+
+        if (matched) {
+          const npsnEl = document.getElementById('loginNpsn');
+          const kodeEl = document.getElementById('loginKodeUnik');
+          if (npsnEl) npsnEl.value = matched.npsn;
+          if (kodeEl) kodeEl.value = matched.kodeUnik || matched.kode;
+          inputEl.value = '';
+          checkSchoolLoginBadge();
+          showToast(`🏫 Kode sekolah ${matched.nama} terdeteksi! Kolom NPSN & Kode Unik diisi otomatis.`, 'success');
+        }
+      }
     }
 
     let checkRegSchoolTimer = null;
@@ -1507,7 +1548,7 @@
       }
 
       container.innerHTML = `
-        <input type="text" id="loginTeacherNameInput" required placeholder="Masukkan Nama Lengkap / NIP Anda"
+        <input type="text" id="loginTeacherNameInput" required placeholder="Masukkan Nama Lengkap / NIP Anda" autocomplete="off" oninput="handleTeacherNameInputDetect(this)"
           class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs">
       `;
     }
@@ -3535,6 +3576,7 @@
     }
 
     function backToPortal() {
+      closeUniversalModal();
       renderPortal();
     }
 
@@ -3542,6 +3584,7 @@
     // NAVIGASI HALAMAN MODUL
     // ==========================================
     function openModule(moduleKey) {
+      closeUniversalModal();
       activeModuleKey = moduleKey;
       saveSessionState();
       document.getElementById('portalDashboardView').classList.add('hidden');
@@ -3921,7 +3964,7 @@
               class="px-3.5 py-1.5 rounded-full bg-[#F0EEF9] text-xs font-medium focus:outline-none focus:bg-white border border-violet-100">
           </div>
 
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; transform: translateZ(0);">
             <table class="w-full text-left text-xs" id="tableGuruSiswa">
               <thead>
                 <tr class="border-b border-violet-50 text-brand-muted font-bold text-[11px]">
@@ -3934,8 +3977,10 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-violet-50 font-medium">
-                ${myStudents.map((s, idx) => `
-                  <tr class="hover:bg-[#F8F7FD]">
+                ${myStudents.map((s, idx) => {
+                  const safeWa = s.noHpWali ? String(s.noHpWali).replace(/\D/g, '').replace(/^0/, '').replace(/^62/, '') : '';
+                  return `
+                  <tr class="hover:bg-[#F8F7FD] transition-colors">
                     <td class="py-2.5 text-brand-muted font-bold">${idx + 1}</td>
                     <td class="py-2.5">
                       <div class="font-black text-brand-dark">${s.nama}</div>
@@ -3951,25 +3996,25 @@
                     </td>
                     <td class="py-2.5">
                       <div class="text-brand-dark font-semibold">${s.namaWali || '-'}</div>
-                      ${s.noHpWali ? `
-                        <a href="https://wa.me/62${s.noHpWali.replace(/^0/,'')}" target="_blank" class="text-[10px] text-emerald-600 font-bold hover:underline flex items-center gap-1">
+                      ${safeWa ? `
+                        <a href="https://wa.me/62${safeWa}" target="_blank" rel="noopener noreferrer" class="text-[10px] text-emerald-600 font-bold hover:underline flex items-center gap-1">
                           <span>💬</span> <span>${s.noHpWali}</span>
                         </a>
                       ` : ''}
                     </td>
-                    <td class="py-2.5 text-right space-x-1">
+                    <td class="py-2.5 text-right space-x-1 whitespace-nowrap">
                       <button onclick="printSingleKartuQR('${s.id}')" title="Cetak Kartu QR Siswa" class="px-2.5 py-1 rounded-full bg-violet-50 hover:bg-violet-100 text-brand-700 font-bold text-[11px] cursor-pointer inline-flex items-center gap-1">
                         <span>🪪</span> <span>Kartu</span>
                       </button>
                       <button onclick="openFormSiswaModal('${s.id}')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] cursor-pointer">
                         Edit
                       </button>
-                      <button onclick="handleDeleteSiswa('${s.id}', '${s.nama}')" class="px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] cursor-pointer">
+                      <button onclick="handleDeleteSiswa('${s.id}')" class="px-2 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-[11px] cursor-pointer">
                         ✕
                       </button>
                     </td>
                   </tr>
-                `).join('')}
+                `}).join('')}
               </tbody>
             </table>
           </div>
@@ -3979,63 +4024,66 @@
 
     function filterSiswaTable(q) {
       const rows = document.querySelectorAll('#tableGuruSiswa tbody tr');
+      const cleanQ = (q || '').toLowerCase();
       rows.forEach(r => {
         const text = r.textContent.toLowerCase();
-        r.style.display = text.includes(q.toLowerCase()) ? '' : 'none';
+        r.style.display = text.includes(cleanQ) ? '' : 'none';
       });
     }
 
     function openFormSiswaModal(siswaId = null) {
-      const s = siswaId ? dbData.siswa.find(x => x.id === siswaId) : null;
+      const s = siswaId ? (dbData.siswa || []).find(x => x.id === siswaId) : null;
       const isEdit = !!s;
-      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const actKls = (dbData.kelas || []).find(k => k.id === activeGuruClassId);
+
+      const safeVal = (v) => v ? String(v).replace(/"/g, '&quot;') : '';
 
       const content = `
         <form onsubmit="handleSaveSiswaTeacher(event, '${siswaId || ''}')" class="space-y-3.5 text-xs">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Peserta Didik *</label>
-            <input type="text" id="fsNama" required value="${s ? s.nama : ''}" placeholder="Contoh: Ahmad Rizky Pratama" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+            <input type="text" id="fsNama" required value="${safeVal(s ? s.nama : '')}" placeholder="Contoh: Ahmad Rizky Pratama" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs">
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block font-bold text-slate-700 mb-1">NIS (Nomor Induk)</label>
-              <input type="text" id="fsNis" value="${s ? (s.nis || '') : ''}" placeholder="2401" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+              <input type="text" id="fsNis" value="${safeVal(s ? s.nis : '')}" placeholder="2401" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium focus:outline-none focus:bg-white text-xs">
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-1">NISN (10 Digit)</label>
-              <input type="text" id="fsNisn" value="${s ? (s.nisn || '') : ''}" placeholder="0081234567" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+              <input type="text" id="fsNisn" value="${safeVal(s ? s.nisn : '')}" placeholder="0081234567" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium focus:outline-none focus:bg-white text-xs">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block font-bold text-slate-700 mb-1">Jenis Kelamin *</label>
-              <select id="fsJk" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold">
+              <select id="fsJk" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold focus:outline-none focus:bg-white text-xs">
                 <option value="L" ${!s || s.jenisKelamin === 'L' ? 'selected' : ''}>Laki-laki (L)</option>
                 <option value="P" ${s && s.jenisKelamin === 'P' ? 'selected' : ''}>Perempuan (P)</option>
               </select>
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-1">Kelas Rombel</label>
-              <input type="text" disabled value="${actKls ? actKls.namaRombel : '-'}" class="w-full p-2.5 bg-slate-200 text-slate-600 rounded-xl font-bold">
+              <input type="text" disabled value="${actKls ? actKls.namaRombel : '-'}" class="w-full p-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs border border-slate-200">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block font-bold text-slate-700 mb-1">Nama Orang Tua / Wali</label>
-              <input type="text" id="fsWali" value="${s ? (s.namaWali || '') : ''}" placeholder="Nama Orang Tua" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+              <input type="text" id="fsWali" value="${safeVal(s ? s.namaWali : '')}" placeholder="Nama Orang Tua" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium focus:outline-none focus:bg-white text-xs">
             </div>
             <div>
               <label class="block font-bold text-slate-700 mb-1">No. WhatsApp Wali</label>
-              <input type="tel" id="fsHp" value="${s ? (s.noHpWali || '') : ''}" placeholder="081234567890" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium">
+              <input type="tel" id="fsHp" value="${safeVal(s ? s.noHpWali : '')}" placeholder="081234567890" class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-medium focus:outline-none focus:bg-white text-xs">
             </div>
           </div>
 
           <div class="pt-2 flex justify-end gap-2">
-            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 rounded-full font-bold">Batal</button>
-            <button type="submit" class="px-5 py-2 bg-brand-600 text-white rounded-full font-bold cursor-pointer hover:bg-brand-700 shadow-xs">
+            <button type="button" onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-full font-bold cursor-pointer transition">Batal</button>
+            <button type="submit" class="px-5 py-2 bg-brand-600 text-white rounded-full font-bold cursor-pointer hover:bg-brand-700 shadow-xs transition active:scale-95">
               ${isEdit ? 'Simpan Perubahan' : 'Daftarkan Siswa'}
             </button>
           </div>
@@ -4046,12 +4094,17 @@
 
     async function handleSaveSiswaTeacher(e, siswaId) {
       e.preventDefault();
-      const nama = document.getElementById('fsNama').value.trim();
-      const nis = document.getElementById('fsNis').value.trim();
-      const nisn = document.getElementById('fsNisn').value.trim();
-      const jk = document.getElementById('fsJk').value;
-      const wali = document.getElementById('fsWali').value.trim();
-      const hp = document.getElementById('fsHp').value.trim();
+      const namaInput = document.getElementById('fsNama');
+      if (!namaInput || !namaInput.value.trim()) {
+        showToast('Nama Lengkap Siswa wajib diisi!', 'warning');
+        return;
+      }
+      const nama = namaInput.value.trim();
+      const nis = (document.getElementById('fsNis')?.value || '').trim();
+      const nisn = (document.getElementById('fsNisn')?.value || '').trim();
+      const jk = document.getElementById('fsJk')?.value || 'L';
+      const wali = (document.getElementById('fsWali')?.value || '').trim();
+      const hp = (document.getElementById('fsHp')?.value || '').trim();
 
       const newId = siswaId || ('SIS-' + Date.now().toString().slice(-5));
       const sObj = {
@@ -4066,11 +4119,13 @@
         statusAktif: 'Aktif'
       };
 
+      if (!Array.isArray(dbData.siswa)) dbData.siswa = [];
       if (!siswaId) {
         dbData.siswa.push(sObj);
       } else {
         const idx = dbData.siswa.findIndex(x => x.id === siswaId);
         if (idx !== -1) dbData.siswa[idx] = { ...dbData.siswa[idx], ...sObj };
+        else dbData.siswa.push(sObj);
       }
 
       closeUniversalModal();
@@ -4078,9 +4133,11 @@
       await executeDbWrite('saveStudentTeacher', sObj, `Data siswa ${nama} berhasil disimpan.`);
     }
 
-    async function handleDeleteSiswa(siswaId, nama) {
+    async function handleDeleteSiswa(siswaId) {
+      const s = (dbData.siswa || []).find(x => x.id === siswaId);
+      const nama = s ? s.nama : 'siswa';
       if (!confirm(`Hapus data siswa "${nama}"?`)) return;
-      dbData.siswa = dbData.siswa.filter(s => s.id !== siswaId);
+      dbData.siswa = (dbData.siswa || []).filter(x => x.id !== siswaId);
       openModule('guru-siswa');
       await executeDbWrite('deleteStudentTeacher', { id: siswaId, siswaId: siswaId }, `Data siswa ${nama} dihapus.`);
     }
@@ -8180,19 +8237,32 @@
     // MODAL & TOAST UTILITIES
     // ==========================================
     function openUniversalModal(title, bodyHtml) {
-      document.getElementById('universalModalTitle').textContent = title;
-      document.getElementById('universalModalBody').innerHTML = bodyHtml;
+      const titleEl = document.getElementById('universalModalTitle');
+      const bodyEl = document.getElementById('universalModalBody');
       const m = document.getElementById('universalModal');
-      m.classList.remove('hidden');
-      m.classList.add('flex');
+      if (titleEl) titleEl.textContent = title;
+      if (bodyEl) bodyEl.innerHTML = bodyHtml;
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+      }
       document.body.classList.add('modal-open');
     }
 
     function closeUniversalModal() {
       const m = document.getElementById('universalModal');
-      m.classList.add('hidden');
-      m.classList.remove('flex');
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+      }
       document.body.classList.remove('modal-open');
+      document.body.style.overflow = '';
+    }
+
+    function handleUniversalModalBackdrop(e) {
+      if (e && e.target && e.target.id === 'universalModal') {
+        closeUniversalModal();
+      }
     }
 
     function showToast(msg, type = 'info') {
@@ -8279,6 +8349,20 @@
       document.addEventListener('visibilitychange', () => {
         // Jangan merefresh aplikasi secara otomatis saat ganti tab / kembali ke tab
         syncState.isTabActive = !document.hidden;
+      });
+
+      // PENGAMAN ESC & BACK: Selalu bersihkan modal dan kunci scroll jika pengguna menekan Escape
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeUniversalModal();
+          const qrModal = document.getElementById('qrScannerModal');
+          if (qrModal && !qrModal.classList.contains('hidden') && typeof stopQrScanner === 'function') {
+            stopQrScanner();
+          }
+        }
+      });
+      window.addEventListener('popstate', () => {
+        closeUniversalModal();
       });
     });
   </script>
