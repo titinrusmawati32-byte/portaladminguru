@@ -30,7 +30,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Konfigurasi Platform & Master Data NPSN Kecamatan Ambulu (48 SD) -->
-  <script src="config.js?v=speed-wush-3.0"></script>
+  <script src="config.js?v=speed-wush-3.1-seamless"></script>
 
   <!-- Library Scanner Kamera QR Code & QR Generator Card -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -99,18 +99,19 @@
       overscroll-behavior-y: contain;
       scroll-behavior: smooth;
       -webkit-text-size-adjust: 100%;
+      background-color: #EBE8F9;
     }
     body {
       min-height: 100%;
       margin: 0;
-      background-color: #F0EEF9;
+      background-color: #EBE8F9;
       color: #1E1B4B;
       /* overflow-x: clip dan overflow-y: visible agar tidak membuat nested scroll container ganda */
       overflow-x: clip;
       overflow-y: visible;
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
-      padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: 0;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
     body.modal-open {
@@ -945,7 +946,7 @@
   <!-- ============================================================
        2. PORTAL UTAMA GURU (SOFT PASTEL LAVENDER AESTHETIC)
        ============================================================ -->
-  <div id="mainApp" class="flex-1 flex flex-col w-full min-h-screen relative" style="display: none;">
+  <div id="mainApp" class="flex-1 flex flex-col w-full min-h-screen relative" style="display: none; padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));">
 
     <!-- TOP HEADER (AVATAR, GREETING, SYNC BADGE, LOGOUT) -->
     <header class="w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 pt-5 pb-3 flex items-center justify-between no-print gap-2">
