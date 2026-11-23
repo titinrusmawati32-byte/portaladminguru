@@ -4714,9 +4714,12 @@
     }
 
 // ============================================================
-    // SISTEM PENILAIAN LANDSCAPE MATRIX & CHECKBOX (SD / FASE ABC)
+    // SISTEM PENILAIAN DUAL-MODE: FOKUS HP & MATRIKS LEBAR
     // ============================================================
     let activeMatrixMapel = '';
+    let currentGradeViewMode = 'auto'; // 'auto', 'focus', or 'matrix'
+    let activeMobileCategoryKey = 'ph1'; // Default: Formatif 1
+
     let matrixActiveCols = {
       ph1: true,
       ph2: true,
@@ -4779,259 +4782,118 @@
       return null;
     }
 
+    function isMobileGradeView() {
+      if (currentGradeViewMode === 'focus') return true;
+      if (currentGradeViewMode === 'matrix') return false;
+      return window.innerWidth < 768;
+    }
+
+    function setGradeViewMode(mode) {
+      currentGradeViewMode = mode;
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const subArea = document.getElementById('nilaiSubTabContentArea');
+      if (subArea) {
+        renderLembarInputNilaiMassal(subArea, actKls, myStudents);
+      }
+    }
+
     function renderLembarInputNilaiMassal(container, actKls, students) {
       if (!container) return;
       try {
         const mapels = getTeacherMapelList();
-      if (!activeMatrixMapel || !mapels.includes(activeMatrixMapel)) {
-        activeMatrixMapel = mapels[0] || 'Matematika';
-      }
+        if (!activeMatrixMapel || !mapels.includes(activeMatrixMapel)) {
+          activeMatrixMapel = mapels[0] || 'Matematika';
+        }
 
-      const activeCount = Object.values(matrixActiveCols).filter(Boolean).length;
-      const kktpVal = schoolMetaConfig.kkm || 75;
+        const kktpVal = schoolMetaConfig.kkm || 75;
+        const isMobile = isMobileGradeView();
 
-      container.innerHTML = `
-        <form onsubmit="handleSaveAllNilaiBatch(event)" class="space-y-4">
+        container.innerHTML = `
+          <form onsubmit="handleSaveAllNilaiBatch(event)" class="space-y-4 pb-24">
 
-          <!-- TOP CONTROL & MAPEL SELECTOR -->
-          <div class="bg-white rounded-[26px] p-4 sm:p-5 border border-violet-100/70 shadow-xs space-y-3.5 text-xs">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-violet-50 pb-3">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
-                  📑
+            <!-- HEADER CONTROL CARD -->
+            <div class="bg-white rounded-[26px] p-4 sm:p-5 border border-violet-100/70 shadow-xs space-y-3.5 text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-violet-50 pb-3">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center font-black text-sm">
+                    📑
+                  </div>
+                  <div>
+                    <h4 class="font-black text-brand-dark text-sm sm:text-base leading-tight">
+                      ${isMobile ? 'Buku Nilai Guru (Mode HP)' : 'Buku Nilai Landscape SD'}
+                    </h4>
+                    <p class="text-[11px] text-brand-muted">Kelas ${actKls ? actKls.namaRombel : '-'} • ${students.length} Siswa Terdaftar</p>
+                  </div>
                 </div>
+
+                <!-- Mode Switcher & Quick Action Toolbar -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button type="button" onclick="setGradeViewMode('${isMobile ? 'matrix' : 'focus'}')"
+                    class="px-3 py-1.5 rounded-full ${isMobile ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-brand-50 text-brand-700 border border-brand-200'} font-extrabold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1">
+                    <span>${isMobile ? '🔄' : '📱'}</span>
+                    <span>${isMobile ? 'Mode Matriks Lebar' : 'Mode Fokus HP'}</span>
+                  </button>
+                  <button type="button" onclick="quickFillMatrixScore()"
+                    class="px-3 py-1.5 rounded-full bg-[#EAE7FB] hover:bg-brand-200 text-brand-700 font-extrabold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1">
+                    <span>⚡</span> <span>Isi Cepat</span>
+                  </button>
+                  <button type="button" onclick="resetMatrixScoreInputs()"
+                    class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer">
+                    Bersihkan
+                  </button>
+                  <button type="submit" id="btnSaveMatrixGrades"
+                    class="px-4 py-1.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-black text-[11px] shadow-xs transition cursor-pointer flex items-center gap-1.5">
+                    <span>💾</span> <span>Simpan Semua</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Filter Controls Bar: Mapel & KKTP -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <div class="sm:col-span-2">
+                  <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
+                  <select id="inpNilaiMapel" onchange="reloadMatrixForMapel(this.value)" required
+                    class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-black text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs sm:text-sm">
+                    ${mapels.map(m => `<option value="${m}" ${m === activeMatrixMapel ? 'selected' : ''}>${m}</option>`).join('')}
+                  </select>
+                </div>
+
                 <div>
-                  <h4 class="font-black text-brand-dark text-sm sm:text-base leading-tight">Buku Nilai Landscape SD</h4>
-                  <p class="text-[11px] text-brand-muted">Kelas ${actKls ? actKls.namaRombel : '-'} • ${students.length} Siswa Terdaftar</p>
-                </div>
-              </div>
-
-              <!-- Quick action toolbar -->
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <button type="button" onclick="quickFillMatrixScore()"
-                  class="px-3 py-1.5 rounded-full bg-[#EAE7FB] hover:bg-brand-200 text-brand-700 font-extrabold text-[11px] shadow-2xs transition cursor-pointer flex items-center gap-1">
-                  <span>⚡</span> <span>Isi Cepat</span>
-                </button>
-                <button type="button" onclick="resetMatrixScoreInputs()"
-                  class="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-[11px] transition cursor-pointer">
-                  Bersihkan
-                </button>
-                <button type="submit" id="btnSaveMatrixGrades"
-                  class="px-4 py-1.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-black text-[11px] shadow-xs transition cursor-pointer flex items-center gap-1.5">
-                  <span>💾</span> <span>Simpan Semua Nilai</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Filter Controls Bar: Mapel & KKTP -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-              <div class="sm:col-span-2">
-                <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran *</label>
-                <select id="inpNilaiMapel" onchange="reloadMatrixForMapel(this.value)" required
-                  class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-black text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white text-xs sm:text-sm">
-                  ${mapels.map(m => `<option value="${m}" ${m === activeMatrixMapel ? 'selected' : ''}>${m}</option>`).join('')}
-                </select>
-              </div>
-
-              <div>
-                <label class="block font-bold text-slate-700 mb-1">Batas KKTP / Tuntas *</label>
-                <div class="flex items-center gap-2">
-                  <input type="number" id="inpNilaiKktp" value="${kktpVal}" min="50" max="100" oninput="recalcAllMatrixRows()"
-                    class="w-24 p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
-                  <span class="text-brand-muted text-[11px] font-medium leading-tight">Standar ketuntasan kelas</span>
+                  <label class="block font-bold text-slate-700 mb-1">Batas KKTP / Tuntas *</label>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="inpNilaiKktp" value="${kktpVal}" min="50" max="100" oninput="recalcAllMatrixRows()"
+                      class="w-24 p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
+                    <span class="text-brand-muted text-[11px] font-medium leading-tight">Standar ketuntasan kelas</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- PITA CENTANG PILIHAN PENILAIAN (HORIZONTAL SCROLL CHIPS) -->
-          <div class="bg-white rounded-[24px] p-3.5 sm:p-4 border border-violet-100/70 shadow-xs space-y-2 text-xs">
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 pb-1">
-              <div class="flex items-center gap-1.5">
-                <span>☑️</span>
-                <span>Pilih kolom penilaian yang ingin ditampilkan di tabel:</span>
-                <span id="matrixColCountBadge" class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 font-black text-[10px]">
-                  ${activeCount} Kolom Aktif
-                </span>
+            <!-- SUCCESS SAVED BANNER -->
+            <div id="matrixSavedBanner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-800 flex items-center justify-between gap-2 shadow-2xs">
+              <div class="flex items-center gap-2">
+                <span class="text-base">✅</span>
+                <div>
+                  <span class="font-black" id="matrixSavedBannerMsg">Nilai siswa berhasil disimpan ke database!</span>
+                  <div class="text-[11px] text-emerald-700">Data tersinkronisasi offline & online cloud.</div>
+                </div>
               </div>
-              <button type="button" onclick="toggleAllMatrixCols()"
-                class="text-brand-600 hover:text-brand-800 font-extrabold cursor-pointer transition text-[11px] underline">
-                Toggle Semua
+              <button type="button" onclick="switchNilaiSubTab('history')"
+                class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl shadow-xs transition shrink-0 cursor-pointer">
+                Lihat Rekap Rapor 📊
               </button>
             </div>
 
-            <!-- Chips Horizontal List -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 text-[11px] select-none" id="matrixFilterBarContainer">
-              ${MATRIX_COLUMNS.map(col => {
-                const isChk = !!matrixActiveCols[col.key];
-                return `
-                  <label id="chip_col_${col.key}"
-                    class="px-2.5 sm:px-3 py-1.5 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition-all ${isChk ? '' : 'opacity-50'}"
-                    style="background:${isChk ? col.bgHeader : '#F8FAFC'}; border-color:${isChk ? col.borderHeader : '#E2E8F0'}; color:${isChk ? col.textHeader : '#64748B'};">
-                    <input type="checkbox" id="chk_col_${col.key}" ${isChk ? 'checked' : ''} onchange="toggleMatrixCol('${col.key}', this.checked)"
-                      class="w-3.5 h-3.5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
-                    <span>${col.label}</span>
-                    <span class="text-[9px] opacity-75 font-normal">(${col.sub})</span>
-                  </label>
-                `;
-              }).join('')}
-            </div>
+            ${isMobile ? renderMobileFocusViewHtml(students, kktpVal) : renderDesktopMatrixViewHtml(students, kktpVal)}
 
-            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5">
-              <span>💡 <strong>Tip HP:</strong> Geser tabel ke kanan untuk melihat kolom penilaian lainnya. Nama siswa tetap terkunci (freeze) di sebelah kiri.</span>
-            </div>
-          </div>
+          </form>
+        `;
 
-          <!-- SUCCESS SAVED BANNER (JIKA BARU SAJA SIMPAN) -->
-          <div id="matrixSavedBanner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-800 flex items-center justify-between gap-2 shadow-2xs">
-            <div class="flex items-center gap-2">
-              <span class="text-base">✅</span>
-              <div>
-                <span class="font-black" id="matrixSavedBannerMsg">Nilai siswa berhasil disimpan ke database!</span>
-                <div class="text-[11px] text-emerald-700">Data tersinkronisasi offline & online cloud.</div>
-              </div>
-            </div>
-            <button type="button" onclick="switchNilaiSubTab('history')"
-              class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[11px] rounded-xl shadow-xs transition shrink-0 cursor-pointer">
-              Lihat Rekap Rapor 📊
-            </button>
-          </div>
-
-          <!-- TABEL LANDSCAPE MATRIX TERPADU (HP, TABLET, LAPTOP) -->
-          <div class="bg-white rounded-[26px] p-3 sm:p-5 border border-violet-100/70 shadow-xs space-y-3">
-            <div class="overflow-x-auto overflow-y-auto max-h-[62vh] border border-violet-100/90 rounded-2xl relative bg-white shadow-2xs" id="matrixTableContainer">
-              <table class="w-full text-left border-collapse text-xs whitespace-nowrap" id="tableMassInputNilai">
-                
-                <!-- STICKY TABLE HEADER -->
-                <thead>
-                  <tr class="mob-sticky-header text-center font-black uppercase text-[10px] border-b border-violet-100 bg-[#F5F3FF]">
-                    
-                    <!-- Frozen Corner Columns (No & Nama) -->
-                    <th class="mob-sticky-corner-no py-2.5 px-1.5 w-10 sm:w-12 border-r border-violet-100 text-slate-600">No</th>
-                    <th class="mob-sticky-corner-name py-2.5 px-3 w-40 sm:w-52 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
-
-                    <!-- Dynamic Assessment Columns -->
-                    ${MATRIX_COLUMNS.map((col, cIdx) => `
-                      <th class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-2 px-2 text-center border-r font-extrabold text-[11px] min-w-[70px] sm:min-w-[80px]"
-                        style="background:${col.bgHeader}; color:${col.textHeader}; border-color:${col.borderHeader};">
-                        ${col.label}<br>
-                        <span class="text-[9px] font-normal opacity-85">(${col.sub})</span>
-                      </th>
-                    `).join('')}
-
-                    <!-- Summary & Final Columns -->
-                    <th class="py-2.5 px-2 text-center bg-violet-100 text-indigo-950 font-black min-w-[65px] border-l border-violet-200">
-                      Rata-Rata
-                    </th>
-                    <th class="py-2.5 px-2.5 text-center bg-violet-100 text-indigo-950 font-black min-w-[75px]">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-
-                <!-- BODY SISWA -->
-                <tbody class="divide-y divide-violet-50 font-medium">
-                  ${students.map((s, idx) => {
-                    return `
-                      <tr class="hover:bg-violet-50/60 transition-colors" data-row-student-id="${s.id}">
-                        <!-- Sticky No -->
-                        <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[11px]">
-                          ${idx + 1}
-                        </td>
-
-                        <!-- Sticky Nama Siswa -->
-                        <td class="mob-sticky-col-name py-2 px-2.5 border-r border-violet-100">
-                          <div class="font-extrabold text-brand-dark text-xs truncate max-w-[140px] sm:max-w-[190px]" title="${escapeHtml(s.nama)}">
-                            ${escapeHtml(s.nama)}
-                          </div>
-                          <div class="text-[9px] text-brand-muted font-mono flex items-center gap-1 mt-0.5">
-                            <span>NIS: ${s.nis || '-'}</span>
-                            <span>•</span>
-                            <span class="${s.jenisKelamin === 'P' ? 'text-pink-600 font-bold' : 'text-blue-600 font-bold'}">${s.jenisKelamin === 'P' ? 'P' : 'L'}</span>
-                          </div>
-                        </td>
-
-                        <!-- Dynamic Matrix Inputs -->
-                        ${MATRIX_COLUMNS.map((col, cIdx) => {
-                          const existing = findExistingStudentScore(s.id, activeMatrixMapel, col);
-                          const val = existing !== null && existing.value !== null && existing.value !== undefined ? existing.value : '';
-                          return `
-                            <td class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-1 px-1 text-center border-r border-violet-50">
-                              <input type="number" inputmode="decimal" min="0" max="100" step="any"
-                                id="score_${s.id}_${col.key}"
-                                data-student-id="${s.id}"
-                                data-student-name="${escapeHtml(s.nama)}"
-                                data-col-key="${col.key}"
-                                data-row-idx="${idx}"
-                                data-col-idx="${cIdx}"
-                                value="${val}"
-                                placeholder="-"
-                                oninput="onMatrixCellInput('${s.id}')"
-                                onkeydown="handleMatrixNav(event, ${idx}, ${cIdx})"
-                                class="matrix-score-input matrix-input-cell w-14 sm:w-16 h-8 text-center font-black text-xs rounded-lg border border-slate-200 text-brand-dark"
-                                style="background:${col.bgInput}; border-color:${col.borderInput};">
-                            </td>
-                          `;
-                        }).join('')}
-
-                        <!-- Realtime Average & Status -->
-                        <td class="py-1 px-2 text-center font-black font-mono text-xs border-l border-violet-100 bg-violet-50/30 text-slate-700" id="mat_avg_${s.id}">
-                          -
-                        </td>
-                        <td class="py-1 px-2 text-center text-[10px]" id="mat_status_${s.id}">
-                          <span class="inline-block px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-400">
-                            Belum Diisi
-                          </span>
-                        </td>
-                      </tr>
-                    `;
-                  }).join('')}
-                </tbody>
-              </table>
-            </div>
-
-            <!-- LIVE CLASS STATS SUMMARY -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
-              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
-                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Rata-Rata Kelas</span>
-                <span id="statRataRata" class="font-black text-brand-dark text-sm sm:text-base font-mono">0.0</span>
-              </div>
-              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
-                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Tertinggi / Terendah</span>
-                <span id="statMaxMin" class="font-black text-brand-dark text-sm sm:text-base font-mono">- / -</span>
-              </div>
-              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
-                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Tuntas / Remedial</span>
-                <span id="statTuntasRemedial" class="font-black text-xs sm:text-sm font-mono leading-tight">-</span>
-              </div>
-              <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
-                <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Ketuntasan Klasikal</span>
-                <span id="statKetuntasanPct" class="font-black text-brand-600 text-sm sm:text-base font-mono">0%</span>
-              </div>
-            </div>
-
-            <!-- Bottom Floating Save Bar for Easy Mobile Thumb Access -->
-            <div class="pt-2 flex items-center justify-between gap-3 border-t border-violet-50">
-              <div class="text-[11px] text-brand-muted hidden sm:block">
-                Gunakan tombol <strong>Enter</strong> atau <strong>Panah Bawah (↓)</strong> untuk berpindah baris.
-              </div>
-              <div class="w-full sm:w-auto flex items-center gap-2 justify-end">
-                <button type="submit"
-                  class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition cursor-pointer flex items-center justify-center gap-2">
-                  <span>💾</span> <span>Simpan Semua Nilai ke Database</span>
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </form>
-      `;
-
-      // Kalkulasi langsung nilai yang terisi awal
         setTimeout(() => {
           recalcAllMatrixRows();
         }, 50);
+
       } catch (err) {
         console.error('Error rendering lembar input nilai:', err);
         container.innerHTML = `
@@ -5043,6 +4905,359 @@
             </button>
           </div>
         `;
+      }
+    }
+
+    // ============================================================
+    // RENDER VIEW A: MODE FOKUS PENILAIAN (HP VIEW - LEGA & CEPAT)
+    // ============================================================
+    function renderMobileFocusViewHtml(students, kktpVal) {
+      const activeCol = MATRIX_COLUMNS.find(c => c.key === activeMobileCategoryKey) || MATRIX_COLUMNS[0];
+
+      return `
+        <div class="space-y-3">
+          
+          <!-- PITA SELEKTOR PENILAIAN DI HP (HORIZONTAL CAROUSEL PILLS) -->
+          <div class="bg-white rounded-2xl p-3 border border-violet-100 shadow-2xs space-y-2">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-extrabold text-slate-700">Tap untuk Ganti Penilaian:</span>
+              <span class="text-brand-600 font-extrabold text-[10px] bg-brand-50 px-2 py-0.5 rounded-full">
+                KKTP: ${kktpVal}
+              </span>
+            </div>
+
+            <!-- Horizontal Carousel Pills -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs select-none">
+              ${MATRIX_COLUMNS.map(col => {
+                const isActive = col.key === activeMobileCategoryKey;
+                return `
+                  <button type="button" onclick="selectMobileCategory('${col.key}')" id="mob_tab_${col.key}"
+                    class="px-3 py-1.5 rounded-full font-black text-xs shrink-0 transition flex items-center gap-1.5 ${isActive ? 'bg-brand-600 text-white shadow-xs' : 'bg-[#F8F7FD] text-slate-700 border border-violet-100 hover:bg-violet-50'}">
+                    <span>${col.label}</span>
+                    <span class="text-[9px] ${isActive ? 'bg-white/25 text-white' : 'bg-slate-200/80 text-slate-600'} px-1.5 py-0.2 rounded-full font-semibold">
+                      ${col.sub}
+                    </span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- MINI STATS STRIP (COMPACT, TIDAK MAKAN TEMPAT) -->
+            <div class="bg-violet-50/70 rounded-xl px-3 py-2 flex items-center justify-between text-[11px] text-brand-dark border border-violet-100 font-semibold">
+              <div class="truncate">
+                Mengisi: <strong class="text-brand-700">${activeCol.label} (${activeCol.sub})</strong>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 text-slate-600 text-[10px]">
+                <span id="lblMobFilledCount">0/${students.length} Terisi</span>
+                <span>•</span>
+                <span id="lblMobAvgScore">Rata: 0.0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DAFTAR SISWA HP RAMAH JEMPOL -->
+          <div class="space-y-2.5">
+            ${students.map((s, idx) => {
+              const existing = findExistingStudentScore(s.id, activeMatrixMapel, activeCol);
+              const val = existing !== null && existing.value !== null && existing.value !== undefined ? existing.value : '';
+              const scoreNum = parseFloat(val);
+              const isFilled = val !== '' && !isNaN(scoreNum);
+              const isTuntas = isFilled && scoreNum >= kktpVal;
+
+              return `
+                <div class="bg-white rounded-2xl p-3 border border-violet-100/90 shadow-2xs flex items-center justify-between gap-3 hover:border-brand-300 transition-all">
+                  <!-- Identitas Siswa Lengkap (Tanpa Terpotong) -->
+                  <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                    <span class="w-6 h-6 rounded-full bg-violet-100 text-brand-700 font-black text-xs flex items-center justify-center shrink-0">
+                      ${idx + 1}
+                    </span>
+                    <div class="min-w-0 flex-1">
+                      <div class="font-extrabold text-brand-dark text-xs sm:text-sm leading-snug break-words">
+                        ${escapeHtml(s.nama)}
+                      </div>
+                      <div class="text-[10px] text-brand-muted font-mono mt-0.5 flex items-center gap-1.5">
+                        <span>NIS: ${s.nis || '-'}</span>
+                        <span>•</span>
+                        <span class="${s.jenisKelamin === 'P' ? 'text-pink-600 font-bold' : 'text-blue-600 font-bold'}">
+                          ${s.jenisKelamin === 'P' ? 'Perempuan' : 'Laki-laki'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Input Nilai Ramah Jempol (Numpad Ready) -->
+                  <div class="flex items-center gap-2 shrink-0">
+                    <div id="mob_badge_${s.id}">
+                      ${isFilled ? `
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                          <span class="w-1.5 h-1.5 rounded-full ${isTuntas ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
+                          ${isTuntas ? 'Tuntas' : 'Remedial'}
+                        </span>
+                      ` : `
+                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-400">
+                          Kosong
+                        </span>
+                      `}
+                    </div>
+
+                    <input type="number" inputmode="decimal" min="0" max="100" step="any"
+                      id="score_${s.id}_${activeCol.key}"
+                      data-student-id="${s.id}"
+                      data-col-key="${activeCol.key}"
+                      data-row-idx="${idx}"
+                      value="${val}"
+                      placeholder="0"
+                      oninput="onMobileCellInput('${s.id}', '${activeCol.key}')"
+                      onkeydown="handleMobileInputNav(event, ${idx})"
+                      class="matrix-score-input w-20 h-11 text-center font-black text-base bg-violet-50/70 border-2 border-violet-200 focus:border-brand-600 focus:bg-white rounded-xl focus:outline-none text-brand-dark shadow-2xs">
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <!-- FLOATING BOTTOM ACTION BAR HP -->
+          <div class="sticky bottom-4 bg-white/95 backdrop-blur-md p-3.5 border border-violet-200/80 rounded-2xl shadow-lg flex items-center justify-between gap-3 z-30">
+            <div class="text-[11px] text-brand-muted leading-tight">
+              Kategori: <strong class="text-brand-dark">${activeCol.label}</strong>
+            </div>
+            <button type="submit"
+              class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition flex items-center gap-2 active:scale-95 cursor-pointer">
+              <span>💾</span> <span>Simpan Semua Nilai</span>
+            </button>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // ============================================================
+    // RENDER VIEW B: MODE MATRIKS LEBAR (DESKTOP & LANDSCAPE)
+    // ============================================================
+    function renderDesktopMatrixViewHtml(students, kktpVal) {
+      const activeCount = Object.values(matrixActiveCols).filter(Boolean).length;
+
+      return `
+        <!-- PITA CENTANG PILIHAN PENILAIAN -->
+        <div class="bg-white rounded-[24px] p-3.5 sm:p-4 border border-violet-100/70 shadow-xs space-y-2 text-xs">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 pb-1">
+            <div class="flex items-center gap-1.5">
+              <span>☑️</span>
+              <span>Pilih kolom penilaian yang ingin ditampilkan di tabel:</span>
+              <span id="matrixColCountBadge" class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 font-black text-[10px]">
+                ${activeCount} Kolom Aktif
+              </span>
+            </div>
+            <button type="button" onclick="toggleAllMatrixCols()"
+              class="text-brand-600 hover:text-brand-800 font-extrabold cursor-pointer transition text-[11px] underline">
+              Toggle Semua
+            </button>
+          </div>
+
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1.5 text-[11px] select-none" id="matrixFilterBarContainer">
+            ${MATRIX_COLUMNS.map(col => {
+              const isChk = !!matrixActiveCols[col.key];
+              return `
+                <label id="chip_col_${col.key}"
+                  class="px-2.5 sm:px-3 py-1.5 rounded-full border cursor-pointer shrink-0 flex items-center gap-1.5 font-bold transition-all ${isChk ? '' : 'opacity-50'}"
+                  style="background:${isChk ? col.bgHeader : '#F8FAFC'}; border-color:${isChk ? col.borderHeader : '#E2E8F0'}; color:${isChk ? col.textHeader : '#64748B'};">
+                  <input type="checkbox" id="chk_col_${col.key}" ${isChk ? 'checked' : ''} onchange="toggleMatrixCol('${col.key}', this.checked)"
+                    class="w-3.5 h-3.5 rounded text-brand-600 focus:ring-brand-500 cursor-pointer">
+                  <span>${col.label}</span>
+                  <span class="text-[9px] opacity-75 font-normal">(${col.sub})</span>
+                </label>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- TABEL LANDSCAPE MATRIX -->
+        <div class="bg-white rounded-[26px] p-3 sm:p-5 border border-violet-100/70 shadow-xs space-y-3">
+          <div class="overflow-x-auto overflow-y-auto max-h-[62vh] border border-violet-100/90 rounded-2xl relative bg-white shadow-2xs" id="matrixTableContainer">
+            <table class="w-full text-left border-collapse text-xs whitespace-nowrap" id="tableMassInputNilai">
+              <thead>
+                <tr class="mob-sticky-header text-center font-black uppercase text-[10px] border-b border-violet-100 bg-[#F5F3FF]">
+                  <th class="mob-sticky-corner-no py-2.5 px-1.5 w-10 sm:w-12 border-r border-violet-100 text-slate-600">No</th>
+                  <th class="mob-sticky-corner-name py-2.5 px-3 w-40 sm:w-52 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
+
+                  ${MATRIX_COLUMNS.map((col, cIdx) => `
+                    <th class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-2 px-2 text-center border-r font-extrabold text-[11px] min-w-[70px] sm:min-w-[80px]"
+                      style="background:${col.bgHeader}; color:${col.textHeader}; border-color:${col.borderHeader};">
+                      ${col.label}<br>
+                      <span class="text-[9px] font-normal opacity-85">(${col.sub})</span>
+                    </th>
+                  `).join('')}
+
+                  <th class="py-2.5 px-2 text-center bg-violet-100 text-indigo-950 font-black min-w-[65px] border-l border-violet-200">
+                    Rata-Rata
+                  </th>
+                  <th class="py-2.5 px-2.5 text-center bg-violet-100 text-indigo-950 font-black min-w-[75px]">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody class="divide-y divide-violet-50 font-medium">
+                ${students.map((s, idx) => {
+                  return `
+                    <tr class="hover:bg-violet-50/60 transition-colors" data-row-student-id="${s.id}">
+                      <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[11px]">
+                        ${idx + 1}
+                      </td>
+
+                      <td class="mob-sticky-col-name py-2 px-2.5 border-r border-violet-100">
+                        <div class="font-extrabold text-brand-dark text-xs truncate max-w-[140px] sm:max-w-[190px]" title="${escapeHtml(s.nama)}">
+                          ${escapeHtml(s.nama)}
+                        </div>
+                        <div class="text-[9px] text-brand-muted font-mono flex items-center gap-1 mt-0.5">
+                          <span>NIS: ${s.nis || '-'}</span>
+                          <span>•</span>
+                          <span class="${s.jenisKelamin === 'P' ? 'text-pink-600 font-bold' : 'text-blue-600 font-bold'}">${s.jenisKelamin === 'P' ? 'P' : 'L'}</span>
+                        </div>
+                      </td>
+
+                      ${MATRIX_COLUMNS.map((col, cIdx) => {
+                        const existing = findExistingStudentScore(s.id, activeMatrixMapel, col);
+                        const val = existing !== null && existing.value !== null && existing.value !== undefined ? existing.value : '';
+                        return `
+                          <td class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-1 px-1 text-center border-r border-violet-50">
+                            <input type="number" inputmode="decimal" min="0" max="100" step="any"
+                              id="score_${s.id}_${col.key}"
+                              data-student-id="${s.id}"
+                              data-student-name="${escapeHtml(s.nama)}"
+                              data-col-key="${col.key}"
+                              data-row-idx="${idx}"
+                              data-col-idx="${cIdx}"
+                              value="${val}"
+                              placeholder="-"
+                              oninput="onMatrixCellInput('${s.id}')"
+                              onkeydown="handleMatrixNav(event, ${idx}, ${cIdx})"
+                              class="matrix-score-input matrix-input-cell w-14 sm:w-16 h-8 text-center font-black text-xs rounded-lg border border-slate-200 text-brand-dark"
+                              style="background:${col.bgInput}; border-color:${col.borderInput};">
+                          </td>
+                        `;
+                      }).join('')}
+
+                      <td class="py-1 px-2 text-center font-black font-mono text-xs border-l border-violet-100 bg-violet-50/30 text-slate-700" id="mat_avg_${s.id}">
+                        -
+                      </td>
+                      <td class="py-1 px-2 text-center text-[10px]" id="mat_status_${s.id}">
+                        <span class="inline-block px-2 py-0.5 rounded-full font-bold bg-slate-100 text-slate-400">
+                          Belum Diisi
+                        </span>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- LIVE CLASS STATS SUMMARY DESKTOP -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+            <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+              <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Rata-Rata Kelas</span>
+              <span id="statRataRata" class="font-black text-brand-dark text-sm sm:text-base font-mono">0.0</span>
+            </div>
+            <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+              <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Tertinggi / Terendah</span>
+              <span id="statMaxMin" class="font-black text-brand-dark text-sm sm:text-base font-mono">- / -</span>
+            </div>
+            <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+              <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Tuntas / Remedial</span>
+              <span id="statTuntasRemedial" class="font-black text-xs sm:text-sm font-mono leading-tight">-</span>
+            </div>
+            <div class="bg-violet-50/70 rounded-2xl p-2.5 text-center border border-violet-100">
+              <span class="text-[10px] text-brand-muted font-bold block mb-0.5">Ketuntasan Klasikal</span>
+              <span id="statKetuntasanPct" class="font-black text-brand-600 text-sm sm:text-base font-mono">0%</span>
+            </div>
+          </div>
+
+          <div class="pt-2 flex items-center justify-between gap-3 border-t border-violet-50">
+            <div class="text-[11px] text-brand-muted hidden sm:block">
+              Gunakan tombol <strong>Enter</strong> atau <strong>Panah Bawah (↓)</strong> untuk berpindah baris.
+            </div>
+            <div class="w-full sm:w-auto flex items-center gap-2 justify-end">
+              <button type="submit"
+                class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition cursor-pointer flex items-center justify-center gap-2">
+                <span>💾</span> <span>Simpan Semua Nilai ke Database</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectMobileCategory(catKey) {
+      activeMobileCategoryKey = catKey;
+      const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      const subArea = document.getElementById('nilaiSubTabContentArea');
+      if (subArea) {
+        renderLembarInputNilaiMassal(subArea, actKls, myStudents);
+      }
+    }
+
+    function onMobileCellInput(studentId, colKey) {
+      const kktp = parseFloat(document.getElementById('inpNilaiKktp')?.value) || 75;
+      const inp = document.getElementById('score_' + studentId + '_' + colKey);
+      const badge = document.getElementById('mob_badge_' + studentId);
+
+      if (inp && badge) {
+        const val = inp.value.trim();
+        if (val !== '') {
+          const num = parseFloat(val);
+          const isTuntas = num >= kktp;
+          badge.innerHTML = `
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+              <span class="w-1.5 h-1.5 rounded-full ${isTuntas ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
+              ${isTuntas ? 'Tuntas' : 'Remedial'}
+            </span>
+          `;
+        } else {
+          badge.innerHTML = `
+            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-400">
+              Kosong
+            </span>
+          `;
+        }
+      }
+
+      updateMobileStatsStrip();
+    }
+
+    function updateMobileStatsStrip() {
+      const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
+      let filled = 0;
+      let total = 0;
+
+      myStudents.forEach(s => {
+        const inp = document.getElementById('score_' + s.id + '_' + activeMobileCategoryKey);
+        if (inp && inp.value.trim() !== '') {
+          const num = parseFloat(inp.value.trim());
+          if (!isNaN(num)) {
+            total += num;
+            filled++;
+          }
+        }
+      });
+
+      const lblFilled = document.getElementById('lblMobFilledCount');
+      const lblAvg = document.getElementById('lblMobAvgScore');
+
+      if (lblFilled) lblFilled.textContent = `${filled}/${myStudents.length} Terisi`;
+      if (lblAvg) lblAvg.textContent = 'Rata: ' + (filled > 0 ? (total / filled).toFixed(1) : '0.0');
+    }
+
+    function handleMobileInputNav(e, idx) {
+      if (e.key === 'Enter' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextInp = document.querySelector(`input[data-row-idx="${idx + 1}"]`);
+        if (nextInp) nextInp.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevInp = document.querySelector(`input[data-row-idx="${idx - 1}"]`);
+        if (prevInp) prevInp.focus();
       }
     }
 
@@ -5164,6 +5379,10 @@
     }
 
     function recalcAllMatrixRows() {
+      if (isMobileGradeView()) {
+        updateMobileStatsStrip();
+        return;
+      }
       const myStudents = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
       myStudents.forEach(s => recalcSingleMatrixRow(s.id));
       recalcMatrixClassStats();
@@ -5242,23 +5461,30 @@
     }
 
     function quickFillMatrixScore() {
-      const activeList = MATRIX_COLUMNS.filter(c => matrixActiveCols[c.key]);
-      if (activeList.length === 0) {
-        showToast('Aktifkan minimal satu kolom penilaian terlebih dahulu.', 'warning');
-        return;
+      const isMobile = isMobileGradeView();
+      let targetCol;
+
+      if (isMobile) {
+        targetCol = MATRIX_COLUMNS.find(c => c.key === activeMobileCategoryKey) || MATRIX_COLUMNS[0];
+      } else {
+        const activeList = MATRIX_COLUMNS.filter(c => matrixActiveCols[c.key]);
+        if (activeList.length === 0) {
+          showToast('Aktifkan minimal satu kolom penilaian terlebih dahulu.', 'warning');
+          return;
+        }
+
+        const optionsStr = activeList.map((c, i) => `${i + 1}. ${c.label} (${c.sub})`).join('\n');
+        const choice = prompt('Pilih kolom yang ingin diisi nilai cepat:\n' + optionsStr + '\n\nMasukkan nomor pilihan (1-' + activeList.length + '):', '1');
+        if (choice === null) return;
+
+        const idx = parseInt(choice, 10) - 1;
+        if (isNaN(idx) || idx < 0 || idx >= activeList.length) {
+          showToast('Pilihan kolom tidak valid.', 'warning');
+          return;
+        }
+        targetCol = activeList[idx];
       }
 
-      const optionsStr = activeList.map((c, i) => `${i + 1}. ${c.label} (${c.sub})`).join('\n');
-      const choice = prompt('Pilih kolom yang ingin diisi nilai cepat:\n' + optionsStr + '\n\nMasukkan nomor pilihan (1-' + activeList.length + '):', '1');
-      if (choice === null) return;
-
-      const idx = parseInt(choice, 10) - 1;
-      if (isNaN(idx) || idx < 0 || idx >= activeList.length) {
-        showToast('Pilihan kolom tidak valid.', 'warning');
-        return;
-      }
-
-      const targetCol = activeList[idx];
       const valStr = prompt(`Masukkan nilai default untuk kolom "${targetCol.label}" (0-100):\n(Hanya mengisi baris yang masih kosong)`, '80');
       if (valStr === null) return;
 
@@ -5275,6 +5501,7 @@
         if (inp && inp.value.trim() === '') {
           inp.value = num;
           filled++;
+          if (isMobile) onMobileCellInput(s.id, targetCol.key);
         }
       });
 
@@ -5285,7 +5512,12 @@
     function resetMatrixScoreInputs() {
       if (!confirm('Kosongkan seluruh isian nilai pada tabel penilaian?')) return;
       const inputs = document.querySelectorAll('.matrix-score-input');
-      inputs.forEach(inp => inp.value = '');
+      inputs.forEach(inp => {
+        inp.value = '';
+        const sId = inp.dataset.studentId;
+        const cKey = inp.dataset.colKey;
+        if (sId && cKey && isMobileGradeView()) onMobileCellInput(sId, cKey);
+      });
       recalcAllMatrixRows();
       showToast('Seluruh isian tabel telah dibersihkan.', 'info');
     }
@@ -5303,7 +5535,6 @@
 
       myStudents.forEach(s => {
         MATRIX_COLUMNS.forEach(col => {
-          if (!matrixActiveCols[col.key]) return;
           const inp = document.getElementById('score_' + s.id + '_' + col.key);
           if (inp && inp.value.trim() !== '') {
             const score = parseFloat(inp.value.trim());
@@ -5311,7 +5542,6 @@
 
             const statusTuntas = score >= kktp ? 'Tuntas' : 'Remedial';
 
-            // Cek apakah sudah ada di local database
             const existing = findExistingStudentScore(s.id, mapel, col);
             let gradeId = existing ? existing.id : ('NIL-' + Date.now().toString().slice(-6) + Math.random().toString(36).substr(2, 4));
 
@@ -5340,7 +5570,6 @@
               teacherName: currentUser ? currentUser.nama : ''
             };
 
-            // Update in-memory local state
             if (existing && existing.item) {
               Object.assign(existing.item, gradeObj);
             } else {
@@ -5365,7 +5594,6 @@
 
       showToast(`Menyimpan ${gradesToSave.length} nilai siswa ke database...`, 'info');
 
-      // Local snapshot save
       if (typeof saveLocalDbSnapshot === 'function') {
         saveLocalDbSnapshot();
       }
@@ -5385,7 +5613,6 @@
       try {
         await executeDbWrite('batchSaveNilai', payload, `Berhasil menyimpan ${gradesToSave.length} nilai peserta didik.`);
 
-        // Tampilkan success banner di atas tabel
         const banner = document.getElementById('matrixSavedBanner');
         const bannerMsg = document.getElementById('matrixSavedBannerMsg');
         if (banner && bannerMsg) {
@@ -5406,7 +5633,6 @@
       }
     }
 
-    // Backward compatibility helper functions
     function autoFillNamaPenilaian() {
       const mapelSelect = document.getElementById('inpNilaiMapel');
       if (mapelSelect && mapelSelect.value) {
@@ -5415,11 +5641,7 @@
     }
 
     function handleScoreInputNavigation(e, idx) {
-      if (e.key === 'Enter' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        const nextInp = document.querySelector(`input[data-idx="${idx + 1}"]`);
-        if (nextInp) nextInp.focus();
-      }
+      handleMobileInputNav(e, idx);
     }
 
     function updateStudentScoreCalculation() {
@@ -5430,7 +5652,7 @@
       quickFillMatrixScore();
     }
 
-        // ==========================================
+    // ==========================================
     // 1. REKAP NILAI SISWA (SESUAI TEMPLATE RESMI)
     // ==========================================
     function compileRekapNilaiMatrix(actKls, students, mapel) {
