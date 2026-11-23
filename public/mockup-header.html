@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup Desain Header Portal Guru</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F1EFFB; color: #1E1B4B; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    .lavender-gradient {
+      background: linear-gradient(135deg, #7C3AED 0%, #6366F1 50%, #8B5CF6 100%);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Screen containers */
+    .view-desktop { max-width: 1080px; width: 100%; transition: all 0.35s ease; }
+    .view-mobile { max-width: 390px; width: 100%; transition: all 0.35s ease; }
+
+    /* Pulse glow */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.15); }
+    }
+    .pulse-dot { animation: pulseGlow 2s infinite ease-in-out; }
+  </style>
+</head>
+<body class="p-3 sm:p-6 min-h-screen flex flex-col items-center justify-start">
+
+  <!-- TOP BAR & CONTROLLER -->
+  <div class="max-w-5xl w-full mb-6 bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-violet-200/80">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-indigo-100 text-indigo-800 uppercase tracking-wide">
+          <span>✨</span> <span>REDESAIN HEADER PORTAL GURU</span>
+        </div>
+        <h1 class="text-base sm:text-2xl font-black text-slate-900 mt-1.5">
+          Pilihan Mockup Tampilan Header Aplikasi
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+          Bandingkan tampilan saat ini dengan 3 konsep baru di bawah, dan coba beralih mode <strong>Laptop vs HP</strong>.
+        </p>
+      </div>
+
+      <!-- Device View Toggle -->
+      <div class="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+        <button onclick="setPreviewDevice('desktop')" id="btnDeviceDesk"
+          class="px-3.5 py-1.5 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-xs transition flex items-center gap-1.5">
+          <span>💻</span> <span>Layar Laptop</span>
+        </button>
+        <button onclick="setPreviewDevice('mobile')" id="btnDeviceMob"
+          class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+          <span>📱</span> <span>Layar HP</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS PILIHAN KONSEP -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 text-xs">
+      
+      <button onclick="switchHeaderConcept('current')" id="tab_current"
+        class="p-3 rounded-2xl border-2 text-left transition cursor-pointer bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+        <span class="font-extrabold text-xs block text-slate-800">Tampilan Saat Ini</span>
+        <span class="text-[10px] text-slate-400">Versi flat asli seperti screenshot</span>
+      </button>
+
+      <button onclick="switchHeaderConcept('option1')" id="tab_option1"
+        class="p-3 rounded-2xl border-2 text-left transition cursor-pointer bg-indigo-50 border-indigo-600 text-indigo-950 shadow-xs">
+        <span class="font-extrabold text-xs block text-indigo-700">Opsi 1: Floating Glass (Rekomendasi)</span>
+        <span class="text-[10px] text-slate-500">Modern soft pastel, kartu mengambang & quick class</span>
+      </button>
+
+      <button onclick="switchHeaderConcept('option2')" id="tab_option2"
+        class="p-3 rounded-2xl border-2 text-left transition cursor-pointer bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+        <span class="font-extrabold text-xs block text-slate-800">Opsi 2: Portal Eksekutif Sekolah</span>
+        <span class="text-[10px] text-slate-400">Logo dinas/sekolah, jam real-time & tanggal</span>
+      </button>
+
+      <button onclick="switchHeaderConcept('option3')" id="tab_option3"
+        class="p-3 rounded-2xl border-2 text-left transition cursor-pointer bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+        <span class="font-extrabold text-xs block text-slate-800">Opsi 3: Ultra-Clean Minimalis</span>
+        <span class="text-[10px] text-slate-400">Super ramping, hemat ruang & ramah mobile</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- CONTAINER PREVIEW (RESPONSIVE WRAPPER) -->
+  <div id="previewWrapper" class="view-desktop space-y-6">
+
+    <!-- ==============================================================
+         CONCEPT 0: TAMPILAN SAAT INI (SEBAGAI PEMBANDING)
+         ============================================================== -->
+    <div id="view_current" class="hidden space-y-2">
+      <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">
+        Tampilan Saat Ini (Sesuai Screenshot Anda):
+      </div>
+
+      <div class="bg-white rounded-3xl p-4 sm:p-5 border border-violet-100 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <!-- Sisi Kiri -->
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <div class="w-11 h-11 rounded-full bg-indigo-600 flex items-center justify-center text-white font-black text-sm">
+              r
+            </div>
+            <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+          </div>
+          <div>
+            <div class="text-[11px] text-slate-400 leading-none">Selamat Malam,</div>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <span class="text-sm font-black text-slate-900">reza fahlevi</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-[#EDE9FE] text-indigo-700">Guru Kelas</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-0.5">SDN Sumberejo 04</div>
+          </div>
+        </div>
+
+        <!-- Sisi Kanan -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-emerald-700 border border-emerald-300 text-xs font-bold shadow-2xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>Online • Tersinkronisasi</span>
+            <span>🔄</span>
+          </div>
+          <button class="w-9 h-9 rounded-full bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center text-amber-500 text-sm shadow-2xs">
+            🌙
+          </button>
+          <button class="w-9 h-9 rounded-full bg-white hover:bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 text-sm shadow-2xs">
+            ⚙️
+          </button>
+          <button class="w-9 h-9 rounded-full bg-white hover:bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-500 text-sm shadow-2xs">
+            🚪
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==============================================================
+         OPSI 1: MODERN SOFT PASTEL FLOATING (REKOMENDASI UTAMA)
+         ============================================================== -->
+    <div id="view_option1" class="space-y-3">
+      <div class="flex items-center justify-between px-2">
+        <span class="text-[11px] font-black text-indigo-700 uppercase tracking-wider flex items-center gap-1.5">
+          <span>⭐</span> <span>Opsi 1: Modern Soft Pastel Floating Card</span>
+        </span>
+        <span class="text-[10px] text-slate-400">Paling selaras dengan tema pastel SiGuru SD</span>
+      </div>
+
+      <div class="glass-card bg-white/95 rounded-[26px] p-3.5 sm:p-4 border border-violet-100 shadow-md shadow-violet-500/5 flex flex-wrap items-center justify-between gap-3 relative">
+        
+        <!-- Sisi Kiri: Profil Guru & Identitas Sekolah Berkelas -->
+        <div class="flex items-center gap-3 min-w-0">
+          
+          <!-- Avatar dengan Gradient & Ring Modern -->
+          <div class="relative cursor-pointer group" onclick="toggleDropdown('opt1_profile_menu')">
+            <div class="w-12 h-12 rounded-2xl lavender-gradient p-0.5 shadow-sm group-hover:scale-105 transition-transform flex items-center justify-center">
+              <div class="w-full h-full rounded-[14px] bg-white/10 backdrop-blur-xs flex items-center justify-center text-white font-black text-base">
+                RF
+              </div>
+            </div>
+            <!-- Animated Pulse Online Dot -->
+            <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-300 pulse-dot"></span>
+          </div>
+
+          <!-- Teks Identitas Guru -->
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-bold text-slate-400">🌙 Selamat Malam,</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+              <span class="text-[10px] font-bold text-slate-400">24 Nov 2026</span>
+            </div>
+            
+            <div class="flex items-center gap-2 mt-0.5">
+              <h3 class="text-sm sm:text-base font-black text-slate-900 leading-tight truncate">
+                Reza Fahlevi, S.Pd.
+              </h3>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-indigo-100 text-indigo-800 shrink-0">
+                Wali Kelas 4
+              </span>
+            </div>
+
+            <!-- Nama Sekolah dengan Icon -->
+            <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
+              <span>🏫</span>
+              <span class="font-bold text-slate-700 truncate">SDN Sumberejo 04</span>
+              <span class="text-slate-300">•</span>
+              <span class="font-mono text-[10px] text-slate-400">NPSN: 20524959</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sisi Kanan: Quick Rombel Pill + Sync + Action Cluster -->
+        <div class="flex items-center gap-2 flex-wrap">
+          
+          <!-- Quick Class Selector Pill (Langsung di Header!) -->
+          <div class="bg-[#F8F7FD] hover:bg-violet-100/60 border border-violet-100 rounded-2xl px-3 py-1.5 flex items-center gap-2 transition cursor-pointer shadow-2xs">
+            <span class="text-xs">📚</span>
+            <div class="text-left">
+              <span class="text-[9px] text-slate-400 font-bold block leading-none">Rombel Aktif:</span>
+              <span class="text-xs font-black text-indigo-900 leading-tight">Kelas IV-A (28)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 ml-1">▼</span>
+          </div>
+
+          <!-- Sync Pill Modern -->
+          <div class="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold shadow-2xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="hidden sm:inline">Tersinkron Cloud</span>
+            <span class="text-[11px] cursor-pointer hover:rotate-180 transition-transform">🔄</span>
+          </div>
+
+          <!-- Tombol Aksi Bulat Modern -->
+          <div class="flex items-center gap-1 bg-[#F8F7FD] p-1 rounded-2xl border border-violet-100">
+            <button class="w-8 h-8 rounded-xl hover:bg-white text-slate-600 hover:text-indigo-600 flex items-center justify-center text-xs transition cursor-pointer" title="Mode Gelap / Terang">
+              🌙
+            </button>
+            <button class="w-8 h-8 rounded-xl hover:bg-white text-slate-600 hover:text-indigo-600 flex items-center justify-center text-xs transition cursor-pointer" title="Pengaturan">
+              ⚙️
+            </button>
+            <button class="w-8 h-8 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center text-xs transition cursor-pointer" title="Keluar">
+              🚪
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="text-[11px] text-slate-500 bg-white p-3 rounded-2xl border border-violet-100 space-y-1">
+        <strong>Keunggulan Opsi 1:</strong>
+        <ul class="list-disc pl-5 text-slate-600 space-y-0.5">
+          <li><strong>Pill Kelas Aktif Langsung di Header:</strong> Guru bisa melihat dan mengganti rombel aktif kapan saja tanpa harus ke menu beranda.</li>
+          <li><strong>Efek Glassmorphism Mewah:</strong> Sedikit transparan dan berbayang halus, sangat senada dengan estetika ungu pastel SiGuru SD.</li>
+          <li><strong>Cluster Tombol Terpadu:</strong> Tombol mode gelap, setting, dan logout dikelompokkan dalam satu wadah rapi agar tidak berserakan.</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <!-- ==============================================================
+         OPSI 2: PROFESSIONAL SCHOOL PORTAL (KAYA INFORMASI & FORMAL)
+         ============================================================== -->
+    <div id="view_option2" class="hidden space-y-3">
+      <div class="flex items-center justify-between px-2">
+        <span class="text-[11px] font-black text-blue-800 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🏛️</span> <span>Opsi 2: Professional School Portal (Kaya Info & Resmi)</span>
+        </span>
+        <span class="text-[10px] text-slate-400">Cocok untuk nuansa dinas & sekolah formal</span>
+      </div>
+
+      <div class="bg-white rounded-2xl border-t-4 border-indigo-600 p-4 shadow-sm border-x border-b border-slate-200 space-y-3">
+        
+        <!-- Baris 1: Header Instansi & Tanggal -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5 text-xs text-slate-500">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-[10px]">
+              🇮🇩
+            </div>
+            <span class="font-bold text-slate-700">Dinas Pendidikan Kab. Jember • Koorwil Ambulu</span>
+          </div>
+
+          <div class="flex items-center gap-2 font-mono text-[11px] text-slate-600">
+            <span>📅 Selasa, 24 Nov 2026</span>
+            <span>•</span>
+            <span class="font-bold text-indigo-700" id="liveClock">00:25 WIB</span>
+          </div>
+        </div>
+
+        <!-- Baris 2: Profil Utama -->
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-slate-100 border-2 border-indigo-500 p-0.5 flex items-center justify-center">
+              <span class="text-xl">👨‍🏫</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-black text-slate-900 leading-tight">Reza Fahlevi, S.Pd.</h3>
+                <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded text-[10px] font-bold">NIP. 198905202022211005</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">
+                SDN Sumberejo 04 • Wali Kelas IV-A (Fase B)
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+              <span>Online • Database Sync</span>
+            </div>
+            <button class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1">
+              ⚙️ Pengaturan
+            </button>
+            <button class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center gap-1">
+              🚪 Keluar
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="text-[11px] text-slate-500 bg-white p-3 rounded-2xl border border-slate-200 space-y-1">
+        <strong>Keunggulan Opsi 2:</strong>
+        <ul class="list-disc pl-5 text-slate-600 space-y-0.5">
+          <li><strong>Nuansa Resmi & Berwibawa:</strong> Lengkap dengan kop instansi, NIP guru, tanggal Indonesia, dan jam aktif.</li>
+          <li><strong>Struktur Jelas:</strong> Terbagi 2 baris (baris info dinas/waktu & baris profil guru).</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <!-- ==============================================================
+         OPSI 3: ULTRA-CLEAN MINIMALIS (SANGAT RINGKAS & HEMAT RUANG)
+         ============================================================== -->
+    <div id="view_option3" class="hidden space-y-3">
+      <div class="flex items-center justify-between px-2">
+        <span class="text-[11px] font-black text-purple-800 uppercase tracking-wider flex items-center gap-1.5">
+          <span>⚡</span> <span>Opsi 3: Ultra-Clean Minimalis (Mobile-First)</span>
+        </span>
+        <span class="text-[10px] text-slate-400">Sangat hemat tinggi layar</span>
+      </div>
+
+      <div class="bg-white rounded-2xl px-4 py-2.5 border border-violet-100 shadow-2xs flex items-center justify-between gap-3">
+        
+        <!-- Sisi Kiri: Profil Ringkas -->
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-full bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0">
+            RF
+          </div>
+          <div class="truncate">
+            <div class="flex items-center gap-1.5">
+              <span class="font-black text-slate-900 text-xs sm:text-sm truncate">Reza Fahlevi</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Online"></span>
+            </div>
+            <div class="text-[10px] text-slate-400 truncate">SDN Sumberejo 04 • Kelas 4</div>
+          </div>
+        </div>
+
+        <!-- Sisi Kanan: Status & Profil Dropdown -->
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+            <span>☁️</span> <span class="hidden sm:inline">Tersinkron</span>
+          </span>
+
+          <button class="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center text-xs">
+            🌙
+          </button>
+          <button class="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center text-xs">
+            ⚙️
+          </button>
+          <button class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
+            🚪
+          </button>
+        </div>
+
+      </div>
+
+      <div class="text-[11px] text-slate-500 bg-white p-3 rounded-2xl border border-violet-100 space-y-1">
+        <strong>Keunggulan Opsi 3:</strong>
+        <ul class="list-disc pl-5 text-slate-600 space-y-0.5">
+          <li><strong>Tinggi Header Sangat Ramping:</strong> Hanya memakan sekitar 45px - 50px tinggi layar sehingga area konten aplikasi di bawahnya jauh lebih luas.</li>
+          <li><strong>Sangat Ringan di Layar HP:</strong> Cocok bagi pengguna yang menyukai tampilan simpel tanpa banyak ornamen.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchHeaderConcept(conceptId) {
+      const concepts = ['current', 'option1', 'option2', 'option3'];
+      concepts.forEach(c => {
+        const view = document.getElementById('view_' + c);
+        const tab = document.getElementById('tab_' + c);
+
+        if (c === conceptId) {
+          view.classList.remove('hidden');
+          tab.className = 'p-3 rounded-2xl border-2 text-left transition cursor-pointer bg-indigo-50 border-indigo-600 text-indigo-950 shadow-xs';
+        } else {
+          view.classList.add('hidden');
+          tab.className = 'p-3 rounded-2xl border-2 text-left transition cursor-pointer bg-white border-slate-200 text-slate-600 hover:bg-slate-50';
+        }
+      });
+    }
+
+    function setPreviewDevice(device) {
+      const wrapper = document.getElementById('previewWrapper');
+      const btnDesk = document.getElementById('btnDeviceDesk');
+      const btnMob = document.getElementById('btnDeviceMob');
+
+      if (device === 'mobile') {
+        wrapper.className = 'view-mobile space-y-6';
+        btnMob.className = 'px-3.5 py-1.5 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-xs transition flex items-center gap-1.5';
+        btnDesk.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+      } else {
+        wrapper.className = 'view-desktop space-y-6';
+        btnDesk.className = 'px-3.5 py-1.5 rounded-xl text-xs font-black bg-indigo-600 text-white shadow-xs transition flex items-center gap-1.5';
+        btnMob.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+      }
+    }
+
+    // Live clock simulator
+    function updateClock() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) clockEl.textContent = `${hrs}:${mins} WIB`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
