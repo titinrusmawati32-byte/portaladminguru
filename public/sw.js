@@ -3,10 +3,11 @@
  * SiGuru SD - Service Worker (Offline-First App Shell & Cache)
  * Memungkinkan aplikasi tetap terbuka dan berjalan lancar saat
  * perangkat guru tidak memiliki koneksi internet (Offline Mode).
+ * Version: v2 (Force update config & 48 SD list)
  * ============================================================
  */
 
-const CACHE_NAME = 'siguru-pwa-v1';
+const CACHE_NAME = 'siguru-pwa-v2';
 
 // Aset inti yang wajib di-cache saat Service Worker dipasang
 const PRECACHE_ASSETS = [
@@ -28,13 +29,14 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Siklus Activate: Bersihkan versi cache usang dan ambil alih klien
+// Siklus Activate: Bersihkan versi cache usang (v1) dan ambil alih klien
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Menghapus cache usang:', key);
             return caches.delete(key);
           }
         })
@@ -86,7 +88,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. Strategi Aset Statis (CSS, JS, Fonts, Gambar, CDN): Stale-While-Revalidate
+  // 3b. Khusus config.js: Network-First agar daftar sekolah & konfigurasi selalu update terkini
+  if (url.pathname.includes('config.js')) {
+    event.respondWith(
+      fetch(req)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cache = await caches.open(CACHE_NAME);
+          const cached = await cache.match(req) || await cache.match('/config.js');
+          if (cached) return cached;
+        })
+    );
+    return;
+  }
+
+  // 4. Strategi Aset Statis Lainnya (CSS, JS, Fonts, Gambar, CDN): Stale-While-Revalidate
   event.respondWith(
     caches.match(req).then((cachedResponse) => {
       const fetchPromise = fetch(req)
