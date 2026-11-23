@@ -928,10 +928,10 @@
       <div class="mt-4 flex flex-col items-center gap-1.5 text-center">
         <button type="button" onclick="openMasterSchoolDirectoryModal()"
           class="text-xs text-brand-700 font-extrabold hover:text-brand-900 hover:underline flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/70 backdrop-blur-md border border-white/80 shadow-xs cursor-pointer">
-          <span>📋</span> <span>Lihat Daftar NPSN & Kode Akses 14 SD Ambulu</span>
+          <span>📋</span> <span>Lihat Daftar NPSN & Kode Akses 48 SD Ambulu</span>
         </button>
         
-        <span class="text-[10px] text-brand-muted">Akses murni guru per lembaga • Terisolasi aman</span>
+        <span class="text-[10px] text-brand-muted">Akses 48 SD Negeri & Swasta • Cukup login 1x untuk pakai selamanya</span>
       </div>
 
     </div>
@@ -1745,7 +1745,7 @@
 
       const school = window.APP_CONFIG.findSchool(npsn, kodeUnik);
       if (!school) {
-        showToast('NPSN atau Kode Unik Sekolah tidak cocok dengan 14 SDN Ambulu.', 'error');
+        showToast('NPSN atau Kode Unik Sekolah tidak cocok dengan 48 SD se-Kecamatan Ambulu.', 'error');
         return;
       }
 
@@ -1961,36 +1961,59 @@
     }
 
     // ==========================================
-    // MODAL DIRECTORY KODE UNIK 14 SD AMBULU
+    // MODAL DIRECTORY KODE UNIK 48 SD AMBULU (NEGERI & SWASTA)
     // ==========================================
+    function renderSchoolDirectoryItems(list) {
+      return list.map(s => `
+        <div class="school-dir-item p-3 rounded-2xl border border-violet-100/70 bg-[#FBFBFE] flex items-center justify-between gap-2"
+             data-search="${(s.nama + ' ' + s.npsn + ' ' + s.desa + ' ' + s.kodeUnik).toLowerCase()}">
+          <div>
+            <h4 class="font-extrabold text-brand-dark text-xs">${s.nama}</h4>
+            <div class="font-mono text-[11px] text-brand-muted">
+              NPSN: <strong class="text-brand-dark">${s.npsn}</strong> • Desa ${s.desa}
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="inline-block px-2.5 py-1 rounded-xl bg-[#EAE7FB] text-brand-700 font-mono font-black text-xs">
+              ${s.kodeUnik}
+            </span>
+            <button onclick="applySchoolCode('${s.npsn}', '${s.kodeUnik}')" class="block mt-1 text-[10px] text-brand-600 font-extrabold hover:underline">
+              Gunakan Ini ➔
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterSchoolDirList(query) {
+      const q = String(query).toLowerCase().trim();
+      const items = document.querySelectorAll('.school-dir-item');
+      items.forEach(el => {
+        const text = el.getAttribute('data-search') || '';
+        if (!q || text.includes(q)) {
+          el.style.display = 'flex';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
     function openMasterSchoolDirectoryModal() {
       const schools = window.APP_CONFIG.MASTER_SEKOLAH_AMBULU || [];
       const content = `
-        <div class="space-y-4 text-xs">
+        <div class="space-y-3.5 text-xs">
           <div class="p-3 bg-violet-50 rounded-2xl border border-violet-100 text-brand-dark leading-relaxed">
-            <strong>Daftar 14 SD Negeri Resmi Kecamatan Ambulu & Kode Unik:</strong><br>
+            <strong>Daftar 48 Satuan Pendidikan (SD Negeri & Swasta) Resmi Kecamatan Ambulu:</strong><br>
             Setiap lembaga memiliki NPSN resmi dan Kode Akses unik rahasia yang mengisolasi database sekolah secara mandiri.
           </div>
 
-          <div class="max-h-72 overflow-y-auto space-y-2 pr-1">
-            ${schools.map(s => `
-              <div class="p-3 rounded-2xl border border-violet-100/70 bg-[#FBFBFE] flex items-center justify-between gap-2">
-                <div>
-                  <h4 class="font-extrabold text-brand-dark text-xs">${s.nama}</h4>
-                  <div class="font-mono text-[11px] text-brand-muted">
-                    NPSN: <strong class="text-brand-dark">${s.npsn}</strong> • Desa ${s.desa}
-                  </div>
-                </div>
-                <div class="text-right">
-                  <span class="inline-block px-2.5 py-1 rounded-xl bg-[#EAE7FB] text-brand-700 font-mono font-black text-xs">
-                    ${s.kodeUnik}
-                  </span>
-                  <button onclick="applySchoolCode('${s.npsn}', '${s.kodeUnik}')" class="block mt-1 text-[10px] text-brand-600 font-extrabold hover:underline">
-                    Gunakan Ini ➔
-                  </button>
-                </div>
-              </div>
-            `).join('')}
+          <div>
+            <input type="text" id="dirSearchSchool" oninput="filterSchoolDirList(this.value)" placeholder="🔍 Cari nama sekolah, desa, atau NPSN..."
+              class="w-full p-2.5 bg-white border border-[#E2DEF7] rounded-xl font-bold text-xs focus:outline-none focus:ring-2 focus:ring-brand-600">
+          </div>
+
+          <div id="schoolDirListContainer" class="max-h-72 overflow-y-auto space-y-2 pr-1">
+            ${renderSchoolDirectoryItems(schools)}
           </div>
 
           <div class="pt-2 flex justify-end">
@@ -2000,7 +2023,7 @@
           </div>
         </div>
       `;
-      openUniversalModal('Daftar NPSN & Kode Akses 14 SD Ambulu', content);
+      openUniversalModal('Daftar NPSN & Kode Akses 48 SD Ambulu', content);
     }
 
     function applySchoolCode(npsn, kode) {
@@ -2544,27 +2567,32 @@
 
     function saveSessionState() {
       if (!currentUser) {
+        localStorage.removeItem('siguru_permanent_session');
         sessionStorage.removeItem('siguru_npsn_session');
         return;
       }
       try {
-        sessionStorage.setItem('siguru_npsn_session', JSON.stringify({
+        const payload = JSON.stringify({
           user: currentUser,
           school: currentSchool,
           activeClassId: activeGuruClassId,
           activeModule: activeModuleKey,
           time: Date.now()
-        }));
+        });
+        localStorage.setItem('siguru_permanent_session', payload);
+        sessionStorage.setItem('siguru_npsn_session', payload);
       } catch (e) {}
     }
 
     function restoreSession() {
       try {
-        const raw = sessionStorage.getItem('siguru_npsn_session');
+        // Cek sesi permanen di localStorage (Opsi A) atau fallback sessionStorage
+        const raw = localStorage.getItem('siguru_permanent_session') || sessionStorage.getItem('siguru_npsn_session');
         if (!raw) return false;
         const s = JSON.parse(raw);
         if (s && s.user && s.school) {
           if (s.user.statusVerifikasi && s.user.statusVerifikasi !== 'Terverifikasi') {
+            localStorage.removeItem('siguru_permanent_session');
             sessionStorage.removeItem('siguru_npsn_session');
             return false;
           }
@@ -2602,6 +2630,7 @@
       currentSchool = null;
       activeGuruClassId = null;
       stopAutoSync();
+      localStorage.removeItem('siguru_permanent_session');
       sessionStorage.removeItem('siguru_npsn_session');
       document.getElementById('mainApp').style.display = 'none';
       document.getElementById('loginScreen').style.display = 'flex';
