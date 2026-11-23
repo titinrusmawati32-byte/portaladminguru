@@ -1302,6 +1302,16 @@
     let currentRole = 'Guru';
     let activeGuruClassId = null;
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     let dbData = {
       pengaturan: {
         namaSekolah: 'SD Negeri di Kecamatan Ambulu',
@@ -3721,14 +3731,7 @@
         case 'guru-nilai':
           titleEl.textContent = 'Input & Olah Nilai Pembelajaran';
           subEl.textContent = 'Formatif, sumatif, ulangan harian, tugas, keterampilan, dan SAS';
-          actionEl.innerHTML = `
-            <button onclick="switchNilaiSubTab('input')" class="bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition">
-              📝 Lembar Input
-            </button>
-            <button onclick="switchNilaiSubTab('history')" class="bg-white hover:bg-violet-50 text-brand-700 border border-violet-200 font-extrabold text-xs px-3.5 py-2 rounded-full cursor-pointer shadow-xs transition">
-              📊 Rekap & Riwayat
-            </button>
-          `;
+          actionEl.innerHTML = '';
           renderModuleGuruNilai(contentEl);
           break;
 
@@ -4777,7 +4780,9 @@
     }
 
     function renderLembarInputNilaiMassal(container, actKls, students) {
-      const mapels = getTeacherMapelList();
+      if (!container) return;
+      try {
+        const mapels = getTeacherMapelList();
       if (!activeMatrixMapel || !mapels.includes(activeMatrixMapel)) {
         activeMatrixMapel = mapels[0] || 'Matematika';
       }
@@ -5024,9 +5029,21 @@
       `;
 
       // Kalkulasi langsung nilai yang terisi awal
-      setTimeout(() => {
-        recalcAllMatrixRows();
-      }, 50);
+        setTimeout(() => {
+          recalcAllMatrixRows();
+        }, 50);
+      } catch (err) {
+        console.error('Error rendering lembar input nilai:', err);
+        container.innerHTML = `
+          <div class="bg-rose-50 border border-rose-200 text-rose-800 p-5 rounded-2xl text-xs space-y-2">
+            <h5 class="font-black text-sm">Gagal Menampilkan Buku Nilai</h5>
+            <p>${err.message}</p>
+            <button onclick="renderLembarInputNilaiMassal(document.getElementById('nilaiSubTabContentArea'), dbData.kelas.find(k => k.id === activeGuruClassId), dbData.siswa.filter(s => s.idKelas === activeGuruClassId))" class="px-3 py-1.5 bg-rose-600 text-white font-bold rounded-lg text-xs">
+              Coba Muat Ulang
+            </button>
+          </div>
+        `;
+      }
     }
 
     function reloadMatrixForMapel(mapel) {
