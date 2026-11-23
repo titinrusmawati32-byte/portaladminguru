@@ -1,7 +1,7 @@
 /**
  * ============================================================
  * SiGuru SD - Platform Administrasi Pendidikan Kecamatan Ambulu
- * Kabupaten Jember, Jawa Timur - Versi 3.3.0-STRICT-ADMIN-MULTI-TENANT
+ * Kabupaten Jember, Jawa Timur - Versi 3.6.0-EXPANDED-48SD-STRICT-MULTI-TENANT
  * Sistem Autentikasi: NPSN + Kode Unik Lembaga & PIN Guru dengan Verifikasi Admin
  * Database Terisolasi Per Lembaga (Sheet DB_[NPSN]_[NamaSekolah])
  * ============================================================
@@ -12,23 +12,57 @@ var DRIVE_FOLDER_NAME = 'SiGuru_SD_Ambulu_Perangkat_Ajar';
 var DEFAULT_ADMIN_PIN = 'admin123';
 
 // ============================================================
-// DAFTAR 14 SD NEGERI RESMI KECAMATAN AMBULU (SESUAI EXCEL)
+// DAFTAR RESMI 48 SATUAN PENDIDIKAN (SD NEGERI & SWASTA) KECAMATAN AMBULU
 // ============================================================
 var OFFICIAL_SCHOOLS_AMBULU = [
-  { npsn: '20524058', kode: 'SMB04-3918', nama: 'SDN Sumberejo 04', desa: 'Sumberejo' },
-  { npsn: '20524059', kode: 'SMB05-2746', nama: 'SDN Sumberejo 05', desa: 'Sumberejo' },
-  { npsn: '20524060', kode: 'SMB07-1683', nama: 'SDN Sumberejo 07', desa: 'Sumberejo' },
-  { npsn: '20524972', kode: 'AMB02-8821', nama: 'SDN Ambulu 02', desa: 'Ambulu' },
-  { npsn: '20524171', kode: 'TGL01-7142', nama: 'SDN Tegalsari 01', desa: 'Tegalsari' },
-  { npsn: '20524146', kode: 'TGL02-6315', nama: 'SDN Tegalsari 02', desa: 'Tegalsari' },
-  { npsn: '20524148', kode: 'TGL03-5294', nama: 'SDN Tegalsari 03', desa: 'Tegalsari' },
-  { npsn: '20524147', kode: 'TGL04-4819', nama: 'SDN Tegalsari 04', desa: 'Tegalsari' },
-  { npsn: '20524958', kode: 'ADG02-9524', nama: 'SDN Andongsari 02', desa: 'Andongsari' },
-  { npsn: '20524962', kode: 'ADG04-8417', nama: 'SDN Andongsari 04', desa: 'Andongsari' },
-  { npsn: '20523264', kode: 'PNT01-7362', nama: 'SDN Pontang 01', desa: 'Pontang' },
-  { npsn: '20524830', kode: 'KRN01-6251', nama: 'SDN Karanganyar 01', desa: 'Karanganyar' },
-  { npsn: '20524821', kode: 'KRN03-5149', nama: 'SDN Karanganyar 03', desa: 'Karanganyar' },
-  { npsn: '20512009', kode: 'SBR01-8312', nama: 'SDN Sabrang 01', desa: 'Sabrang' }
+  { npsn: '70012859', kode: 'DFA-7012', kodeUnik: 'DFA-7012', nama: 'SD Dafa Al-Amien', namaLengkap: 'Satuan Pendidikan SD Dafa Al-Amien', desa: 'Ambulu' },
+  { npsn: '20525027', kode: 'YOS-2502', kodeUnik: 'YOS-2502', nama: 'SD Katolik Yos Sudarso', namaLengkap: 'Satuan Pendidikan SD Katolik Yos Sudarso', desa: 'Ambulu' },
+  { npsn: '20525017', kode: 'SLF-2501', kodeUnik: 'SLF-2501', nama: 'SD Salafiyah Syafiiyah', namaLengkap: 'Satuan Pendidikan SD Salafiyah Syafiiyah', desa: 'Ambulu' },
+  { npsn: '70002409', kode: 'WHD-7002', kodeUnik: 'WHD-7002', nama: 'SD Wahidiyah', namaLengkap: 'Satuan Pendidikan SD Wahidiyah', desa: 'Ambulu' },
+  { npsn: '20524971', kode: 'AMB01-4971', kodeUnik: 'AMB01-4971', nama: 'SDN Ambulu 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 01', desa: 'Ambulu' },
+  { npsn: '20524972', kode: 'AMB02-8821', kodeUnik: 'AMB02-8821', nama: 'SDN Ambulu 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 02', desa: 'Ambulu' },
+  { npsn: '20524975', kode: 'AMB03-4975', kodeUnik: 'AMB03-4975', nama: 'SDN Ambulu 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 03', desa: 'Ambulu' },
+  { npsn: '20524974', kode: 'AMB04-4974', kodeUnik: 'AMB04-4974', nama: 'SDN Ambulu 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Ambulu 04', desa: 'Ambulu' },
+  { npsn: '20524957', kode: 'ADG01-4957', kodeUnik: 'ADG01-4957', nama: 'SDN Andongsari 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 01', desa: 'Andongsari' },
+  { npsn: '20524958', kode: 'ADG02-9524', kodeUnik: 'ADG02-9524', nama: 'SDN Andongsari 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 02', desa: 'Andongsari' },
+  { npsn: '20524959', kode: 'ADG03-4959', kodeUnik: 'ADG03-4959', nama: 'SDN Andongsari 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 03', desa: 'Andongsari' },
+  { npsn: '20524962', kode: 'ADG04-8417', kodeUnik: 'ADG04-8417', nama: 'SDN Andongsari 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 04', desa: 'Andongsari' },
+  { npsn: '20524961', kode: 'ADG05-4961', kodeUnik: 'ADG05-4961', nama: 'SDN Andongsari 05', namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 05', desa: 'Andongsari' },
+  { npsn: '20524963', kode: 'ADG06-4963', kodeUnik: 'ADG06-4963', nama: 'SDN Andongsari 06', namaLengkap: 'UPTD Satuan Pendidikan SDN Andongsari 06', desa: 'Andongsari' },
+  { npsn: '20524830', kode: 'KRN01-6251', kodeUnik: 'KRN01-6251', nama: 'SDN Karanganyar 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 01', desa: 'Karanganyar' },
+  { npsn: '20524831', kode: 'KRN02-4831', kodeUnik: 'KRN02-4831', nama: 'SDN Karanganyar 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 02', desa: 'Karanganyar' },
+  { npsn: '20524821', kode: 'KRN03-5149', kodeUnik: 'KRN03-5149', nama: 'SDN Karanganyar 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 03', desa: 'Karanganyar' },
+  { npsn: '20524832', kode: 'KRN04-4832', kodeUnik: 'KRN04-4832', nama: 'SDN Karanganyar 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 04', desa: 'Karanganyar' },
+  { npsn: '20524833', kode: 'KRN05-4833', kodeUnik: 'KRN05-4833', nama: 'SDN Karanganyar 05', namaLengkap: 'UPTD Satuan Pendidikan SDN Karanganyar 05', desa: 'Karanganyar' },
+  { npsn: '20523264', kode: 'PNT01-7362', kodeUnik: 'PNT01-7362', nama: 'SDN Pontang 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 01', desa: 'Pontang' },
+  { npsn: '20523265', kode: 'PNT02-3265', kodeUnik: 'PNT02-3265', nama: 'SDN Pontang 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 02', desa: 'Pontang' },
+  { npsn: '20523266', kode: 'PNT03-3266', kodeUnik: 'PNT03-3266', nama: 'SDN Pontang 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 03', desa: 'Pontang' },
+  { npsn: '20523267', kode: 'PNT04-3267', kodeUnik: 'PNT04-3267', nama: 'SDN Pontang 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 04', desa: 'Pontang' },
+  { npsn: '20523268', kode: 'PNT05-3268', kodeUnik: 'PNT05-3268', nama: 'SDN Pontang 05', namaLengkap: 'UPTD Satuan Pendidikan SDN Pontang 05', desa: 'Pontang' },
+  { npsn: '20523185', altNpsn: '20512009', kode: 'SBR01-8312', kodeUnik: 'SBR01-8312', nama: 'SDN Sabrang 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 01', desa: 'Sabrang' },
+  { npsn: '20523202', kode: 'SBR02-3202', kodeUnik: 'SBR02-3202', nama: 'SDN Sabrang 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 02', desa: 'Sabrang' },
+  { npsn: '20523201', kode: 'SBR03-3201', kodeUnik: 'SBR03-3201', nama: 'SDN Sabrang 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 03', desa: 'Sabrang' },
+  { npsn: '20523203', kode: 'SBR04-3203', kodeUnik: 'SBR04-3203', nama: 'SDN Sabrang 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 04', desa: 'Sabrang' },
+  { npsn: '20523204', kode: 'SBR05-3204', kodeUnik: 'SBR05-3204', nama: 'SDN Sabrang 05', namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 05', desa: 'Sabrang' },
+  { npsn: '20523205', kode: 'SBR06-3205', kodeUnik: 'SBR06-3205', nama: 'SDN Sabrang 06', namaLengkap: 'UPTD Satuan Pendidikan SDN Sabrang 06', desa: 'Sabrang' },
+  { npsn: '20524062', kode: 'SMB01-4062', kodeUnik: 'SMB01-4062', nama: 'SDN Sumberejo 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 01', desa: 'Sumberejo' },
+  { npsn: '20524071', kode: 'SMB02-4071', kodeUnik: 'SMB02-4071', nama: 'SDN Sumberejo 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 02', desa: 'Sumberejo' },
+  { npsn: '20524061', kode: 'SMB03-4061', kodeUnik: 'SMB03-4061', nama: 'SDN Sumberejo 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 03', desa: 'Sumberejo' },
+  { npsn: '20524058', kode: 'SMB04-3918', kodeUnik: 'SMB04-3918', nama: 'SDN Sumberejo 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 04', desa: 'Sumberejo' },
+  { npsn: '20524059', kode: 'SMB05-2746', kodeUnik: 'SMB05-2746', nama: 'SDN Sumberejo 05', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 05', desa: 'Sumberejo' },
+  { npsn: '20551780', kode: 'SMB06-1780', kodeUnik: 'SMB06-1780', nama: 'SDN Sumberejo 06', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 06', desa: 'Sumberejo' },
+  { npsn: '20524060', kode: 'SMB07-1683', kodeUnik: 'SMB07-1683', nama: 'SDN Sumberejo 07', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 07', desa: 'Sumberejo' },
+  { npsn: '20524063', kode: 'SMB08-4063', kodeUnik: 'SMB08-4063', nama: 'SDN Sumberejo 08', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 08', desa: 'Sumberejo' },
+  { npsn: '20524064', kode: 'SMB09-4064', kodeUnik: 'SMB09-4064', nama: 'SDN Sumberejo 09', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 09', desa: 'Sumberejo' },
+  { npsn: '20524065', kode: 'SMB10-4065', kodeUnik: 'SMB10-4065', nama: 'SDN Sumberejo 10', namaLengkap: 'UPTD Satuan Pendidikan SDN Sumberejo 10', desa: 'Sumberejo' },
+  { npsn: '20524171', kode: 'TGL01-7142', kodeUnik: 'TGL01-7142', nama: 'SDN Tegalsari 01', namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 01', desa: 'Tegalsari' },
+  { npsn: '20524146', kode: 'TGL02-6315', kodeUnik: 'TGL02-6315', nama: 'SDN Tegalsari 02', namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 02', desa: 'Tegalsari' },
+  { npsn: '20524148', kode: 'TGL03-5294', kodeUnik: 'TGL03-5294', nama: 'SDN Tegalsari 03', namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 03', desa: 'Tegalsari' },
+  { npsn: '20524147', kode: 'TGL04-4819', kodeUnik: 'TGL04-4819', nama: 'SDN Tegalsari 04', namaLengkap: 'UPTD Satuan Pendidikan SDN Tegalsari 04', desa: 'Tegalsari' },
+  { npsn: '20525035', kode: 'IBU-2503', kodeUnik: 'IBU-2503', nama: 'SDS Islam Bustanul Ulum', namaLengkap: 'Satuan Pendidikan SDS Islam Bustanul Ulum', desa: 'Ambulu' },
+  { npsn: '20554042', kode: 'ATQ-5404', kodeUnik: 'ATQ-5404', nama: 'SDS Islam Terpadu At Taqwa', namaLengkap: 'Satuan Pendidikan SDS Islam Terpadu At Taqwa', desa: 'Ambulu' },
+  { npsn: '20525014', kode: 'PHL-2501', kodeUnik: 'PHL-2501', nama: 'SDS Kristen Philia', namaLengkap: 'Satuan Pendidikan SDS Kristen Philia', desa: 'Ambulu' },
+  { npsn: '20554179', kode: 'MHD-5417', kodeUnik: 'MHD-5417', nama: 'SDS Muhammadiyah', namaLengkap: 'Satuan Pendidikan SDS Muhammadiyah', desa: 'Ambulu' }
 ];
 
 // ============================================================
@@ -211,6 +245,7 @@ function batchRestoreFullDataBackend(p) {
 function initAllAmbuluSchoolSheets() {
   var ss = getActiveDb();
   setupDatabaseMultiSchool();
+  syncAllOfficialSchoolsToSheet(ss);
 
   var created = [];
   OFFICIAL_SCHOOLS_AMBULU.forEach(function (sch) {
@@ -222,7 +257,7 @@ function initAllAmbuluSchoolSheets() {
     success: true,
     totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
     sheetsCreated: created,
-    message: '14 Database per Lembaga berhasil disiapkan di Google Sheets.'
+    message: OFFICIAL_SCHOOLS_AMBULU.length + ' Database per Lembaga berhasil disiapkan di Google Sheets.'
   };
 }
 
@@ -244,7 +279,8 @@ function doGet(e) {
         result = {
           success: true,
           platform: PLATFORM_TITLE,
-          version: '3.3.0-STRICT-ADMIN-MULTI-TENANT',
+          version: '3.6.0-EXPANDED-48SD-STRICT-MULTI-TENANT',
+          totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
           kecamatan: 'Ambulu',
           kabupaten: 'Jember',
           timestamp: new Date().toISOString()
@@ -265,6 +301,11 @@ function doGet(e) {
 
       case 'getSchools':
         result = getAllSchoolsBackend();
+        break;
+
+      case 'syncSchools':
+      case 'sync48Schools':
+        result = syncAllOfficialSchoolsToSheet(getActiveDb());
         break;
 
       case 'verifySchool':
@@ -343,6 +384,13 @@ function doPost(e) {
       // 1. Verifikasi Sekolah & Autentikasi
       case 'verifySchoolByNpsn':
         result = verifySchoolByNpsnBackend(payload);
+        break;
+
+      case 'syncSchools':
+      case 'sync48Schools':
+        result = withScriptLock('syncSchools', function () {
+          return syncAllOfficialSchoolsToSheet(getActiveDb());
+        });
         break;
 
       case 'registerTeacherWithPin':
@@ -541,8 +589,8 @@ function doPost(e) {
 // ============================================================
 function verifySchoolByNpsnBackend(p) {
   try {
-    var npsn = (p.npsn || '').trim();
-    var kodeUnik = (p.kodeUnik || p.code || '').trim().toUpperCase();
+    var npsn = String(p.npsn || '').trim();
+    var kodeUnik = String(p.kodeUnik || p.code || '').trim().toUpperCase();
 
     if (!npsn || !kodeUnik) {
       return { success: false, message: 'NPSN dan Kode Unik Sekolah wajib diisi.' };
@@ -551,12 +599,14 @@ function verifySchoolByNpsnBackend(p) {
     var matchedSchool = null;
     for (var k = 0; k < OFFICIAL_SCHOOLS_AMBULU.length; k++) {
       var item = OFFICIAL_SCHOOLS_AMBULU[k];
-      if (item.npsn === npsn && item.kode.toUpperCase() === kodeUnik) {
+      var npsnMatch = (String(item.npsn).trim() === npsn) || (item.altNpsn && String(item.altNpsn).trim() === npsn);
+      var codeMatch = (String(item.kode || item.kodeUnik).trim().toUpperCase() === kodeUnik);
+      if (npsnMatch && codeMatch) {
         matchedSchool = {
           id: 'SCH-' + item.npsn,
           nama: item.nama,
           npsn: item.npsn,
-          kodeUnik: item.kode,
+          kodeUnik: item.kode || item.kodeUnik,
           desa: item.desa,
           status: 'Terverifikasi'
         };
@@ -568,7 +618,7 @@ function verifySchoolByNpsnBackend(p) {
     if (!matchedSchool) {
       var ss = getActiveDb();
       var sSheet = ss.getSheetByName('Schools');
-      if (sSheet) {
+      if (sSheet && sSheet.getLastRow() > 1) {
         var sData = sSheet.getDataRange().getValues();
         for (var i = 1; i < sData.length; i++) {
           var rNpsn = String(sData[i][2]).trim();
@@ -594,6 +644,11 @@ function verifySchoolByNpsnBackend(p) {
         message: 'Kombinasi NPSN (' + npsn + ') dan Kode Unik Sekolah tidak cocok dengan data resmi Kecamatan Ambulu.'
       };
     }
+
+    // Auto-sync: pastikan sekolah ini terdaftar di sheet Schools dan database per lembaganya ada
+    var ssDb = getActiveDb();
+    ensureSchoolInSheet(ssDb, matchedSchool);
+    getOrCreateSchoolDbSheet(ssDb, matchedSchool.npsn, matchedSchool.nama);
 
     // Ambil guru yang SUDAH TERVERIFIKASI saja untuk dropdown login
     var ssDb = getActiveDb();
@@ -2337,6 +2392,114 @@ function incrementDataVersion() {
 // ============================================================
 // INISIALISASI MASTER SEKOLAH & STRUKTUR TABEL LENGKAP
 // ============================================================
+
+// ============================================================
+// SINKRONISASI 48 SEKOLAH KE GOOGLE SHEETS 'Schools'
+// ============================================================
+function ensureSchoolInSheet(ss, school) {
+  try {
+    var sSheet = ss.getSheetByName('Schools');
+    if (!sSheet) {
+      setupDatabaseMultiSchool();
+      sSheet = ss.getSheetByName('Schools');
+    }
+    if (!sSheet) return;
+
+    var sData = sSheet.getDataRange().getValues();
+    var exists = false;
+    for (var i = 1; i < sData.length; i++) {
+      if (String(sData[i][2]).trim() === String(school.npsn).trim()) {
+        exists = true;
+        break;
+      }
+    }
+
+    if (!exists) {
+      var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+      sSheet.appendRow([
+        'SCH-' + school.npsn,
+        school.nama,
+        school.npsn,
+        school.kode || school.kodeUnik,
+        'Kecamatan Ambulu, Jember',
+        school.desa,
+        'Ambulu',
+        'Jember',
+        'Kepala Sekolah',
+        '-',
+        'Terverifikasi',
+        now
+      ]);
+    }
+  } catch (e) {}
+}
+
+function syncAllOfficialSchoolsToSheet(ss) {
+  var sSheet = ss.getSheetByName('Schools');
+  if (!sSheet) {
+    setupDatabaseMultiSchool();
+    sSheet = ss.getSheetByName('Schools');
+  }
+  if (!sSheet) return { success: false, message: 'Sheet Schools tidak dapat diakses.' };
+
+  var sData = sSheet.getDataRange().getValues();
+  var existingNpsns = {};
+  for (var i = 1; i < sData.length; i++) {
+    var n = String(sData[i][2]).trim();
+    if (n) existingNpsns[n] = i + 1;
+  }
+
+  var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+  var addedCount = 0;
+  var rowsToAppend = [];
+
+  OFFICIAL_SCHOOLS_AMBULU.forEach(function (sch) {
+    if (!existingNpsns[sch.npsn]) {
+      rowsToAppend.push([
+        'SCH-' + sch.npsn,
+        sch.nama,
+        sch.npsn,
+        sch.kode || sch.kodeUnik,
+        'Kecamatan Ambulu, Jember',
+        sch.desa,
+        'Ambulu',
+        'Jember',
+        'Kepala Sekolah',
+        '-',
+        'Terverifikasi',
+        now
+      ]);
+      addedCount++;
+    }
+  });
+
+  if (rowsToAppend.length > 0) {
+    var startRow = sSheet.getLastRow() + 1;
+    sSheet.getRange(startRow, 1, rowsToAppend.length, rowsToAppend[0].length).setValues(rowsToAppend);
+  }
+
+  SpreadsheetApp.flush();
+  return {
+    success: true,
+    totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
+    addedSchools: addedCount,
+    message: 'Sinkronisasi 48 Lembaga selesai. ' + addedCount + ' sekolah baru ditambahkan ke sheet Schools.'
+  };
+}
+
+function getAllSchoolsBackend() {
+  var ss = getActiveDb();
+  try {
+    syncAllOfficialSchoolsToSheet(ss);
+  } catch (e) {}
+
+  return {
+    success: true,
+    totalSchools: OFFICIAL_SCHOOLS_AMBULU.length,
+    schools: OFFICIAL_SCHOOLS_AMBULU
+  };
+}
+
 function setupDatabaseMultiSchool() {
   var ss = getActiveDb();
   var sheetsDef = [
@@ -2376,29 +2539,8 @@ function setupDatabaseMultiSchool() {
     }
   });
 
-  // Isi ke-14 SD Negeri Resmi Kecamatan Ambulu
-  var sSheet = ss.getSheetByName('Schools');
-  var now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
-
-  if (sSheet && sSheet.getLastRow() <= 1) {
-    var rows = OFFICIAL_SCHOOLS_AMBULU.map(function (s) {
-      return [
-        'SCH-' + s.npsn,
-        s.nama,
-        s.npsn,
-        s.kode,
-        'Kecamatan Ambulu, Jember',
-        s.desa,
-        'Ambulu',
-        'Jember',
-        'Kepala Sekolah',
-        '-',
-        'Terverifikasi',
-        now
-      ];
-    });
-    sSheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
-  }
+  // Sinkronkan seluruh 48 SD (Negeri & Swasta) Resmi Kecamatan Ambulu
+  syncAllOfficialSchoolsToSheet(ss);
 
   SpreadsheetApp.flush();
   return { success: true, message: 'Database SiGuru SD Ambulu multi-school siap digunakan.' };
