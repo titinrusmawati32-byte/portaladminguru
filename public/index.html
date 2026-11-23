@@ -426,11 +426,18 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Mencegah tabel horizontal mengunci scroll vertikal di HP */
-    .overflow-x-auto,
+    /* Mencegah tabel horizontal mengunci scroll vertikal di HP, Laptop, dan Tablet */
+    .overflow-x-auto {
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch !important;
+      touch-action: pan-y pan-x;
+      overscroll-behavior-x: contain;
+      overscroll-behavior-y: auto !important;
+    }
     .overflow-y-auto {
       -webkit-overflow-scrolling: touch !important;
-      touch-action: pan-x pan-y;
+      touch-action: pan-y;
       overscroll-behavior: contain;
     }
 
@@ -488,10 +495,17 @@
       }
 
       /* Momentum scrolling licin untuk semua tabel & daftar */
-      .overflow-x-auto,
+      .overflow-x-auto {
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch !important;
+        touch-action: pan-y pan-x !important;
+        overscroll-behavior-x: contain !important;
+        overscroll-behavior-y: auto !important;
+      }
       .overflow-y-auto {
         -webkit-overflow-scrolling: touch !important;
-        touch-action: pan-x pan-y !important;
+        touch-action: pan-y !important;
         overscroll-behavior: contain !important;
       }
     }
@@ -3964,7 +3978,7 @@
               class="px-3.5 py-1.5 rounded-full bg-[#F0EEF9] text-xs font-medium focus:outline-none focus:bg-white border border-violet-100">
           </div>
 
-          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; transform: translateZ(0);">
+          <div class="overflow-x-auto" style="-webkit-overflow-scrolling: touch; touch-action: pan-y pan-x; overscroll-behavior-x: contain; overscroll-behavior-y: auto !important;">
             <table class="w-full text-left text-xs" id="tableGuruSiswa">
               <thead>
                 <tr class="border-b border-violet-50 text-brand-muted font-bold text-[11px]">
@@ -8364,6 +8378,17 @@
       window.addEventListener('popstate', () => {
         closeUniversalModal();
       });
+
+      // PASSTHROUGH SCROLL MOUSE WHEEL & TOUCHPAD DI DALAM TABEL (LAPTOP, DESKTOP & TABLET)
+      // Menjamin saat kursor berada di atas tabel horizontal, scroll vertikal tetap menggulir halaman
+      window.addEventListener('wheel', (e) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && Math.abs(e.deltaY) > 0) {
+          const tableWrapper = e.target ? e.target.closest('.overflow-x-auto') : null;
+          if (tableWrapper) {
+            window.scrollBy(0, e.deltaY);
+          }
+        }
+      }, { passive: true });
     });
   </script>
 </body>
