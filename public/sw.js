@@ -3,11 +3,11 @@
  * SiGuru SD - Service Worker (Speed Wush & Turbo Cache Engine)
  * Memungkinkan aplikasi terbuka instan (<0.1s) dan berjalan lancar saat
  * perangkat guru tidak memiliki koneksi internet (Offline Mode).
- * Version: v4.2-mobile-focus-dual
+ * Version: v4.3-matrix-unfreeze-smooth
  * ============================================================
  */
 
-const CACHE_NAME = 'siguru-pwa-v4.2-mobile-focus-dual';
+const CACHE_NAME = 'siguru-pwa-v4.3-matrix-unfreeze-smooth';
 
 // Aset inti yang wajib di-cache saat Service Worker dipasang
 const PRECACHE_ASSETS = [

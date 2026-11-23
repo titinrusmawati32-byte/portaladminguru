@@ -622,43 +622,8 @@
     }
 
     /* ============================================================
-       LANDSCAPE MATRIX STICKY COLUMNS & HEADERS (HP, TABLET, DESKTOP)
+       LANDSCAPE MATRIX STYLES (NATURAL FLUID SCROLL, NO FREEZE LOCK)
        ============================================================ */
-    .mob-sticky-col-no {
-      position: sticky;
-      left: 0;
-      z-index: 20;
-      background-color: #FFFFFF;
-      box-shadow: 2px 0 6px rgba(0,0,0,0.04);
-    }
-    .mob-sticky-col-name {
-      position: sticky;
-      left: 36px;
-      z-index: 20;
-      background-color: #FFFFFF;
-      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
-    }
-    .mob-sticky-header th {
-      position: sticky;
-      top: 0;
-      z-index: 25;
-      background-color: #F8F7FD;
-    }
-    .mob-sticky-corner-no {
-      position: sticky;
-      left: 0;
-      top: 0;
-      z-index: 35 !important;
-      background-color: #EDE9FE !important;
-    }
-    .mob-sticky-corner-name {
-      position: sticky;
-      left: 36px;
-      top: 0;
-      z-index: 35 !important;
-      background-color: #EDE9FE !important;
-      box-shadow: 4px 0 8px rgba(0,0,0,0.06);
-    }
     .matrix-input-cell {
       transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -5073,12 +5038,12 @@
 
         <!-- TABEL LANDSCAPE MATRIX -->
         <div class="bg-white rounded-[26px] p-3 sm:p-5 border border-violet-100/70 shadow-xs space-y-3">
-          <div class="overflow-x-auto overflow-y-auto max-h-[62vh] border border-violet-100/90 rounded-2xl relative bg-white shadow-2xs" id="matrixTableContainer">
+          <div class="overflow-x-auto border border-violet-100/90 rounded-2xl relative bg-white shadow-2xs w-full" id="matrixTableContainer" style="-webkit-overflow-scrolling: touch; touch-action: pan-y pan-x; overscroll-behavior-x: contain; overscroll-behavior-y: auto !important;">
             <table class="w-full text-left border-collapse text-xs whitespace-nowrap" id="tableMassInputNilai">
               <thead>
-                <tr class="mob-sticky-header text-center font-black uppercase text-[10px] border-b border-violet-100 bg-[#F5F3FF]">
-                  <th class="mob-sticky-corner-no py-2.5 px-1.5 w-10 sm:w-12 border-r border-violet-100 text-slate-600">No</th>
-                  <th class="mob-sticky-corner-name py-2.5 px-3 w-40 sm:w-52 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
+                <tr class="text-center font-black uppercase text-[10px] border-b border-violet-100 bg-[#F5F3FF]">
+                  <th class="py-2.5 px-2 w-10 sm:w-12 border-r border-violet-100 text-slate-600">No</th>
+                  <th class="py-2.5 px-3 w-40 sm:w-52 text-left border-r border-violet-200 text-slate-800">Nama Siswa</th>
 
                   ${MATRIX_COLUMNS.map((col, cIdx) => `
                     <th class="col_${col.key} ${matrixActiveCols[col.key] ? '' : 'hidden'} py-2 px-2 text-center border-r font-extrabold text-[11px] min-w-[70px] sm:min-w-[80px]"
@@ -5101,11 +5066,11 @@
                 ${students.map((s, idx) => {
                   return `
                     <tr class="hover:bg-violet-50/60 transition-colors" data-row-student-id="${s.id}">
-                      <td class="mob-sticky-col-no py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[11px]">
+                      <td class="py-2 px-1 text-center font-bold text-slate-400 border-r border-violet-50 text-[11px]">
                         ${idx + 1}
                       </td>
 
-                      <td class="mob-sticky-col-name py-2 px-2.5 border-r border-violet-100">
+                      <td class="py-2 px-2.5 border-r border-violet-100">
                         <div class="font-extrabold text-brand-dark text-xs truncate max-w-[140px] sm:max-w-[190px]" title="${escapeHtml(s.nama)}">
                           ${escapeHtml(s.nama)}
                         </div>
