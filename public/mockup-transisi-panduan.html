@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup 4 Efek Transisi Pop-Up Ultra-Keren - SiGuru SD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#F5F3FF',
+              100: '#EDE9FE',
+              200: '#DDD6FE',
+              300: '#C4B5FD',
+              400: '#A78BFA',
+              500: '#8B5CF6',
+              600: '#6C5CE7',
+              700: '#5843E0',
+              800: '#4734B8',
+              900: '#382894',
+              dark: '#2D3436'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* ============================================================
+       4 PILIHAN EFEK TRANSISI ULTRA-KEREN & SPEKTAKULER
+       ============================================================ */
+
+    /* ------------------------------------------------------------
+       OPSI 1: 3D HOLOGRAPHIC PERSPECTIVE TILT + NEON AURORA GLOW
+       ------------------------------------------------------------ */
+    @keyframes holo3DIn {
+      0% {
+        opacity: 0;
+        transform: perspective(1400px) rotateX(32deg) rotateY(-8deg) scale(0.68) translateY(110px) translateZ(-140px);
+        filter: blur(14px) brightness(1.7);
+      }
+      65% {
+        opacity: 1;
+        transform: perspective(1400px) rotateX(-5deg) rotateY(1.5deg) scale(1.03) translateY(-10px) translateZ(25px);
+        filter: blur(0px) brightness(1.1);
+      }
+      85% {
+        transform: perspective(1400px) rotateX(2deg) rotateY(-0.5deg) scale(0.99) translateY(2px) translateZ(5px);
+      }
+      100% {
+        opacity: 1;
+        transform: perspective(1400px) rotateX(0deg) rotateY(0deg) scale(1) translateY(0) translateZ(0);
+        filter: blur(0px) brightness(1);
+      }
+    }
+
+    /* ------------------------------------------------------------
+       OPSI 2: CYBER QUANTUM WARP & SINGULARITY BURST
+       ------------------------------------------------------------ */
+    @keyframes cyberQuantumIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.12) rotate(-22deg);
+        filter: blur(24px) contrast(200%) brightness(2.2);
+        box-shadow: 0 0 120px #06b6d4, 0 0 160px #8b5cf6;
+      }
+      45% {
+        opacity: 0.95;
+        filter: blur(2px) contrast(130%) brightness(1.2);
+      }
+      75% {
+        transform: scale(1.05) rotate(2deg);
+        filter: blur(0px) contrast(100%) brightness(1);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+        filter: blur(0px) brightness(1);
+        box-shadow: 0 25px 60px -15px rgba(6, 182, 212, 0.45), 0 0 35px rgba(139, 92, 246, 0.3);
+      }
+    }
+
+    /* ------------------------------------------------------------
+       OPSI 3: DYNAMIC LIQUID ISLAND (APPLE FLUID MORPH)
+       ------------------------------------------------------------ */
+    @keyframes dynamicLiquidIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.35, 0.15) translateY(90px);
+        border-radius: 9999px;
+        filter: blur(8px);
+      }
+      40% {
+        opacity: 1;
+        transform: scale(0.88, 1.18) translateY(-16px);
+        border-radius: 56px;
+        filter: blur(0px);
+      }
+      68% {
+        transform: scale(1.05, 0.95) translateY(6px);
+        border-radius: 36px;
+      }
+      84% {
+        transform: scale(0.98, 1.02) translateY(-2px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1, 1) translateY(0);
+        border-radius: 32px;
+      }
+    }
+
+    /* ------------------------------------------------------------
+       OPSI 4: 3D ORIGAMI UNFOLD & SCANNER LIGHT BAR
+       ------------------------------------------------------------ */
+    @keyframes origamiUnfoldIn {
+      0% {
+        opacity: 0;
+        transform-origin: 50% 0%;
+        transform: perspective(1400px) rotateX(-85deg) scale(0.72);
+        filter: blur(12px) brightness(1.6);
+      }
+      60% {
+        opacity: 1;
+        transform-origin: 50% 0%;
+        transform: perspective(1400px) rotateX(18deg) scale(1.03);
+        filter: blur(0px);
+      }
+      82% {
+        transform-origin: 50% 0%;
+        transform: perspective(1400px) rotateX(-6deg) scale(0.99);
+      }
+      100% {
+        opacity: 1;
+        transform-origin: 50% 0%;
+        transform: perspective(1400px) rotateX(0deg) scale(1);
+        filter: blur(0px) brightness(1);
+      }
+    }
+
+    /* ------------------------------------------------------------
+       AURORA NEON BORDER ANIMATION (RGB PULSE)
+       ------------------------------------------------------------ */
+    .neon-aurora-active {
+      position: relative;
+    }
+    .neon-aurora-active::before {
+      content: '';
+      position: absolute;
+      inset: -3.5px;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #8b5cf6, #06b6d4, #10b981, #ec4899, #8b5cf6);
+      background-size: 300% 300%;
+      animation: auroraGlowShift 4s linear infinite;
+      z-index: -1;
+      filter: blur(10px);
+      opacity: 0.9;
+    }
+    @keyframes auroraGlowShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* KILATAN CAHAYA DI HEADER (LASER SHIMMER) */
+    .laser-shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    .laser-shimmer::after {
+      content: '';
+      position: absolute;
+      top: -60%;
+      left: -150%;
+      width: 60%;
+      height: 220%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transform: rotate(25deg);
+      animation: shimmerSweep 3.2s infinite 0.6s;
+    }
+    @keyframes shimmerSweep {
+      0% { left: -150%; }
+      30% { left: 180%; }
+      100% { left: 180%; }
+    }
+
+    /* CARD STAGGER ENTRANCE */
+    @keyframes cardFloatIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+      }
+      70% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.01);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .stagger-1 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards; opacity: 0; }
+    .stagger-2 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.22s forwards; opacity: 0; }
+    .stagger-3 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s forwards; opacity: 0; }
+    .stagger-4 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards; opacity: 0; }
+
+    /* CLASS PENERAPAN ANIMASI */
+    .anim-holo-3d {
+      animation: holo3DIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .anim-cyber-quantum {
+      animation: cyberQuantumIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.25) forwards;
+    }
+    .anim-dynamic-liquid {
+      animation: dynamicLiquidIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .anim-origami-3d {
+      animation: origamiUnfoldIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .lavender-gradient {
+      background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 100%);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 font-sans">
+
+  <!-- ============================================================
+       TOP CONTROL PANEL: PILIH 4 EFEK TRANSISI & SIMULASI LAYAR
+       ============================================================ -->
+  <header class="max-w-6xl mx-auto mb-6 p-4 sm:p-5 rounded-3xl bg-slate-900/95 border border-purple-500/30 backdrop-blur-xl shadow-2xl shadow-purple-950/40">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+            UI/UX Studio Eksplorasi
+          </span>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            Responsif Mobile + Desktop
+          </span>
+        </div>
+        <h1 class="text-lg sm:text-xl font-black text-white font-outfit mt-1.5 flex items-center gap-2">
+          <span>✨</span> <span>Pilihan Transisi Pop-Up Panduan Keren</span>
+        </h1>
+        <p class="text-xs text-slate-400 mt-0.5">
+          Klik salah satu efek di bawah untuk melihat animasi langsung di HP dan Laptop secara bersamaan.
+        </p>
+      </div>
+
+      <!-- Action Replay & Kecepatan -->
+      <div class="flex items-center gap-2">
+        <button onclick="replayAnimation()" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/30 active:scale-95 transition">
+          <span class="text-base">▶️</span> <span>Putar Ulang Efek</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- SELECTOR 4 EFEK TRANSISI KEREN -->
+    <div class="mt-4 pt-4 border-t border-white/10">
+      <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <span>⚡</span> <span>PILIH EFEK ANIMASI (KLIK UNTUK MENCOBA):</span>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs font-bold">
+        
+        <!-- OPSI 1: 3D HOLOGRAPHIC (DEFAULT) -->
+        <button onclick="setTransitionEffect('holo-3d')" id="btnEffect1" class="p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left transition cursor-pointer hover:bg-purple-600/40 relative overflow-hidden shadow-lg shadow-purple-600/20">
+          <div class="flex items-center justify-between">
+            <span class="text-base">🔮</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-500 text-white font-black">Rekomendasi</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1.5">1. 3D Hologram Tilt</div>
+          <p class="text-[10px] text-purple-300/80 font-normal mt-0.5">Sudut 3D miring dramatis + Border neon aurora menyala pelangi.</p>
+        </button>
+
+        <!-- OPSI 2: CYBER QUANTUM WARP -->
+        <button onclick="setTransitionEffect('cyber-quantum')" id="btnEffect2" class="p-3 rounded-2xl bg-slate-800/80 border border-white/10 text-slate-300 text-left transition cursor-pointer hover:border-cyan-400 hover:bg-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="text-base">⚡</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 font-bold">Futuristik</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1.5">2. Cyber Quantum Warp</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Meluncur dari titik sinar singularitas dengan putaran sci-fi kilat.</p>
+        </button>
+
+        <!-- OPSI 3: DYNAMIC LIQUID ISLAND -->
+        <button onclick="setTransitionEffect('dynamic-liquid')" id="btnEffect3" class="p-3 rounded-2xl bg-slate-800/80 border border-white/10 text-slate-300 text-left transition cursor-pointer hover:border-emerald-400 hover:bg-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="text-base">🌊</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold">Apple iOS 18</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1.5">3. Dynamic Liquid Island</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Mekar kenyal seperti cairan kapsul mengembang elastis halus.</p>
+        </button>
+
+        <!-- OPSI 4: 3D ORIGAMI UNFOLD -->
+        <button onclick="setTransitionEffect('origami-3d')" id="btnEffect4" class="p-3 rounded-2xl bg-slate-800/80 border border-white/10 text-slate-300 text-left transition cursor-pointer hover:border-amber-400 hover:bg-slate-800">
+          <div class="flex items-center justify-between">
+            <span class="text-base">🎬</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-bold">Bioskop Lipat</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1.5">4. 3D Origami Unfold</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Membuka lipatan dari engsel atas seperti panel layar akrilik proyektor.</p>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- FILTER TAMPILAN VIEW -->
+    <div class="mt-3 flex items-center justify-between flex-wrap gap-2 pt-3 border-t border-white/5">
+      <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Efek Aktif: <b id="activeEffectLabel" class="text-purple-300 font-bold">Opsi 1: 3D Holographic Perspective Tilt</b></span>
+      </div>
+      <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-white/10 text-xs font-bold">
+        <button onclick="switchView('side-by-side')" id="btnViewSide" class="px-3 py-1 rounded-lg bg-brand-600 text-white cursor-pointer">
+          📱💻 Berdampingan
+        </button>
+        <button onclick="switchView('mobile-focus')" id="btnViewMobile" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer">
+          📱 Fokus HP
+        </button>
+        <button onclick="switchView('laptop-focus')" id="btnViewLaptop" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer">
+          💻 Fokus Laptop
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       CONTAINER UTAMA: SIMULATOR DUA PERANGKAT
+       ============================================================ -->
+  <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" id="mainContainer">
+
+    <!-- ============================================================
+         KOLOM 1: SIMULATOR TAMPILAN HP (MOBILE OPTIMIZED GRID)
+         Ukuran font 13-14px, icon 48px, thumb button 48px, terbaca jelas
+         ============================================================ -->
+    <div class="lg:col-span-5 flex flex-col items-center" id="mobileCol">
+      <div class="mb-2 text-center">
+        <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
+          <span>📱</span> <span>Layar HP (Teks Jelas & Mudah Dibaca)</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Font 13-14px tegas, kartu horizontal rapi, tombol jempol nyaman</p>
+      </div>
+
+      <!-- Frame Device HP -->
+      <div class="w-full max-w-[390px] h-[730px] rounded-[46px] bg-slate-950 border-[6px] border-slate-700 shadow-2xl p-3 relative flex flex-col justify-between overflow-hidden">
+        
+        <!-- Notch / Dynamic Island -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-4 rounded-full bg-slate-800 z-50"></div>
+
+        <!-- Layar Dalam HP -->
+        <div class="w-full h-full rounded-[36px] bg-[#DFDAF7] relative flex flex-col justify-center items-center p-3 text-slate-800 overflow-hidden">
+          
+          <!-- Background Login SiGuru SD Samar di Belakang -->
+          <div class="absolute inset-0 p-4 pt-12 text-center opacity-25 select-none pointer-events-none">
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-brand-600 text-white flex items-center justify-center text-xl font-black mb-2">S</div>
+            <h3 class="text-sm font-black text-slate-800">SiGuru SD Ambulu</h3>
+            <div class="mt-4 p-3 bg-white rounded-2xl shadow-xs space-y-2.5">
+              <div class="h-9 bg-slate-200 rounded-xl"></div>
+              <div class="h-9 bg-slate-200 rounded-xl"></div>
+              <div class="h-9 bg-brand-600 rounded-xl"></div>
+            </div>
+          </div>
+
+          <!-- POP-UP OVERLAY HP -->
+          <div id="mobileModalOverlay" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md flex flex-col justify-center items-center z-40 p-3">
+            
+            <!-- MODAL CARD HP DENGAN EFEK AKTIF & NEON BORDER -->
+            <div id="mobileModalBox" class="bg-white w-full rounded-[28px] shadow-2xl border border-white/80 overflow-hidden flex flex-col max-h-[92%] anim-holo-3d neon-aurora-active">
+              
+              <!-- HEADER MODAL HP: LASER SHIMMER SWEEP -->
+              <div class="p-4 pt-3.5 border-b border-slate-100 flex items-start justify-between gap-2 bg-gradient-to-r from-purple-50/90 via-white to-indigo-50/90 laser-shimmer">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-2xl lavender-gradient text-white flex items-center justify-center text-xl shadow-md shadow-brand-500/25 shrink-0">
+                    💡
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        Panduan Guru
+                      </span>
+                    </div>
+                    <h3 class="font-black text-sm text-slate-900 font-outfit mt-0.5 leading-tight">
+                      Panduan Pakai SiGuru SD
+                    </h3>
+                  </div>
+                </div>
+                <button class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold shrink-0">✕</button>
+              </div>
+
+              <!-- BODY MODAL HP: KARTU HORIZONTAL DENGAN FONT JELAS (13-14px) -->
+              <div class="p-3 space-y-2.5 overflow-y-auto custom-scrollbar flex-1">
+                
+                <!-- KARTU 1: DAFTAR AKUN -->
+                <div class="p-3 rounded-2xl bg-white border border-slate-200/90 hover:border-brand-500 shadow-xs flex items-center gap-3 cursor-pointer active:scale-98 transition stagger-1">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                    📝
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="font-black text-[13px] text-slate-900 truncate">Daftar Akun Guru Baru</span>
+                      <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-purple-100 text-purple-700 shrink-0">2 Menit</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 line-clamp-1 mt-0.5 font-medium">Isi NPSN, WhatsApp & buat PIN pribadi</p>
+                    <span class="text-[10px] text-brand-600 font-extrabold mt-0.5 inline-block">Buka Langkah ➔</span>
+                  </div>
+                </div>
+
+                <!-- KARTU 2: INPUT NILAI DI HP (HIGHLIGHT HIJAU) -->
+                <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-300 shadow-xs flex items-center gap-3 cursor-pointer active:scale-98 transition stagger-2">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                    📱
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="font-black text-[13px] text-emerald-950 truncate">Input Nilai di HP Cepat</span>
+                      <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-800 shrink-0">Populer</span>
+                    </div>
+                    <p class="text-[11px] text-emerald-800 line-clamp-1 mt-0.5 font-medium">Mode landscape luas tanpa scroll berlebih</p>
+                    <span class="text-[10px] text-emerald-700 font-extrabold mt-0.5 inline-block">Buka Langkah ➔</span>
+                  </div>
+                </div>
+
+                <!-- KARTU 3: LUPA PIN -->
+                <div class="p-3 rounded-2xl bg-white border border-slate-200/90 hover:border-amber-500 shadow-xs flex items-center gap-3 cursor-pointer active:scale-98 transition stagger-3">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                    🔑
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="font-black text-[13px] text-slate-900 truncate">Lupa PIN / Reset Akun</span>
+                      <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 shrink-0">1 Menit</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 line-clamp-1 mt-0.5 font-medium">Reset PIN kilat langsung via Koorwil</p>
+                    <span class="text-[10px] text-amber-600 font-extrabold mt-0.5 inline-block">Buka Langkah ➔</span>
+                  </div>
+                </div>
+
+                <!-- KARTU 4: UNDUH PERANGKAT AJAR -->
+                <div class="p-3 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-500 shadow-xs flex items-center gap-3 cursor-pointer active:scale-98 transition stagger-4">
+                  <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                    📁
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="font-black text-[13px] text-slate-900 truncate">Unduh Perangkat Ajar</span>
+                      <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 shrink-0">Drive</span>
+                    </div>
+                    <p class="text-[11px] text-slate-600 line-clamp-1 mt-0.5 font-medium">Modul Ajar, Prota, Prosem lengkap SD</p>
+                    <span class="text-[10px] text-blue-600 font-extrabold mt-0.5 inline-block">Buka Langkah ➔</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- FOOTER TOMBOL HP: JUMBO TOUCH TARGET (48px) -->
+              <div class="p-3 border-t border-slate-100 bg-slate-50 flex items-center gap-2">
+                <button class="px-3.5 py-3 rounded-xl border border-slate-300 font-bold text-xs text-slate-700 bg-white shrink-0 active:scale-95 transition">
+                  ✕ Exit
+                </button>
+                <button class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 active:scale-95 transition text-center">
+                  ✓ Saya Paham, Lanjut Masuk ➔
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Bottom Bar HP -->
+          <div class="w-32 h-1 rounded-full bg-slate-400 mx-auto my-1 z-50"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         KOLOM 2: SIMULATOR TAMPILAN LAPTOP (GRID 2x2 LAPANG)
+         Banner visual tinggi, grid 2 kolom mewah, ruang lega
+         ============================================================ -->
+    <div class="lg:col-span-7 flex flex-col items-center" id="laptopCol">
+      <div class="mb-2 text-center">
+        <div class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-300 bg-cyan-400/10 px-3 py-1 rounded-full border border-cyan-400/20">
+          <span>💻</span> <span>Layar Laptop (Grid 2 Kolom Luas & Lapang)</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1">Struktur 2x2 cards dengan efek 3D tilt yang megah di layar lebar</p>
+      </div>
+
+      <!-- Frame Device Laptop -->
+      <div class="w-full h-[730px] rounded-[36px] bg-slate-950 border-[6px] border-slate-700 shadow-2xl p-4 relative flex flex-col justify-between overflow-hidden">
+        
+        <!-- Layar Dalam Laptop -->
+        <div class="w-full h-full rounded-[24px] bg-[#DFDAF7] relative flex flex-col justify-center items-center p-6 text-slate-800 overflow-hidden">
+          
+          <!-- Background Login Laptop Samar -->
+          <div class="absolute inset-0 p-8 pt-16 flex flex-col items-center opacity-25 select-none pointer-events-none">
+            <div class="w-14 h-14 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-2xl font-black mb-3">S</div>
+            <h2 class="text-xl font-black text-slate-900">Portal Administrasi Guru SD</h2>
+            <div class="mt-6 w-96 p-5 bg-white rounded-3xl shadow-sm space-y-3">
+              <div class="h-10 bg-slate-200 rounded-xl"></div>
+              <div class="h-10 bg-slate-200 rounded-xl"></div>
+              <div class="h-10 bg-brand-600 rounded-xl"></div>
+            </div>
+          </div>
+
+          <!-- POP-UP OVERLAY LAPTOP -->
+          <div id="laptopModalBox" class="w-full max-w-xl bg-white rounded-[32px] shadow-2xl border border-white/90 overflow-hidden flex flex-col max-h-[92vh] anim-holo-3d neon-aurora-active z-30">
+            
+            <!-- HEADER LAPTOP: LASER SHIMMER SWEEP -->
+            <div class="p-5 pb-3.5 border-b border-slate-100 bg-gradient-to-r from-purple-50/80 via-white to-indigo-50/80 flex items-start justify-between gap-3 laser-shimmer">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl lavender-gradient text-white flex items-center justify-center text-2xl shadow-lg shadow-brand-500/25 shrink-0">
+                  💡
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      Panduan Singkat
+                    </span>
+                    <span class="text-[11px] text-slate-400 font-bold">• Wajib Dibaca Guru Baru</span>
+                  </div>
+                  <h3 class="font-black text-base text-slate-900 font-outfit mt-0.5">
+                    Selamat Datang di Portal SiGuru SD!
+                  </h3>
+                  <p class="text-xs text-slate-500">Pelajari 4 panduan penting di bawah sebelum mulai menggunakan aplikasi.</p>
+                </div>
+              </div>
+              <button class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-sm font-black transition cursor-pointer">✕</button>
+            </div>
+
+            <!-- BODY LAPTOP: GRID 2x2 CARD DECK -->
+            <div class="p-5 overflow-y-auto custom-scrollbar space-y-3.5 max-h-[390px]">
+              <div class="grid grid-cols-2 gap-3.5">
+                
+                <!-- CARD 1 -->
+                <div class="group bg-white rounded-2xl border border-slate-200/90 hover:border-brand-500 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between stagger-1">
+                  <div class="h-20 bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 flex flex-col justify-between text-white relative">
+                    <div class="flex justify-between items-center text-[9px] font-bold">
+                      <span class="bg-white/20 px-1.5 py-0.5 rounded">Langkah 1</span>
+                      <span class="bg-black/30 px-1.5 py-0.5 rounded">⏱️ 2 Menit</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-black text-xs">
+                      <span>📝</span> <span>Daftar Akun Guru Baru</span>
+                    </div>
+                  </div>
+                  <div class="p-2.5 text-[11px] text-slate-500">
+                    <p class="line-clamp-2">Ketik NPSN, WhatsApp & buat PIN hingga disetujui Koorwil.</p>
+                    <span class="text-brand-600 font-black text-[10px] mt-1.5 block">Buka Panduan ➔</span>
+                  </div>
+                </div>
+
+                <!-- CARD 2 -->
+                <div class="group bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between stagger-2">
+                  <div class="h-20 bg-gradient-to-br from-emerald-500 to-teal-600 p-2.5 flex flex-col justify-between text-white relative">
+                    <div class="flex justify-between items-center text-[9px] font-bold">
+                      <span class="bg-white/20 px-1.5 py-0.5 rounded">Populer</span>
+                      <span class="bg-black/30 px-1.5 py-0.5 rounded">⏱️ 3 Menit</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-black text-xs">
+                      <span>📱</span> <span>Input Nilai di HP Cepat</span>
+                    </div>
+                  </div>
+                  <div class="p-2.5 text-[11px] text-slate-500">
+                    <p class="line-clamp-2">Gunakan mode landscape luas & kartu per siswa tanpa scroll.</p>
+                    <span class="text-emerald-600 font-black text-[10px] mt-1.5 block">Buka Panduan ➔</span>
+                  </div>
+                </div>
+
+                <!-- CARD 3 -->
+                <div class="group bg-white rounded-2xl border border-slate-200/90 hover:border-amber-500 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between stagger-3">
+                  <div class="h-20 bg-gradient-to-br from-amber-500 to-orange-600 p-2.5 flex flex-col justify-between text-white relative">
+                    <div class="flex justify-between items-center text-[9px] font-bold">
+                      <span class="bg-white/20 px-1.5 py-0.5 rounded">Keamanan</span>
+                      <span class="bg-black/30 px-1.5 py-0.5 rounded">⏱️ 1 Menit</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-black text-xs">
+                      <span>🔑</span> <span>Lupa PIN / Reset Akun</span>
+                    </div>
+                  </div>
+                  <div class="p-2.5 text-[11px] text-slate-500">
+                    <p class="line-clamp-2">Solusi jika gagal masuk & reset PIN kilat oleh Admin.</p>
+                    <span class="text-amber-600 font-black text-[10px] mt-1.5 block">Buka Panduan ➔</span>
+                  </div>
+                </div>
+
+                <!-- CARD 4 -->
+                <div class="group bg-white rounded-2xl border border-slate-200/90 hover:border-blue-500 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer overflow-hidden flex flex-col justify-between stagger-4">
+                  <div class="h-20 bg-gradient-to-br from-cyan-500 to-blue-600 p-2.5 flex flex-col justify-between text-white relative">
+                    <div class="flex justify-between items-center text-[9px] font-bold">
+                      <span class="bg-white/20 px-1.5 py-0.5 rounded">Drive</span>
+                      <span class="bg-black/30 px-1.5 py-0.5 rounded">⏱️ 2 Menit</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-black text-xs">
+                      <span>📁</span> <span>Unduh Perangkat Ajar</span>
+                    </div>
+                  </div>
+                  <div class="p-2.5 text-[11px] text-slate-500">
+                    <p class="line-clamp-2">Modul Ajar, Prota, Prosem & ATP resmi se-Kecamatan Ambulu.</p>
+                    <span class="text-blue-600 font-black text-[10px] mt-1.5 block">Buka Panduan ➔</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- FOOTER LAPTOP -->
+            <div class="p-4 px-6 border-t border-slate-100 bg-slate-50/90 flex items-center justify-between">
+              <span class="text-[11px] text-slate-400">💡 Klik kartu untuk membaca tutorial langkah demi langkah.</span>
+              <div class="flex items-center gap-2.5">
+                <button class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-200 text-slate-700 font-bold text-xs transition">
+                  ✕ Exit
+                </button>
+                <button class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/20 active:scale-95 transition">
+                  ✓ Saya Paham, Lanjut Masuk ➔
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       SCRIPT SWITCHER EFEK & INTERAKSI LIVE
+       ============================================================ -->
+  <script>
+    let currentEffectClass = 'anim-holo-3d';
+
+    const effectMap = {
+      'holo-3d': {
+        className: 'anim-holo-3d',
+        label: 'Opsi 1: 🔮 3D Holographic Perspective Tilt & Aurora Neon Glow',
+        btnId: 'btnEffect1'
+      },
+      'cyber-quantum': {
+        className: 'anim-cyber-quantum',
+        label: 'Opsi 2: ⚡ Cyber Quantum Warp & Singularity Burst',
+        btnId: 'btnEffect2'
+      },
+      'dynamic-liquid': {
+        className: 'anim-dynamic-liquid',
+        label: 'Opsi 3: 🌊 Dynamic Liquid Island (Apple Fluid Morph)',
+        btnId: 'btnEffect3'
+      },
+      'origami-3d': {
+        className: 'anim-origami-3d',
+        label: 'Opsi 4: 🎬 3D Origami Unfold (Bioskop Acrylic Panel)',
+        btnId: 'btnEffect4'
+      }
+    };
+
+    function setTransitionEffect(effectKey) {
+      const config = effectMap[effectKey];
+      if (!config) return;
+
+      currentEffectClass = config.className;
+      document.getElementById('activeEffectLabel').textContent = config.label;
+
+      // Update styling tombol selector
+      ['btnEffect1', 'btnEffect2', 'btnEffect3', 'btnEffect4'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (id === config.btnId) {
+          btn.className = 'p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left transition cursor-pointer hover:bg-purple-600/40 relative overflow-hidden shadow-lg shadow-purple-600/20';
+        } else {
+          btn.className = 'p-3 rounded-2xl bg-slate-800/80 border border-white/10 text-slate-300 text-left transition cursor-pointer hover:border-slate-500 hover:bg-slate-800';
+        }
+      });
+
+      replayAnimation();
+    }
+
+    function replayAnimation() {
+      const mobBox = document.getElementById('mobileModalBox');
+      const lapBox = document.getElementById('laptopModalBox');
+
+      const allAnimClasses = ['anim-holo-3d', 'anim-cyber-quantum', 'anim-dynamic-liquid', 'anim-origami-3d'];
+
+      // Reset animasi mobile
+      if (mobBox) {
+        allAnimClasses.forEach(cls => mobBox.classList.remove(cls));
+        void mobBox.offsetWidth; // Force reflow
+        mobBox.classList.add(currentEffectClass);
+      }
+
+      // Reset animasi laptop
+      if (lapBox) {
+        allAnimClasses.forEach(cls => lapBox.classList.remove(cls));
+        void lapBox.offsetWidth; // Force reflow
+        lapBox.classList.add(currentEffectClass);
+      }
+    }
+
+    function switchView(mode) {
+      const mobCol = document.getElementById('mobileCol');
+      const lapCol = document.getElementById('laptopCol');
+      const btnSide = document.getElementById('btnViewSide');
+      const btnMob = document.getElementById('btnViewMobile');
+      const btnLap = document.getElementById('btnViewLaptop');
+
+      [btnSide, btnMob, btnLap].forEach(b => {
+        b.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white cursor-pointer';
+      });
+
+      if (mode === 'side-by-side') {
+        btnSide.className = 'px-3 py-1 rounded-lg bg-brand-600 text-white cursor-pointer';
+        mobCol.className = 'lg:col-span-5 flex flex-col items-center';
+        lapCol.className = 'lg:col-span-7 flex flex-col items-center';
+        mobCol.style.display = 'flex';
+        lapCol.style.display = 'flex';
+      } else if (mode === 'mobile-focus') {
+        btnMob.className = 'px-3 py-1 rounded-lg bg-brand-600 text-white cursor-pointer';
+        mobCol.className = 'lg:col-span-12 flex flex-col items-center';
+        mobCol.style.display = 'flex';
+        lapCol.style.display = 'none';
+      } else if (mode === 'laptop-focus') {
+        btnLap.className = 'px-3 py-1 rounded-lg bg-brand-600 text-white cursor-pointer';
+        lapCol.className = 'lg:col-span-12 flex flex-col items-center';
+        mobCol.style.display = 'none';
+        lapCol.style.display = 'flex';
+      }
+      replayAnimation();
+    }
+  </script>
+</body>
+</html>
