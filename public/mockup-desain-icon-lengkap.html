@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Desain Icon Lengkap - SiGuru SD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#F5F3FF',
+              100: '#ECE9FA',
+              200: '#DDD6FE',
+              300: '#C4B5FD',
+              400: '#A78BFA',
+              500: '#8275E5',
+              600: '#7C6EE6',
+              700: '#6C5CE7',
+              800: '#5846B5',
+              900: '#3D2F85',
+              dark: '#1E1B4B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-sizing: border-box;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-300" id="bodyWrapper">
+
+  <!-- ============================================================
+       TOP CONTROLS: SELECTOR 4 GAYA ICON & MODE GELAP/TERANG
+       ============================================================ -->
+  <header class="max-w-6xl mx-auto mb-6 p-4 sm:p-5 rounded-3xl bg-slate-800/90 border border-white/10 backdrop-blur-md shadow-xl flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          Design System SiGuru SD
+        </span>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          Eksplorasi Icon Lengkap
+        </span>
+      </div>
+      <h1 class="text-lg sm:text-xl font-black text-white font-outfit mt-1.5 flex items-center gap-2">
+        <span>🎨</span> <span>Katalog Desain Icon Lengkap Aplikasi</span>
+      </h1>
+      <p class="text-xs text-slate-400 mt-0.5">Mulai dari tombol Kembali (Back), menu navigasi, hingga modul nilai & presensi.</p>
+    </div>
+
+    <!-- Switcher Mode Gelap / Terang -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <button onclick="toggleDarkModePreview()" id="btnThemeToggle" class="px-3.5 py-2 rounded-xl bg-slate-950 border border-white/10 text-xs font-bold text-slate-300 flex items-center gap-1.5 cursor-pointer hover:text-white transition">
+        <span id="themeIcon">🌙</span> <span id="themeText">Mode Gelap</span>
+      </button>
+    </div>
+
+    <!-- SELECTOR 4 GAYA ICON -->
+    <div class="w-full pt-3 border-t border-white/10">
+      <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <span>⚡</span> <span>PILIH TEMA / GAYA ICON:</span>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-bold">
+        
+        <!-- GAYA 1: MODERN CRISP DUOTONE -->
+        <button onclick="setIconStyle('duotone')" id="btnStyleDuotone" class="p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left cursor-pointer transition shadow-md shadow-purple-600/20">
+          <div class="flex justify-between items-center">
+            <span class="text-base">💎</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500 text-white font-black">Rekomendasi</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">1. Modern Duotone</div>
+          <p class="text-[10px] text-purple-300/80 font-normal mt-0.5">Garis tegas 2px + sentuhan aksen warna lembut.</p>
+        </button>
+
+        <!-- GAYA 2: MINIMALIST CLEAN STROKE -->
+        <button onclick="setIconStyle('stroke')" id="btnStyleStroke" class="p-3 rounded-2xl bg-slate-950/60 border border-white/10 text-slate-300 text-left cursor-pointer transition hover:border-slate-500">
+          <div class="flex justify-between items-center">
+            <span class="text-base">🍏</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">Apple SF Style</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">2. Minimalist Outline</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Garis ramping 2px dengan ujung membulat rapi.</p>
+        </button>
+
+        <!-- GAYA 3: 3D GRADIENT SQUIRCLE -->
+        <button onclick="setIconStyle('squircle')" id="btnStyleSquircle" class="p-3 rounded-2xl bg-slate-950/60 border border-white/10 text-slate-300 text-left cursor-pointer transition hover:border-slate-500">
+          <div class="flex justify-between items-center">
+            <span class="text-base">🔮</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold">Fluent Glass</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">3. Gradient Squircle</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Ubin kotak membulat dengan gradasi warna hidup.</p>
+        </button>
+
+        <!-- GAYA 4: SOLID BOLD BADGE -->
+        <button onclick="setIconStyle('solid')" id="btnStyleSolid" class="p-3 rounded-2xl bg-slate-950/60 border border-white/10 text-slate-300 text-left cursor-pointer transition hover:border-slate-500">
+          <div class="flex justify-between items-center">
+            <span class="text-base">🎯</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">Kontras Tinggi</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">4. Solid Bold</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Ikon padat tebal, sangat mudah dikenali sekilas.</p>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       SECTION 1: FOKUS TOMBOL & ICON "KEMBALI" (BACK BUTTON)
+       Karena user meminta "Mulai icon kembali dan lain-lain"
+       ============================================================ -->
+  <section class="max-w-6xl mx-auto mb-8 p-5 sm:p-6 rounded-3xl bg-slate-800/60 border border-white/10 shadow-xl">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+      <div>
+        <span class="text-[10px] font-black uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">
+          Fokus Utama
+        </span>
+        <h2 class="text-base sm:text-lg font-black text-white font-outfit mt-1">
+          4 Variasi Desain Tombol & Icon "Kembali" (Back Button)
+        </h2>
+        <p class="text-xs text-slate-400">Pilih model tombol kembali yang paling nyaman untuk guru saat berpindah antar layar.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- VARIAN A: APPLE FROSTED PILL -->
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10 flex flex-col justify-between hover:border-purple-400 transition group">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-purple-300">Model A: Frosted Pill</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">Populer</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Bentuk pil kapsul transparan dengan chevron melengkung khas iOS.</p>
+        </div>
+        <!-- Preview Tombol -->
+        <div class="mt-4 p-4 rounded-xl bg-slate-950 flex items-center justify-center">
+          <button class="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-sm">
+            <svg class="w-4 h-4 stroke-current stroke-2 fill-none" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            <span>Kembali</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VARIAN B: CIRCULAR SOFT BADGE -->
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10 flex flex-col justify-between hover:border-purple-400 transition group">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-purple-300">Model B: Circular Badge</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Sentuh Cepat</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Lingkaran bulat dengan panah kiri halus, hemat tempat di pojok atas.</p>
+        </div>
+        <!-- Preview Tombol -->
+        <div class="mt-4 p-4 rounded-xl bg-slate-950 flex items-center justify-center gap-2">
+          <button class="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white flex items-center justify-center transition active:scale-95 cursor-pointer shadow-md shadow-purple-600/30">
+            <svg class="w-4 h-4 stroke-current stroke-[2.5] fill-none" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <span class="text-xs font-bold text-slate-300">Kembali</span>
+        </div>
+      </div>
+
+      <!-- VARIAN C: MODERN TEXT & FLOATING ARROW -->
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10 flex flex-col justify-between hover:border-purple-400 transition group">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-purple-300">Model C: Kinetic Arrow</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Elegan</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Teks dengan panah geser kiri saat kursor melintas (animasi hover dinamis).</p>
+        </div>
+        <!-- Preview Tombol -->
+        <div class="mt-4 p-4 rounded-xl bg-slate-950 flex items-center justify-center">
+          <button class="px-3 py-1.5 rounded-xl hover:bg-white/5 text-purple-300 hover:text-white font-extrabold text-xs flex items-center gap-1.5 transition group/btn cursor-pointer">
+            <svg class="w-4 h-4 stroke-current stroke-2 fill-none group-hover/btn:-translate-x-1 transition-transform" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
+            </svg>
+            <span>Kembali ke Beranda</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VARIAN D: SOFT MINIMALIST CHEVRON -->
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10 flex flex-col justify-between hover:border-purple-400 transition group">
+        <div>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-purple-300">Model D: Rounded Squircle</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Modern</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Tombol kotak membulat 12px dengan border lembut dan bayangan halus.</p>
+        </div>
+        <!-- Preview Tombol -->
+        <div class="mt-4 p-4 rounded-xl bg-slate-950 flex items-center justify-center">
+          <button class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/15 text-white flex items-center justify-center transition active:scale-95 cursor-pointer">
+            <svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SECTION 2: KATALOG LENGKAP ICON SELURUH APLIKASI SIGURU SD
+       Dikelompokkan berdasarkan fungsi dalam aplikasi
+       ============================================================ -->
+  <main class="max-w-6xl mx-auto space-y-6" id="iconCatalog">
+
+    <!-- KELOMPOK 1: NAVIGASI & AKSI UTAMA -->
+    <div class="p-5 sm:p-6 rounded-3xl bg-slate-800/80 border border-white/10 shadow-lg">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+        <h3 class="font-black text-sm sm:text-base text-white font-outfit uppercase tracking-wide">
+          1. Navigasi & Aksi Utama (Navigation & Actions)
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+        
+        <!-- ICON 1: KEMBALI -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-purple-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center icon-container" data-name="back">
+            <!-- Injected via JS -->
+          </div>
+          <span class="text-xs font-black text-white mt-2">Kembali</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Back / Return</span>
+        </div>
+
+        <!-- ICON 2: TUTUP / EXIT -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-purple-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center icon-container" data-name="close">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Tutup / Exit</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Dismiss Modal</span>
+        </div>
+
+        <!-- ICON 3: BERANDA / HOME -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-purple-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center icon-container" data-name="home">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Beranda</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Dashboard Portal</span>
+        </div>
+
+        <!-- ICON 4: CARI / FILTER -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-purple-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center icon-container" data-name="search">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Cari & Filter</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Search Siswa/Mapel</span>
+        </div>
+
+        <!-- ICON 5: SINKRONISASI / REFRESH -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-purple-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center icon-container" data-name="sync">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Sinkronisasi</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Auto-Sync Cloud</span>
+        </div>
+
+        <!-- ICON 6: PENGATURAN -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-purple-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center icon-container" data-name="settings">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Pengaturan</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Settings & Akun</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KELOMPOK 2: MODUL UTAMA GURU -->
+    <div class="p-5 sm:p-6 rounded-3xl bg-slate-800/80 border border-white/10 shadow-lg">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+        <h3 class="font-black text-sm sm:text-base text-white font-outfit uppercase tracking-wide">
+          2. Modul Inti Portal Guru (Core Academic Features)
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+        
+        <!-- ICON 7: INPUT NILAI DI HP -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-emerald-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center icon-container" data-name="grading">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Input Nilai di HP</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Asesmen & Format</span>
+        </div>
+
+        <!-- ICON 8: SCAN QR PRESENSI -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-emerald-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center icon-container" data-name="qr-scan">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Scan QR Siswa</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Presensi Otomatis</span>
+        </div>
+
+        <!-- ICON 9: PERANGKAT AJAR -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-emerald-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center icon-container" data-name="curriculum">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Perangkat Ajar</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Modul, Prota, Prosem</span>
+        </div>
+
+        <!-- ICON 10: RAPOR SISWA -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-emerald-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center icon-container" data-name="report">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Cetak Rapor</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Rekap Nilai Siswa</span>
+        </div>
+
+        <!-- ICON 11: DATA SISWA / ROMBEL -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-emerald-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-400 flex items-center justify-center icon-container" data-name="students">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Data Siswa</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Rombel & NISN</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KELOMPOK 3: KEAMANAN & AKUN GURU -->
+    <div class="p-5 sm:p-6 rounded-3xl bg-slate-800/80 border border-white/10 shadow-lg">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+        <h3 class="font-black text-sm sm:text-base text-white font-outfit uppercase tracking-wide">
+          3. Akun & Keamanan (Account & Security)
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        
+        <!-- ICON 12: PIN / KEAMANAN -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-amber-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center icon-container" data-name="security-pin">
+          </div>
+          <span class="text-xs font-black text-white mt-2">PIN Pribadi</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Password & Reset</span>
+        </div>
+
+        <!-- ICON 13: PROFIL GURU -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-amber-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center icon-container" data-name="teacher-profile">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Profil Terverifikasi</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Identitas Pendidik</span>
+        </div>
+
+        <!-- ICON 14: SEKOLAH / NPSN -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-amber-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center icon-container" data-name="school-building">
+          </div>
+          <span class="text-xs font-black text-white mt-2">NPSN Sekolah</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">48 SD Se-Ambulu</span>
+        </div>
+
+        <!-- ICON 15: LOGOUT / KELUAR -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-amber-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center icon-container" data-name="logout">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Keluar Akun</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Logout Aman</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KELOMPOK 4: UTILITAS KHUSUS -->
+    <div class="p-5 sm:p-6 rounded-3xl bg-slate-800/80 border border-white/10 shadow-lg">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+        <h3 class="font-black text-sm sm:text-base text-white font-outfit uppercase tracking-wide">
+          4. Fitur Khusus & Utilitas (Tools & Utilities)
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        
+        <!-- ICON 16: PANDUAN APLIKASI -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-cyan-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center icon-container" data-name="guide-lightbulb">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Panduan Guru</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Petunjuk Penggunaan</span>
+        </div>
+
+        <!-- ICON 17: EXCEL IMPORT / EXPORT -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-cyan-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center icon-container" data-name="excel">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Excel .xlsx</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Unduh & Unggah Data</span>
+        </div>
+
+        <!-- ICON 18: MODE GELAP / TERANG -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-cyan-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center icon-container" data-name="dark-mode">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Mode Tampilan</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Gelap / Terang</span>
+        </div>
+
+        <!-- ICON 19: SUKSES / TERVERIFIKASI -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-white/5 flex flex-col items-center text-center hover:border-cyan-400/50 transition">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center icon-container" data-name="check-circle">
+          </div>
+          <span class="text-xs font-black text-white mt-2">Status Sukses</span>
+          <span class="text-[10px] text-slate-400 mt-0.5">Centang Terverifikasi</span>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       SCRIPT DATA SVG VECTOR UNTUK TIAP GAYA (INTERAKTIF)
+       ============================================================ -->
+  <script>
+    let currentStyle = 'duotone';
+    let isDarkMode = true;
+
+    // DEFINISI PATH SVG UNTUK MASING-MASING ICON DAN GAYA
+    const ICON_DEFINITIONS = {
+      'back': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/><path d="M7 12a4 4 0 014-4h4" class="opacity-20 fill-current"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 20l-8-8 8-8v5h8v6h-8v5z"/></svg>`
+      },
+      'close': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" class="opacity-20 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 9l-6 6m0-6l6 6"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>`
+      },
+      'home': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-25 fill-current" d="M9 22V12h6v10z"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4m8-11v10a1 1 0 01-1 1h-4"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.59 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>`
+      },
+      'search': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" class="opacity-20 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path stroke-linecap="round" d="M20 20l-4-4"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>`
+      },
+      'sync': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/><circle cx="12" cy="12" r="3" class="opacity-20 fill-current"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0114.8-3.4L20 9M20 15a9 9 0 01-14.8 3.4L4 15"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>`
+      },
+      'settings': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" class="opacity-25 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-orange-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54A.484.484 0 0014 2h-4c-.25 0-.46.18-.49.42l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.63 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h4c.25 0 .46-.18.49-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54A.484.484 0 0014 2h-4c-.25 0-.46.18-.49.42l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.63 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h4c.25 0 .46-.18.49-.42l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>`
+      },
+      'grading': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-20 fill-current" d="M4 6h16v12H4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6m4 6v-9m4 9v-4M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>`
+      },
+      'qr-scan': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V6a2 2 0 012-2h2m8 0h2a2 2 0 012 2v2m0 8v2a2 2 0 01-2 2h-2m-8 0H6a2 2 0 01-2-2v-2"/><rect x="8" y="8" width="8" height="8" rx="1.5" class="opacity-25 fill-current"/><circle cx="12" cy="12" r="1.5" class="fill-current"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5zM15 15h3v3h-3z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V6a2 2 0 012-2h2m8 0h2a2 2 0 012 2v2m0 8v2a2 2 0 01-2 2h-2m-8 0H6a2 2 0 01-2-2v-2"/><rect x="9" y="9" width="6" height="6" class="fill-current"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v3h-3v-3zm-5 5h3v3h-3v-3zm3 0h3v3h-3v-3z"/></svg>`
+      },
+      'curriculum': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-25 fill-current" d="M4 6h6l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`
+      },
+      'report': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-20 fill-current" d="M6 4h9l5 5v11H6z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h4m5-7l-5-5H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-orange-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>`
+      },
+      'students': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" class="opacity-25 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-600 to-emerald-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>`
+      },
+      'security-pin': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4" class="opacity-25 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 12.5L20 3m-4 0l4 4m-2-2l-2 2"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`
+      },
+      'teacher-profile': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4" class="opacity-25 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 11l2 2 4-4" class="text-emerald-400"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>`
+      },
+      'school-building': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-25 fill-current" d="M4 10h16v10H4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V10l7-5 7 5v11M9 14h2m2 0h2m-6 4h2m2 0h2"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>`
+      },
+      'logout': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-20 fill-current" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-red-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>`
+      },
+      'guide-lightbulb': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-25 fill-current" d="M9 18h6v2H9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.516 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-900 flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>`
+      },
+      'excel': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-25 fill-current" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM9 13l6 6m0-6l-6 6"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m1.125-1.125h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m0 0v1.5m0-1.5c0 .621.504 1.125 1.125 1.125m0 0h7.5"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9.5 16L7 12.5l2.5-3.5h1.8L8.8 12.5l2.5 3.5H9.5zm5.7 0l-2.5-3.5 2.5-3.5h1.8L14.5 12.5l2.5 3.5h-1.8z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9.5 16L7 12.5l2.5-3.5h1.8L8.8 12.5l2.5 3.5H9.5zm5.7 0l-2.5-3.5 2.5-3.5h1.8L14.5 12.5l2.5 3.5h-1.8z"/></svg>`
+      },
+      'dark-mode': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path class="opacity-25 fill-current" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-700 to-indigo-800 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.3 2a10 10 0 00-1.9 19.8 10 10 0 0011.5-11.5A10 10 0 0012.3 2z"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.3 2a10 10 0 00-1.9 19.8 10 10 0 0011.5-11.5A10 10 0 0012.3 2z"/></svg>`
+      },
+      'check-circle': {
+        duotone: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" class="opacity-25 fill-current"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/></svg>`,
+        stroke: `<svg class="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+        squircle: `<div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center shadow-md"><svg class="w-5 h-5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>`,
+        solid: `<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`
+      }
+    };
+
+    function renderIcons() {
+      document.querySelectorAll('.icon-container').forEach(el => {
+        const name = el.getAttribute('data-name');
+        if (ICON_DEFINITIONS[name] && ICON_DEFINITIONS[name][currentStyle]) {
+          el.innerHTML = ICON_DEFINITIONS[name][currentStyle];
+        }
+      });
+    }
+
+    function setIconStyle(styleName) {
+      currentStyle = styleName;
+
+      // Update button styling
+      ['btnStyleDuotone', 'btnStyleStroke', 'btnStyleSquircle', 'btnStyleSolid'].forEach(id => {
+        const btn = document.getElementById(id);
+        btn.className = 'p-3 rounded-2xl bg-slate-950/60 border border-white/10 text-slate-300 text-left cursor-pointer transition hover:border-slate-500';
+      });
+
+      const activeBtnMap = {
+        'duotone': 'btnStyleDuotone',
+        'stroke': 'btnStyleStroke',
+        'squircle': 'btnStyleSquircle',
+        'solid': 'btnStyleSolid'
+      };
+
+      const activeBtn = document.getElementById(activeBtnMap[styleName]);
+      if (activeBtn) {
+        activeBtn.className = 'p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left cursor-pointer transition shadow-md shadow-purple-600/20';
+      }
+
+      renderIcons();
+    }
+
+    function toggleDarkModePreview() {
+      isDarkMode = !isDarkMode;
+      const body = document.getElementById('bodyWrapper');
+      const themeIcon = document.getElementById('themeIcon');
+      const themeText = document.getElementById('themeText');
+
+      if (isDarkMode) {
+        body.className = 'bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-300';
+        themeIcon.textContent = '🌙';
+        themeText.textContent = 'Mode Gelap';
+      } else {
+        body.className = 'bg-[#EBE8F9] text-slate-900 min-h-screen p-4 sm:p-6 transition-colors duration-300';
+        themeIcon.textContent = '☀️';
+        themeText.textContent = 'Mode Terang';
+      }
+    }
+
+    // Initial render
+    renderIcons();
+  </script>
+</body>
+</html>
