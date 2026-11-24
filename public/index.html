@@ -840,13 +840,13 @@
         <!-- 1. TAB MASUK GURU -->
         <form id="formTeacherLogin" onsubmit="handleLoginTeacherWithPin(event)" class="space-y-3" autocomplete="off">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">1. NPSN Sekolah *</label>
+            <label class="block font-bold text-slate-700 mb-1">NPSN Sekolah *</label>
             <input type="text" id="loginNpsn" required placeholder="Contoh: 20524959" autocomplete="off" oninput="handleCheckSchoolDebounce()"
               class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
           </div>
 
           <div>
-            <label class="block font-bold text-slate-700 mb-1">2. Kode Unik Sekolah *</label>
+            <label class="block font-bold text-slate-700 mb-1">Kode Unik Sekolah *</label>
             <input type="text" id="loginKodeUnik" required placeholder="Contoh: ADG03-4959" autocomplete="off" oninput="handleCheckSchoolDebounce()"
               class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold font-mono text-xs uppercase focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
           </div>
@@ -863,7 +863,7 @@
           <!-- Guru Selector or Name Input -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="font-bold text-slate-700">3. Nama Guru / Akun Terverifikasi *</label>
+              <label class="font-bold text-slate-700">Nama Guru / Akun Terverifikasi *</label>
               <button type="button" onclick="switchLoginTab('register')" class="text-[10px] text-brand-600 font-extrabold hover:underline">
                 + Belum Terdaftar?
               </button>
@@ -876,7 +876,7 @@
 
           <!-- PIN Pribadi -->
           <div>
-            <label class="block font-bold text-slate-700 mb-1">4. PIN Pribadi Guru (4 - 6 Angka) *</label>
+            <label class="block font-bold text-slate-700 mb-1">PIN Pribadi Guru (4 - 6 Angka) *</label>
             <input type="password" id="loginPin" required maxlength="6" placeholder="• • • • • •" autocomplete="current-password"
               class="w-full p-2.5 bg-[#F8F7FD] border border-[#E2DEF7] rounded-xl font-bold text-center tracking-widest text-base focus:outline-none focus:ring-2 focus:ring-brand-600 focus:bg-white">
           </div>
@@ -989,8 +989,9 @@
 
   <!-- ============================================================
        POP-UP MODAL: PANDUAN PENGGUNAAN OTOMATIS (ONBOARDING GURU)
+       MUNCUL OTOMATIS SETIAP KALI URL DIBUKA SEBELUM MENU LOGIN
        ============================================================ -->
-  <div id="modalGuideOverlay" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden items-center justify-center p-3 sm:p-5 transition-all duration-300" style="display: none; z-index: 99999;">
+  <div id="modalGuideOverlay" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 transition-all duration-300" style="display: flex; z-index: 99999;">
     <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl border border-white/90 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200 text-slate-800">
       
       <!-- 1. Modal Header -->
@@ -1173,27 +1174,24 @@
         </div>
       </div>
 
-      <!-- 5. Modal Footer: TOMBOL PAHAM & EXIT (SESUAI REQUEST USER) -->
+      <!-- 5. Modal Footer: TOMBOL PAHAM & EXIT (SESUAI PERMINTAAN USER) -->
       <div class="p-4 px-6 border-t border-slate-100 bg-slate-50/90 flex flex-wrap items-center justify-between gap-3">
-        
-        <!-- Checkbox opsi jangan tampilkan lagi -->
-        <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
-          <input type="checkbox" id="chkDoNotShowAgainGuide" class="w-4 h-4 rounded text-brand-600 accent-brand-600 cursor-pointer">
-          <span>Jangan tampilkan pop-up ini lagi secara otomatis</span>
-        </label>
+        <div class="text-xs text-slate-500 font-medium hidden sm:flex items-center gap-1.5">
+          <span>💡</span> <span>Pelajari panduan di atas untuk kemudahan penggunaan aplikasi.</span>
+        </div>
 
-        <!-- Tombol Aksi Utama: PAHAM & EXIT -->
-        <div class="flex items-center gap-2.5 ml-auto">
+        <!-- Tombol Aksi Utama: EXIT & PAHAM -->
+        <div class="flex items-center gap-2.5 ml-auto w-full sm:w-auto justify-end">
           <!-- Tombol EXIT / Batal -->
           <button onclick="handleExitGuide()" 
-                  class="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95 cursor-pointer">
+                  class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95 cursor-pointer">
             ✕ Exit
           </button>
 
           <!-- Tombol SAYA PAHAM (Utama) -->
           <button onclick="handleUnderstoodGuide()" 
-                  class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5">
-            <span>✓ Saya Paham, Masuk Portal</span>
+                  class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5">
+            <span>✓ Saya Paham, Lanjut Masuk</span> ➔
           </button>
         </div>
 
@@ -2463,17 +2461,11 @@
     };
 
     function checkAutoOpenGuideModal() {
-      try {
-        const doNotShow = localStorage.getItem('siguru_dismiss_auto_guide');
-        if (!doNotShow) {
-          setTimeout(() => {
-            const loginScreen = document.getElementById('loginScreen');
-            if (loginScreen && loginScreen.style.display !== 'none' && !loginScreen.classList.contains('hidden')) {
-              openGuideModal();
-            }
-          }, 350);
-        }
-      } catch (e) {}
+      // Selalu munculkan pop-up panduan otomatis setiap kali URL dibuka sebelum menu login
+      const loginScreen = document.getElementById('loginScreen');
+      if (loginScreen && loginScreen.style.display !== 'none' && !loginScreen.classList.contains('hidden')) {
+        openGuideModal();
+      }
     }
 
     function openGuideModal() {
@@ -2494,25 +2486,15 @@
     }
 
     function handleUnderstoodGuide() {
-      const chk = document.getElementById('chkDoNotShowAgainGuide');
-      if (chk && chk.checked) {
-        try {
-          localStorage.setItem('siguru_dismiss_auto_guide', 'true');
-        } catch (e) {}
-      }
       closeGuideModal();
       const npsnInput = document.getElementById('loginNpsn');
       if (npsnInput) npsnInput.focus();
     }
 
     function handleExitGuide() {
-      const chk = document.getElementById('chkDoNotShowAgainGuide');
-      if (chk && chk.checked) {
-        try {
-          localStorage.setItem('siguru_dismiss_auto_guide', 'true');
-        } catch (e) {}
-      }
       closeGuideModal();
+      const npsnInput = document.getElementById('loginNpsn');
+      if (npsnInput) npsnInput.focus();
     }
 
     function filterGuideCategory(cat, btn) {
@@ -9295,9 +9277,10 @@
       if (!restored) {
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('mainApp').style.display = 'none';
-        // Munculkan otomatis pop-up panduan saat URL dibuka
-        checkAutoOpenGuideModal();
+        // Selalu tampilkan pop-up panduan di awal sebelum menu login
+        openGuideModal();
       } else {
+        closeGuideModal();
         startAutoSync(); // Aktifkan sinkronisasi lintas perangkat jika sesi guru aktif
       }
 
