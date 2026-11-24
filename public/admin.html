@@ -254,24 +254,34 @@
 
       </div>
 
-      <!-- Filter Sekolah & Tab Navigasi -->
+      <!-- Filter Sekolah, Pencarian & Tab Navigasi -->
       <div class="glass-box rounded-3xl p-4 border border-white/10 space-y-4">
         
         <div class="flex flex-wrap items-center justify-between gap-3">
           
-          <!-- Filter Dropdown Sekolah -->
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-300">Filter Sekolah:</span>
-            <select id="filterSchoolSelect" onchange="renderActiveAdminTabContent()"
-              class="px-3.5 py-2 rounded-2xl bg-slate-900 border border-white/20 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
-              <option value="ALL">Semua 14 SD Negeri (Kecamatan Ambulu)</option>
-            </select>
+          <!-- Sisi Kiri: Filter Dropdown Sekolah & Pencarian Cepat -->
+          <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-300 shrink-0">Filter Sekolah:</span>
+              <select id="filterSchoolSelect" onchange="renderActiveAdminTabContent()"
+                class="px-3.5 py-2 rounded-2xl bg-slate-900 border border-white/20 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-amber-500 max-w-[260px] truncate">
+                <option value="ALL">Semua Satuan Pendidikan (Ambulu)</option>
+              </select>
+            </div>
+
+            <!-- Pencarian Instan (Real-Time Search 0ms) -->
+            <div class="relative flex-1 min-w-[200px] max-w-xs">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">🔍</span>
+              <input type="text" id="adminTeacherSearchInput" oninput="renderActiveAdminTabContent()"
+                placeholder="Cari guru, NIP, no WA..."
+                class="w-full pl-8 pr-3 py-2 rounded-2xl bg-slate-900 border border-white/20 text-xs font-bold text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+            </div>
           </div>
 
           <!-- Refresh Data Button -->
-          <button onclick="fetchAllAdminData(true)"
-            class="px-3.5 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition flex items-center gap-1.5 cursor-pointer">
-            <span>🔄</span> <span>Muat Ulang Data</span>
+          <button onclick="fetchAllAdminData(true)" id="btnRefreshAdminData"
+            class="px-3.5 py-2 rounded-2xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0">
+            <span id="refreshIconSpin">🔄</span> <span>Muat Ulang Data</span>
           </button>
 
         </div>
@@ -421,22 +431,29 @@
     // INITIALIZATION & SESSION RESTORE
     // ==========================================
     window.addEventListener('DOMContentLoaded', async () => {
-      populateSchoolFilterDropdown();
-
-      // Muat config Firebase secara aman dari serverless API Vercel
-      await loadFirebaseConfigFromApi();
-      initFirebase();
-
-      // Cek apakah halaman kembali dari alur redirect login Google
-      checkRedirectLoginResult();
-
+      // 1. Coba pulihkan sesi admin dari storage
       const restored = restoreAdminSession();
       if (restored) {
+        // Coba muat cache instan terlebih dahulu agar UI langsung tampil 0 milidetik
+        const hasCache = restoreAdminCache();
         showDashboard();
+        populateSchoolFilterDropdown();
+        if (hasCache) {
+          updateMetricsUI();
+          renderActiveAdminTabContent();
+        }
+        // Sinkronisasi data terbaru secara background
         fetchAllAdminData();
       } else {
         showLoginScreen();
       }
+
+      // 2. Muat config Firebase secara aman dari serverless API Vercel
+      await loadFirebaseConfigFromApi();
+      initFirebase();
+
+      // 3. Cek apakah halaman kembali dari alur redirect login Google
+      checkRedirectLoginResult();
     });
 
     // ==========================================
@@ -774,10 +791,46 @@
     function populateSchoolFilterDropdown() {
       const sel = document.getElementById('filterSchoolSelect');
       if (!sel) return;
-      sel.innerHTML = '<option value="ALL">Semua 14 SD Negeri (Kecamatan Ambulu)</option>';
+      const count = adminState.schools ? adminState.schools.length : 48;
+      const currentVal = sel.value || 'ALL';
+      sel.innerHTML = `<option value="ALL">Semua ${count} Satuan Pendidikan (Ambulu)</option>`;
       adminState.schools.forEach(s => {
         sel.innerHTML += `<option value="${s.npsn}">${s.nama} (${s.desa}) - ${s.npsn}</option>`;
       });
+      sel.value = currentVal;
+    }
+
+    // ==========================================
+    // INSTANT LOCAL CACHE (STALE-WHILE-REVALIDATE)
+    // ==========================================
+    function cacheAdminState() {
+      try {
+        sessionStorage.setItem('siguru_admin_cache_data', JSON.stringify({
+          pendingTeachers: adminState.pendingTeachers,
+          verifiedTeachers: adminState.verifiedTeachers,
+          rejectedTeachers: adminState.rejectedTeachers,
+          perangkatList: adminState.perangkatList,
+          schools: adminState.schools,
+          cachedAt: Date.now()
+        }));
+      } catch (e) {}
+    }
+
+    function restoreAdminCache() {
+      try {
+        const raw = sessionStorage.getItem('siguru_admin_cache_data');
+        if (!raw) return false;
+        const c = JSON.parse(raw);
+        if (c) {
+          if (Array.isArray(c.pendingTeachers)) adminState.pendingTeachers = c.pendingTeachers;
+          if (Array.isArray(c.verifiedTeachers)) adminState.verifiedTeachers = c.verifiedTeachers;
+          if (Array.isArray(c.rejectedTeachers)) adminState.rejectedTeachers = c.rejectedTeachers;
+          if (Array.isArray(c.perangkatList)) adminState.perangkatList = c.perangkatList;
+          if (Array.isArray(c.schools) && c.schools.length > 0) adminState.schools = c.schools;
+          return true;
+        }
+      } catch (e) {}
+      return false;
     }
 
     // Kompatibilitas tombol lama
@@ -805,6 +858,7 @@
 
     function handleAdminLogout() {
       sessionStorage.removeItem('siguru_admin_session');
+      sessionStorage.removeItem('siguru_admin_cache_data');
       adminState.isLoggedIn = false;
       adminState.isGoogleOwner = false;
       adminState.adminEmail = '';
@@ -813,16 +867,20 @@
     }
 
     // ==========================================
-    // API CALLS (DENGAN RESILIENT FALLBACK)
+    // API CALLS (DENGAN RESILIENT FALLBACK & TIMEOUT)
     // ==========================================
     async function callAdminApi(action, payload = {}) {
       // 1. Coba proxy /api/gas terlebih dahulu jika ada
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
         const res = await fetch('/api/gas', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gasUrl: GAS_URL, action: action, payload: payload })
+          body: JSON.stringify({ gasUrl: GAS_URL, action: action, payload: payload }),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           return data;
@@ -834,12 +892,16 @@
       // 2. Direct fallback ke GAS_URL jika tersedia
       if (GAS_URL) {
         try {
+          const controller2 = new AbortController();
+          const timeoutId2 = setTimeout(() => controller2.abort(), 20000);
           const directRes = await fetch(GAS_URL, {
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: action, payload: payload })
+            body: JSON.stringify({ action: action, payload: payload }),
+            signal: controller2.signal
           });
+          clearTimeout(timeoutId2);
           return await directRes.json();
         } catch (postErr) {
           // 3. Fallback GET jika POST CORS dicegah oleh browser
@@ -860,8 +922,17 @@
       throw new Error('Endpoint Google Apps Script (GAS_URL) belum terkonfigurasi.');
     }
 
+    let isFetchingAdminData = false;
     async function fetchAllAdminData(isManual = false) {
-      if (isManual) showAdminToast('Memuat ulang data terbaru dari database...', 'info');
+      if (isFetchingAdminData) return;
+      isFetchingAdminData = true;
+
+      const refreshBtn = document.getElementById('btnRefreshAdminData');
+      const refreshIcon = document.getElementById('refreshIconSpin');
+      if (refreshBtn) refreshBtn.classList.add('opacity-60', 'pointer-events-none');
+      if (refreshIcon) refreshIcon.classList.add('inline-block', 'animate-spin');
+
+      if (isManual) showAdminToast('Memuat data terbaru dari Google Spreadsheet...', 'info');
       try {
         const res = await callAdminApi('getAllTeachersAdmin', {});
         if (res && res.success) {
@@ -869,13 +940,21 @@
           adminState.verifiedTeachers = res.verifiedTeachers || [];
           adminState.rejectedTeachers = res.rejectedTeachers || [];
           adminState.perangkatList = res.perangkatList || [];
-          if (res.schools && res.schools.length > 0) adminState.schools = res.schools;
+          if (res.schools && res.schools.length > 0) {
+            adminState.schools = res.schools;
+            populateSchoolFilterDropdown();
+          }
+          cacheAdminState();
           updateMetricsUI();
           renderActiveAdminTabContent();
-          if (isManual) showAdminToast('Data terbaru berhasil disinkronkan.', 'success');
+          if (isManual) showAdminToast('✓ Data terbaru berhasil disinkronkan.', 'success');
         }
       } catch (err) {
         if (isManual) showAdminToast('Gagal memuat data: ' + err.message, 'error');
+      } finally {
+        isFetchingAdminData = false;
+        if (refreshBtn) refreshBtn.classList.remove('opacity-60', 'pointer-events-none');
+        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
       }
     }
 
@@ -913,10 +992,36 @@
       if (bPerangkat) bPerangkat.textContent = validPerangkat.length;
     }
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function getFilteredList(list) {
+      if (!Array.isArray(list)) return [];
       const filterNpsn = document.getElementById('filterSchoolSelect') ? document.getElementById('filterSchoolSelect').value : 'ALL';
-      if (!filterNpsn || filterNpsn === 'ALL') return list;
-      return list.filter(item => String(item.npsn).trim() === filterNpsn);
+      const searchInput = document.getElementById('adminTeacherSearchInput');
+      const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+      return list.filter(item => {
+        // Filter Sekolah
+        const matchSchool = (!filterNpsn || filterNpsn === 'ALL') || String(item.npsn).trim() === filterNpsn;
+        if (!matchSchool) return false;
+
+        // Filter Pencarian Teks (Real-time 0ms)
+        if (!query) return true;
+        const name = String(item.nama || '').toLowerCase();
+        const nip = String(item.nip || '').toLowerCase();
+        const hp = String(item.noHp || '').toLowerCase();
+        const sekolah = String(item.namaSekolah || '').toLowerCase();
+        const npsn = String(item.npsn || '').toLowerCase();
+        return name.includes(query) || nip.includes(query) || hp.includes(query) || sekolah.includes(query) || npsn.includes(query);
+      });
     }
 
     function renderActiveAdminTabContent() {
@@ -938,32 +1043,38 @@
 
         container.innerHTML = `
           <div class="space-y-3">
-            <div class="flex items-center justify-between text-xs text-slate-400 px-1">
-              <span>Menampilkan ${list.length} guru menunggu persetujuan</span>
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 px-1">
+              <span>Menampilkan <strong class="text-white">${list.length}</strong> guru menunggu persetujuan</span>
+              ${list.length > 1 ? `
+                <button onclick="handleApproveAllPending()"
+                  class="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-black text-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                  <span>⚡</span> <span>Setujui Semua (${list.length} Guru)</span>
+                </button>
+              ` : ''}
             </div>
             ${list.map(t => `
-              <div class="glass-box p-5 rounded-3xl border border-amber-500/30 bg-amber-500/5 flex flex-wrap items-center justify-between gap-4">
+              <div class="glass-box p-5 rounded-3xl border border-amber-500/30 bg-amber-500/5 flex flex-wrap items-center justify-between gap-4 transition-all duration-200 hover:border-amber-500/50" id="cardTeacher_${t.id}">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span class="text-base font-black text-white">${t.nama}</span>
+                    <span class="text-base font-black text-white">${escapeHtml(t.nama)}</span>
                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-400 text-slate-950">Menunggu Verifikasi</span>
                   </div>
                   <div class="text-xs text-slate-300 font-medium">
-                    🏫 <strong class="text-white">${t.namaSekolah || 'SD Negeri'}</strong> (NPSN: ${t.npsn})
+                    🏫 <strong class="text-white">${escapeHtml(t.namaSekolah || 'SD Negeri')}</strong> (NPSN: ${escapeHtml(t.npsn)})
                   </div>
                   <div class="text-xs text-slate-400 font-mono">
-                    NIP: ${t.nip || '-'} • WA: <a href="https://wa.me/62${(t.noHp || '').replace(/^0/,'')}" target="_blank" class="text-emerald-400 font-bold hover:underline">${t.noHp}</a>
-                    • Jabatan: <strong class="text-slate-200">${t.jabatan}</strong>
+                    NIP: ${escapeHtml(t.nip || '-')} • WA: <a href="https://wa.me/62${(t.noHp || '').replace(/^0/,'')}" target="_blank" class="text-emerald-400 font-bold hover:underline">${escapeHtml(t.noHp)}</a>
+                    • Jabatan: <strong class="text-slate-200">${escapeHtml(t.jabatan)}</strong>
                   </div>
-                  <div class="text-[10px] text-slate-500">Mendaftar pada: ${t.tanggalDaftar || '-'}</div>
+                  <div class="text-[10px] text-slate-500">Mendaftar pada: ${escapeHtml(t.tanggalDaftar || '-')}</div>
                 </div>
 
                 <div class="flex items-center gap-2">
-                  <button onclick="handleApproveTeacher('${t.id}', '${t.npsn}', '${t.nama}')"
-                    class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition cursor-pointer flex items-center gap-1.5">
+                  <button onclick="handleApproveTeacher('${t.id}')" id="btnApprove_${t.id}"
+                    class="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20 active:scale-95 transition cursor-pointer flex items-center gap-1.5">
                     <span>✓</span> <span>Setujui (Verifikasi)</span>
                   </button>
-                  <button onclick="handleRejectTeacher('${t.id}', '${t.npsn}', '${t.nama}')"
+                  <button onclick="handleRejectTeacher('${t.id}')" id="btnReject_${t.id}"
                     class="px-4 py-2.5 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 font-bold text-xs active:scale-95 transition cursor-pointer">
                     ✕ Tolak
                   </button>
@@ -989,7 +1100,7 @@
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
                 <thead>
-                  <tr class="border-b border-white/10 bg-white/5 text-slate-400 font-bold">
+                  <tr class="border-b border-white/10 bg-white/5 text-slate-400 font-bold whitespace-nowrap">
                     <th class="p-4">No</th>
                     <th class="p-4">Nama Lengkap & NIP</th>
                     <th class="p-4">Satuan Pendidikan</th>
@@ -1000,29 +1111,29 @@
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   ${list.map((t, idx) => `
-                    <tr class="hover:bg-white/5 transition">
+                    <tr class="hover:bg-white/5 transition" id="rowTeacher_${t.id}">
                       <td class="p-4 text-slate-500 font-mono">${idx + 1}</td>
                       <td class="p-4">
-                        <div class="font-extrabold text-white text-sm">${t.nama}</div>
-                        <div class="font-mono text-[11px] text-slate-400">${t.nip || 'Non-NIP'}</div>
+                        <div class="font-extrabold text-white text-sm">${escapeHtml(t.nama)}</div>
+                        <div class="font-mono text-[11px] text-slate-400">${escapeHtml(t.nip || 'Non-NIP')}</div>
                       </td>
                       <td class="p-4">
-                        <div class="font-bold text-slate-200">${t.namaSekolah}</div>
-                        <div class="font-mono text-[10px] text-slate-400">NPSN: ${t.npsn}</div>
+                        <div class="font-bold text-slate-200">${escapeHtml(t.namaSekolah)}</div>
+                        <div class="font-mono text-[10px] text-slate-400">NPSN: ${escapeHtml(t.npsn)}</div>
                       </td>
-                      <td class="p-4 font-semibold text-slate-300">${t.jabatan}</td>
+                      <td class="p-4 font-semibold text-slate-300">${escapeHtml(t.jabatan)}</td>
                       <td class="p-4 font-mono">
                         <a href="https://wa.me/62${(t.noHp || '').replace(/^0/,'')}" target="_blank" class="text-emerald-400 hover:underline font-bold">
-                          ${t.noHp}
+                          ${escapeHtml(t.noHp)}
                         </a>
                       </td>
-                      <td class="p-4 text-right space-x-2">
-                        <button onclick="handleAdminResetPinPrompt('${t.id}', '${t.npsn}', '${t.nama}')"
-                          class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] cursor-pointer">
+                      <td class="p-4 text-right space-x-2 whitespace-nowrap">
+                        <button onclick="handleAdminResetPinPrompt('${t.id}')"
+                          class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition active:scale-95 cursor-pointer">
                           🔑 Reset PIN
                         </button>
-                        <button onclick="handleRejectTeacher('${t.id}', '${t.npsn}', '${t.nama}', 'Nonaktifkan')"
-                          class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-bold text-[11px] cursor-pointer">
+                        <button onclick="handleRejectTeacher('${t.id}', 'Nonaktifkan')"
+                          class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-bold text-[11px] transition active:scale-95 cursor-pointer">
                           Nonaktifkan
                         </button>
                       </td>
@@ -1042,13 +1153,13 @@
                 <p class="text-xs text-slate-400">Tidak ada data pendaftaran yang ditolak.</p>
               </div>
             ` : list.map(t => `
-              <div class="glass-box p-4 rounded-3xl border border-rose-500/20 flex items-center justify-between gap-4">
+              <div class="glass-box p-4 rounded-3xl border border-rose-500/20 flex flex-wrap items-center justify-between gap-4 transition-all duration-200" id="cardRejected_${t.id}">
                 <div>
-                  <div class="font-extrabold text-white">${t.nama}</div>
-                  <div class="text-xs text-slate-400">${t.namaSekolah} (NPSN: ${t.npsn}) • ${t.noHp}</div>
+                  <div class="font-extrabold text-white">${escapeHtml(t.nama)}</div>
+                  <div class="text-xs text-slate-400">${escapeHtml(t.namaSekolah)} (NPSN: ${escapeHtml(t.npsn)}) • ${escapeHtml(t.noHp)}</div>
                 </div>
-                <button onclick="handleApproveTeacher('${t.id}', '${t.npsn}', '${t.nama}')"
-                  class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs cursor-pointer">
+                <button onclick="handleApproveTeacher('${t.id}')"
+                  class="px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs active:scale-95 transition cursor-pointer">
                   Pulihkan & Setujui ➔
                 </button>
               </div>
@@ -1252,7 +1363,7 @@
                           <span>🔗 Buka Link Drive</span>
                           <span>➔</span>
                         </a>
-                        <button onclick="handleAdminDeletePerangkat('${d.id}', '${(d.judul || '').replace(/'/g, "\\'")}')"
+                        <button onclick="handleAdminDeletePerangkat('${d.id}')"
                           class="px-3.5 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 font-bold text-xs transition cursor-pointer"
                           title="Hapus Dokumen">
                           🗑️
@@ -1353,62 +1464,198 @@
     }
 
     // ==========================================
-    // ACTIONS: VERIFY / REJECT / RESET PIN
+    // ACTIONS: VERIFY / REJECT / RESET PIN (OPTIMISTIC & SAFE)
     // ==========================================
-    async function handleApproveTeacher(teacherId, npsn, teacherName) {
-      if (!confirm(`Setujui pendaftaran guru atas nama "${teacherName}"? Guru langsung dapat login ke aplikasi.`)) return;
-      showAdminToast(`Menyetujui ${teacherName}...`, 'info');
+    function findTeacherById(id) {
+      if (!id) return null;
+      return (adminState.pendingTeachers || []).find(t => String(t.id) === String(id)) ||
+             (adminState.verifiedTeachers || []).find(t => String(t.id) === String(id)) ||
+             (adminState.rejectedTeachers || []).find(t => String(t.id) === String(id)) || null;
+    }
 
+    async function handleApproveTeacher(teacherId) {
+      const teacher = findTeacherById(teacherId);
+      if (!teacher) {
+        showAdminToast('Data guru tidak ditemukan di memori.', 'error');
+        return;
+      }
+      const teacherName = teacher.nama || 'Guru';
+      const npsn = teacher.npsn || '';
+
+      if (!confirm(`Setujui pendaftaran guru atas nama "${teacherName}"? Guru langsung dapat login ke aplikasi.`)) return;
+
+      // 1. Instant Optimistic UI Update (0ms)
+      const originalPending = [...adminState.pendingTeachers];
+      const originalVerified = [...adminState.verifiedTeachers];
+      const originalRejected = [...adminState.rejectedTeachers];
+
+      // Pindahkan guru seketika ke tab terverifikasi
+      adminState.pendingTeachers = adminState.pendingTeachers.filter(t => t.id !== teacherId);
+      adminState.rejectedTeachers = adminState.rejectedTeachers.filter(t => t.id !== teacherId);
+
+      const updatedTeacher = {
+        ...teacher,
+        statusVerifikasi: 'Terverifikasi',
+        tanggalVerifikasi: new Date().toLocaleString('id-ID'),
+        diverifikasiOleh: adminState.adminEmail || 'Super Administrator'
+      };
+
+      if (!adminState.verifiedTeachers.some(t => t.id === teacherId)) {
+        adminState.verifiedTeachers.unshift(updatedTeacher);
+      }
+
+      cacheAdminState();
+      updateMetricsUI();
+      renderActiveAdminTabContent();
+      showAdminToast(`⚡ Guru "${teacherName}" telah disetujui! Menyimpan ke cloud...`, 'success');
+
+      // 2. Background Cloud Sync ke Google Apps Script
       try {
         const res = await callAdminApi('verifyTeacherRegistration', {
           teacherId: teacherId,
           npsn: npsn,
           status: 'Terverifikasi',
-          adminName: 'Super Administrator'
+          adminName: adminState.adminEmail || 'Super Administrator'
         });
 
         if (res && res.success) {
-          showAdminToast(`Guru "${teacherName}" telah BERHASIL diverifikasi!`, 'success');
-          fetchAllAdminData();
+          showAdminToast(`✓ Terverifikasi resmi: "${teacherName}" sudah dapat login ke aplikasi.`, 'success');
         } else {
-          showAdminToast((res && res.message) ? res.message : 'Gagal verifikasi.', 'error');
+          throw new Error((res && res.message) ? res.message : 'Gagal menyimpan status ke server.');
         }
       } catch (e) {
-        showAdminToast('Error: ' + e.message, 'error');
+        // Rollback otomatis jika jaringan gagal
+        adminState.pendingTeachers = originalPending;
+        adminState.verifiedTeachers = originalVerified;
+        adminState.rejectedTeachers = originalRejected;
+        cacheAdminState();
+        updateMetricsUI();
+        renderActiveAdminTabContent();
+        showAdminToast(`❌ Gagal verifikasi: ${e.message}. Status dikembalikan.`, 'error');
       }
     }
 
-    async function handleRejectTeacher(teacherId, npsn, teacherName, actionLabel = 'Tolak') {
-      if (!confirm(`${actionLabel} pendaftaran guru "${teacherName}"?`)) return;
-      showAdminToast(`Memproses ${teacherName}...`, 'info');
+    async function handleRejectTeacher(teacherId, actionLabel = 'Tolak') {
+      const teacher = findTeacherById(teacherId);
+      if (!teacher) {
+        showAdminToast('Data guru tidak ditemukan.', 'error');
+        return;
+      }
+      const teacherName = teacher.nama || 'Guru';
+      const npsn = teacher.npsn || '';
 
+      if (!confirm(`${actionLabel} guru "${teacherName}"?`)) return;
+
+      // 1. Instant Optimistic UI Update (0ms)
+      const originalPending = [...adminState.pendingTeachers];
+      const originalVerified = [...adminState.verifiedTeachers];
+      const originalRejected = [...adminState.rejectedTeachers];
+
+      adminState.pendingTeachers = adminState.pendingTeachers.filter(t => t.id !== teacherId);
+      adminState.verifiedTeachers = adminState.verifiedTeachers.filter(t => t.id !== teacherId);
+
+      const updatedTeacher = {
+        ...teacher,
+        statusVerifikasi: 'Ditolak',
+        tanggalVerifikasi: new Date().toLocaleString('id-ID'),
+        diverifikasiOleh: adminState.adminEmail || 'Super Administrator'
+      };
+
+      if (!adminState.rejectedTeachers.some(t => t.id === teacherId)) {
+        adminState.rejectedTeachers.unshift(updatedTeacher);
+      }
+
+      cacheAdminState();
+      updateMetricsUI();
+      renderActiveAdminTabContent();
+      showAdminToast(`Status guru "${teacherName}" diubah menjadi Ditolak. Menyimpan ke cloud...`, 'info');
+
+      // 2. Background Cloud Sync
       try {
         const res = await callAdminApi('verifyTeacherRegistration', {
           teacherId: teacherId,
           npsn: npsn,
           status: 'Ditolak',
-          adminName: 'Super Administrator'
+          adminName: adminState.adminEmail || 'Super Administrator'
         });
 
         if (res && res.success) {
-          showAdminToast(`Status guru "${teacherName}" diubah menjadi Ditolak.`, 'info');
-          fetchAllAdminData();
+          showAdminToast(`✓ Status guru "${teacherName}" berhasil disimpan sebagai Ditolak.`, 'info');
         } else {
-          showAdminToast((res && res.message) ? res.message : 'Gagal memproses.', 'error');
+          throw new Error((res && res.message) ? res.message : 'Gagal memproses ke server.');
         }
       } catch (e) {
-        showAdminToast('Error: ' + e.message, 'error');
+        adminState.pendingTeachers = originalPending;
+        adminState.verifiedTeachers = originalVerified;
+        adminState.rejectedTeachers = originalRejected;
+        cacheAdminState();
+        updateMetricsUI();
+        renderActiveAdminTabContent();
+        showAdminToast(`❌ Gagal: ${e.message}. Status dikembalikan.`, 'error');
       }
     }
 
-    async function handleAdminResetPinPrompt(teacherId, npsn, teacherName) {
+    async function handleApproveAllPending() {
+      const list = getFilteredList(adminState.pendingTeachers);
+      if (list.length === 0) return;
+      if (!confirm(`Setujui sekaligus ${list.length} pendaftaran guru yang sedang menunggu?`)) return;
+
+      const count = list.length;
+      showAdminToast(`⚡ Memverifikasi ${count} guru sekaligus...`, 'info');
+
+      // Optimistic move
+      const originalPending = [...adminState.pendingTeachers];
+      const originalVerified = [...adminState.verifiedTeachers];
+
+      list.forEach(teacher => {
+        adminState.pendingTeachers = adminState.pendingTeachers.filter(p => p.id !== teacher.id);
+        if (!adminState.verifiedTeachers.some(v => v.id === teacher.id)) {
+          adminState.verifiedTeachers.unshift({
+            ...teacher,
+            statusVerifikasi: 'Terverifikasi',
+            tanggalVerifikasi: new Date().toLocaleString('id-ID'),
+            diverifikasiOleh: adminState.adminEmail || 'Super Administrator'
+          });
+        }
+      });
+
+      cacheAdminState();
+      updateMetricsUI();
+      renderActiveAdminTabContent();
+
+      // Background calls
+      try {
+        for (const t of list) {
+          await callAdminApi('verifyTeacherRegistration', {
+            teacherId: t.id,
+            npsn: t.npsn,
+            status: 'Terverifikasi',
+            adminName: adminState.adminEmail || 'Super Administrator'
+          });
+        }
+        showAdminToast(`✓ Berhasil! Seluruh ${count} guru telah resmi disetujui.`, 'success');
+      } catch (e) {
+        showAdminToast('Sinkronisasi cloud parsial. Memuat ulang data...', 'info');
+        fetchAllAdminData(false);
+      }
+    }
+
+    async function handleAdminResetPinPrompt(teacherId) {
+      const teacher = findTeacherById(teacherId);
+      if (!teacher) {
+        showAdminToast('Data guru tidak ditemukan.', 'error');
+        return;
+      }
+      const teacherName = teacher.nama || 'Guru';
+      const npsn = teacher.npsn || '';
+
       const newPin = prompt(`Masukkan PIN baru untuk ${teacherName} (4 - 6 digit):`, '123456');
       if (!newPin || newPin.trim().length < 4) {
         if (newPin !== null) showAdminToast('PIN minimal 4 angka.', 'warning');
         return;
       }
 
-      showAdminToast('Memperbarui PIN...', 'info');
+      showAdminToast(`Memperbarui PIN ${teacherName}...`, 'info');
       try {
         const res = await callAdminApi('resetTeacherPinByAdmin', {
           teacherId: teacherId,
@@ -1417,7 +1664,7 @@
         });
 
         if (res && res.success) {
-          showAdminToast(`PIN ${teacherName} berhasil direset menjadi: ${newPin.trim()}`, 'success');
+          showAdminToast(`✓ PIN ${teacherName} berhasil direset menjadi: ${newPin.trim()}`, 'success');
         } else {
           showAdminToast((res && res.message) ? res.message : 'Gagal reset PIN.', 'error');
         }
@@ -1467,33 +1714,49 @@
       }
     }
 
-    async function handleAdminDeletePerangkat(id, judul) {
+    async function handleAdminDeletePerangkat(id) {
+      const doc = (adminState.perangkatList || []).find(d => d.id === id);
+      const judul = doc ? doc.judul : 'Dokumen';
+
       if (!confirm(`Hapus paket perangkat ajar "${judul}" dari database? Seluruh guru tidak akan dapat melihat paket ini lagi.`)) {
         return;
       }
       showAdminToast('Menghapus paket perangkat ajar...', 'info');
+
+      // Optimistic delete
+      const originalList = [...adminState.perangkatList];
+      adminState.perangkatList = adminState.perangkatList.filter(d => d.id !== id);
+      cacheAdminState();
+      updateMetricsUI();
+      renderActiveAdminTabContent();
+
       try {
         const res = await callAdminApi('deletePerangkatAdmin', { id: id });
         if (res && res.success) {
-          showAdminToast('Paket perangkat ajar berhasil dihapus.', 'success');
-          adminState.perangkatList = adminState.perangkatList.filter(d => d.id !== id);
+          showAdminToast('✓ Paket perangkat ajar berhasil dihapus.', 'success');
+        } else {
+          adminState.perangkatList = originalList;
+          cacheAdminState();
           updateMetricsUI();
           renderActiveAdminTabContent();
-        } else {
           showAdminToast('Gagal menghapus: ' + (res.message || 'Error'), 'error');
         }
       } catch (err) {
+        adminState.perangkatList = originalList;
+        cacheAdminState();
+        updateMetricsUI();
+        renderActiveAdminTabContent();
         showAdminToast('Error menghapus: ' + err.message, 'error');
       }
     }
 
     async function handleTriggerInitSheets() {
-      if (!confirm('Periksa dan buat otomatis ke-14 Sheet Lembaga di Google Spreadsheet Anda?')) return;
-      showAdminToast('Membuat sheet lembaga di Google Sheets...', 'info');
+      if (!confirm('Periksa dan buat otomatis Sheet Lembaga di Google Spreadsheet Anda?')) return;
+      showAdminToast('Memeriksa sheet lembaga di Google Sheets...', 'info');
       try {
         const res = await callAdminApi('initAllSheets', {});
         if (res && res.success) {
-          showAdminToast('14 Sheet Lembaga siap di Google Sheets!', 'success');
+          showAdminToast(res.message || 'Sheet Lembaga siap di Google Sheets!', 'success');
         } else {
           showAdminToast((res && res.message) ? res.message : 'Proses selesai.', 'info');
         }
