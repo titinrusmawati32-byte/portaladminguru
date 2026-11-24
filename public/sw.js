@@ -7,7 +7,7 @@
  * ============================================================
  */
 
-const CACHE_NAME = 'siguru-pwa-v5.2-native-xlsx-rekap-nilai-dan-absen';
+const CACHE_NAME = 'siguru-pwa-v5.3-cdn-failover-and-perf-optimization';
 
 // Aset inti yang wajib di-cache saat Service Worker dipasang
 const PRECACHE_ASSETS = [
