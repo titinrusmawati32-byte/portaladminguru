@@ -14,7 +14,7 @@ const APP_CONFIG = {
   // 1b. Konfigurasi Firebase Authentication (Google SSO Resmi Admin)
   // API Key aman dikelola melalui Vercel Environment Variables (/api/firebase-config)
   FIREBASE_CONFIG: {
-    apiKey: "", // Diambil otomatis & aman melalui serverless endpoint /api/firebase-config
+    apiKey: "AIzaSyB2gGUkOn-alsZY5U8XJ468nPySsF5yn7A",
     authDomain: "portaladmguru-e0689.firebaseapp.com",
     projectId: "portaladmguru-e0689",
     storageBucket: "portaladmguru-e0689.firebasestorage.app",
