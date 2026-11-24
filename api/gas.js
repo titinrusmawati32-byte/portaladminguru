@@ -7,10 +7,12 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+  const startTime = Date.now();
+
   // Header CORS lengkap
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -25,6 +27,14 @@ export default async function handler(req, res) {
       gasUrl = req.query.gasUrl || gasUrl;
       action = req.query.action || '';
 
+      // Terapkan Edge Caching untuk Read-Only Query (misal getAllTeachersAdmin)
+      const readActions = ['getAllTeachersAdmin', 'getMasterSchools', 'getSchoolProfiles', 'ping'];
+      if (readActions.includes(action) && !req.query.nocache) {
+        res.setHeader('Cache-Control', 's-maxage=20, stale-while-revalidate=60');
+      } else {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      }
+
       if (!gasUrl) {
         return res.status(400).json({
           success: false,
@@ -35,7 +45,7 @@ export default async function handler(req, res) {
       const targetUrl = new URL(gasUrl);
       targetUrl.searchParams.set('action', action);
       Object.entries(req.query).forEach(([k, v]) => {
-        if (k !== 'gasUrl' && k !== 'action') {
+        if (k !== 'gasUrl' && k !== 'action' && k !== 'nocache') {
           targetUrl.searchParams.set(k, String(v));
         }
       });
@@ -46,6 +56,7 @@ export default async function handler(req, res) {
       });
 
       const text = await response.text();
+      res.setHeader('X-Execution-Latency', `${Date.now() - startTime}ms`);
       try {
         const json = JSON.parse(text);
         return res.status(200).json(json);
@@ -78,6 +89,14 @@ export default async function handler(req, res) {
       action = body.action || '';
       payload = body.payload || {};
 
+      // Mutasi data (write) tidak boleh di-cache
+      const isMutation = ['verifyTeacherRegistration', 'resetTeacherPinByAdmin', 'deletePerangkatAdmin', 'savePerangkatAdmin', 'saveStudentTeacher', 'deleteStudentTeacher', 'saveClassTeacher', 'deleteClassTeacher'].includes(action);
+      if (isMutation) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      } else {
+        res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=30');
+      }
+
       if (!gasUrl) {
         return res.status(400).json({
           success: false,
@@ -96,6 +115,7 @@ export default async function handler(req, res) {
       });
 
       const text = await response.text();
+      res.setHeader('X-Execution-Latency', `${Date.now() - startTime}ms`);
       try {
         const json = JSON.parse(text);
         return res.status(200).json(json);
