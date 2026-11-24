@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup Perbaikan Format Rekap Excel - SiGuru SD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#F5F3FF',
+              100: '#ECE9FA',
+              200: '#DDD6FE',
+              300: '#C4B5FD',
+              400: '#A78BFA',
+              500: '#8275E5',
+              600: '#7C6EE6',
+              700: '#6C5CE7',
+              800: '#5846B5',
+              900: '#3D2F85',
+              dark: '#1E1B4B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-sizing: border-box;
+    }
+    .excel-grid td, .excel-grid th {
+      border: 1px solid #d1d5db;
+      padding: 6px 10px;
+      font-size: 11px;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 transition-colors duration-300">
+
+  <!-- ============================================================
+       TOP HEADER & CONTROL BAR
+       ============================================================ -->
+  <header class="max-w-6xl mx-auto mb-6 p-4 sm:p-5 rounded-3xl bg-slate-900/90 border border-white/10 backdrop-blur-md shadow-xl flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/30">
+          Solusi Masalah CSV Rusak
+        </span>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          Native .XLSX Excel Engine
+        </span>
+      </div>
+      <h1 class="text-lg sm:text-xl font-black text-white font-outfit mt-1.5 flex items-center gap-2">
+        <span>📊</span> <span>Mockup & Ide Perbaikan Hasil Rekap Excel SiGuru SD</span>
+      </h1>
+      <p class="text-xs text-slate-400 mt-0.5">Memperbaiki teks CSV yang menumpuk di Kolom A menjadi dokumen Excel (.xlsx) resmi, bergaris, dan rapi.</p>
+    </div>
+
+    <!-- Tombol Unduh Contoh Langsung -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <button onclick="downloadLiveSampleXLSX()" class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/30 transition active:scale-95 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Unduh Contoh .XLSX Hasil Perbaikan</span>
+      </button>
+    </div>
+
+    <!-- SWITCHER TAB: SEBELUM vs SESUDAH -->
+    <div class="w-full pt-3 border-t border-white/10 flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <button onclick="setTab('after')" id="btnTabAfter" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-extrabold text-xs cursor-pointer shadow-md shadow-emerald-600/20 transition">
+          ✓ Sesudah Perbaikan (Format .XLSX Resmi)
+        </button>
+        <button onclick="setTab('before')" id="btnTabBefore" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white font-extrabold text-xs cursor-pointer transition">
+          ✕ Masalah Saat Ini (CSV Menumpuk di Kolom A)
+        </button>
+      </div>
+
+      <!-- Pilihan Warna Tabel Excel -->
+      <div class="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+        <span class="text-[11px]">Tema Warna Excel:</span>
+        <button onclick="setTableTheme('emerald')" class="w-6 h-6 rounded-full bg-emerald-600 border-2 border-white/40 cursor-pointer" title="Emerald Mint"></button>
+        <button onclick="setTableTheme('navy')" class="w-6 h-6 rounded-full bg-blue-700 border-2 border-white/40 cursor-pointer" title="Classic Navy"></button>
+        <button onclick="setTableTheme('violet')" class="w-6 h-6 rounded-full bg-purple-600 border-2 border-white/40 cursor-pointer" title="Soft Lavender"></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       ANALISIS PENYEBAB & SOLUSI
+       ============================================================ -->
+  <section class="max-w-6xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    
+    <div class="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/30 space-y-1.5">
+      <div class="flex items-center gap-2 text-rose-400 font-black text-xs">
+        <span>⚠️</span> <span>1. Penyebab Masalah Tumpuk di Kolom A</span>
+      </div>
+      <p class="text-[11px] text-slate-300 leading-relaxed">
+        Aplikasi sebelumnya mengekspor format teks mentah <strong>.csv dengan koma</strong>. Pada Windows & Excel ber-setting Indonesia/Regional, Excel mengharapkan tanda titik koma (<code>;</code>), sehingga Excel membaca semua baris hanya sebagai 1 kalimat teks panjang di Kolom A.
+      </p>
+    </div>
+
+    <div class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 space-y-1.5">
+      <div class="flex items-center gap-2 text-emerald-400 font-black text-xs">
+        <span>💎</span> <span>2. Solusi: Gunakan Native .XLSX via SheetJS</span>
+      </div>
+      <p class="text-[11px] text-slate-300 leading-relaxed">
+        Mengubah fungsi download menggunakan library <strong>SheetJS</strong> untuk memproduksi file biner <strong>.xlsx asli</strong>. Saat dibuka di Excel versi berapa pun, Kolom A, B, C, D... otomatis terpisah sempurna tanpa perlu pengaturan delimiter.
+      </p>
+    </div>
+
+    <div class="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/30 space-y-1.5">
+      <div class="flex items-center gap-2 text-purple-300 font-black text-xs">
+        <span>📐</span> <span>3. Layout Standar Dinas & Kurikulum Merdeka</span>
+      </div>
+      <p class="text-[11px] text-slate-300 leading-relaxed">
+        Dilengkapi <strong>Kop Resmi Sekolah</strong>, lebar kolom otomatis (Auto-Fit agar nama siswa tidak terpotong), tabel bergaris kisi-kisi rapi, rumus otomatis rata-rata kelas, dan blok tanda tangan resmi Kepala Sekolah & Guru.
+      </p>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       SIMULASI TAMPILAN WINDOWS EXCEL (BEFORE / AFTER)
+       ============================================================ -->
+  <main class="max-w-6xl mx-auto rounded-3xl bg-slate-900 border border-white/10 shadow-2xl overflow-hidden flex flex-col">
+    
+    <!-- Excel Window Title Bar -->
+    <div class="bg-slate-800 px-4 py-2 border-b border-white/10 flex items-center justify-between text-xs text-slate-300 select-none">
+      <div class="flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+        <span class="font-bold text-white ml-2 flex items-center gap-1.5 font-mono text-[11px]" id="excelFileName">
+          📗 Rekap_Nilai_Kelas_IV-A_Bahasa_Indonesia.xlsx - Microsoft Excel
+        </span>
+      </div>
+      <span class="text-[10px] text-slate-400 font-mono">100% Zoom • Siap Cetak & Kirim</span>
+    </div>
+
+    <!-- Excel Ribbon Mockup -->
+    <div class="bg-slate-100 text-slate-700 px-4 py-1.5 text-[11px] font-bold border-b border-slate-300 flex items-center gap-4 select-none">
+      <span class="text-emerald-700 font-black border-b-2 border-emerald-600 pb-0.5">Beranda</span>
+      <span class="hover:text-emerald-700 cursor-pointer">Sisipkan</span>
+      <span class="hover:text-emerald-700 cursor-pointer">Tata Letak Halaman</span>
+      <span class="hover:text-emerald-700 cursor-pointer">Rumus</span>
+      <span class="hover:text-emerald-700 cursor-pointer">Data</span>
+      <span class="hover:text-emerald-700 cursor-pointer">Tampilan</span>
+    </div>
+
+    <!-- WORKSPACE SPREADSHEET (SESUDAH / SEBELUM) -->
+    <div class="p-4 bg-white text-slate-800 overflow-x-auto custom-scrollbar min-h-[460px]" id="spreadsheetView">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Excel Sheet Tabs Bar di Bagian Bawah -->
+    <div class="bg-slate-200 px-4 py-2 border-t border-slate-300 flex items-center justify-between text-xs select-none">
+      <div class="flex items-center gap-1.5" id="sheetTabsContainer">
+        <!-- Tabs -->
+      </div>
+      <div class="text-[11px] text-slate-600 font-bold font-mono">
+        Jumlah Siswa: 28 • Rata-rata Kelas: 86.4
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       SCRIPT DATA & GENERATOR CONTOH
+       ============================================================ -->
+  <script>
+    let activeTab = 'after'; // 'after' atau 'before'
+    let currentTheme = 'emerald'; // 'emerald', 'navy', 'violet'
+
+    const SAMPLE_STUDENTS = [
+      { no: 1, nisn: "0128394819", nama: "Achmad Fauzi Pratama", t1: 85, t2: 88, t3: 90, uh1: 88, uh2: 86, pts: 88, pas: 92, na: 89, pred: "A", ket: "Sangat Baik" },
+      { no: 2, nisn: "0128394822", nama: "Anisa Rahmawati Putri", t1: 90, t2: 92, t3: 94, uh1: 92, uh2: 90, pts: 94, pas: 95, na: 93, pred: "A", ket: "Sangat Baik" },
+      { no: 3, nisn: "0128394835", nama: "Bagas Surya Ramadhan", t1: 78, t2: 80, t3: 82, uh1: 80, uh2: 78, pts: 80, pas: 84, na: 81, pred: "B", ket: "Baik" },
+      { no: 4, nisn: "0128394848", nama: "Dinda Ayu Lestari", t1: 82, t2: 85, t3: 88, uh1: 85, uh2: 84, pts: 86, pas: 90, na: 86, pred: "B", ket: "Baik" },
+      { no: 5, nisn: "0128394851", nama: "Fajar Rizki Hidayat", t1: 75, t2: 78, t3: 80, uh1: 78, uh2: 76, pts: 78, pas: 80, na: 78, pred: "C", ket: "Cukup" },
+      { no: 6, nisn: "0128394864", nama: "Kirana Dewi Safitri", t1: 92, t2: 95, t3: 95, uh1: 94, uh2: 92, pts: 96, pas: 98, na: 95, pred: "A", ket: "Sangat Baik" },
+      { no: 7, nisn: "0128394877", nama: "Muhammad Ilham Maulana", t1: 80, t2: 82, t3: 85, uh1: 82, uh2: 80, pts: 84, pas: 86, na: 83, pred: "B", ket: "Baik" },
+      { no: 8, nisn: "0128394880", nama: "Nabila Zahra Syakirah", t1: 88, t2: 90, t3: 92, uh1: 90, uh2: 88, pts: 92, pas: 94, na: 91, pred: "A", ket: "Sangat Baik" }
+    ];
+
+    function setTab(tab) {
+      activeTab = tab;
+      const btnAfter = document.getElementById('btnTabAfter');
+      const btnBefore = document.getElementById('btnTabBefore');
+      const fileName = document.getElementById('excelFileName');
+
+      if (tab === 'after') {
+        btnAfter.className = 'px-4 py-2 rounded-xl bg-emerald-600 text-white font-extrabold text-xs cursor-pointer shadow-md shadow-emerald-600/20 transition';
+        btnBefore.className = 'px-4 py-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white font-extrabold text-xs cursor-pointer transition';
+        fileName.innerText = '📗 Rekap_Nilai_Kelas_IV-A_Bahasa_Indonesia.xlsx - Microsoft Excel';
+      } else {
+        btnBefore.className = 'px-4 py-2 rounded-xl bg-rose-600 text-white font-extrabold text-xs cursor-pointer shadow-md shadow-rose-600/20 transition';
+        btnAfter.className = 'px-4 py-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white font-extrabold text-xs cursor-pointer transition';
+        fileName.innerText = '📄 Rekap_Nilai_Kelas_IV-A_Bahasa_Indonesia.csv - Microsoft Excel (Rusak)';
+      }
+      renderSpreadsheet();
+    }
+
+    function setTableTheme(theme) {
+      currentTheme = theme;
+      if (activeTab === 'after') renderSpreadsheet();
+    }
+
+    function renderSpreadsheet() {
+      const container = document.getElementById('spreadsheetView');
+      const tabs = document.getElementById('sheetTabsContainer');
+      if (!container || !tabs) return;
+
+      if (activeTab === 'before') {
+        // TAMPILAN MASALAH SEPERTI SCREENSHOT USER
+        tabs.innerHTML = `
+          <div class="px-3 py-1 bg-white border border-slate-300 font-bold text-slate-800 rounded-t shadow-xs text-[11px]">
+            Rekap_Nilai_Kelas_IV-A_Bahasa_I
+          </div>
+        `;
+
+        container.innerHTML = `
+          <div class="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl mb-3 text-xs flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base">❌</span>
+              <strong>Tampilan Masalah Saat Ini:</strong> Seluruh teks bergabung ke dalam <strong>Kolom A</strong> saja karena delimiter koma tidak terbaca di Excel Indonesia.
+            </div>
+            <span class="font-mono text-[10px] bg-rose-200 px-2 py-0.5 rounded">Format .CSV</span>
+          </div>
+
+          <table class="w-full text-left font-mono text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-200 text-slate-600 border border-slate-300">
+                <th class="p-1 px-3 w-12 border border-slate-300">#</th>
+                <th class="p-1 px-3 w-96 border border-slate-300 font-bold text-slate-800">A (Semua Data Menumpuk Di Sini)</th>
+                <th class="p-1 px-3 w-28 border border-slate-300 text-slate-400 font-normal">B (Kosong)</th>
+                <th class="p-1 px-3 w-28 border border-slate-300 text-slate-400 font-normal">C (Kosong)</th>
+                <th class="p-1 px-3 w-28 border border-slate-300 text-slate-400 font-normal">D (Kosong)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 text-[11px]">
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">1</td><td class="p-1 px-2">PENGATURAN & PETUNJUK,,,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">2</td><td class="p-1 px-2">Isi sel berwarna kuning (teks biru). Semua sheet rekap otomatis mengikuti pengaturan ini.,,,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">3</td><td class="p-1 px-2">Identitas,,,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">4</td><td class="p-1 px-2">Nama Sekolah,"SDN Sumberejo 04",,Skala Predikat,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">5</td><td class="p-1 px-2">Nama Guru,"reza fahlevi",,A,≥ 90</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">6</td><td class="p-1 px-2">NIP Guru,"123456",,B,80 – 89</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">7</td><td class="p-1 px-2">Mata Pelajaran,"Bahasa Indonesia",,C,KKM – 79</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">8</td><td class="p-1 px-2">Kelas,"Kelas IV A",,D,&lt; KKM</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">9</td><td class="p-1 px-2">Semester,"Ganjil",,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">10</td><td class="p-1 px-2">Tahun Ajaran,"2026/2027",,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">11</td><td class="p-1 px-2">KKM,75,,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">12</td><td class="p-1 px-2">REKAP NILAI SISWA,,,,,,,,,,,,,</td><td></td><td></td><td></td></tr>
+              <tr><td class="p-1 px-2 bg-slate-100 text-slate-500 text-center">13</td><td class="p-1 px-2">1,"0128394819","Achmad Fauzi Pratama",85,88,90,88,86,88,92,89,A,Sangat Baik</td><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        `;
+        return;
+      }
+
+      // TAMPILAN SESUDAH: NATIVE .XLSX MULTI-KOLOM RESMI
+      let headerBg = 'bg-emerald-700 text-white';
+      let subHeaderBg = 'bg-emerald-100 text-emerald-950 font-bold';
+      let borderTone = 'border-emerald-300';
+
+      if (currentTheme === 'navy') {
+        headerBg = 'bg-blue-800 text-white';
+        subHeaderBg = 'bg-blue-100 text-blue-950 font-bold';
+        borderTone = 'border-blue-300';
+      } else if (currentTheme === 'violet') {
+        headerBg = 'bg-purple-700 text-white';
+        subHeaderBg = 'bg-purple-100 text-purple-950 font-bold';
+        borderTone = 'border-purple-300';
+      }
+
+      tabs.innerHTML = `
+        <div class="px-3.5 py-1 bg-white border-t-2 border-emerald-600 font-extrabold text-slate-900 rounded-t shadow-xs text-[11px] flex items-center gap-1.5">
+          <span>📊 Rekap Nilai Rapor</span>
+        </div>
+        <div class="px-3 py-1 bg-slate-100 hover:bg-white text-slate-600 font-bold rounded-t text-[11px] cursor-pointer">
+          📈 Analisis & Peringkat
+        </div>
+        <div class="px-3 py-1 bg-slate-100 hover:bg-white text-slate-600 font-bold rounded-t text-[11px] cursor-pointer">
+          📅 Rekap Presensi
+        </div>
+      `;
+
+      container.innerHTML = `
+        <div class="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl mb-3 text-xs flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-base">✨</span>
+            <strong>Format Baru .XLSX Resmi:</strong> Kolom otomatis terbagi rapi (A, B, C, D... O), memiliki garis kisi resmi, header berwarna, dan siap diprint/dikirim.
+          </div>
+          <button onclick="downloadLiveSampleXLSX()" class="text-xs font-black px-3 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition cursor-pointer">
+            Unduh Berkas Ini ➔
+          </button>
+        </div>
+
+        <!-- SPREADSHEET CANVAS -->
+        <div class="space-y-4">
+          
+          <!-- KOP RESMI LEMBAGA -->
+          <div class="text-center space-y-0.5 pb-2 border-b-2 border-slate-800">
+            <h4 class="font-extrabold text-xs text-slate-600 uppercase tracking-wider">PEMERINTAH KABUPATEN JEMBER • KOORWIL PENDIDIKAN KECAMATAN AMBULU</h4>
+            <h2 class="text-base font-black text-slate-900 font-outfit uppercase">DAFTAR REKAPITULASI NILAI ASESMEN SISWA</h2>
+            <h3 class="text-xs font-black text-slate-800 uppercase">SD NEGERI SUMBEREJO 04 • TAHUN AJARAN 2026/2027</h3>
+          </div>
+
+          <!-- METADATA 2 KOLOM -->
+          <div class="grid grid-cols-2 text-xs font-bold gap-y-1 text-slate-700 py-1">
+            <div>Mata Pelajaran : <span class="font-extrabold text-slate-900">Bahasa Indonesia</span></div>
+            <div>Kelas / Semester : <span class="font-extrabold text-slate-900">Kelas IV-A / Ganjil</span></div>
+            <div>Guru Pengampu : <span class="font-extrabold text-slate-900">Reza Fahlevi, S.Pd.</span></div>
+            <div>KKM / Target : <span class="font-extrabold text-slate-900">75 (Skala 100)</span></div>
+          </div>
+
+          <!-- TABEL NILAI MULTI-KOLOM LENGKAP -->
+          <table class="w-full text-center border-collapse excel-grid">
+            <thead>
+              <tr class="${headerBg}">
+                <th rowspan="2" class="w-10">No</th>
+                <th rowspan="2" class="w-24">NISN</th>
+                <th rowspan="2" class="text-left w-52">Nama Siswa</th>
+                <th colspan="3" class="bg-black/10">Tugas / Formatif (TP)</th>
+                <th colspan="2" class="bg-black/15">Ulangan Harian</th>
+                <th rowspan="2" class="w-14">PTS</th>
+                <th rowspan="2" class="w-14">PAS</th>
+                <th rowspan="2" class="w-16 bg-amber-400 text-slate-950 font-black">Nilai Akhir</th>
+                <th rowspan="2" class="w-12">Predikat</th>
+                <th rowspan="2" class="text-left w-28">Keterangan</th>
+              </tr>
+              <tr class="${subHeaderBg}">
+                <th>TP 1</th>
+                <th>TP 2</th>
+                <th>TP 3</th>
+                <th>UH 1</th>
+                <th>UH 2</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${SAMPLE_STUDENTS.map(s => `
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="font-bold text-slate-500">${s.no}</td>
+                  <td class="font-mono text-slate-600">${s.nisn}</td>
+                  <td class="text-left font-bold text-slate-900">${s.nama}</td>
+                  <td>${s.t1}</td>
+                  <td>${s.t2}</td>
+                  <td>${s.t3}</td>
+                  <td>${s.uh1}</td>
+                  <td>${s.uh2}</td>
+                  <td>${s.pts}</td>
+                  <td>${s.pas}</td>
+                  <td class="font-black bg-amber-50 text-slate-950 font-mono text-xs">${s.na}</td>
+                  <td class="font-black ${s.pred === 'A' ? 'text-emerald-700 bg-emerald-50' : 'text-blue-700 bg-blue-50'}">${s.pred}</td>
+                  <td class="text-left font-medium text-slate-600">${s.ket}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+            <tfoot>
+              <!-- BARIS STATISTIK OTOMATIS RUMUS EXCEL -->
+              <tr class="bg-slate-100 font-extrabold text-slate-900">
+                <td colspan="3" class="text-right pr-3">Rata-rata Kelas :</td>
+                <td>83.7</td><td>86.8</td><td>88.5</td><td>86.1</td><td>84.5</td><td>87.0</td><td>90.0</td>
+                <td class="bg-amber-100 text-slate-950 font-black font-mono">86.4</td>
+                <td>-</td>
+                <td class="text-left text-emerald-800">100% Tuntas</td>
+              </tr>
+              <tr class="bg-slate-100 font-extrabold text-slate-900">
+                <td colspan="3" class="text-right pr-3">Nilai Tertinggi :</td>
+                <td colspan="7"></td>
+                <td class="bg-emerald-100 text-emerald-900 font-black font-mono">95</td>
+                <td colspan="2"></td>
+              </tr>
+              <tr class="bg-slate-100 font-extrabold text-slate-900">
+                <td colspan="3" class="text-right pr-3">Nilai Terendah :</td>
+                <td colspan="7"></td>
+                <td class="bg-rose-100 text-rose-900 font-black font-mono">78</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- KOTAK TANDA TANGAN RESMI KEPALA SEKOLAH & GURU -->
+          <div class="grid grid-cols-2 pt-6 text-xs text-center font-bold text-slate-800">
+            <div>
+              <p>Mengetahui,</p>
+              <p class="font-black">Kepala SD Negeri Sumberejo 04</p>
+              <div class="h-16"></div>
+              <p class="font-black underline uppercase">SAMSUL ARIFIN, S.Pd., M.Pd.</p>
+              <p class="font-mono text-[10px]">NIP. 19700505 199512 1 002</p>
+            </div>
+            <div>
+              <p>Ambulu, 24 November 2026</p>
+              <p class="font-black">Guru Mata Pelajaran</p>
+              <div class="h-16"></div>
+              <p class="font-black underline uppercase">REZA FAHLEVI, S.Pd.</p>
+              <p class="font-mono text-[10px]">NIP. 19920516 202012 1 005</p>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // FUNGSI MENGHASILKAN FILE NYATA .XLSX DENGAN SHEETJS
+    function downloadLiveSampleXLSX() {
+      if (!window.XLSX) {
+        alert("Library Excel sedang memuat, silakan coba 2 detik lagi.");
+        return;
+      }
+
+      const rows = [
+        ["PEMERINTAH KABUPATEN JEMBER - KOORWIL PENDIDIKAN KECAMATAN AMBULU"],
+        ["DAFTAR REKAPITULASI NILAI ASESMEN SISWA"],
+        ["SD NEGERI SUMBEREJO 04 - TAHUN AJARAN 2026/2027"],
+        [""],
+        ["Mata Pelajaran:", "Bahasa Indonesia", "", "Kelas / Semester:", "Kelas IV-A / Ganjil"],
+        ["Guru Pengampu:", "Reza Fahlevi, S.Pd.", "", "KKM:", 75],
+        [""],
+        ["No", "NISN", "Nama Siswa", "TP 1", "TP 2", "TP 3", "UH 1", "UH 2", "PTS", "PAS", "Nilai Akhir", "Predikat", "Keterangan"]
+      ];
+
+      SAMPLE_STUDENTS.forEach(s => {
+        rows.push([s.no, s.nisn, s.nama, s.t1, s.t2, s.t3, s.uh1, s.uh2, s.pts, s.pas, s.na, s.pred, s.ket]);
+      });
+
+      rows.push([""]);
+      rows.push(["", "", "Rata-rata Kelas:", "", "", "", "", "", "", "", 86.4, "-", "100% Tuntas"]);
+      rows.push(["", "", "Nilai Tertinggi:", "", "", "", "", "", "", "", 95, "-", ""]);
+      rows.push(["", "", "Nilai Terendah:", "", "", "", "", "", "", "", 78, "-", ""]);
+      rows.push([""]);
+      rows.push(["", "Mengetahui,", "", "", "", "", "", "", "Ambulu, 24 November 2026"]);
+      rows.push(["", "Kepala Sekolah", "", "", "", "", "", "", "Guru Mata Pelajaran"]);
+      rows.push([""]);
+      rows.push([""]);
+      rows.push(["", "SAMSUL ARIFIN, S.Pd., M.Pd.", "", "", "", "", "", "", "REZA FAHLEVI, S.Pd."]);
+      rows.push(["", "NIP. 19700505 199512 1 002", "", "", "", "", "", "", "NIP. 19920516 202012 1 005"]);
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+
+      // Set Lebar Kolom Otomatis (Auto-Fit)
+      ws['!cols'] = [
+        { wch: 6 },  // No
+        { wch: 15 }, // NISN
+        { wch: 28 }, // Nama Siswa
+        { wch: 8 },  // TP1
+        { wch: 8 },  // TP2
+        { wch: 8 },  // TP3
+        { wch: 8 },  // UH1
+        { wch: 8 },  // UH2
+        { wch: 8 },  // PTS
+        { wch: 8 },  // PAS
+        { wch: 12 }, // Nilai Akhir
+        { wch: 10 }, // Predikat
+        { wch: 18 }  // Keterangan
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai Rapor");
+
+      // Sheet 2: Analisis Singkat
+      const wsAnalisis = XLSX.utils.aoa_to_sheet([
+        ["RINGKASAN ANALISIS NILAI ASESMEN"],
+        ["SD NEGERI SUMBEREJO 04 - KELAS IV-A"],
+        [""],
+        ["Indikator", "Hasil"],
+        ["Total Siswa", 28],
+        ["Siswa Tuntas", 28],
+        ["Siswa Belum Tuntas", 0],
+        ["Persentase Ketuntasan", "100%"],
+        ["Rata-rata Rapor", 86.4]
+      ]);
+      wsAnalisis['!cols'] = [{ wch: 25 }, { wch: 15 }];
+      XLSX.utils.book_append_sheet(wb, wsAnalisis, "Ringkasan Analisis");
+
+      XLSX.writeFile(wb, "Rekap_Nilai_Resmi_Kelas_IV-A_Bahasa_Indonesia.xlsx");
+    }
+
+    // Init first load
+    setTab('after');
+  </script>
+</body>
+</html>
