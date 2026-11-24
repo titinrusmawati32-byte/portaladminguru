@@ -760,6 +760,10 @@
         <span class="font-extrabold text-brand-700 tracking-wide font-outfit">SiGuru SD Digital</span>
       </div>
       <div class="flex items-center gap-2">
+        <!-- Tombol Cepat Panduan Penggunaan -->
+        <button type="button" onclick="openGuideModal()" class="px-2.5 py-1 rounded-full bg-brand-500/15 hover:bg-brand-500/25 border border-brand-500/30 text-brand-700 font-extrabold text-[11px] flex items-center gap-1 cursor-pointer transition active:scale-95" title="Buka Panduan Aplikasi">
+          <span>📖 Panduan</span>
+        </button>
         <span class="text-[11px] font-bold text-brand-muted hidden sm:inline">Kec. Ambulu • Jember</span>
         <button type="button" onclick="toggleDarkMode()" title="Mode Gelap / Terang" class="w-7 h-7 rounded-full bg-white/80 hover:bg-white text-xs flex items-center justify-center border border-violet-100 cursor-pointer shadow-2xs">
           <span class="loginDarkModeIcon">🌙</span>
@@ -959,6 +963,244 @@
         
         <span class="text-[10px] text-brand-muted">Akses 48 SD Negeri & Swasta • Cukup login 1x untuk pakai selamanya</span>
       </div>
+
+      <!-- Banner / Tombol Buka Panduan Aplikasi -->
+      <div class="w-full max-w-sm mt-3 space-y-2">
+        <button type="button" onclick="openGuideModal()" 
+                class="w-full bg-white/80 hover:bg-white backdrop-blur-md p-3 rounded-2xl border border-white/90 shadow-xs flex items-center justify-between gap-2.5 text-xs font-bold text-slate-700 cursor-pointer transition hover:shadow-md active:scale-98">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-xl bg-purple-100 text-brand-600 flex items-center justify-center text-sm font-black shrink-0">📖</span>
+            <div class="text-left">
+              <div class="text-brand-dark font-extrabold text-xs">Panduan Penggunaan Aplikasi</div>
+              <div class="text-[10px] text-slate-400 font-medium">Cara daftar, login & input nilai di HP</div>
+            </div>
+          </div>
+          <span class="text-brand-600 font-extrabold text-xs shrink-0">Buka ➔</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Bottom Footer -->
+    <div class="relative z-10 text-center text-[11px] text-brand-muted pt-2 font-medium">
+      SiGuru SD • Koorwil Pendidikan Kecamatan Ambulu, Jember • v4.0 Landscape Matrix Edition
+    </div>
+  </section>
+
+  <!-- ============================================================
+       POP-UP MODAL: PANDUAN PENGGUNAAN OTOMATIS (ONBOARDING GURU)
+       ============================================================ -->
+  <div id="modalGuideOverlay" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md hidden items-center justify-center p-3 sm:p-5 transition-all duration-300" style="display: none; z-index: 99999;">
+    <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl border border-white/90 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200 text-slate-800">
+      
+      <!-- 1. Modal Header -->
+      <div class="p-5 sm:p-6 pb-4 border-b border-slate-100 bg-gradient-to-r from-purple-50/70 via-white to-indigo-50/70 flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl lavender-gradient text-white flex items-center justify-center text-2xl shadow-lg shadow-brand-500/25 shrink-0">
+            💡
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                Panduan Singkat
+              </span>
+              <span class="text-[11px] text-slate-400 font-bold">• Wajib Dibaca Guru Baru</span>
+            </div>
+            <h3 class="font-black text-base sm:text-lg text-slate-900 font-outfit leading-tight mt-0.5">
+              Selamat Datang di Portal SiGuru SD!
+            </h3>
+            <p class="text-xs text-slate-500">Silakan baca panduan penggunaan di bawah sebelum mulai menggunakan aplikasi.</p>
+          </div>
+        </div>
+
+        <button onclick="handleExitGuide()" title="Tutup / Exit" 
+                class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-black transition cursor-pointer shrink-0">
+          ✕
+        </button>
+      </div>
+
+      <!-- 2. Kategori Tab Filter -->
+      <div class="px-5 sm:px-6 pt-3 pb-2 flex items-center gap-1.5 overflow-x-auto custom-scrollbar border-b border-slate-100 text-xs bg-slate-50/40">
+        <button onclick="filterGuideCategory('semua', this)" class="guide-tab-btn active px-3.5 py-1.5 rounded-full font-bold bg-brand-600 text-white shadow-xs cursor-pointer shrink-0">
+          🌟 Semua Panduan (4)
+        </button>
+        <button onclick="filterGuideCategory('akun', this)" class="guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0">
+          🔑 Pendaftaran & Akun
+        </button>
+        <button onclick="filterGuideCategory('nilai', this)" class="guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0">
+          📊 Input Nilai di HP
+        </button>
+        <button onclick="filterGuideCategory('perangkat', this)" class="guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0">
+          📁 Perangkat Ajar Drive
+        </button>
+      </div>
+
+      <!-- 3. Modal Body: Galeri Thumbnail Panduan -->
+      <div id="guideGalleryView" class="p-5 sm:p-6 overflow-y-auto custom-scrollbar space-y-4">
+        
+        <div class="p-3 rounded-2xl bg-brand-50/70 border border-brand-100 flex items-center gap-2.5 text-xs text-brand-900">
+          <span class="text-base shrink-0">👆</span>
+          <span><strong>Tips:</strong> Klik pada salah satu kartu thumbnail di bawah untuk membaca tutorial langkah demi langkah.</span>
+        </div>
+
+        <!-- Grid 4 Kartu Thumbnail -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- THUMBNAIL 1: CARA DAFTAR GURU BARU -->
+          <div onclick="openGuideDetail(1)" data-cat="akun"
+               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-brand-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden">
+            <div class="h-28 bg-gradient-to-br from-indigo-500 to-purple-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
+              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
+                  Langkah Awal
+                </span>
+                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 2 Menit</span>
+              </div>
+              <div class="z-10 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">📝</div>
+                <div class="font-extrabold text-sm leading-tight text-white">Daftar Akun Guru Baru</div>
+              </div>
+            </div>
+            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-extrabold text-xs text-slate-900 group-hover:text-brand-600 transition">Cara Daftar & Menunggu Persetujuan Admin</h4>
+                <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">Panduan memasukkan NPSN, kode sekolah, data diri guru, buat PIN, hingga diverifikasi oleh Koorwil.</p>
+              </div>
+              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
+                <span class="text-emerald-600 font-bold">✓ 3 Langkah Mudah</span>
+                <span class="text-brand-600 font-extrabold group-hover:translate-x-1 transition">Baca Panduan ➔</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- THUMBNAIL 2: CARA INPUT NILAI DI HP (LANDSCAPE & MATRIKS) -->
+          <div onclick="openGuideDetail(2)" data-cat="nilai"
+               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden">
+            <div class="h-28 bg-gradient-to-br from-emerald-500 to-teal-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
+              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
+                  Paling Populer
+                </span>
+                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 3 Menit</span>
+              </div>
+              <div class="z-10 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">📱</div>
+                <div class="font-extrabold text-sm leading-tight text-white">Input Nilai & Asesmen di HP</div>
+              </div>
+            </div>
+            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-extrabold text-xs text-slate-900 group-hover:text-emerald-600 transition">Cara Mengisi Nilai Cepat Tanpa Scroll</h4>
+                <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">Gunakan mode landscape HP atau kartu siswa per nama untuk memasukkan nilai formatif & sumatif dalam sekejap.</p>
+              </div>
+              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
+                <span class="text-emerald-600 font-bold">✓ Cepat & Anti-Ribet</span>
+                <span class="text-emerald-600 font-extrabold group-hover:translate-x-1 transition">Baca Panduan ➔</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- THUMBNAIL 3: CARA LOGIN & RESET PIN -->
+          <div onclick="openGuideDetail(3)" data-cat="akun"
+               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-amber-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden">
+            <div class="h-28 bg-gradient-to-br from-amber-500 to-orange-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
+              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
+                  Keamanan
+                </span>
+                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 1 Menit</span>
+              </div>
+              <div class="z-10 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">🔑</div>
+                <div class="font-extrabold text-sm leading-tight text-white">Lupa PIN / Gagal Masuk</div>
+              </div>
+            </div>
+            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-extrabold text-xs text-slate-900 group-hover:text-amber-600 transition">Panduan Reset PIN & Masuk Kembali</h4>
+                <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">Solusi jika salah memasukkan PIN atau belum tahu PIN akun Anda. Admin sekolah dapat mereset dalam 1 klik.</p>
+              </div>
+              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
+                <span class="text-amber-600 font-bold">✓ Bantuan Reset</span>
+                <span class="text-amber-600 font-extrabold group-hover:translate-x-1 transition">Baca Panduan ➔</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- THUMBNAIL 4: UNDUH PERANGKAT AJAR GOOGLE DRIVE -->
+          <div onclick="openGuideDetail(4)" data-cat="perangkat"
+               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-cyan-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden">
+            <div class="h-28 bg-gradient-to-br from-cyan-500 to-blue-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
+              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
+              <div class="flex items-center justify-between z-10">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
+                  Kurikulum Merdeka
+                </span>
+                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 2 Menit</span>
+              </div>
+              <div class="z-10 flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">📁</div>
+                <div class="font-extrabold text-sm leading-tight text-white">Unduh Modul Ajar Resmi</div>
+              </div>
+            </div>
+            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+              <div>
+                <h4 class="font-extrabold text-xs text-slate-900 group-hover:text-blue-600 transition">Cara Akses Modul Ajar, Prota, Prosem, CP & ATP</h4>
+                <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">Semua paket perangkat pembelajaran se-Kecamatan Ambulu dapat diunduh gratis langsung ke HP atau Laptop.</p>
+              </div>
+              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
+                <span class="text-blue-600 font-bold">✓ Google Drive Siap Pakai</span>
+                <span class="text-blue-600 font-extrabold group-hover:translate-x-1 transition">Baca Panduan ➔</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- 4. Modal Body: Tampilan Detail Langkah (Step-by-Step Reader) -->
+      <div id="guideDetailView" class="p-5 sm:p-6 overflow-y-auto custom-scrollbar space-y-4 hidden">
+        <button onclick="backToGallery()" class="text-xs font-bold text-brand-700 hover:underline flex items-center gap-1 cursor-pointer">
+          <span>⬅</span> <span>Kembali ke Galeri Panduan</span>
+        </button>
+
+        <div id="guideDetailContent" class="space-y-4">
+          <!-- Diisi via JavaScript -->
+        </div>
+      </div>
+
+      <!-- 5. Modal Footer: TOMBOL PAHAM & EXIT (SESUAI REQUEST USER) -->
+      <div class="p-4 px-6 border-t border-slate-100 bg-slate-50/90 flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- Checkbox opsi jangan tampilkan lagi -->
+        <label class="flex items-center gap-2 text-xs text-slate-600 cursor-pointer select-none">
+          <input type="checkbox" id="chkDoNotShowAgainGuide" class="w-4 h-4 rounded text-brand-600 accent-brand-600 cursor-pointer">
+          <span>Jangan tampilkan pop-up ini lagi secara otomatis</span>
+        </label>
+
+        <!-- Tombol Aksi Utama: PAHAM & EXIT -->
+        <div class="flex items-center gap-2.5 ml-auto">
+          <!-- Tombol EXIT / Batal -->
+          <button onclick="handleExitGuide()" 
+                  class="px-4 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95 cursor-pointer">
+            ✕ Exit
+          </button>
+
+          <!-- Tombol SAYA PAHAM (Utama) -->
+          <button onclick="handleUnderstoodGuide()" 
+                  class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5">
+            <span>✓ Saya Paham, Masuk Portal</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 
     </div>
 
@@ -2114,6 +2356,230 @@
       checkSchoolLoginBadge();
       checkSchoolRegBadge();
       showToast(`NPSN ${npsn} terpasang.`, 'info');
+    }
+
+    // ==========================================
+    // SISTEM PANDUAN PENGGUNAAN APLIKASI (ONBOARDING POP-UP)
+    // ==========================================
+    const APP_GUIDE_DATA = {
+      1: {
+        title: "Cara Daftar Akun Guru Baru & Verifikasi",
+        badge: "Pendaftaran Akun",
+        badgeColor: "bg-purple-100 text-purple-700",
+        steps: [
+          {
+            num: "1",
+            title: "Pilih Tab '📝 Guru Baru (Daftar)' di Halaman Login",
+            desc: "Buka halaman awal aplikasi, lalu klik tombol tab 'Guru Baru (Daftar)' di atas formulir login."
+          },
+          {
+            num: "2",
+            title: "Ketik NPSN & Kode Unik Lembaga Sekolah Anda",
+            desc: "Masukkan 8 digit NPSN dan Kode Unik sekolah (contoh: 20524065 dan SMB10-4065). Nama sekolah akan otomatis terdeteksi berwarna hijau."
+          },
+          {
+            num: "3",
+            title: "Lengkapi Nama, NIP, Nomor WhatsApp & Buat PIN Rahasia",
+            desc: "Ketik nama lengkap beserta gelar, nomor WhatsApp aktif untuk notifikasi persetujuan, dan buat 4-6 angka PIN pribadi rahasia Anda."
+          },
+          {
+            num: "4",
+            title: "Tunggu Verifikasi Admin Koorwil (Notifikasi WhatsApp Otomatis)",
+            desc: "Setelah Anda klik 'Ajukan Pendaftaran', akun Anda akan diperiksa oleh Admin Koorwil. Begitu disetujui, Anda akan langsung menerima pesan WhatsApp konfirmasi dan akun siap digunakan!"
+          }
+        ]
+      },
+      2: {
+        title: "Cara Cepat Input Nilai & Asesmen di HP",
+        badge: "Input Nilai di HP",
+        badgeColor: "bg-emerald-100 text-emerald-700",
+        steps: [
+          {
+            num: "1",
+            title: "Pilih Rombel & Mata Pelajaran Aktif",
+            desc: "Setelah login ke Portal Guru, klik dropdown 'Rombel Aktif' (misal: Kelas IV-A) dan pilih Mata Pelajaran yang sedang dinilai."
+          },
+          {
+            num: "2",
+            title: "Gunakan Mode HP Landscape (Miringkan Layar HP Anda)",
+            desc: "Untuk melihat tabel nilai matriks lengkap (TP1, TP2, TP3, Sumatif) secara luas tanpa perlu geser layar, miringkan HP Anda ke posisi horizontal (Landscape)."
+          },
+          {
+            num: "3",
+            title: "Atau Gunakan Mode Kartu Siswa (Tampilan Vertikal)",
+            desc: "Jika memegang HP dengan satu tangan, gunakan 'Mode Kartu Siswa'. Nilai setiap siswa dapat diisi secara bertahap dengan tombol angka instan."
+          },
+          {
+            num: "4",
+            title: "Data Otomatis Tersimpan Aman ke Cloud (Auto-Save)",
+            desc: "Setiap angka nilai yang Anda masukkan langsung tersimpan otomatis ke database. Anda tidak perlu khawatir kehilangan data saat baterai habis atau koneksi terputus."
+          }
+        ]
+      },
+      3: {
+        title: "Lupa PIN / Panduan Gagal Masuk Portal",
+        badge: "Bantuan Login",
+        badgeColor: "bg-amber-100 text-amber-700",
+        steps: [
+          {
+            num: "1",
+            title: "Pastikan NPSN & Kode Unik Sekolah Benar",
+            desc: "Periksa kembali NPSN dan Kode Unik sekolah Anda. Jika lupa kodenya, klik tombol 'Lihat Daftar NPSN & Kode Akses 48 SD Ambulu'."
+          },
+          {
+            num: "2",
+            title: "Pilih Nama Anda dari Menu Dropdown",
+            desc: "Setelah sekolah terverifikasi, pilih nama Anda yang sudah resmi terdaftar dan diverifikasi."
+          },
+          {
+            num: "3",
+            title: "Jika Lupa PIN, Minta Reset ke Admin Sekolah / Koorwil",
+            desc: "Admin Koorwil Ambulu memiliki fitur '1-Click Reset PIN' di panel admin. Hubungi admin melalui tombol WhatsApp di bawah, dan PIN baru Anda akan langsung diaktifkan dalam hitungan detik."
+          }
+        ]
+      },
+      4: {
+        title: "Cara Unduh Perangkat Ajar Kurikulum Merdeka",
+        badge: "Perangkat Pembelajaran",
+        badgeColor: "bg-blue-100 text-blue-700",
+        steps: [
+          {
+            num: "1",
+            title: "Masuk ke Menu 'Perangkat Ajar' di Menu Utama",
+            desc: "Klik menu berkas atau tab perangkat ajar di dashboard portal guru."
+          },
+          {
+            num: "2",
+            title: "Filter Berdasarkan Kelas, Mapel & Semester",
+            desc: "Pilih sasaran kelas (misal Kelas 1 Fase A atau Kelas 4 Fase B), mata pelajaran, dan semester 1/2."
+          },
+          {
+            num: "3",
+            title: "Klik 'Buka Link Google Drive'",
+            desc: "Klik tombol hijau pada paket yang diinginkan. Folder Google Drive resmi dari Koorwil Ambulu akan terbuka dan berkas DOCX/PDF siap diunduh ke perangkat Anda."
+          }
+        ]
+      }
+    };
+
+    function checkAutoOpenGuideModal() {
+      try {
+        const doNotShow = localStorage.getItem('siguru_dismiss_auto_guide');
+        if (!doNotShow) {
+          setTimeout(() => {
+            const loginScreen = document.getElementById('loginScreen');
+            if (loginScreen && loginScreen.style.display !== 'none' && !loginScreen.classList.contains('hidden')) {
+              openGuideModal();
+            }
+          }, 350);
+        }
+      } catch (e) {}
+    }
+
+    function openGuideModal() {
+      const modal = document.getElementById('modalGuideOverlay');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      modal.style.display = 'flex';
+      backToGuideGallery();
+    }
+
+    function closeGuideModal() {
+      const modal = document.getElementById('modalGuideOverlay');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      modal.style.display = 'none';
+    }
+
+    function handleUnderstoodGuide() {
+      const chk = document.getElementById('chkDoNotShowAgainGuide');
+      if (chk && chk.checked) {
+        try {
+          localStorage.setItem('siguru_dismiss_auto_guide', 'true');
+        } catch (e) {}
+      }
+      closeGuideModal();
+      const npsnInput = document.getElementById('loginNpsn');
+      if (npsnInput) npsnInput.focus();
+    }
+
+    function handleExitGuide() {
+      const chk = document.getElementById('chkDoNotShowAgainGuide');
+      if (chk && chk.checked) {
+        try {
+          localStorage.setItem('siguru_dismiss_auto_guide', 'true');
+        } catch (e) {}
+      }
+      closeGuideModal();
+    }
+
+    function filterGuideCategory(cat, btn) {
+      document.querySelectorAll('.guide-tab-btn').forEach(b => {
+        b.className = 'guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0';
+      });
+      if (btn) btn.className = 'guide-tab-btn active px-3.5 py-1.5 rounded-full font-bold bg-brand-600 text-white shadow-xs cursor-pointer shrink-0';
+
+      const cards = document.querySelectorAll('.guide-card');
+      cards.forEach(card => {
+        if (cat === 'semua' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function openGuideDetail(id) {
+      const data = APP_GUIDE_DATA[id];
+      if (!data) return;
+
+      const gallery = document.getElementById('guideGalleryView');
+      const detail = document.getElementById('guideDetailView');
+      const content = document.getElementById('guideDetailContent');
+      if (!gallery || !detail || !content) return;
+
+      content.innerHTML = `
+        <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-1">
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${data.badgeColor}">${data.badge}</span>
+          <h3 class="text-base sm:text-lg font-black text-slate-900 font-outfit mt-1">${data.title}</h3>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          ${data.steps.map(s => `
+            <div class="p-4 rounded-2xl bg-white border border-slate-200/80 hover:border-brand-300 transition flex items-start gap-3.5 shadow-2xs">
+              <div class="w-8 h-8 rounded-xl bg-brand-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-sm">
+                ${s.num}
+              </div>
+              <div class="space-y-1">
+                <h5 class="font-extrabold text-xs sm:text-sm text-slate-800">${s.title}</h5>
+                <p class="text-xs text-slate-500 leading-relaxed">${s.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">💡</span>
+            <span>Sudah paham dengan tutorial ini? Langsung coba di aplikasi.</span>
+          </div>
+          <button onclick="handleUnderstoodGuide()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shrink-0 cursor-pointer shadow-xs">
+            ✓ Sudah Paham, Masuk ➔
+          </button>
+        </div>
+      `;
+
+      gallery.classList.add('hidden');
+      detail.classList.remove('hidden');
+    }
+
+    function backToGuideGallery() {
+      const gallery = document.getElementById('guideGalleryView');
+      const detail = document.getElementById('guideDetailView');
+      if (gallery) gallery.classList.remove('hidden');
+      if (detail) detail.classList.add('hidden');
     }
 
     // ==========================================
@@ -8829,6 +9295,8 @@
       if (!restored) {
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('mainApp').style.display = 'none';
+        // Munculkan otomatis pop-up panduan saat URL dibuka
+        checkAutoOpenGuideModal();
       } else {
         startAutoSync(); // Aktifkan sinkronisasi lintas perangkat jika sesi guru aktif
       }
@@ -8862,6 +9330,7 @@
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeUniversalModal();
+          closeGuideModal();
           const qrModal = document.getElementById('qrScannerModal');
           if (qrModal && !qrModal.classList.contains('hidden') && typeof stopQrScanner === 'function') {
             stopQrScanner();
@@ -8870,6 +9339,7 @@
       });
       window.addEventListener('popstate', () => {
         closeUniversalModal();
+        closeGuideModal();
       });
 
       // PASSTHROUGH SCROLL MOUSE WHEEL & TOUCHPAD DI DALAM TABEL (LAPTOP, DESKTOP & TABLET)
