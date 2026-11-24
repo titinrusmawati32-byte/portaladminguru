@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup Desain Creator by rzafah_education - Login Page SiGuru SD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            outfit: ['"Outfit"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#F4F2FB',
+              100: '#E8E4F8',
+              500: '#7C6EE6',
+              600: '#6C5CE7',
+              700: '#5A4AD1',
+              dark: '#2D3436',
+              muted: '#636E72',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .lavender-gradient {
+      background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 100%);
+    }
+    .frosted-glass {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+
+  <!-- TOP LAB TOOLBAR: CONTROLLER -->
+  <header class="bg-slate-800/90 border-b border-slate-700/80 backdrop-blur-md px-4 py-3 sticky top-0 z-50 shadow-md">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-black text-base shadow-sm">
+          R
+        </div>
+        <div>
+          <h1 class="text-sm font-black text-white flex items-center gap-2">
+            <span>Mockup Desain Creator Signature</span>
+            <span class="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 text-[10px] font-extrabold border border-brand-500/30">Hanya di Login Page</span>
+          </h1>
+          <p class="text-[11px] text-slate-400">Pilih variasi tampilan identitas <span class="text-amber-300 font-bold">by rzafah_education</span> di bawah form login</p>
+        </div>
+      </div>
+
+      <!-- Selector Variasi Model -->
+      <div class="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-2xl border border-slate-700/80 text-xs">
+        <button onclick="setVariation('A')" id="btnVarA" class="px-3 py-1.5 rounded-xl font-extrabold transition cursor-pointer bg-brand-600 text-white shadow-xs">
+          Model A: Frosted Pill ✨
+        </button>
+        <button onclick="setVariation('B')" id="btnVarB" class="px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition cursor-pointer">
+          Model B: Micro Card 🎓
+        </button>
+        <button onclick="setVariation('C')" id="btnVarC" class="px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition cursor-pointer">
+          Model C: Minimalist Line 🌿
+        </button>
+        <button onclick="setVariation('D')" id="btnVarD" class="px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition cursor-pointer">
+          Model D: Dual Badge 🏛️
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN PREVIEW STAGE -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT: MOBILE DEVICE SIMULATOR (IPHONE VIEWPORT) -->
+    <div class="lg:col-span-7 flex justify-center">
+      <div class="w-full max-w-[390px] rounded-[48px] bg-slate-950 p-3.5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] border-4 border-slate-700/60 relative overflow-hidden">
+        
+        <!-- Dynamic Island / Speaker Notch -->
+        <div class="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-40 flex items-center justify-between px-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-800"></div>
+          <div class="w-2 h-2 rounded-full bg-emerald-500/60 animate-pulse"></div>
+        </div>
+
+        <!-- SIMULATOR SCREEN CONTAINER -->
+        <div class="w-full rounded-[38px] overflow-hidden min-h-[720px] flex flex-col justify-between items-center p-4 pt-10 relative select-none"
+             style="background: linear-gradient(135deg, #EBE8F9 0%, #DFDAF7 45%, #D5CDF4 100%);">
+          
+          <!-- Ambient Pastel Blobs -->
+          <div class="absolute -top-16 -left-16 w-64 h-64 bg-[#C4B5FD]/40 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="absolute -bottom-16 -right-16 w-64 h-64 bg-[#DDD6FE]/40 rounded-full blur-2xl pointer-events-none"></div>
+
+          <!-- 1. Header Mini Pill -->
+          <div class="relative z-10 w-full flex items-center justify-between px-3.5 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-white/80 text-brand-dark text-xs shadow-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="font-extrabold text-brand-700 text-[11px] font-outfit">SiGuru SD Digital</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-bold text-brand-muted">Kec. Ambulu</span>
+              <div class="w-6 h-6 rounded-full bg-white/80 text-[10px] flex items-center justify-center border border-violet-100 shadow-2xs">
+                🌙
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Mid Section: Otoritas Card & Login Box -->
+          <div class="relative z-10 w-full flex flex-col items-center my-auto py-2">
+            
+            <!-- Mini Otoritas Card -->
+            <div class="relative w-64 h-32 mb-3">
+              <div class="absolute inset-0 rounded-[20px] bg-white/40 backdrop-blur-md border border-white/60 shadow-lg -rotate-4 scale-95"></div>
+              <div class="absolute inset-0 rounded-[20px] p-3.5 flex flex-col justify-between text-white border border-white/60 shadow-md overflow-hidden lavender-gradient">
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] font-extrabold uppercase tracking-wider text-amber-200">SiGuru Access</span>
+                  <span class="text-[10px] font-black tracking-widest text-white/90">KEC. AMBULU</span>
+                </div>
+                <div class="space-y-0.5">
+                  <p class="text-[8px] uppercase tracking-wider text-purple-200 font-bold">Otoritas Akses Lembaga</p>
+                  <p class="text-[11px] font-mono font-black tracking-widest text-white">NPSN & KODE SEKOLAH</p>
+                </div>
+                <div class="flex items-center justify-between text-[9px] pt-1 border-t border-white/20">
+                  <span class="font-bold text-white">SD Negeri Ambulu</span>
+                  <span class="font-extrabold text-amber-200 text-[8px]">KURIKULUM MERDEKA</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Login Box Mockup -->
+            <div class="w-full max-w-[310px] bg-white rounded-[24px] p-4 shadow-xl border border-white/80 space-y-2.5 text-xs text-brand-dark">
+              <div class="space-y-0.5 text-center">
+                <h3 class="font-black text-sm text-brand-dark">Masuk Guru SD</h3>
+                <p class="text-[10px] text-brand-muted">Pilih sekolah & masukkan PIN pribadi</p>
+              </div>
+
+              <div class="space-y-2 pt-1">
+                <div>
+                  <label class="block font-bold text-[10px] text-slate-700 mb-0.5">NPSN Sekolah</label>
+                  <div class="p-2 bg-[#F8F7FD] border border-[#E2DEF7] rounded-lg font-mono text-[11px] text-slate-800 font-bold">
+                    20524058 (SDN Sumberejo 04)
+                  </div>
+                </div>
+                <div>
+                  <label class="block font-bold text-[10px] text-slate-700 mb-0.5">PIN Pribadi</label>
+                  <div class="p-2 bg-[#F8F7FD] border border-[#E2DEF7] rounded-lg text-center tracking-widest font-black text-xs text-slate-800">
+                    • • • • • •
+                  </div>
+                </div>
+                <div class="w-full py-2.5 rounded-xl bg-brand-600 text-white font-black text-[11px] text-center shadow-md shadow-brand-500/25">
+                  Masuk ke Portal Guru
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 3. FOOTER SIGNATURE AREA: THIS IS WHAT WE ARE DESIGNING -->
+          <div class="relative z-10 w-full mt-auto pt-3 pb-1" id="mockupFooterContainer">
+            <!-- Variation rendered via JS -->
+          </div>
+
+          <!-- Home Indicator Bar -->
+          <div class="w-32 h-1 bg-slate-900/40 rounded-full mt-2"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: VARIATION EXPLORATION & DETAIL PANEL -->
+    <div class="lg:col-span-5 space-y-4">
+      
+      <div class="bg-slate-800 rounded-3xl p-5 border border-slate-700 shadow-md space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+          <h2 class="text-base font-black text-white flex items-center gap-2">
+            <span id="detailIcon">✨</span>
+            <span id="detailTitle">Model A: Frosted Capsule Pill</span>
+          </h2>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-[10px]" id="detailBadge">Rekomendasi Utama</span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed" id="detailDesc">
+          Menggunakan kapsul kaca melayang (frosted glass) bergaya Apple iOS. Memberikan kesan modern, mewah, dan eksklusif tanpa mengganggu elemen form login di atasnya.
+        </p>
+
+        <!-- Preview Cuplikan Tampilan -->
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-700 space-y-2">
+          <div class="text-[11px] font-bold text-slate-400">Tampilan Pratinjau Desain:</div>
+          <div class="p-3 rounded-xl bg-gradient-to-r from-[#EBE8F9] to-[#DFDAF7] text-slate-800 flex items-center justify-center" id="componentPreview">
+            <!-- Component injected here -->
+          </div>
+        </div>
+
+        <!-- Spesifikasi Desain -->
+        <div class="space-y-2 text-xs">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Kelebihan Model Ini:</div>
+          <ul class="space-y-1.5 text-slate-300" id="detailList">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Selaras dengan tema tombol 'Kembali' frosted glass yang sudah disetujui sebelumnya.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Bisa dipasangi tautan yang bisa diklik langsung ke akun media sosial edukasi Anda.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Hanya muncul di halaman login awal, sehingga ruang kerja harian guru di dalam modul tetap 100% lega.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Action Note -->
+        <div class="p-3 bg-brand-500/10 border border-brand-500/30 rounded-2xl text-[11px] text-brand-300 leading-relaxed">
+          💡 <strong>Komitmen:</strong> Belum ada kode produksi yang diubah. Anda dapat memilih variasi mana yang paling Anda sukai, lalu beri tahu saya kapan siap untuk diterapkan!
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    const variations = {
+      'A': {
+        title: 'Model A: Frosted Capsule Pill',
+        icon: '✨',
+        badge: 'Paling Estetik & Modern',
+        desc: 'Kapsul kaca semi-transparan bergaya iOS Frosted Glass. Menghadirkan logo verified education badge dengan gradasi lavender yang serasi dengan kartu login.',
+        html: `
+          <div class="flex flex-col items-center gap-1">
+            <a href="https://instagram.com/rzafah_education" target="_blank" rel="noopener noreferrer" 
+               class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/75 hover:bg-white backdrop-blur-md border border-white/80 shadow-xs text-[11px] font-extrabold text-brand-dark transition-all hover:scale-105 active:scale-95 group cursor-pointer">
+              <span class="w-4 h-4 rounded-full bg-brand-600 text-white flex items-center justify-center text-[9px] font-black shadow-2xs">R</span>
+              <span>created by <strong class="text-brand-700 group-hover:text-brand-600 font-black">rzafah_education</strong></span>
+              <svg class="w-3 h-3 text-brand-500 opacity-60 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/>
+              </svg>
+            </a>
+            <span class="text-[9px] text-brand-muted/80 font-medium">Inovasi Digital Pendidikan Kecamatan Ambulu</span>
+          </div>
+        `,
+        preview: `
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 border border-white/90 shadow-xs text-xs font-bold text-slate-800">
+            <span class="w-4 h-4 rounded-full bg-brand-600 text-white flex items-center justify-center text-[9px] font-black">R</span>
+            <span>created by <strong class="text-brand-700">rzafah_education</strong></span>
+            <span class="text-[10px] text-slate-400">↗</span>
+          </div>
+        `,
+        list: [
+          'Tampilan kapsul melayang yang sangat rapi dan ramah di layar ponsel.',
+          'Bisa diklik untuk mengarahkan pengguna ke media sosial atau kontak edukasi Anda.',
+          'Hanya ada di menu login saja, tidak mengganggu halaman dalam portal guru.'
+        ]
+      },
+      'B': {
+        title: 'Model B: Micro Card with Monogram',
+        icon: '🎓',
+        badge: 'Profesional EdTech',
+        desc: 'Kartu mini terstruktur dengan monogram avatar inisial, nama kreator, dan badge spesialisasi teknologi pendidikan.',
+        html: `
+          <div class="w-full max-w-[280px] mx-auto p-2.5 rounded-2xl bg-white/70 backdrop-blur-md border border-white/80 shadow-xs flex items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-black text-xs shadow-2xs">
+                R
+              </div>
+              <div class="text-left leading-tight">
+                <div class="text-[10px] text-brand-muted font-bold">Created & Built by</div>
+                <div class="text-[11px] font-black text-brand-dark tracking-wide">rzafah_education</div>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-[9px] font-black">EdTech</span>
+          </div>
+        `,
+        preview: `
+          <div class="w-full p-2.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold text-xs">R</div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-semibold">Created & Built by</div>
+                <div class="text-xs font-black text-slate-800">rzafah_education</div>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-violet-100 text-violet-800 text-[9px] font-bold">EdTech</span>
+          </div>
+        `,
+        list: [
+          'Memberikan identitas formal seperti kartu pengembang software modern.',
+          'Sangat cocok jika Anda ingin membranding diri sebagai konsultan teknologi pendidikan.',
+          'Desain kokoh dan simetris di bagian paling bawah layar.'
+        ]
+      },
+      'C': {
+        title: 'Model C: Minimalist Typographic Line',
+        icon: '🌿',
+        badge: 'Paling Bersih & Sederhana',
+        desc: 'Satu baris teks tipografi elegan dan bersahaja tanpa kotak atau border tebal, sangat tenang dan menyatu dengan background.',
+        html: `
+          <div class="text-center space-y-0.5 py-1">
+            <p class="text-[10px] text-brand-muted font-semibold tracking-wide">
+              SiGuru SD Digital • Kecamatan Ambulu
+            </p>
+            <p class="text-[11px] text-brand-dark font-extrabold flex items-center justify-center gap-1.5">
+              <span>Crafted with</span>
+              <span class="text-rose-500 animate-pulse">❤️</span>
+              <span>by</span>
+              <span class="text-brand-700 underline decoration-brand-400 decoration-1 underline-offset-2">rzafah_education</span>
+            </p>
+          </div>
+        `,
+        preview: `
+          <div class="text-center text-xs font-bold text-slate-700">
+            Crafted with <span class="text-rose-500">❤️</span> by <span class="text-brand-700 underline">rzafah_education</span>
+          </div>
+        `,
+        list: [
+          'Sangat simpel dan tidak menyita perhatian sama sekali.',
+          'Menampilkan ikon hati lembut (Crafted with passion).',
+          'Menyatu mulus dengan warna latar belakang pastel lavender.'
+        ]
+      },
+      'D': {
+        title: 'Model D: Dual Badge (Lembaga + Creator)',
+        icon: '🏛️',
+        badge: 'Identitas Resmi Bersama',
+        desc: 'Dua lencana terpisah yang menyeimbangkan antara identitas Koorwil Pendidikan Kecamatan Ambulu dan tanda tangan pengembang rzafah_education.',
+        html: `
+          <div class="flex flex-wrap items-center justify-center gap-1.5 py-1">
+            <span class="px-2.5 py-1 rounded-full bg-white/60 border border-white/70 text-[10px] font-bold text-brand-muted">
+              🏛️ Koorwil Ambulu
+            </span>
+            <span class="text-brand-muted text-[10px]">•</span>
+            <span class="px-2.5 py-1 rounded-full bg-brand-600 text-white text-[10px] font-black shadow-xs flex items-center gap-1">
+              <span>⚡</span> <span>by rzafah_education</span>
+            </span>
+          </div>
+        `,
+        preview: `
+          <div class="flex items-center gap-1.5">
+            <span class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">🏛️ Koorwil Ambulu</span>
+            <span class="px-2 py-0.5 rounded-full bg-brand-600 text-white text-[10px] font-black">⚡ by rzafah_education</span>
+          </div>
+        `,
+        list: [
+          'Memperlihatkan kolaborasi antara lembaga pendidikan resmi dan kreator.',
+          'Pilihan kontras warna yang tegas dan berwibawa.',
+          'Menyatu dengan status 48 SD yang dilayani di platform.'
+        ]
+      }
+    };
+
+    function setVariation(key) {
+      const v = variations[key];
+      if (!v) return;
+
+      // Update Toolbar Buttons
+      ['A', 'B', 'C', 'D'].forEach(k => {
+        const btn = document.getElementById('btnVar' + k);
+        if (k === key) {
+          btn.className = 'px-3 py-1.5 rounded-xl font-extrabold transition cursor-pointer bg-brand-600 text-white shadow-xs';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition cursor-pointer';
+        }
+      });
+
+      // Update Simulator Footer
+      document.getElementById('mockupFooterContainer').innerHTML = v.html;
+
+      // Update Details
+      document.getElementById('detailTitle').textContent = v.title;
+      document.getElementById('detailIcon').textContent = v.icon;
+      document.getElementById('detailBadge').textContent = v.badge;
+      document.getElementById('detailDesc').textContent = v.desc;
+      document.getElementById('componentPreview').innerHTML = v.preview;
+
+      const listContainer = document.getElementById('detailList');
+      listContainer.innerHTML = v.list.map(item => `
+        <li class="flex items-start gap-2">
+          <span class="text-emerald-400 font-bold">✓</span>
+          <span>${item}</span>
+        </li>
+      `).join('');
+    }
+
+    // Default to Model A
+    setVariation('A');
+  </script>
+</body>
+</html>
