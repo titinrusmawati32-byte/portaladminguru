@@ -543,97 +543,26 @@
     }
 
     /* ============================================================
-       TRANSISI ULTRA-KEREN: 3D HOLOGRAPHIC PERSPECTIVE TILT & AURORA NEON GLOW
+       TRANSISI SUPER CLEAN & RINGAN: SMOOTH SPRING POP-IN
        ============================================================ */
-    @keyframes holo3DIn {
+    @keyframes smoothSpringIn {
       0% {
         opacity: 0;
-        transform: perspective(1400px) rotateX(32deg) rotateY(-8deg) scale(0.68) translateY(110px) translateZ(-140px);
-        filter: blur(14px) brightness(1.7);
-      }
-      65% {
-        opacity: 1;
-        transform: perspective(1400px) rotateX(-5deg) rotateY(1.5deg) scale(1.03) translateY(-10px) translateZ(25px);
-        filter: blur(0px) brightness(1.1);
-      }
-      85% {
-        transform: perspective(1400px) rotateX(2deg) rotateY(-0.5deg) scale(0.99) translateY(2px) translateZ(5px);
-      }
-      100% {
-        opacity: 1;
-        transform: perspective(1400px) rotateX(0deg) rotateY(0deg) scale(1) translateY(0) translateZ(0);
-        filter: blur(0px) brightness(1);
-      }
-    }
-
-    .anim-holo-3d {
-      animation: holo3DIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    /* PENDAR BORDER NEON AURORA RGB BERPUTAR */
-    .neon-aurora-active {
-      position: relative;
-    }
-    .neon-aurora-active::before {
-      content: '';
-      position: absolute;
-      inset: -3.5px;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #8b5cf6, #06b6d4, #10b981, #ec4899, #8b5cf6);
-      background-size: 300% 300%;
-      animation: auroraGlowShift 4s linear infinite;
-      z-index: -1;
-      filter: blur(10px);
-      opacity: 0.85;
-    }
-    @keyframes auroraGlowShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* KILATAN CAHAYA DI HEADER (LASER SHIMMER) */
-    .laser-shimmer {
-      position: relative;
-      overflow: hidden;
-    }
-    .laser-shimmer::after {
-      content: '';
-      position: absolute;
-      top: -60%;
-      left: -150%;
-      width: 60%;
-      height: 220%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
-      transform: rotate(25deg);
-      animation: shimmerSweep 3.2s infinite 0.6s;
-    }
-    @keyframes shimmerSweep {
-      0% { left: -150%; }
-      30% { left: 180%; }
-      100% { left: 180%; }
-    }
-
-    /* CARD STAGGER ENTRANCE */
-    @keyframes cardFloatIn {
-      0% {
-        opacity: 0;
-        transform: translateY(20px) scale(0.96);
+        transform: scale(0.92) translateY(24px);
       }
       70% {
         opacity: 1;
-        transform: translateY(-2px) scale(1.01);
+        transform: scale(1.01) translateY(-2px);
       }
       100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: scale(1) translateY(0);
       }
     }
 
-    .stagger-1 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards; opacity: 0; }
-    .stagger-2 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.22s forwards; opacity: 0; }
-    .stagger-3 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.32s forwards; opacity: 0; }
-    .stagger-4 { animation: cardFloatIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards; opacity: 0; }
+    .animate-smooth-spring {
+      animation: smoothSpringIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
     /* Aksesibilitas: Hormati prefers-reduced-motion */
     @media (prefers-reduced-motion: reduce) {
@@ -1082,213 +1011,118 @@
 
   <!-- ============================================================
        POP-UP MODAL: PANDUAN PENGGUNAAN OTOMATIS (ONBOARDING GURU)
-       MUNCUL OTOMATIS SETIAP KALI URL DIBUKA SEBELUM MENU LOGIN
-       TRANSISI: 3D HOLOGRAPHIC TILT & AURORA NEON GLOW (RGB PULSE)
+       DESAIN: SUPER CLEAN, RINGKAS & SANGAT NYAMAN DIBACA DI HP
        ============================================================ -->
   <div id="modalGuideOverlay" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 transition-all duration-300" style="display: flex; z-index: 99999;">
-    <div class="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl border border-white/90 overflow-hidden flex flex-col max-h-[92vh] anim-holo-3d neon-aurora-active text-slate-800">
+    <div class="bg-white w-full max-w-lg rounded-[28px] shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col max-h-[94vh] animate-smooth-spring text-slate-800">
       
-      <!-- 1. Modal Header (Laser Shimmer Sweep) -->
-      <div class="p-5 sm:p-6 pb-4 border-b border-slate-100 bg-gradient-to-r from-purple-50/80 via-white to-indigo-50/80 flex items-start justify-between gap-3 laser-shimmer">
-        <div class="flex items-center gap-3.5">
-          <div class="w-12 h-12 rounded-2xl lavender-gradient text-white flex items-center justify-center text-2xl shadow-lg shadow-brand-500/25 shrink-0">
+      <!-- 1. Header: Ramping & Elegan (Hanya 48px) -->
+      <div class="p-3.5 px-4 bg-gradient-to-r from-purple-50/90 via-white to-indigo-50/90 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-lg shadow-sm shrink-0">
             💡
           </div>
           <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                Panduan Singkat
-              </span>
-              <span class="text-[11px] text-slate-400 font-bold">• Wajib Dibaca Guru Baru</span>
-            </div>
-            <h3 class="font-black text-base sm:text-lg text-slate-900 font-outfit leading-tight mt-0.5">
-              Selamat Datang di Portal SiGuru SD!
-            </h3>
-            <p class="text-xs text-slate-500">Silakan baca panduan penggunaan di bawah sebelum mulai menggunakan aplikasi.</p>
+            <h3 class="font-black text-sm sm:text-base text-slate-900 leading-tight">Panduan Pakai SiGuru SD</h3>
+            <p class="text-[10px] sm:text-xs text-slate-500 font-medium">Sentuh salah satu topik untuk membaca langkahnya</p>
           </div>
         </div>
-
         <button onclick="handleExitGuide()" title="Tutup / Exit" 
-                class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-sm font-black transition cursor-pointer shrink-0">
+                class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs font-bold transition cursor-pointer shrink-0">
           ✕
         </button>
       </div>
 
-      <!-- 2. Kategori Tab Filter -->
-      <div class="px-5 sm:px-6 pt-3 pb-2 flex items-center gap-1.5 overflow-x-auto custom-scrollbar border-b border-slate-100 text-xs bg-slate-50/40">
-        <button onclick="filterGuideCategory('semua', this)" class="guide-tab-btn active px-3.5 py-1.5 rounded-full font-bold bg-brand-600 text-white shadow-xs cursor-pointer shrink-0">
-          🌟 Semua Panduan (4)
-        </button>
-        <button onclick="filterGuideCategory('akun', this)" class="guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0">
-          🔑 Pendaftaran & Akun
-        </button>
-        <button onclick="filterGuideCategory('nilai', this)" class="guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0">
-          📊 Input Nilai di HP
-        </button>
-        <button onclick="filterGuideCategory('perangkat', this)" class="guide-tab-btn px-3.5 py-1.5 rounded-full font-semibold text-slate-500 hover:bg-slate-100 cursor-pointer shrink-0">
-          📁 Perangkat Ajar Drive
-        </button>
-      </div>
-
-      <!-- 3. Modal Body: Galeri Thumbnail Panduan (Grid Responsif: 1 Kolom di HP, 2 Kolom di Laptop) -->
-      <div id="guideGalleryView" class="p-4 sm:p-6 overflow-y-auto custom-scrollbar space-y-4">
+      <!-- 2. Body: 4 Kartu Baris Ramping (Semuanya Terlihat Sekaligus di HP Tanpa Scroll!) -->
+      <div id="guideGalleryView" class="p-3 sm:p-4 space-y-2 overflow-y-auto custom-scrollbar flex-1 bg-white">
         
-        <div class="p-3 rounded-2xl bg-brand-50/80 border border-brand-100 flex items-center gap-2.5 text-xs text-brand-900">
-          <span class="text-base shrink-0">👆</span>
-          <span><strong>Tips:</strong> Klik pada salah satu kartu thumbnail di bawah untuk membaca tutorial langkah demi langkah.</span>
+        <!-- TOPIK 1: DAFTAR AKUN GURU BARU -->
+        <div onclick="openGuideDetail(1)" 
+             class="p-2.5 sm:p-3 rounded-xl border border-slate-200/90 hover:border-purple-500 hover:bg-purple-50/30 transition-all flex items-center gap-2.5 sm:gap-3 cursor-pointer active:scale-98 shadow-xs">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
+            📝
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-black text-xs sm:text-sm text-slate-900 truncate">Daftar Akun Guru Baru</span>
+              <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-purple-100 text-purple-700 shrink-0">2 Menit</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-slate-600 truncate mt-0.5 font-medium">Isi NPSN, nomor WhatsApp & buat PIN pribadi</p>
+          </div>
+          <span class="text-xs text-purple-600 font-black shrink-0">➔</span>
         </div>
 
-        <!-- Grid 4 Kartu Thumbnail -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
-
-          <!-- THUMBNAIL 1: CARA DAFTAR GURU BARU -->
-          <div onclick="openGuideDetail(1)" data-cat="akun"
-               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-brand-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden stagger-1">
-            <div class="h-24 sm:h-28 bg-gradient-to-br from-indigo-500 to-purple-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
-              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
-              <div class="flex items-center justify-between z-10">
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                  Langkah Awal
-                </span>
-                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 2 Menit</span>
-              </div>
-              <div class="z-10 flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">📝</div>
-                <div class="font-extrabold text-xs sm:text-sm leading-tight text-white">Daftar Akun Guru Baru</div>
-              </div>
-            </div>
-            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
-              <div>
-                <h4 class="font-black text-xs sm:text-[13px] text-slate-900 group-hover:text-brand-600 transition">Cara Daftar & Menunggu Persetujuan Admin</h4>
-                <p class="text-[11px] sm:text-xs text-slate-600 line-clamp-2 mt-1 font-medium">Panduan memasukkan NPSN, kode sekolah, data diri guru, buat PIN, hingga diverifikasi oleh Koorwil.</p>
-              </div>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-                <span class="text-emerald-600 font-bold">✓ 3 Langkah Mudah</span>
-                <span class="text-brand-600 font-black group-hover:translate-x-1 transition">Baca Panduan ➔</span>
-              </div>
-            </div>
+        <!-- TOPIK 2: INPUT NILAI DI HP (HIGHLIGHT EMERALD) -->
+        <div onclick="openGuideDetail(2)" 
+             class="p-2.5 sm:p-3 rounded-xl border-2 border-emerald-400 bg-emerald-50/50 hover:bg-emerald-50 transition-all flex items-center gap-2.5 sm:gap-3 cursor-pointer active:scale-98 shadow-xs">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
+            📱
           </div>
-
-          <!-- THUMBNAIL 2: CARA INPUT NILAI DI HP (LANDSCAPE & MATRIKS) -->
-          <div onclick="openGuideDetail(2)" data-cat="nilai"
-               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden stagger-2">
-            <div class="h-24 sm:h-28 bg-gradient-to-br from-emerald-500 to-teal-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
-              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
-              <div class="flex items-center justify-between z-10">
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                  Paling Populer
-                </span>
-                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 3 Menit</span>
-              </div>
-              <div class="z-10 flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">📱</div>
-                <div class="font-extrabold text-xs sm:text-sm leading-tight text-white">Input Nilai & Asesmen di HP</div>
-              </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-black text-xs sm:text-sm text-emerald-950 truncate">Input Nilai Cepat di HP</span>
+              <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-emerald-200 text-emerald-800 shrink-0">Populer</span>
             </div>
-            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
-              <div>
-                <h4 class="font-black text-xs sm:text-[13px] text-slate-900 group-hover:text-emerald-600 transition">Cara Mengisi Nilai Cepat Tanpa Scroll</h4>
-                <p class="text-[11px] sm:text-xs text-slate-600 line-clamp-2 mt-1 font-medium">Gunakan mode landscape HP atau kartu siswa per nama untuk memasukkan nilai formatif & sumatif dalam sekejap.</p>
-              </div>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-                <span class="text-emerald-600 font-bold">✓ Cepat & Anti-Ribet</span>
-                <span class="text-emerald-600 font-black group-hover:translate-x-1 transition">Baca Panduan ➔</span>
-              </div>
-            </div>
+            <p class="text-[11px] sm:text-xs text-emerald-800 truncate mt-0.5 font-medium">Mode landscape luas & kartu siswa tanpa scroll</p>
           </div>
+          <span class="text-xs text-emerald-700 font-black shrink-0">➔</span>
+        </div>
 
-          <!-- THUMBNAIL 3: CARA LOGIN & RESET PIN -->
-          <div onclick="openGuideDetail(3)" data-cat="akun"
-               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-amber-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden stagger-3">
-            <div class="h-24 sm:h-28 bg-gradient-to-br from-amber-500 to-orange-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
-              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
-              <div class="flex items-center justify-between z-10">
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                  Keamanan
-                </span>
-                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 1 Menit</span>
-              </div>
-              <div class="z-10 flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">🔑</div>
-                <div class="font-extrabold text-xs sm:text-sm leading-tight text-white">Lupa PIN / Gagal Masuk</div>
-              </div>
-            </div>
-            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
-              <div>
-                <h4 class="font-black text-xs sm:text-[13px] text-slate-900 group-hover:text-amber-600 transition">Panduan Reset PIN & Masuk Kembali</h4>
-                <p class="text-[11px] sm:text-xs text-slate-600 line-clamp-2 mt-1 font-medium">Solusi jika salah memasukkan PIN atau belum tahu PIN akun Anda. Admin sekolah dapat mereset dalam 1 klik.</p>
-              </div>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-                <span class="text-amber-600 font-bold">✓ Bantuan Reset</span>
-                <span class="text-amber-600 font-black group-hover:translate-x-1 transition">Baca Panduan ➔</span>
-              </div>
-            </div>
+        <!-- TOPIK 3: LUPA PIN / RESET AKUN -->
+        <div onclick="openGuideDetail(3)" 
+             class="p-2.5 sm:p-3 rounded-xl border border-slate-200/90 hover:border-amber-500 hover:bg-amber-50/30 transition-all flex items-center gap-2.5 sm:gap-3 cursor-pointer active:scale-98 shadow-xs">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
+            🔑
           </div>
-
-          <!-- THUMBNAIL 4: UNDUH PERANGKAT AJAR GOOGLE DRIVE -->
-          <div onclick="openGuideDetail(4)" data-cat="perangkat"
-               class="guide-card group bg-white rounded-2xl border border-slate-200/90 hover:border-cyan-500 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer flex flex-col justify-between overflow-hidden stagger-4">
-            <div class="h-24 sm:h-28 bg-gradient-to-br from-cyan-500 to-blue-600 relative p-3 flex flex-col justify-between text-white overflow-hidden">
-              <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xs"></div>
-              <div class="flex items-center justify-between z-10">
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 backdrop-blur-md border border-white/30 text-white">
-                  Kurikulum Merdeka
-                </span>
-                <span class="text-xs bg-black/30 backdrop-blur-md px-2 py-0.5 rounded-full font-bold">⏱️ 2 Menit</span>
-              </div>
-              <div class="z-10 flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-lg">📁</div>
-                <div class="font-extrabold text-xs sm:text-sm leading-tight text-white">Unduh Modul Ajar Resmi</div>
-              </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-black text-xs sm:text-sm text-slate-900 truncate">Lupa PIN / Reset Akun</span>
+              <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 shrink-0">1 Menit</span>
             </div>
-            <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
-              <div>
-                <h4 class="font-black text-xs sm:text-[13px] text-slate-900 group-hover:text-blue-600 transition">Cara Akses Modul Ajar, Prota, Prosem, CP & ATP</h4>
-                <p class="text-[11px] sm:text-xs text-slate-600 line-clamp-2 mt-1 font-medium">Semua paket perangkat pembelajaran se-Kecamatan Ambulu dapat diunduh gratis langsung ke HP atau Laptop.</p>
-              </div>
-              <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100">
-                <span class="text-blue-600 font-bold">✓ Google Drive Siap Pakai</span>
-                <span class="text-blue-600 font-black group-hover:translate-x-1 transition">Baca Panduan ➔</span>
-              </div>
-            </div>
+            <p class="text-[11px] sm:text-xs text-slate-600 truncate mt-0.5 font-medium">Solusi jika gagal masuk & reset PIN via Koorwil</p>
           </div>
+          <span class="text-xs text-amber-600 font-black shrink-0">➔</span>
+        </div>
 
+        <!-- TOPIK 4: UNDUH PERANGKAT AJAR -->
+        <div onclick="openGuideDetail(4)" 
+             class="p-2.5 sm:p-3 rounded-xl border border-slate-200/90 hover:border-blue-500 hover:bg-blue-50/30 transition-all flex items-center gap-2.5 sm:gap-3 cursor-pointer active:scale-98 shadow-xs">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
+            📁
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-black text-xs sm:text-sm text-slate-900 truncate">Unduh Perangkat Ajar</span>
+              <span class="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 shrink-0">Drive</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-slate-600 truncate mt-0.5 font-medium">Modul Ajar, Prota, Prosem & ATP resmi SD</p>
+          </div>
+          <span class="text-xs text-blue-600 font-black shrink-0">➔</span>
         </div>
 
       </div>
 
-      <!-- 4. Modal Body: Tampilan Detail Langkah (Step-by-Step Reader) -->
-      <div id="guideDetailView" class="p-5 sm:p-6 overflow-y-auto custom-scrollbar space-y-4 hidden">
-        <button onclick="backToGuideGallery()" class="text-xs font-bold text-brand-700 hover:underline flex items-center gap-1 cursor-pointer">
-          <span>⬅</span> <span>Kembali ke Galeri Panduan</span>
+      <!-- 3. Modal Body: Tampilan Detail Langkah (Step-by-Step Reader) -->
+      <div id="guideDetailView" class="p-4 sm:p-5 overflow-y-auto custom-scrollbar space-y-3.5 hidden bg-white">
+        <button onclick="backToGuideGallery()" class="text-xs font-bold text-purple-700 hover:underline flex items-center gap-1 cursor-pointer">
+          <span>⬅</span> <span>Kembali ke Daftar Panduan</span>
         </button>
 
-        <div id="guideDetailContent" class="space-y-4">
+        <div id="guideDetailContent" class="space-y-3">
           <!-- Diisi via JavaScript -->
         </div>
       </div>
 
-      <!-- 5. Modal Footer: TOMBOL PAHAM & EXIT (JUMBO TOUCH TARGET 48px) -->
-      <div class="p-4 px-6 border-t border-slate-100 bg-slate-50/90 flex flex-wrap items-center justify-between gap-3">
-        <div class="text-xs text-slate-500 font-medium hidden sm:flex items-center gap-1.5">
-          <span>💡</span> <span>Pelajari panduan di atas untuk kemudahan penggunaan aplikasi.</span>
-        </div>
-
-        <!-- Tombol Aksi Utama: EXIT & PAHAM -->
-        <div class="flex items-center gap-2.5 ml-auto w-full sm:w-auto justify-end">
-          <!-- Tombol EXIT / Batal -->
-          <button onclick="handleExitGuide()" 
-                  class="flex-1 sm:flex-initial px-5 py-3 sm:py-2.5 rounded-xl border border-slate-300 hover:bg-slate-200 text-slate-700 font-bold text-xs transition active:scale-95 cursor-pointer">
-            ✕ Exit
-          </button>
-
-          <!-- Tombol SAYA PAHAM (Utama) -->
-          <button onclick="handleUnderstoodGuide()" 
-                  class="flex-1 sm:flex-initial px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md shadow-emerald-600/25 transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5">
-            <span>✓ Saya Paham, Lanjut Masuk</span> ➔
-          </button>
-        </div>
-
+      <!-- 4. Modal Footer: TOMBOL BERSIH & EMPUK DI IBU JARI -->
+      <div class="p-3 px-4 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
+        <button onclick="handleExitGuide()" 
+                class="px-4 py-2.5 rounded-xl border border-slate-300 font-bold text-xs text-slate-700 bg-white hover:bg-slate-100 transition active:scale-95 cursor-pointer">
+          ✕ Exit
+        </button>
+        <button onclick="handleUnderstoodGuide()" 
+                class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md shadow-emerald-600/25 transition active:scale-95 text-center flex items-center justify-center gap-1.5 cursor-pointer">
+          <span>✓ Lanjut Masuk ke Login</span> ➔
+        </button>
       </div>
 
     </div>
@@ -2568,11 +2402,11 @@
       modal.classList.remove('hidden');
       modal.classList.add('flex');
       modal.style.display = 'flex';
-      const box = modal.querySelector('.anim-holo-3d');
+      const box = modal.querySelector('.animate-smooth-spring');
       if (box) {
-        box.classList.remove('anim-holo-3d');
+        box.classList.remove('animate-smooth-spring');
         void box.offsetWidth;
-        box.classList.add('anim-holo-3d');
+        box.classList.add('animate-smooth-spring');
       }
       backToGuideGallery();
     }
