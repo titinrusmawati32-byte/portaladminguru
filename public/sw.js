@@ -7,7 +7,7 @@
  * ============================================================
  */
 
-const CACHE_NAME = 'siguru-pwa-v5.3-cdn-failover-and-perf-optimization';
+const CACHE_NAME = 'siguru-pwa-v5.4-dual-engine-gas-firebase';
 
 // Aset inti yang wajib di-cache saat Service Worker dipasang
 const PRECACHE_ASSETS = [

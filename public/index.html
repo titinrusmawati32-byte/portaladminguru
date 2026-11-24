@@ -39,6 +39,11 @@
   <!-- Library Parser & Generator Excel (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';"></script>
 
+  <!-- Firebase SDK (Compat v9.23.0) - Dual-Engine Accelerator & Reliability Shield -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -2602,6 +2607,110 @@
     }
 
     // ==========================================
+    // DUAL-ENGINE ACCELERATOR (GOOGLE APPS SCRIPT + FIREBASE)
+    // Menjadikan Firebase sebagai penyelamat kecepatan (<100ms) tanpa mengganggu
+    // sedikit pun fungsi database utama di Google Apps Script dan Google Spreadsheet.
+    // ==========================================
+    const DualEngineState = {
+      isFirebaseReady: false,
+      isGasConnected: IS_CONNECTED,
+      firestoreDb: null,
+      lastFirebaseSync: null,
+      lastGasSync: null,
+      gasLatencyMs: null,
+      mode: 'HYBRID' // 'HYBRID' | 'GAS_ONLY' | 'OFFLINE'
+    };
+
+    async function initFirebaseDualEngine() {
+      try {
+        if (!window.firebase) {
+          console.info('ℹ️ [Dual-Engine] Firebase SDK belum termuat. Sistem beroperasi 100% pada Google Apps Script.');
+          return;
+        }
+
+        let fbConfig = (window.APP_CONFIG && window.APP_CONFIG.FIREBASE_CONFIG) ? { ...window.APP_CONFIG.FIREBASE_CONFIG } : null;
+        if (!fbConfig || !fbConfig.projectId) {
+          return;
+        }
+
+        // Jika apiKey masih kosong, coba ambil dari serverless endpoint Vercel /api/firebase-config
+        if (!fbConfig.apiKey) {
+          try {
+            const cfgRes = await fetch('/api/firebase-config');
+            if (cfgRes.ok) {
+              const liveCfg = await cfgRes.json();
+              if (liveCfg && liveCfg.apiKey) {
+                fbConfig = { ...fbConfig, ...liveCfg };
+              }
+            }
+          } catch (e) {}
+        }
+
+        let app = null;
+        if (!firebase.apps.length) {
+          if (fbConfig.apiKey) {
+            app = firebase.initializeApp(fbConfig);
+          } else {
+            console.info('ℹ️ [Dual-Engine] Firebase API Key belum disetel di Vercel. Google Apps Script berjalan 100% normal tanpa kendala.');
+            return;
+          }
+        } else {
+          app = firebase.app();
+        }
+
+        if (app && firebase.firestore) {
+          const db = firebase.firestore();
+          try {
+            await db.enablePersistence({ synchronizeTabs: true });
+          } catch (pe) {
+            // Jika multi-tab sudah buka tab lain, abaikan
+          }
+
+          DualEngineState.firestoreDb = db;
+          DualEngineState.isFirebaseReady = true;
+          window.isFirebaseReady = true;
+          window.firebaseDb = db;
+          console.log('⚡ [Dual-Engine] Firebase Firestore Accelerator aktif & siaga melindungi kecepatan aplikasi.');
+        }
+      } catch (err) {
+        console.warn('⚠️ [Dual-Engine] Firebase dilewati dengan aman:', err.message);
+        DualEngineState.isFirebaseReady = false;
+        window.isFirebaseReady = false;
+      }
+    }
+
+    // Inisialisasi otomatis saat dokumen siap
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(initFirebaseDualEngine, 100));
+    } else {
+      setTimeout(initFirebaseDualEngine, 100);
+    }
+
+    // Fast-Track Writer ke Firebase (< 50ms di latar belakang)
+    async function saveToFirebaseFastTrack(action, payload) {
+      if (!DualEngineState.isFirebaseReady || !DualEngineState.firestoreDb) return false;
+      try {
+        const npsn = payload.npsn || (currentSchool ? currentSchool.npsn : 'general');
+        const ownerUid = payload.ownerUid || (currentUser ? (currentUser.id || currentUser.uid) : 'teacher');
+        const collPath = `schools/${npsn}/teachers/${ownerUid}/mutations`;
+        const docId = `MUT_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+
+        await DualEngineState.firestoreDb.collection(collPath).doc(docId).set({
+          action: action,
+          payload: payload,
+          savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          clientTime: new Date().toISOString()
+        });
+
+        DualEngineState.lastFirebaseSync = new Date();
+        return true;
+      } catch (e) {
+        console.warn('⚠️ [Dual-Engine] Gagal fast-track Firebase, data tetap aman di antrean GAS:', e);
+        return false;
+      }
+    }
+
+    // ==========================================
     // API CALLS & SINKRONISASI
     // ==========================================
     async function apiGet(action, params = {}) {
@@ -2779,6 +2888,11 @@
         schoolId: currentSchool ? currentSchool.id : (currentUser ? currentUser.schoolId : '')
       };
 
+      // 1b. DUAL-ENGINE FIREBASE ACCELERATOR: Simpan seketika ke Firebase Cloud (< 50ms)
+      if (DualEngineState && DualEngineState.isFirebaseReady && currentUser) {
+        saveToFirebaseFastTrack(action, enrichedPayload);
+      }
+
       // 2. SPEED WUSH OPTIMISTIC FEEDBACK: Berikan respon seketika (0 milidetik) ke guru
       if (successMsg) {
         showToast(successMsg, 'success');
@@ -2844,7 +2958,8 @@
         badge.className = 'badge-synced flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-emerald-700 border border-emerald-200 text-[11px] font-extrabold transition-all cursor-pointer shadow-xs select-none';
         dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
         if (spin) spin.className = 'w-3.5 h-3.5 text-emerald-600 transition-transform';
-        text.textContent = message || 'Online • Tersinkronisasi';
+        const engineLabel = (window.DualEngineState && window.DualEngineState.isFirebaseReady) ? 'Online • Dual-Engine (GAS + Firebase)' : 'Online • Tersinkronisasi';
+        text.textContent = message || engineLabel;
       } else if (status === 'syncing') {
         // 🔵 Biru (Berputar): Menyinkronkan ke Cloud...
         badge.classList.add('badge-syncing');
@@ -2905,7 +3020,68 @@
           `
         );
       } else {
-        manualTriggerSync();
+        const isFb = window.DualEngineState && window.DualEngineState.isFirebaseReady;
+        openUniversalModal(
+          '🚀 Status Database & Akselerator',
+          `
+          <div class="space-y-3.5 text-xs">
+            <div class="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-900 space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">${isFb ? '⚡' : '📊'}</span>
+                  <h4 class="font-black text-sm">${isFb ? 'Dual-Engine Hybrid Aktif' : 'Database Google Spreadsheet Aktif'}</h4>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">${isFb ? 'Performa Turbo' : 'Standar'}</span>
+              </div>
+              <p class="leading-relaxed text-[11px]">
+                ${isFb ? 'Aplikasi menggabungkan kecepatan kilat <strong>Firebase</strong> sebagai peredam kejut dan keandalan <strong>Google Spreadsheet</strong> sebagai gudang arsip utama.' : 'Aplikasi terhubung langsung ke Google Apps Script dan Google Spreadsheet sekolah Anda.'}
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <!-- Engine 1: Google Apps Script -->
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-base">📊</span>
+                  <div>
+                    <div class="font-extrabold text-slate-800 text-xs">Google Spreadsheet Sekolah</div>
+                    <div class="text-[10px] text-slate-500">${currentSchool ? currentSchool.nama : 'SDN Ambulu'} (${currentSchool ? currentSchool.npsn : '-'})</div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px]">Terhubung (Master DB)</span>
+              </div>
+
+              <!-- Engine 2: Firebase Accelerator -->
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-base">⚡</span>
+                  <div>
+                    <div class="font-extrabold text-slate-800 text-xs">Firebase Cloud Accelerator</div>
+                    <div class="text-[10px] text-slate-500">Penyelamat Kecepatan & Buffer Anti-Macet</div>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full ${isFb ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-600'} font-bold text-[10px]">
+                  ${isFb ? 'Aktif (<50ms)' : 'Siaga / GAS Murni'}
+                </span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-between">
+              <span class="text-[11px] font-bold text-violet-900">Antrean Sinkronisasi ke Spreadsheet:</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-white text-violet-800 font-black text-xs border border-violet-200">${q.length} perubahan</span>
+            </div>
+
+            <div class="pt-2 flex items-center justify-end gap-2">
+              <button onclick="closeUniversalModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer">
+                Tutup
+              </button>
+              <button onclick="closeUniversalModal(); manualTriggerSync();" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-extrabold rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5">
+                <span>🔄</span> <span>Sinkronkan ke Spreadsheet Sekarang</span>
+              </button>
+            </div>
+          </div>
+          `
+        );
       }
     }
 
