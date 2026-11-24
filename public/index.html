@@ -6253,8 +6253,8 @@
             <!-- Tombol Ekspor Excel & Pratinjau PDF Terpisah -->
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportNilaiToExcel('${currentSelectedMapel}')"
-                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>📊</span> <span>Ekspor Excel (.csv)</span>
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition" title="Unduh Spreadsheet Excel (.xlsx)">
+                <span>📊</span> <span>Ekspor Excel (.xlsx)</span>
               </button>
               <button onclick="openPrintInNewTab(generateRekapNilaiHTML('${currentSelectedMapel}'), 'Rekap_Nilai_${currentSelectedMapel}', 'landscape')"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
@@ -6342,58 +6342,110 @@
       const students = dbData.siswa.filter(s => s.idKelas === activeGuruClassId);
       const selectedMapel = filterMapel === 'ALL' ? (getTeacherMapelList()[0] || 'Matematika') : filterMapel;
       const matrix = compileRekapNilaiMatrix(actKls, students, selectedMapel);
+      const filename = `Rekap_Nilai_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}_${selectedMapel.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`;
 
+      // Gunakan SheetJS untuk mengekspor native .xlsx bergaris & multi-kolom sempurna
+      if (window.XLSX && window.XLSX.utils) {
+        // SHEET 1: REKAPITULASI NILAI RAPOR RESMI
+        const rows = [
+          ["PEMERINTAH KABUPATEN JEMBER - KOORWIL PENDIDIKAN KECAMATAN AMBULU"],
+          ["DAFTAR REKAPITULASI NILAI ASESMEN SISWA"],
+          [`${sch.nama.toUpperCase()} - TAHUN AJARAN ${actKls ? actKls.tahunAjaran : '2026/2027'}`],
+          [""],
+          ["Mata Pelajaran:", selectedMapel, "", "Kelas / Semester:", `${actKls ? actKls.namaRombel : '-'} / ${actKls ? actKls.semester : 'Ganjil'}`],
+          ["Guru Pengampu:", currentUser ? currentUser.nama : 'Guru', "", "KKM / Target:", schoolMetaConfig.kkm || 75],
+          [""],
+          ["No", "NISN", "Nama Siswa", "TP 1", "TP 2", "TP 3", "UH 1", "UH 2", "PTS", "PAS", "Rata² Tugas", "Rata² UH", "Nilai Akhir", "Predikat", "Keterangan"]
+        ];
+
+        matrix.rows.forEach(r => {
+          rows.push([
+            r.no,
+            r.nis,
+            r.nama,
+            Number(r.t1) || 0,
+            Number(r.t2) || 0,
+            Number(r.t3) || 0,
+            Number(r.uh1) || 0,
+            Number(r.uh2) || 0,
+            Number(r.pts) || 0,
+            Number(r.pas) || 0,
+            Number(r.rataTugas) || 0,
+            Number(r.rataUH) || 0,
+            Number(r.nilaiAkhir) || 0,
+            r.predikat,
+            r.keterangan
+          ]);
+        });
+
+        rows.push([""]);
+        rows.push(["", "", "Rata-rata Kelas:", "", "", "", "", "", "", "", "", "", Number(matrix.stats.avg) || 0, "-", matrix.stats.tuntasPct ? `${matrix.stats.tuntasPct}% Tuntas` : '100% Tuntas']);
+        rows.push(["", "", "Nilai Tertinggi:", "", "", "", "", "", "", "", "", "", Number(matrix.stats.highest) || 0, "-", ""]);
+        rows.push(["", "", "Nilai Terendah:", "", "", "", "", "", "", "", "", "", Number(matrix.stats.lowest) || 0, "-", ""]);
+        rows.push(["", "", "Jumlah Siswa Tuntas:", "", "", "", "", "", "", "", "", "", matrix.stats.tuntasCount, "Siswa", ""]);
+        rows.push(["", "", "Jumlah Siswa Belum Tuntas:", "", "", "", "", "", "", "", "", "", matrix.stats.belumTuntasCount, "Siswa", ""]);
+        rows.push([""]);
+        rows.push(["", "Mengetahui,", "", "", "", "", "", "", "", "", "", "Ambulu, " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })]);
+        rows.push(["", "Kepala Sekolah", "", "", "", "", "", "", "", "", "", "Guru Mata Pelajaran"]);
+        rows.push([""]);
+        rows.push([""]);
+        rows.push(["", schoolMetaConfig.kepalaSekolah || 'Kepala Sekolah', "", "", "", "", "", "", "", "", "", currentUser ? currentUser.nama : 'Guru']);
+        rows.push(["", "NIP. " + (schoolMetaConfig.nipKepalaSekolah || '-'), "", "", "", "", "", "", "", "", "", "NIP. " + (currentUser && currentUser.nip ? currentUser.nip : '-')]);
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+
+        // Auto-fit kolom agar nama siswa dan nilai tidak terpotong
+        ws['!cols'] = [
+          { wch: 6 },  // No
+          { wch: 15 }, // NISN
+          { wch: 32 }, // Nama Siswa
+          { wch: 8 }, { wch: 8 }, { wch: 8 }, // TP1, TP2, TP3
+          { wch: 8 }, { wch: 8 }, // UH1, UH2
+          { wch: 8 }, { wch: 8 }, // PTS, PAS
+          { wch: 12 }, { wch: 12 }, // Rata Tugas, Rata UH
+          { wch: 12 }, // Nilai Akhir
+          { wch: 10 }, // Predikat
+          { wch: 22 }  // Keterangan
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai Rapor");
+
+        // SHEET 2: RINGKASAN & ANALISIS KETUNTASAN
+        const wsAnalisis = XLSX.utils.aoa_to_sheet([
+          ["RINGKASAN ANALISIS KETUNTASAN BELAJAR SISWA"],
+          [`${sch.nama.toUpperCase()} - KELAS ${actKls ? actKls.namaRombel : '-'} - MAPEL ${selectedMapel.toUpperCase()}`],
+          [""],
+          ["Indikator Capaian", "Nilai / Statistik", "Keterangan"],
+          ["Total Siswa Terdaftar", students.length, "Orang"],
+          ["Siswa Mencapai KKM (Tuntas)", matrix.stats.tuntasCount, "Orang"],
+          ["Siswa Belum Tuntas", matrix.stats.belumTuntasCount, "Orang"],
+          ["Persentase Ketuntasan Belajar", (matrix.stats.tuntasPct || '100') + "%", matrix.stats.belumTuntasCount === 0 ? "Tuntas Sempurna" : "Perlu Bimbingan Remedial"],
+          ["Nilai Rata-rata Kelas", Number(matrix.stats.avg) || 0, ""],
+          ["Nilai Tertinggi", Number(matrix.stats.highest) || 0, ""],
+          ["Nilai Terendah", Number(matrix.stats.lowest) || 0, ""],
+          ["Kriteria Ketuntasan Minimal (KKM)", schoolMetaConfig.kkm || 75, "Standar Sekolah"]
+        ]);
+        wsAnalisis['!cols'] = [{ wch: 34 }, { wch: 18 }, { wch: 25 }];
+        XLSX.utils.book_append_sheet(wb, wsAnalisis, "Ringkasan Analisis");
+
+        XLSX.writeFile(wb, filename);
+        showToast('Berkas Rekap Nilai Excel (.xlsx) resmi berhasil diunduh.', 'success');
+        return;
+      }
+
+      // Fallback CSV jika library belum siap
       let csv = '\uFEFF';
-      csv += 'PENGATURAN & PETUNJUK,,,,\r\n';
-      csv += 'Isi sel berwarna kuning (teks biru). Semua sheet rekap otomatis mengikuti pengaturan ini.,,,,\r\n';
-      csv += 'Identitas,,,,\r\n';
-      csv += `Nama Sekolah,"${sch.nama}",,Skala Predikat,\r\n`;
-      csv += `Nama Guru,"${currentUser ? currentUser.nama : 'Guru'}",,A,≥ 90\r\n`;
-      csv += `NIP Guru,"${currentUser ? (currentUser.nip || '-') : '-'}",,B,80 – 89\r\n`;
-      csv += `Mata Pelajaran,"${selectedMapel}",,C,KKM – 79\r\n`;
-      csv += `Kelas,"${actKls ? actKls.namaRombel : '-'}",,D,< KKM\r\n`;
-      csv += `Semester,"${actKls ? actKls.semester : 'Ganjil'}",,,\r\n`;
-      csv += `Tahun Ajaran,"${actKls ? actKls.tahunAjaran : '2026/2027'}",,,\r\n`;
-      csv += `KKM,${schoolMetaConfig.kkm},,,\r\n`;
-      csv += ',,,,\r\n';
-      csv += 'Bobot Nilai Akhir,,,,\r\n';
-      csv += `Bobot Tugas,${schoolMetaConfig.bobotTugas},,,\r\n`;
-      csv += `Bobot Ulangan Harian,${schoolMetaConfig.bobotUH},,,\r\n`;
-      csv += `Bobot PTS,${schoolMetaConfig.bobotPTS},,,\r\n`;
-      csv += `Bobot PAS,${schoolMetaConfig.bobotPAS},,,\r\n`;
-      csv += 'Total Bobot (harus 100%),1,OK,,\r\n';
-      csv += `Total Pertemuan Semester,${schoolMetaConfig.totalPertemuanAbsensi},,,\r\n`;
-      csv += `Nama Kepala Sekolah,"${schoolMetaConfig.kepalaSekolah}",,,\r\n`;
-      csv += `NIP Kepala Sekolah,"${schoolMetaConfig.nipKepalaSekolah}",,,\r\n`;
-      csv += ',,,,\r\n';
-      csv += 'REKAP NILAI SISWA,,,,,,,,,,,,,,\r\n';
-      csv += `"${sch.nama}",,,,,,,,,,,,,,\r\n`;
-      csv += `Mata Pelajaran,:,${selectedMapel},,,,,,,,,,,,\r\n`;
-      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,,,,,,,,,,,\r\n`;
-      csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,,,,,,,\r\n`;
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += 'No,NIS,Nama Siswa,T1,T2,T3,UH1,UH2,PTS,PAS,Rata² Tugas,Rata² UH,Nilai Akhir,Predikat,Keterangan\r\n';
+      csv += 'PENGATURAN & PETUNJUK\r\n';
+      csv += `Nama Sekolah;"${sch.nama}"\r\n`;
+      csv += `Nama Guru;"${currentUser ? currentUser.nama : 'Guru'}"\r\n`;
+      csv += `Mata Pelajaran;"${selectedMapel}"\r\n`;
+      csv += `Kelas;"${actKls ? actKls.namaRombel : '-'}"\r\n`;
+      csv += '\r\nNo;NISN;Nama Siswa;TP 1;TP 2;TP 3;UH 1;UH 2;PTS;PAS;Rata² Tugas;Rata² UH;Nilai Akhir;Predikat;Keterangan\r\n';
 
       matrix.rows.forEach(r => {
-        csv += `${r.no},"${r.nis}","${r.nama.replace(/"/g, '""')}",${r.t1},${r.t2},${r.t3},${r.uh1},${r.uh2},${r.pts},${r.pas},${r.rataTugas},${r.rataUH},${r.nilaiAkhir},${r.predikat},${r.keterangan}\r\n`;
+        csv += `${r.no};"${r.nis}";"${r.nama.replace(/"/g, '""')}";${r.t1};${r.t2};${r.t3};${r.uh1};${r.uh2};${r.pts};${r.pas};${r.rataTugas};${r.rataUH};${r.nilaiAkhir};${r.predikat};${r.keterangan}\r\n`;
       });
-
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += `Rata-rata Kelas,,,${matrix.stats.avg},,,,,,,,,,,\r\n`;
-      csv += `Nilai Tertinggi,,,${matrix.stats.highest},,,,,,,,,,,\r\n`;
-      csv += `Nilai Terendah,,,${matrix.stats.lowest},,,,,,,,,,,\r\n`;
-      csv += `Jumlah Tuntas,,,${matrix.stats.tuntasCount},,,,,,,,,,,\r\n`;
-      csv += `Jumlah Belum Tuntas,,,${matrix.stats.belumTuntasCount},,,,,,,,,,,\r\n`;
-      csv += `Ketuntasan Klasikal,,,${(Number(matrix.stats.tuntasPct) / 100).toFixed(2)},,,,,,,,,,,\r\n`;
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += ',"Mengetahui,",,,,,,,,,,Guru Mata Pelajaran,,,\r\n';
-      csv += ',Kepala Sekolah,,,,,,,,,,,,,\r\n';
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += ',,,,,,,,,,,,,,\r\n';
-      csv += `,"${schoolMetaConfig.kepalaSekolah}",,,,,,,,,,"${currentUser ? currentUser.nama : 'Guru'}",,,\r\n`;
-      csv += `,NIP. ${schoolMetaConfig.nipKepalaSekolah},,,,,,,,,,NIP. ${currentUser ? (currentUser.nip || '-') : '-'},,,\r\n`;
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -6403,7 +6455,7 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Berkas Rekap Nilai Excel (.csv) berhasil diunduh.', 'success');
+      showToast('Berkas Rekap Nilai CSV berhasil diunduh.', 'success');
     }
 
     // ==========================================
@@ -7074,8 +7126,8 @@
 
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportAbsensiToExcel()"
-                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>📊</span> <span>Ekspor Excel (.csv)</span>
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition" title="Unduh Spreadsheet Excel (.xlsx)">
+                <span>📊</span> <span>Ekspor Excel (.xlsx)</span>
               </button>
               <button onclick="openPrintInNewTab(generateRekapAbsensiHTML(), 'Rekap_Absensi', 'landscape')"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
@@ -7194,41 +7246,109 @@
       const rekap = compileRekapAbsensi(actKls, students, rekapFilterStartDate, rekapFilterEndDate);
       const isFiltered = !!(rekapFilterStartDate || rekapFilterEndDate);
       const periodeLabel = isFiltered ? `Periode ${rekapFilterStartDate || 'Awal'} s.d. ${rekapFilterEndDate || 'Sekarang'}` : 'Semester Ganjil';
+      const fileNameSuffix = isFiltered ? `${rekapFilterStartDate || 'Awal'}_sd_${rekapFilterEndDate || 'Sekarang'}` : 'Semester';
+      const filename = `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}_${fileNameSuffix}.xlsx`;
 
+      // Gunakan SheetJS untuk menghasilkan file native .xlsx presensi multi-sheet rapi
+      if (window.XLSX && window.XLSX.utils) {
+        // SHEET 1: REKAPITULASI PRESENSI SISWA
+        const rows = [
+          ["PEMERINTAH KABUPATEN JEMBER - KOORWIL PENDIDIKAN KECAMATAN AMBULU"],
+          ["DAFTAR REKAPITULASI PRESENSI / ABSENSI SISWA"],
+          [`${sch.nama.toUpperCase()} - TAHUN AJARAN ${actKls ? actKls.tahunAjaran : '2026/2027'}`],
+          [""],
+          ["Kelas / Rombel:", `${actKls ? actKls.namaRombel : '-'} (${actKls ? actKls.semester : 'Ganjil'})`, "", "Rentang Waktu:", periodeLabel],
+          ["Guru Kelas / Pengampu:", currentUser ? currentUser.nama : 'Guru', "", "Total Pertemuan:", `${rekap.totalPertemuan} Hari Pertemuan`],
+          [""],
+          ["No", "NISN", "Nama Siswa", "L/P", "Sakit (S)", "Izin (I)", "Alpa (A)", "Hadir (H)", "% Kehadiran", "Keterangan"]
+        ];
+
+        rekap.rows.forEach(r => {
+          rows.push([
+            r.no,
+            r.nis,
+            r.nama,
+            r.jk || '-',
+            Number(r.sakit) || 0,
+            Number(r.izin) || 0,
+            Number(r.alpa) || 0,
+            Number(r.hadir) || 0,
+            `${(Number(r.pctHadirNum) * 100).toFixed(1)}%`,
+            r.keterangan || 'Rajin'
+          ]);
+        });
+
+        rows.push([""]);
+        rows.push(["", "", "TOTAL AKUMULASI KELAS:", "", rekap.totals.sakit, rekap.totals.izin, rekap.totals.alpa, rekap.totals.hadir, `${(Number(rekap.totals.avgPctNum) * 100).toFixed(1)}%`, ""]);
+        rows.push([""]);
+        rows.push(["", "Mengetahui,", "", "", "", "", "Ambulu, " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })]);
+        rows.push(["", "Kepala Sekolah", "", "", "", "", "Guru Kelas / Pengampu"]);
+        rows.push([""]);
+        rows.push([""]);
+        rows.push(["", schoolMetaConfig.kepalaSekolah || 'Kepala Sekolah', "", "", "", "", currentUser ? currentUser.nama : 'Guru']);
+        rows.push(["", "NIP. " + (schoolMetaConfig.nipKepalaSekolah || '-'), "", "", "", "", "NIP. " + (currentUser && currentUser.nip ? currentUser.nip : '-')]);
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+
+        // Auto-fit lebar kolom
+        ws['!cols'] = [
+          { wch: 6 },  // No
+          { wch: 15 }, // NISN
+          { wch: 32 }, // Nama Siswa
+          { wch: 6 },  // L/P
+          { wch: 10 }, // Sakit
+          { wch: 10 }, // Izin
+          { wch: 10 }, // Alpa
+          { wch: 10 }, // Hadir
+          { wch: 14 }, // % Hadir
+          { wch: 18 }  // Keterangan
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Rekap Absensi Siswa");
+
+        // SHEET 2: STATISTIK KEHADIRAN KELAS
+        const wsStat = XLSX.utils.aoa_to_sheet([
+          ["STATISTIK PERSENTASE KEHADIRAN SISWA"],
+          [`${sch.nama.toUpperCase()} - KELAS ${actKls ? actKls.namaRombel : '-'}`],
+          [""],
+          ["Kategori Presensi", "Jumlah Akumulasi", "Rata-rata per Hari"],
+          ["Total Hari Pertemuan Efektif", rekap.totalPertemuan, "Hari KBM"],
+          ["Total Kehadiran Siswa (H)", rekap.totals.hadir, `${(rekap.totals.hadir / (rekap.totalPertemuan || 1)).toFixed(1)} Siswa/hari`],
+          ["Total Sakit (S)", rekap.totals.sakit, `${(rekap.totals.sakit / (rekap.totalPertemuan || 1)).toFixed(1)} Siswa/hari`],
+          ["Total Izin (I)", rekap.totals.izin, `${(rekap.totals.izin / (rekap.totalPertemuan || 1)).toFixed(1)} Siswa/hari`],
+          ["Total Alpa / Tanpa Keterangan (A)", rekap.totals.alpa, `${(rekap.totals.alpa / (rekap.totalPertemuan || 1)).toFixed(1)} Siswa/hari`],
+          ["Rata-rata Persentase Kehadiran Kelas", `${(Number(rekap.totals.avgPctNum) * 100).toFixed(1)}%`, Number(rekap.totals.avgPctNum) >= 0.9 ? "Sangat Baik" : "Cukup"]
+        ]);
+        wsStat['!cols'] = [{ wch: 34 }, { wch: 18 }, { wch: 22 }];
+        XLSX.utils.book_append_sheet(wb, wsStat, "Statistik Kehadiran");
+
+        XLSX.writeFile(wb, filename);
+        showToast('Berkas Rekap Absensi Excel (.xlsx) resmi berhasil diunduh.', 'success');
+        return;
+      }
+
+      // Fallback CSV bertanda titik-koma (agar tidak rusak di Excel Indonesia)
       let csv = '\uFEFF';
-      csv += 'REKAP ABSENSI SISWA,,,,,,,,,\r\n';
-      csv += `"${sch.nama}",,,,,,,,,\r\n`;
-      csv += `Mata Pelajaran,:,Tematik / Guru Kelas,,Rentang Waktu,:,${periodeLabel},,,\r\n`;
-      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,Total Pertemuan,:,${rekap.totalPertemuan} Pertemuan,,,\r\n`;
-      csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,,\r\n`;
-      csv += ',,,,,,,,,\r\n';
-      csv += 'No,NIS,Nama Siswa,L/P,Sakit,Izin,Alpa,Hadir,% Hadir,Keterangan\r\n';
+      csv += 'REKAP ABSENSI SISWA\r\n';
+      csv += `"${sch.nama}"\r\n`;
+      csv += `Mata Pelajaran;Tematik / Guru Kelas;Rentang Waktu;${periodeLabel}\r\n`;
+      csv += `Kelas;${actKls ? actKls.namaRombel : '-'};Total Pertemuan;${rekap.totalPertemuan} Pertemuan\r\n`;
+      csv += '\r\nNo;NISN;Nama Siswa;L/P;Sakit;Izin;Alpa;Hadir;% Hadir;Keterangan\r\n';
 
       rekap.rows.forEach(r => {
-        csv += `${r.no},"${r.nis}","${r.nama.replace(/"/g, '""')}",${r.jk},${r.sakit},${r.izin},${r.alpa},${r.hadir},${r.pctHadirNum.toFixed(4)},${r.keterangan}\r\n`;
+        csv += `${r.no};"${r.nis}";"${r.nama.replace(/"/g, '""')}";${r.jk};${r.sakit};${r.izin};${r.alpa};${r.hadir};${(Number(r.pctHadirNum) * 100).toFixed(1)}%;${r.keterangan}\r\n`;
       });
-
-      csv += `JUMLAH,,,,${rekap.totals.sakit},${rekap.totals.izin},${rekap.totals.alpa},${rekap.totals.hadir},${rekap.totals.avgPctNum.toFixed(4)},\r\n`;
-      csv += ',,,,,,,,,\r\n';
-      csv += ',,,,,,,,,\r\n';
-      csv += ',"Mengetahui,",,,,,,Guru Mata Pelajaran,,\r\n';
-      csv += ',Kepala Sekolah,,,,,,,,\r\n';
-      csv += ',,,,,,,,,\r\n';
-      csv += ',,,,,,,,,\r\n';
-      csv += ',,,,,,,,,\r\n';
-      csv += `,"${schoolMetaConfig.kepalaSekolah}",,,,,,"${currentUser ? currentUser.nama : 'Guru'}",,\r\n`;
-      csv += `,NIP. ${schoolMetaConfig.nipKepalaSekolah},,,,,,NIP. ${currentUser ? (currentUser.nip || '-') : '-'},,\r\n`;
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      const fileNameSuffix = isFiltered ? `${rekapFilterStartDate || 'Awal'}_sd_${rekapFilterEndDate || 'Sekarang'}` : 'Semester';
       link.setAttribute('download', `Rekap_Absensi_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}_${fileNameSuffix}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Berkas Rekap Absensi Excel (.csv) berhasil diunduh.', 'success');
+      showToast('Berkas Rekap Absensi CSV berhasil diunduh.', 'success');
     }
 
     function generateRekapAbsensiHTML() {
@@ -8222,8 +8342,8 @@
 
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="exportJurnalToExcel()"
-                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
-                <span>📊</span> <span>Ekspor Excel (.csv)</span>
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition" title="Unduh Spreadsheet Excel (.xlsx)">
+                <span>📊</span> <span>Ekspor Excel (.xlsx)</span>
               </button>
               <button onclick="openPrintInNewTab(generateRekapJurnalHTML(), 'Rekap_Jurnal_Mengajar', 'landscape')"
                 class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-black text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition">
@@ -8288,30 +8408,76 @@
       const actKls = dbData.kelas.find(k => k.id === activeGuruClassId);
       const sch = currentSchool || { nama: 'SD Negeri Ambulu', npsn: '-' };
       const rekap = compileRekapJurnal(actKls);
+      const filename = `Rekap_Jurnal_${(actKls ? actKls.namaRombel : 'Kelas').replace(/\s+/g, '_')}.xlsx`;
 
+      // Gunakan SheetJS untuk mengekspor native .xlsx jurnal mengajar resmi
+      if (window.XLSX && window.XLSX.utils) {
+        const rows = [
+          ["PEMERINTAH KABUPATEN JEMBER - KOORWIL PENDIDIKAN KECAMATAN AMBULU"],
+          ["AGENDA & JURNAL PELAKSANAAN PEMBELAJARAN GURU"],
+          [`${sch.nama.toUpperCase()} - TAHUN AJARAN ${actKls ? actKls.tahunAjaran : '2026/2027'}`],
+          [""],
+          ["Kelas / Semester:", `${actKls ? actKls.namaRombel : '-'} / ${actKls ? actKls.semester : 'Ganjil'}`, "", "Guru Pengampu:", currentUser ? currentUser.nama : 'Guru'],
+          [""],
+          ["No", "Hari, Tanggal", "Kelas", "Jam Ke", "Materi Pokok / Capaian Pembelajaran", "Metode & Aktivitas", "Hadir", "Tidak Hadir", "Catatan Perkembangan Siswa"]
+        ];
+
+        rekap.rows.forEach(r => {
+          rows.push([
+            r.no,
+            r.tanggal,
+            r.kelas,
+            r.jamKe,
+            r.materiPokok,
+            r.metode,
+            Number(r.hadir) || 0,
+            Number(r.tidakHadir) || 0,
+            r.catatan
+          ]);
+        });
+
+        rows.push([""]);
+        rows.push(["", "", "Rata-rata Kehadiran per Pertemuan:", "", "", "", rekap.avgHadir, rekap.avgTidakHadir, ""]);
+        rows.push([""]);
+        rows.push(["", "Mengetahui,", "", "", "", "", "Ambulu, " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })]);
+        rows.push(["", "Kepala Sekolah", "", "", "", "", "Guru Kelas / Pengampu"]);
+        rows.push([""]);
+        rows.push([""]);
+        rows.push(["", schoolMetaConfig.kepalaSekolah || 'Kepala Sekolah', "", "", "", "", currentUser ? currentUser.nama : 'Guru']);
+        rows.push(["", "NIP. " + (schoolMetaConfig.nipKepalaSekolah || '-'), "", "", "", "", "NIP. " + (currentUser && currentUser.nip ? currentUser.nip : '-')]);
+
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+
+        ws['!cols'] = [
+          { wch: 6 },  // No
+          { wch: 16 }, // Tanggal
+          { wch: 10 }, // Kelas
+          { wch: 10 }, // Jam Ke
+          { wch: 32 }, // Materi Pokok
+          { wch: 25 }, // Metode
+          { wch: 8 },  // Hadir
+          { wch: 12 }, // Tidak Hadir
+          { wch: 30 }  // Catatan
+        ];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Jurnal Pembelajaran");
+
+        XLSX.writeFile(wb, filename);
+        showToast('Berkas Rekap Jurnal Excel (.xlsx) resmi berhasil diunduh.', 'success');
+        return;
+      }
+
+      // Fallback CSV bertanda titik-koma
       let csv = '\uFEFF';
-      csv += 'JURNAL MENGAJAR,,,,,,,,\r\n';
-      csv += `"${sch.nama}",,,,,,,,\r\n`;
-      csv += 'Mata Pelajaran,:,Tematik,,,,,,,\r\n';
-      csv += `Kelas,:,${actKls ? actKls.namaRombel : '-'},,,,,,\r\n`;
-      csv += `Semester / TA,:,${actKls ? actKls.semester : 'Ganjil'} / ${actKls ? actKls.tahunAjaran : '2026/2027'},,,,,,\r\n`;
-      csv += ',,,,,,,,\r\n';
-      csv += 'No,Tanggal,Kelas,Jam Ke,Materi Pokok,Metode,Hadir,Tidak Hadir,Catatan\r\n';
+      csv += 'JURNAL MENGAJAR\r\n';
+      csv += `"${sch.nama}"\r\n`;
+      csv += `Mata Pelajaran;Tematik;Kelas;${actKls ? actKls.namaRombel : '-'}\r\n`;
+      csv += '\r\nNo;Tanggal;Kelas;Jam Ke;Materi Pokok;Metode;Hadir;Tidak Hadir;Catatan\r\n';
 
       rekap.rows.forEach(r => {
-        csv += `${r.no},${r.tanggal},"${r.kelas}","${r.jamKe}","${r.materiPokok.replace(/"/g, '""')}","${r.metode.replace(/"/g, '""')}",${r.hadir},${r.tidakHadir},"${r.catatan.replace(/"/g, '""')}"\r\n`;
+        csv += `${r.no};${r.tanggal};"${r.kelas}";"${r.jamKe}";"${r.materiPokok.replace(/"/g, '""')}";"${r.metode.replace(/"/g, '""')}";${r.hadir};${r.tidakHadir};"${r.catatan.replace(/"/g, '""')}"\r\n`;
       });
-
-      csv += `Rata-rata Kehadiran per Pertemuan,,,,,,${rekap.avgHadir},${rekap.avgTidakHadir},\r\n`;
-      csv += ',,,,,,,,\r\n';
-      csv += ',,,,,,,,\r\n';
-      csv += ',"Mengetahui,",,,,,,Guru Mata Pelajaran,\r\n';
-      csv += ',Kepala Sekolah,,,,,,,\r\n';
-      csv += ',,,,,,,,\r\n';
-      csv += ',,,,,,,,\r\n';
-      csv += ',,,,,,,,\r\n';
-      csv += `,"${schoolMetaConfig.kepalaSekolah}",,,,,,"${currentUser ? currentUser.nama : 'Guru'}",\r\n`;
-      csv += `,NIP. ${schoolMetaConfig.nipKepalaSekolah},,,,,,NIP. ${currentUser ? (currentUser.nip || '-') : '-'},\r\n`;
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -8321,7 +8487,7 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Berkas Rekap Jurnal Excel (.csv) berhasil diunduh.', 'success');
+      showToast('Berkas Rekap Jurnal CSV berhasil diunduh.', 'success');
     }
 
     function generateRekapJurnalHTML() {
