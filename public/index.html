@@ -44,6 +44,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
+  <!-- Three.js Library untuk Efek 3D Holographic Card & Cosmic Particles -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -849,39 +852,54 @@
     <!-- Main Login Card Container -->
     <div class="relative z-10 w-full max-w-md my-auto flex flex-col items-center">
       
-      <!-- Floating Frosted Card (Kartu Otoritas Akses Lembaga) -->
-      <div class="relative w-80 h-44 mb-5">
-        <div class="absolute inset-0 rounded-[28px] bg-white/40 backdrop-blur-md border border-white/60 shadow-xl -rotate-6 scale-95 transform transition-all"></div>
-        <div class="absolute inset-0 rounded-[28px] p-5 flex flex-col justify-between text-white border border-white/60 shadow-[0_15px_40px_rgba(108,92,231,0.25)] overflow-hidden lavender-gradient">
+      <!-- 3D Holographic Card Container with Three.js Cosmic Dust Particles -->
+      <div id="threeDCardContainer" class="relative w-80 h-44 mb-5 flex items-center justify-center" style="perspective: 1000px;">
+        <!-- Three.js Ambient Particle Canvas Behind/Around Card -->
+        <canvas id="threeJsCardCanvas" class="absolute -inset-10 w-[400px] h-[260px] pointer-events-none z-0 opacity-80"></canvas>
+        
+        <!-- Interactive 3D Card Inner (Tilt & Holographic Sheen) -->
+        <div id="threeDCardInner" class="relative w-full h-full transition-transform duration-150 ease-out will-change-transform z-10 cursor-grab active:cursor-grabbing select-none" style="transform-style: preserve-3d;">
+          <!-- Ambient Back Glow -->
+          <div class="absolute inset-0 rounded-[28px] bg-gradient-to-tr from-brand-600/30 to-amber-300/20 blur-xl scale-95 pointer-events-none"></div>
+
+          <!-- Base Card Shadow Offset -->
+          <div class="absolute inset-0 rounded-[28px] bg-white/40 backdrop-blur-md border border-white/60 shadow-xl -rotate-6 scale-95 transform transition-all pointer-events-none" id="cardBackdropShadow"></div>
           
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center p-1 border border-white/30">
-                <svg viewBox="0 0 24 24" class="w-5 h-5 fill-white">
-                  <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-                </svg>
-              </div>
-              <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-200">SiGuru Access</span>
-            </div>
-            <span class="text-xs font-black tracking-widest text-white/90">KEC. AMBULU</span>
-          </div>
+          <!-- Card Surface with Holographic Gradient -->
+          <div class="absolute inset-0 rounded-[28px] p-5 flex flex-col justify-between text-white border border-white/70 shadow-[0_15px_40px_rgba(108,92,231,0.3)] overflow-hidden lavender-gradient" id="cardSurface">
+            <!-- Holographic Sheen Layer -->
+            <div id="cardHoloSheen" class="absolute inset-0 pointer-events-none opacity-40 mix-blend-color-dodge transition-opacity duration-300" 
+                 style="background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.45) 35%, rgba(254, 240, 138, 0.5) 45%, rgba(192, 132, 252, 0.55) 55%, transparent 70%); transform: translateX(-100%);"></div>
 
-          <div class="flex items-center gap-3 my-auto">
-            <div class="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-300 via-yellow-100 to-amber-400 border border-yellow-200/80 p-1 flex items-center justify-center shadow-xs">
-              <div class="w-full h-full border border-amber-600/30 rounded-xs flex flex-col justify-between p-0.5">
-                <div class="w-full h-[1px] bg-amber-700/40"></div>
-                <div class="w-full h-[1px] bg-amber-700/40"></div>
+            <div class="relative z-10 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center p-1 border border-white/30">
+                  <svg viewBox="0 0 24 24" class="w-5 h-5 fill-white">
+                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                  </svg>
+                </div>
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-200">SiGuru Access</span>
+              </div>
+              <span class="text-xs font-black tracking-widest text-white/90">KEC. AMBULU</span>
+            </div>
+
+            <div class="relative z-10 flex items-center gap-3 my-auto">
+              <div class="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-300 via-yellow-100 to-amber-400 border border-yellow-200/80 p-1 flex items-center justify-center shadow-xs">
+                <div class="w-full h-full border border-amber-600/30 rounded-xs flex flex-col justify-between p-0.5">
+                  <div class="w-full h-[1px] bg-amber-700/40"></div>
+                  <div class="w-full h-[1px] bg-amber-700/40"></div>
+                </div>
+              </div>
+              <div class="space-y-0.5">
+                <p class="text-[9px] uppercase tracking-wider text-purple-200 font-bold">Otoritas Akses Lembaga</p>
+                <p class="text-xs font-mono font-black tracking-widest text-white" id="cardSchoolDisplay">NPSN & KODE UNIK SEKOLAH</p>
               </div>
             </div>
-            <div class="space-y-0.5">
-              <p class="text-[9px] uppercase tracking-wider text-purple-200 font-bold">Otoritas Akses Lembaga</p>
-              <p class="text-xs font-mono font-black tracking-widest text-white" id="cardSchoolDisplay">NPSN & KODE UNIK SEKOLAH</p>
-            </div>
-          </div>
 
-          <div class="flex items-center justify-between text-[11px] pt-1.5 border-t border-white/20">
-            <span class="font-bold text-white tracking-wide truncate max-w-[170px]" id="cardSchoolSubDisplay">SD Negeri se-Kec. Ambulu</span>
-            <span class="font-extrabold text-amber-200 text-[10px]">KURIKULUM MERDEKA</span>
+            <div class="relative z-10 flex items-center justify-between text-[11px] pt-1.5 border-t border-white/20">
+              <span class="font-bold text-white tracking-wide truncate max-w-[170px]" id="cardSchoolSubDisplay">SD Negeri se-Kec. Ambulu</span>
+              <span class="font-extrabold text-amber-200 text-[10px]">KURIKULUM MERDEKA</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1065,6 +1083,23 @@
             <svg class="w-3.5 h-3.5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
           </span>
         </button>
+      </div>
+
+      <!-- Creator Signature Credit (Khusus Halaman Login Saja - Variasi C) -->
+      <div class="mt-6 pt-2 text-center space-y-0.5 select-none no-print border-t border-violet-200/40 w-full">
+        <p class="text-[10px] text-brand-muted/80 font-semibold tracking-wide">
+          SiGuru SD Digital • Kecamatan Ambulu
+        </p>
+        <p class="text-[11px] text-brand-dark/90 font-extrabold flex items-center justify-center gap-1.5">
+          <span>Crafted with</span>
+          <span class="text-rose-500 animate-pulse inline-block">❤️</span>
+          <span>by</span>
+          <a href="https://instagram.com/rzafah_education" target="_blank" rel="noopener noreferrer" 
+             class="text-brand-700 hover:text-brand-600 underline decoration-brand-400 decoration-1 underline-offset-2 transition-colors cursor-pointer"
+             title="Kunjungi rzafah_education">
+            rzafah_education
+          </a>
+        </p>
       </div>
 
     </div>
@@ -2177,7 +2212,7 @@
         localStorage.setItem(authKey, JSON.stringify(authList));
       } catch (e) {}
 
-      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'none'; if (typeof isThreeCardRunning !== 'undefined') isThreeCardRunning = false;
       document.getElementById('mainApp').style.display = 'flex';
 
       updateHeaderUserUI();
@@ -2605,6 +2640,185 @@
       if (gallery) gallery.classList.remove('hidden');
       if (detail) detail.classList.add('hidden');
     }
+
+
+    // ==========================================
+    // THREE.JS 3D CARD TILT & COSMIC PARTICLES CONTROLLER
+    // ==========================================
+    let threeCardScene = null;
+    let threeCardCamera = null;
+    let threeCardRenderer = null;
+    let threeCardParticles = null;
+    let threeCardAnimFrame = null;
+    let isThreeCardRunning = false;
+
+    function initThreeCardParticles() {
+      const canvas = document.getElementById('threeJsCardCanvas');
+      if (!canvas || !window.THREE) return;
+
+      try {
+        const width = canvas.clientWidth || 380;
+        const height = canvas.clientHeight || 240;
+
+        threeCardScene = new THREE.Scene();
+        threeCardCamera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+        threeCardCamera.position.z = 250;
+
+        threeCardRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
+        threeCardRenderer.setSize(width, height);
+        threeCardRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+        // Partikel debu kosmik warna lavender, emas, dan putih lembut
+        const particleCount = 55;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        const colorPalette = [
+          new THREE.Color(0xA29BFE), // Soft Lavender
+          new THREE.Color(0xFDCB6E), // Warm Gold
+          new THREE.Color(0x74B9FF), // Sky Blue
+          new THREE.Color(0xFFFFFF)  // Pure White
+        ];
+
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 320;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
+
+          const col = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+          colors[i * 3] = col.r;
+          colors[i * 3 + 1] = col.g;
+          colors[i * 3 + 2] = col.b;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        // Canvas 2D texture untuk partikel bulat halus
+        const pCanvas = document.createElement('canvas');
+        pCanvas.width = 16;
+        pCanvas.height = 16;
+        const pCtx = pCanvas.getContext('2d');
+        const pGrad = pCtx.createRadialGradient(8, 8, 0, 8, 8, 8);
+        pGrad.addColorStop(0, 'rgba(255,255,255,1)');
+        pGrad.addColorStop(0.5, 'rgba(255,255,255,0.6)');
+        pGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        pCtx.fillStyle = pGrad;
+        pCtx.fillRect(0, 0, 16, 16);
+        const pTexture = new THREE.CanvasTexture(pCanvas);
+
+        const material = new THREE.PointsMaterial({
+          size: 7,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.85,
+          map: pTexture,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+
+        threeCardParticles = new THREE.Points(geometry, material);
+        threeCardScene.add(threeCardParticles);
+
+        isThreeCardRunning = true;
+        animateThreeCard();
+      } catch (err) {
+        console.warn('⚠️ WebGL Three.js tidak didukung pada perangkat ini, fallback ke tampilan kartu CSS normal:', err);
+      }
+    }
+
+    function animateThreeCard() {
+      if (!isThreeCardRunning) return;
+      threeCardAnimFrame = requestAnimationFrame(animateThreeCard);
+
+      if (threeCardParticles) {
+        threeCardParticles.rotation.y += 0.003;
+        threeCardParticles.rotation.x += 0.0015;
+      }
+
+      if (threeCardRenderer && threeCardScene && threeCardCamera) {
+        threeCardRenderer.render(threeCardScene, threeCardCamera);
+      }
+    }
+
+    function setupInteractive3DCardTilt() {
+      const container = document.getElementById('threeDCardContainer');
+      const card = document.getElementById('threeDCardInner');
+      const sheen = document.getElementById('cardHoloSheen');
+      if (!container || !card) return;
+
+      let isHovering = false;
+
+      function handleMove(clientX, clientY) {
+        const rect = container.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const deltaX = (x - centerX) / centerX;
+        const deltaY = (y - centerY) / centerY;
+
+        const maxRotate = 16;
+        const rotateY = deltaX * maxRotate;
+        const rotateX = -deltaY * maxRotate;
+
+        card.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.04, 1.04, 1.04)`;
+
+        if (sheen) {
+          const sheenOffset = ((deltaX + 1) / 2) * 200 - 100;
+          sheen.style.transform = `translateX(${sheenOffset.toFixed(1)}%)`;
+          sheen.style.opacity = '0.65';
+        }
+
+        if (threeCardParticles) {
+          threeCardParticles.rotation.y = deltaX * 0.35;
+          threeCardParticles.rotation.x = -deltaY * 0.25;
+        }
+      }
+
+      function handleReset() {
+        card.style.transform = 'rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        if (sheen) {
+          sheen.style.transform = 'translateX(-100%)';
+          sheen.style.opacity = '0.35';
+        }
+        if (threeCardParticles) {
+          threeCardParticles.rotation.y = 0;
+          threeCardParticles.rotation.x = 0;
+        }
+      }
+
+      container.addEventListener('mousemove', (e) => {
+        isHovering = true;
+        handleMove(e.clientX, e.clientY);
+      });
+
+      container.addEventListener('mouseleave', () => {
+        isHovering = false;
+        handleReset();
+      });
+
+      container.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', () => {
+        handleReset();
+      });
+    }
+
+    // Inisialisasi saat halaman login termuat
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        initThreeCardParticles();
+        setupInteractive3DCardTilt();
+      }, 150);
+    });
+
 
     // ==========================================
     // DUAL-ENGINE ACCELERATOR (GOOGLE APPS SCRIPT + FIREBASE)
@@ -3350,7 +3564,7 @@
           // 1. Muat database lokal guru seketika (Offline-First)
           loadLocalTeacherDatabase(s.school.npsn, s.user.id || s.user.uid || s.user.nama);
 
-          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('loginScreen').style.display = 'none'; if (typeof isThreeCardRunning !== 'undefined') isThreeCardRunning = false;
           document.getElementById('mainApp').style.display = 'flex';
           updateHeaderUserUI();
           if (s.activeModule) {
@@ -3380,7 +3594,7 @@
       localStorage.removeItem('siguru_permanent_session');
       sessionStorage.removeItem('siguru_npsn_session');
       document.getElementById('mainApp').style.display = 'none';
-      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('loginScreen').style.display = 'flex'; if (typeof isThreeCardRunning !== 'undefined' && !isThreeCardRunning) { isThreeCardRunning = true; if (typeof animateThreeCard === 'function') animateThreeCard(); }
       window.scrollTo(0, 0);
       showToast('Sesi Anda telah diakhiri.', 'info');
     }
@@ -9654,7 +9868,7 @@
       startLiveClock();
       const restored = restoreSession();
       if (!restored) {
-        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('loginScreen').style.display = 'flex'; if (typeof isThreeCardRunning !== 'undefined' && !isThreeCardRunning) { isThreeCardRunning = true; if (typeof animateThreeCard === 'function') animateThreeCard(); }
         document.getElementById('mainApp').style.display = 'none';
         // Selalu tampilkan pop-up panduan di awal sebelum menu login
         openGuideModal();

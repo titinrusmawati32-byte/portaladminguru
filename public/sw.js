@@ -7,7 +7,7 @@
  * ============================================================
  */
 
-const CACHE_NAME = 'siguru-pwa-v5.4-dual-engine-gas-firebase';
+const CACHE_NAME = 'siguru-pwa-v5.5-threejs-3d-card-and-creator-credit';
 
 // Aset inti yang wajib di-cache saat Service Worker dipasang
 const PRECACHE_ASSETS = [
