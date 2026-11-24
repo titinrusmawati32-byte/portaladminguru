@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup Ergonomi & Kenyamanan Penggunaan HP - SiGuru SD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#F5F3FF',
+              100: '#ECE9FA',
+              200: '#DDD6FE',
+              300: '#C4B5FD',
+              400: '#A78BFA',
+              500: '#8275E5',
+              600: '#7C6EE6',
+              700: '#6C5CE7',
+              800: '#5846B5',
+              900: '#3D2F85',
+              dark: '#1E1B4B',
+              muted: '#7F78B3',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 9999px;
+    }
+    .lavender-gradient {
+      background: linear-gradient(135deg, #7C6EE6 0%, #6C5CE7 50%, #5846B5 100%);
+    }
+
+    /* Smartphone Frame Mockup Styling */
+    .phone-bezel {
+      box-shadow: 0 25px 70px -15px rgba(108, 92, 231, 0.35), 0 0 0 12px #1e1b4b, 0 0 0 14px rgba(255, 255, 255, 0.15);
+    }
+
+    /* Heatmap Overlay Zona Jempol (Thumb Reach) */
+    .thumb-zone-overlay {
+      background: radial-gradient(circle at 50% 90%, rgba(34, 197, 94, 0.28) 0%, rgba(34, 197, 94, 0.20) 45%, rgba(234, 179, 8, 0.20) 70%, rgba(239, 68, 68, 0.25) 100%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 transition-colors duration-300">
+
+  <!-- ============================================================
+       TOP HEADER & CONTROL BAR
+       ============================================================ -->
+  <header class="max-w-6xl mx-auto mb-6 p-4 sm:p-5 rounded-3xl bg-slate-900/90 border border-white/10 backdrop-blur-md shadow-xl flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          Mobile Ergonomics Lab
+        </span>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          SiGuru SD v5.1
+        </span>
+      </div>
+      <h1 class="text-lg sm:text-xl font-black text-white font-outfit mt-1.5 flex items-center gap-2">
+        <span>📱</span> <span>Eksplorasi Kenyamanan & Layout Aplikasi di HP</span>
+      </h1>
+      <p class="text-xs text-slate-400 mt-0.5">Uji coba simulasi 3 model tampilan layar ponsel untuk kemudahan guru mengajar satu tangan.</p>
+    </div>
+
+    <!-- Switcher Heatmap Zona Jempol & Tampilan Layar -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <button onclick="toggleThumbHeatmap()" id="btnHeatmap" class="px-3.5 py-2 rounded-xl bg-slate-800 border border-white/10 text-xs font-bold text-slate-300 flex items-center gap-1.5 cursor-pointer hover:text-white transition">
+        <span>🖐️</span> <span id="heatmapText">Zona Jempol: Mati</span>
+      </button>
+      <button onclick="toggleScreenView()" id="btnScreenView" class="px-3.5 py-2 rounded-xl bg-purple-600 text-white border border-purple-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-purple-500 transition shadow-md shadow-purple-600/30">
+        <span>📑</span> <span id="screenViewText">Layar: Beranda Portal</span>
+      </button>
+    </div>
+
+    <!-- SELECTOR 3 KONSEP LAYOUT HP -->
+    <div class="w-full pt-3 border-t border-white/10">
+      <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <span>⚡</span> <span>PILIH KONSEP LAYOUT HP:</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs font-bold">
+        
+        <!-- KONSEP A -->
+        <button onclick="setLayoutConcept('concept-a')" id="btnConceptA" class="p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left cursor-pointer transition shadow-md shadow-purple-600/20">
+          <div class="flex justify-between items-center">
+            <span class="text-base">⭐</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500 text-white font-black">Rekomendasi</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">Konsep A: Smart Action Hub</div>
+          <p class="text-[10px] text-purple-300/80 font-normal mt-0.5">2 Modul Utama Hari Ini (Kartu Besar) + 6 Modul Cepat Horizontal dengan info status langsung.</p>
+        </button>
+
+        <!-- KONSEP B -->
+        <button onclick="setLayoutConcept('concept-b')" id="btnConceptB" class="p-3 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-left cursor-pointer transition hover:border-slate-500">
+          <div class="flex justify-between items-center">
+            <span class="text-base">🍱</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">Zero Scroll</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">Konsep B: 4x2 Micro Bento Grid</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Semua 8 modul dirapatkan proporsional agar langsung terlihat dalam 1 layar tanpa geser.</p>
+        </button>
+
+        <!-- KONSEP C -->
+        <button onclick="setLayoutConcept('concept-c')" id="btnConceptC" class="p-3 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-left cursor-pointer transition hover:border-slate-500">
+          <div class="flex justify-between items-center">
+            <span class="text-base">🗂️</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-bold">Kategori Tab</span>
+          </div>
+          <div class="font-black text-xs text-white mt-1">Konsep C: Segmented Thumb Flow</div>
+          <p class="text-[10px] text-slate-400 font-normal mt-0.5">Navigasi tab pill di bawah (Rutin Harian, Penilaian Siswa, Modul Ajar) dengan kartu sentuh empuk.</p>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN LAB WORKSPACE: PHONE SIMULATOR + EXPLANATION SIDEBAR
+       ============================================================ -->
+  <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT: REALISTIC SMARTPHONE SIMULATOR (390px Width) -->
+    <div class="lg:col-span-5 flex justify-center sticky top-6">
+      
+      <!-- Phone Body -->
+      <div class="relative w-[380px] h-[780px] bg-slate-900 rounded-[50px] phone-bezel overflow-hidden flex flex-col border-[5px] border-slate-800 select-none">
+        
+        <!-- Dynamic Island / Speaker Notch -->
+        <div class="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-50 flex items-center justify-between px-3">
+          <div class="w-2.5 h-2.5 rounded-full bg-slate-900"></div>
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        </div>
+
+        <!-- Phone Status Bar -->
+        <div class="h-10 pt-2 px-6 flex items-center justify-between text-[11px] font-bold text-slate-700 bg-white dark:bg-slate-900 shrink-0 z-40">
+          <span>09:41</span>
+          <div class="flex items-center gap-1.5 text-xs">
+            <span>📶</span>
+            <span>LTE</span>
+            <span>🔋 88%</span>
+          </div>
+        </div>
+
+        <!-- Heatmap Overlay (Toggleable) -->
+        <div id="thumbOverlay" class="absolute inset-0 z-40 thumb-zone-overlay hidden">
+          <div class="absolute bottom-20 left-4 right-4 p-3 rounded-2xl bg-black/80 backdrop-blur-md text-white text-[10px] space-y-1">
+            <div class="font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> <span>Hijau: Jangkauan Jempol Sangat Nyaman (1 Tangan)</span>
+            </div>
+            <div class="font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span> <span>Kuning: Sedikit Meregangkan Jempol</span>
+            </div>
+            <div class="font-bold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-400"></span> <span>Merah: Butuh Bantuan 2 Tangan</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIMULATOR VIEWPORT: BERANDA / INPUT NILAI -->
+        <div id="phoneScreenContent" class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 relative pb-24 text-slate-800">
+          <!-- Dynamically injected via JS -->
+        </div>
+
+        <!-- ELEVATED BOTTOM NAVIGATION DOCK (FIXED DI PHONE FRAME) -->
+        <div class="absolute bottom-3 left-4 right-4 z-40 bg-white/95 backdrop-blur-md rounded-full shadow-[0_10px_25px_rgba(124,110,230,0.20)] border border-violet-100 p-1.5 px-3 grid grid-cols-5 items-center text-center">
+          
+          <button onclick="setSimActiveTab('beranda')" class="flex flex-col items-center text-brand-600 py-0.5 cursor-pointer">
+            <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span class="text-[9px] font-extrabold mt-0.5">Beranda</span>
+          </button>
+
+          <button onclick="setSimActiveTab('kelas')" class="flex flex-col items-center text-slate-400 hover:text-brand-600 py-0.5 cursor-pointer">
+            <svg class="w-4.5 h-4.5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            <span class="text-[9px] font-bold mt-0.5">Kelas</span>
+          </button>
+
+          <!-- Center Elevated Tilted Diamond FAB (QR Presensi) -->
+          <div class="flex flex-col items-center relative -mt-6">
+            <button onclick="simulateScanClick()" title="Scan QR Presensi Cepat" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#5B4CDB] to-[#8C7AE6] rotate-45 flex items-center justify-center text-white shadow-lg shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/40">
+              <div class="-rotate-45">
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2"/><rect x="8" y="8" width="3" height="3" class="fill-current" stroke="none"/><rect x="13" y="8" width="3" height="3" class="fill-current" stroke="none"/><rect x="8" y="13" width="3" height="3" class="fill-current" stroke="none"/><rect x="13" y="13" width="3" height="3" class="fill-current" stroke="none"/></svg>
+              </div>
+            </button>
+          </div>
+
+          <button onclick="setSimActiveTab('nilai')" class="flex flex-col items-center text-slate-400 hover:text-brand-600 py-0.5 cursor-pointer">
+            <svg class="w-4.5 h-4.5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><path d="M9 19v-6m4 6v-9m4 9v-4M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+            <span class="text-[9px] font-bold mt-0.5">Nilai</span>
+          </button>
+
+          <button onclick="setSimActiveTab('profil')" class="flex flex-col items-center text-slate-400 hover:text-brand-600 py-0.5 cursor-pointer">
+            <svg class="w-4.5 h-4.5 stroke-current stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
+            <span class="text-[9px] font-bold mt-0.5">Akun</span>
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT: INTERACTIVE ANALYSIS, ANATOMY & COMPARISON (7 Cols) -->
+    <div class="lg:col-span-7 space-y-5">
+      
+      <!-- CARD 1: DETAIL KONSEP YANG SEDANG DIPILIH -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-white/10 shadow-xl space-y-4">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-purple-500 animate-ping"></span>
+            <h2 class="text-base sm:text-lg font-black text-white font-outfit" id="activeConceptTitle">
+              Konsep A: Smart Action Hub (Fokus Rutinitas Guru)
+            </h2>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/30" id="activeConceptTag">
+            Sangat Ergonomis
+          </span>
+        </div>
+
+        <p class="text-xs text-slate-300 leading-relaxed" id="activeConceptDesc">
+          Memisahkan 2 aktivitas paling sering guru di sekolah (<strong>Presensi QR</strong> dan <strong>Input Nilai Harian</strong>) ke dalam 2 kartu pahlawan utama berukuran sentuh lega (Large Touch Targets), disusul 6 modul pendukung lainnya dengan badge info real-time.
+        </p>
+
+        <!-- FITUR ERGONOMI UNGGULAN -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 space-y-1">
+            <div class="text-xs font-black text-emerald-400 flex items-center gap-1.5">
+              <span>🎯</span> <span>Zona Jempol (Thumb Reach)</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal" id="featThumb">
+              Semua tombol interaktif berada di 60% area bawah layar sehingga guru dapat mengoperasikannya cukup dengan 1 tangan saat mengajar.
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-white/5 space-y-1">
+            <div class="text-xs font-black text-cyan-400 flex items-center gap-1.5">
+              <span>⚡</span> <span>Kecepatan Akses (Touch Latency)</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal" id="featSpeed">
+              Tombol sentuh memiliki luas minimal 48x48px (Apple Human Interface Guidelines) untuk mencegah salah pencet di layar kecil.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: TABEL PERBANDINGAN 3 KONSEP -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-slate-900/90 border border-white/10 shadow-xl space-y-4">
+        <h3 class="text-sm sm:text-base font-black text-white font-outfit uppercase tracking-wider flex items-center gap-2">
+          <span>⚖️</span> <span>Tabel Perbandingan 3 Konsep di HP</span>
+        </h3>
+
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400 font-extrabold text-[11px]">
+                <th class="py-2.5 px-3">Aspek Kenyamanan</th>
+                <th class="py-2.5 px-3 text-purple-300">Konsep A (Smart Hub)</th>
+                <th class="py-2.5 px-3">Konsep B (Micro Bento)</th>
+                <th class="py-2.5 px-3">Konsep C (Tab Segmented)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5 text-[11px]">
+              <tr>
+                <td class="py-2.5 px-3 font-bold text-white">Scroll di Layar HP</td>
+                <td class="py-2.5 px-3 text-purple-300 font-extrabold">Sedikit (Halus)</td>
+                <td class="py-2.5 px-3 text-emerald-400 font-extrabold">Nol Scroll (1 Layar)</td>
+                <td class="py-2.5 px-3 text-slate-300">Nol Scroll per Tab</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-bold text-white">Ukuran Tombol / Ikon</td>
+                <td class="py-2.5 px-3 text-purple-300 font-extrabold">Besar & Empuk</td>
+                <td class="py-2.5 px-3 text-slate-300">Kompak & Rapat</td>
+                <td class="py-2.5 px-3 text-slate-300">Sedang</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-bold text-white">Kesesuaian Guru Baru</td>
+                <td class="py-2.5 px-3 text-emerald-400 font-extrabold">Sangat Cepat Paham</td>
+                <td class="py-2.5 px-3 text-slate-300">Standar</td>
+                <td class="py-2.5 px-3 text-slate-300">Perlu Mengenal Tab</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-bold text-white">Kecepatan Presensi & Nilai</td>
+                <td class="py-2.5 px-3 text-emerald-400 font-extrabold">1-Klik Langsung</td>
+                <td class="py-2.5 px-3 text-slate-300">1-Klik</td>
+                <td class="py-2.5 px-3 text-slate-300">1-Klik</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CARD 3: REKOMENDASI DESAIN UNTUK GURU SD -->
+      <div class="p-5 rounded-3xl bg-gradient-to-br from-purple-900/40 via-slate-900 to-indigo-900/40 border border-purple-500/30 shadow-xl flex items-start gap-4">
+        <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-lg font-black shrink-0 shadow-lg shadow-purple-600/30">
+          💡
+        </div>
+        <div class="space-y-1">
+          <h4 class="font-black text-sm text-white">Rekomendasi Terbaik untuk Portal Guru SD:</h4>
+          <p class="text-xs text-purple-200/90 leading-relaxed">
+            <strong>Konsep A (Smart Action Hub)</strong> memberikan kenyamanan tertinggi saat guru sedang di kelas karena kartu presensi dan input nilai berukuran besar, sehingga guru tidak perlu memicingkan mata atau menekan tombol kecil.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       SCRIPT INTERAKTIF SIMULATOR HP
+       ============================================================ -->
+  <script>
+    let currentConcept = 'concept-a';
+    let currentScreen = 'portal'; // 'portal' atau 'nilai'
+    let isHeatmapActive = false;
+
+    function setLayoutConcept(concept) {
+      currentConcept = concept;
+      
+      // Update Button Styles
+      document.getElementById('btnConceptA').className = concept === 'concept-a' ? 'p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left cursor-pointer transition shadow-md shadow-purple-600/20' : 'p-3 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-left cursor-pointer transition hover:border-slate-500';
+      document.getElementById('btnConceptB').className = concept === 'concept-b' ? 'p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left cursor-pointer transition shadow-md shadow-purple-600/20' : 'p-3 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-left cursor-pointer transition hover:border-slate-500';
+      document.getElementById('btnConceptC').className = concept === 'concept-c' ? 'p-3 rounded-2xl bg-purple-600/30 border-2 border-purple-500 text-purple-200 text-left cursor-pointer transition shadow-md shadow-purple-600/20' : 'p-3 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-left cursor-pointer transition hover:border-slate-500';
+
+      // Update Text Analysis
+      if (concept === 'concept-a') {
+        document.getElementById('activeConceptTitle').innerText = 'Konsep A: Smart Action Hub (Fokus Rutinitas Guru)';
+        document.getElementById('activeConceptTag').innerText = 'Sangat Ergonomis';
+        document.getElementById('activeConceptDesc').innerHTML = 'Memisahkan 2 aktivitas paling sering guru di sekolah (<strong>Presensi QR</strong> dan <strong>Input Nilai Harian</strong>) ke dalam 2 kartu pahlawan utama berukuran sentuh lega (Large Touch Targets), disusul 6 modul pendukung lainnya dengan badge info real-time.';
+        document.getElementById('featThumb').innerText = 'Semua tombol interaktif berada di 60% area bawah layar sehingga guru dapat mengoperasikannya cukup dengan 1 tangan saat mengajar.';
+        document.getElementById('featSpeed').innerText = 'Tombol sentuh memiliki luas minimal 48x48px (Apple Human Interface Guidelines) untuk mencegah salah pencet di layar kecil.';
+      } else if (concept === 'concept-b') {
+        document.getElementById('activeConceptTitle').innerText = 'Konsep B: 4x2 Micro Bento Grid (Zero Scroll 1-Screen)';
+        document.getElementById('activeConceptTag').innerText = 'Super Kompak';
+        document.getElementById('activeConceptDesc').innerHTML = 'Merampingkan tinggi kartu modul sehingga <strong>seluruh 8 modul portal</strong> langsung tampil serentak di layar ponsel guru tanpa perlu scroll ke bawah sama sekali.';
+        document.getElementById('featThumb').innerText = 'Navigasi cepat dan sekilas pandang (Glanceable UI). Guru langsung melihat semua modul.';
+        document.getElementById('featSpeed').innerText = 'Grid 2 kolom yang presisi dengan ikon duotone dan badge penanda status yang jelas.';
+      } else {
+        document.getElementById('activeConceptTitle').innerText = 'Konsep C: Segmented Thumb Flow (Pengelompokan Tab Kategori)';
+        document.getElementById('activeConceptTag').innerText = 'Terorganisir';
+        document.getElementById('activeConceptDesc').innerHTML = 'Mengelompokkan 8 modul ke dalam 3 tab pill yang mudah dijangkau jempol: [Harian & Siswa], [Asesmen & Rapor], serta [Perangkat Kurikulum].';
+        document.getElementById('featThumb').innerText = 'Tab switcher diletakkan di jangkauan jempol bawah, sangat praktis beralih fokus kerja.';
+        document.getElementById('featSpeed').innerText = 'Hanya menampilkan 2-3 modul relevan per tab, menjaga layar tetap bersih dan tidak membingungkan.';
+      }
+
+      renderSimulator();
+    }
+
+    function toggleThumbHeatmap() {
+      isHeatmapActive = !isHeatmapActive;
+      const overlay = document.getElementById('thumbOverlay');
+      const text = document.getElementById('heatmapText');
+      if (isHeatmapActive) {
+        overlay.classList.remove('hidden');
+        text.innerText = 'Zona Jempol: Nyala';
+      } else {
+        overlay.classList.add('hidden');
+        text.innerText = 'Zona Jempol: Mati';
+      }
+    }
+
+    function toggleScreenView() {
+      currentScreen = currentScreen === 'portal' ? 'nilai' : 'portal';
+      document.getElementById('screenViewText').innerText = currentScreen === 'portal' ? 'Layar: Beranda Portal' : 'Layar: Input Nilai di HP';
+      renderSimulator();
+    }
+
+    function setSimActiveTab(tab) {
+      if (tab === 'nilai') {
+        currentScreen = 'nilai';
+        document.getElementById('screenViewText').innerText = 'Layar: Input Nilai di HP';
+      } else {
+        currentScreen = 'portal';
+        document.getElementById('screenViewText').innerText = 'Layar: Beranda Portal';
+      }
+      renderSimulator();
+    }
+
+    function simulateScanClick() {
+      alert("Simulasi: Kamera Scanner QR Presensi Siswa Terbuka dengan Reticle Panduan!");
+    }
+
+    function renderSimulator() {
+      const container = document.getElementById('phoneScreenContent');
+      if (!container) return;
+
+      if (currentScreen === 'nilai') {
+        // TAMPILAN KHUSUS: INPUT NILAI DI HP (CARD MODE & ERGONOMICS)
+        container.innerHTML = `
+          <!-- Sticky Sub-Header: Back + Title -->
+          <div class="sticky top-0 bg-white/95 backdrop-blur-md px-4 py-3 border-b border-violet-100 flex items-center justify-between z-20">
+            <button onclick="setSimActiveTab('beranda')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-brand-700 font-extrabold text-[11px] border border-violet-200/80 shadow-2xs">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+              <span>Kembali</span>
+            </button>
+            <div class="text-right">
+              <div class="font-black text-xs text-brand-dark">Input Nilai Formatif</div>
+              <div class="text-[10px] text-brand-muted">Kelas IV-A • Matematika</div>
+            </div>
+          </div>
+
+          <!-- Content Area: Siswa Cards & Fast Keypad -->
+          <div class="p-3.5 space-y-3">
+            
+            <!-- Quick Alert: Landscape Hint -->
+            <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-[11px] flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span>🔄</span>
+                <span>Miringkan HP untuk Tabel Matriks</span>
+              </div>
+              <span class="text-[9px] font-black bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full">Landscape</span>
+            </div>
+
+            <!-- Siswa Card 1 -->
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-black text-xs flex items-center justify-center">01</div>
+                  <div>
+                    <h5 class="font-extrabold text-xs text-slate-800">Achmad Fauzi</h5>
+                    <p class="text-[10px] text-slate-400">NISN: 0129384918</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200">Nilai: 88</span>
+                </div>
+              </div>
+
+              <!-- Quick Touch Number Pills (Zona Jempol Cepat) -->
+              <div class="pt-1">
+                <div class="text-[10px] font-bold text-slate-400 mb-1">Sentuh Cepat Angka Nilai:</div>
+                <div class="grid grid-cols-5 gap-1.5 text-center">
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">75</button>
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">80</button>
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">85</button>
+                  <button class="py-1.5 rounded-lg bg-emerald-600 text-white font-black text-[11px] shadow-xs">88</button>
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">95</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Siswa Card 2 -->
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-black text-xs flex items-center justify-center">02</div>
+                  <div>
+                    <h5 class="font-extrabold text-xs text-slate-800">Anisa Rahmawati</h5>
+                    <p class="text-[10px] text-slate-400">NISN: 0129384922</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs font-black text-brand-600 bg-brand-50 px-2 py-1 rounded-lg border border-brand-200">Nilai: 92</span>
+                </div>
+              </div>
+
+              <div class="pt-1">
+                <div class="text-[10px] font-bold text-slate-400 mb-1">Sentuh Cepat Angka Nilai:</div>
+                <div class="grid grid-cols-5 gap-1.5 text-center">
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">75</button>
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">80</button>
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">85</button>
+                  <button class="py-1.5 rounded-lg bg-brand-600 text-white font-black text-[11px] shadow-xs">92</button>
+                  <button class="py-1.5 rounded-lg bg-slate-100 hover:bg-brand-600 hover:text-white font-black text-[11px] transition">95</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sticky Save Bar In-Card -->
+            <div class="p-3 bg-emerald-600 rounded-2xl text-white flex items-center justify-between shadow-lg shadow-emerald-600/30">
+              <div class="text-xs">
+                <div class="font-black">2 Siswa Tersimpan</div>
+                <div class="text-[10px] text-emerald-100">Auto-save aktif</div>
+              </div>
+              <button class="px-4 py-1.5 rounded-xl bg-white text-emerald-800 font-black text-xs shadow-xs">
+                Simpan Cloud ✓
+              </button>
+            </div>
+
+          </div>
+        `;
+        return;
+      }
+
+      // TAMPILAN BERANDA PORTAL (BERDASARKAN KONSEP TERPILIH)
+      let modulesHtml = '';
+
+      if (currentConcept === 'concept-a') {
+        // KONSEP A: SMART ACTION HUB (2 HERO CARDS + 6 SLIM CARDS)
+        modulesHtml = `
+          <!-- 1. DUA KARTU UTAMA HARI INI (HERO ACTION CARDS) -->
+          <div class="space-y-2">
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider px-1">Fokus Rutinitas Hari Ini</div>
+            <div class="grid grid-cols-2 gap-2.5">
+              
+              <!-- Card 1: Presensi QR (Large Touch Target) -->
+              <div onclick="simulateScanClick()" class="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 flex flex-col justify-between h-28 cursor-pointer active:scale-95 transition-all">
+                <div class="flex justify-between items-start">
+                  <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center">
+                    <svg class="w-4.5 h-4.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2m8 0h2a2 2 0 0 1 2 2v2m0 8v2a2 2 0 0 1-2 2h-2m-8 0H6a2 2 0 0 1-2-2v-2"/><rect x="8" y="8" width="8" height="8" rx="1.5" class="fill-current"/></svg>
+                  </div>
+                  <span class="text-[9px] font-black bg-white/25 px-2 py-0.5 rounded-full">Scan QR</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-white leading-tight">Presensi Siswa</h4>
+                  <p class="text-[10px] text-emerald-100 mt-0.5">28/28 Hadir Lengkap</p>
+                </div>
+              </div>
+
+              <!-- Card 2: Input Nilai di HP -->
+              <div onclick="setSimActiveTab('nilai')" class="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-purple-500/25 flex flex-col justify-between h-28 cursor-pointer active:scale-95 transition-all">
+                <div class="flex justify-between items-start">
+                  <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center">
+                    <svg class="w-4.5 h-4.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24"><path d="M9 19v-6m4 6v-9m4 9v-4M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+                  </div>
+                  <span class="text-[9px] font-black bg-white/25 px-2 py-0.5 rounded-full">Asesmen</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-white leading-tight">Input Nilai HP</h4>
+                  <p class="text-[10px] text-purple-100 mt-0.5">Formatif & Sumatif</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 2. ENAM MODUL PENDUKUNG (HORIZONTAL SLIM TILES) -->
+          <div class="space-y-2 pt-1">
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider px-1">Modul Administrasi Lainnya</div>
+            <div class="grid grid-cols-2 gap-2">
+              
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-2 cursor-pointer active:scale-98">
+                <div class="w-7 h-7 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 text-xs font-bold">👥</div>
+                <div class="min-w-0">
+                  <div class="font-black text-[11px] text-slate-800 truncate">Data Siswa</div>
+                  <div class="text-[9px] text-slate-400 truncate">Buku Induk & NISN</div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-2 cursor-pointer active:scale-98">
+                <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 text-xs font-bold">📖</div>
+                <div class="min-w-0">
+                  <div class="font-black text-[11px] text-slate-800 truncate">Jurnal Mengajar</div>
+                  <div class="text-[9px] text-slate-400 truncate">Agenda Harian</div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-2 cursor-pointer active:scale-98">
+                <div class="w-7 h-7 rounded-lg bg-orange-100 text-orange-700 flex items-center justify-center shrink-0 text-xs font-bold">🕒</div>
+                <div class="min-w-0">
+                  <div class="font-black text-[11px] text-slate-800 truncate">Jadwal Kelas</div>
+                  <div class="text-[9px] text-slate-400 truncate">Senin - Sabtu</div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-2 cursor-pointer active:scale-98">
+                <div class="w-7 h-7 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 text-xs font-bold">📁</div>
+                <div class="min-w-0">
+                  <div class="font-black text-[11px] text-slate-800 truncate">Perangkat Ajar</div>
+                  <div class="text-[9px] text-slate-400 truncate">Google Drive SD</div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-2 cursor-pointer active:scale-98">
+                <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0 text-xs font-bold">🏫</div>
+                <div class="min-w-0">
+                  <div class="font-black text-[11px] text-slate-800 truncate">Rombel Belajar</div>
+                  <div class="text-[9px] text-slate-400 truncate">Kelas IV-A</div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200/90 shadow-2xs flex items-center gap-2 cursor-pointer active:scale-98">
+                <div class="w-7 h-7 rounded-lg bg-fuchsia-100 text-fuchsia-700 flex items-center justify-center shrink-0 text-xs font-bold">🛡️</div>
+                <div class="min-w-0">
+                  <div class="font-black text-[11px] text-slate-800 truncate">Backup Data</div>
+                  <div class="text-[9px] text-slate-400 truncate">Cadangan Cloud</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+      } else if (currentConcept === 'concept-b') {
+        // KONSEP B: 4x2 MICRO BENTO GRID (ZERO SCROLL)
+        modulesHtml = `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">8 Modul Portal Utama</span>
+              <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Zero Scroll</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2">
+              
+              <div onclick="simulateScanClick()" class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">📅</div>
+                  <span class="text-[8px] font-extrabold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">Hadir</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Presensi QR</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Absensi harian</p>
+                </div>
+              </div>
+
+              <div onclick="setSimActiveTab('nilai')" class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xs">📝</div>
+                  <span class="text-[8px] font-extrabold text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded">Rapor</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Input Nilai</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Formatif & SAS</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-xs">👥</div>
+                  <span class="text-[8px] font-extrabold text-sky-700 bg-sky-50 px-1.5 py-0.2 rounded">28 Siswa</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Data Siswa</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Buku Induk</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xs">📖</div>
+                  <span class="text-[8px] font-extrabold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded">Agenda</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Jurnal Guru</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Catatan KBM</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xs">🕒</div>
+                  <span class="text-[8px] font-extrabold text-orange-700 bg-orange-50 px-1.5 py-0.2 rounded">Hari Ini</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Jadwal Kelas</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Jam KBM</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">🏫</div>
+                  <span class="text-[8px] font-extrabold text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded">IV-A</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Kelas Saya</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Kelola Rombel</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xs">📁</div>
+                  <span class="text-[8px] font-extrabold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded">Drive</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Perangkat Ajar</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Kurikulum</p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex flex-col justify-between h-20 cursor-pointer active:scale-95">
+                <div class="flex items-center justify-between">
+                  <div class="w-7 h-7 rounded-xl bg-fuchsia-100 text-fuchsia-600 flex items-center justify-center text-xs">🛡️</div>
+                  <span class="text-[8px] font-extrabold text-fuchsia-700 bg-fuchsia-50 px-1.5 py-0.2 rounded">Aman</span>
+                </div>
+                <div>
+                  <h4 class="font-black text-xs text-slate-900 leading-tight">Cadangan</h4>
+                  <p class="text-[9px] text-slate-400 truncate">Backup Cloud</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        `;
+      } else {
+        // KONSEP C: SEGMENTED THUMB FLOW (3 TABS)
+        modulesHtml = `
+          <div class="space-y-2.5">
+            <!-- Segmented Pill Selector (Zona Jempol) -->
+            <div class="p-1 rounded-xl bg-slate-200/80 flex gap-1 text-[11px] font-black">
+              <button class="flex-1 py-1.5 rounded-lg bg-white text-purple-700 shadow-xs text-center">⭐ Harian</button>
+              <button class="flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 text-center">📊 Nilai</button>
+              <button class="flex-1 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 text-center">📚 Modul</button>
+            </div>
+
+            <!-- Kartu Besar Sesuai Tab Aktif -->
+            <div class="space-y-2 pt-1">
+              <div onclick="simulateScanClick()" class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-98">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-base">📅</div>
+                  <div>
+                    <h4 class="font-black text-xs text-slate-900">Presensi & Scan QR</h4>
+                    <p class="text-[10px] text-slate-400">28 Siswa terabsen hari ini</p>
+                  </div>
+                </div>
+                <span class="text-xs text-emerald-600 font-black">Buka ➔</span>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-98">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-base">📖</div>
+                  <div>
+                    <h4 class="font-black text-xs text-slate-900">Jurnal & Agenda Mengajar</h4>
+                    <p class="text-[10px] text-slate-400">Materi Matematika Fase B</p>
+                  </div>
+                </div>
+                <span class="text-xs text-amber-600 font-black">Isi ➔</span>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-98">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center font-black text-base">🕒</div>
+                  <div>
+                    <h4 class="font-black text-xs text-slate-900">Jadwal Pelajaran Kelas</h4>
+                    <p class="text-[10px] text-slate-400">Jam 07:00 - 12:30 WIB</p>
+                  </div>
+                </div>
+                <span class="text-xs text-orange-600 font-black">Lihat ➔</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <!-- Top Greeting Bar -->
+        <div class="p-3.5 px-4 bg-white border-b border-violet-100 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-full lavender-gradient text-white font-black text-xs flex items-center justify-center shadow-xs">
+              G
+            </div>
+            <div>
+              <div class="text-[10px] font-semibold text-brand-muted">Selamat Pagi,</div>
+              <div class="font-black text-xs text-brand-dark">Guru Kelas IV-A</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Online ✓</span>
+          </div>
+        </div>
+
+        <!-- Hero Attendance Strip Widget -->
+        <div class="p-3.5 mx-3.5 mt-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-violet-200 font-bold">SDN 01 Ambulu • Jember</div>
+            <div class="text-xs font-black mt-0.5">Selasa, 24 November 2026</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[9px] text-emerald-300 font-extrabold">Presensi Rombel</div>
+            <div class="text-sm font-black">100% Hadir</div>
+          </div>
+        </div>
+
+        <!-- Modules Container -->
+        <div class="p-3.5">
+          ${modulesHtml}
+        </div>
+      `;
+    }
+
+    // Init first load
+    setLayoutConcept('concept-a');
+  </script>
+</body>
+</html>
